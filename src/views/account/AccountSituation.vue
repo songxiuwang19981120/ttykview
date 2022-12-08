@@ -24,7 +24,9 @@
 
     <div class="tt-accsituation--content">
       <div class="tt-accsituation-content--top">
-        <el-select v-model="userID" placeholder="请输入账户ID"> </el-select>
+
+        <el-input @keydown.native.enter="searchAccId" class="tt-accsituation--search" placeholder="输入账号ID" v-model="accId" clearable>
+        </el-input>
 
         <el-button>批量编辑</el-button>
       </div>
@@ -100,6 +102,7 @@ export default {
   components: {},
   data() {
     return {
+      accId:'',
       option: "",
       TABLE_MAP: TABLE_MAP,
       group: "",
@@ -235,6 +238,16 @@ export default {
         console.error(error);
       }
     },
+
+
+    /*
+      function: searchAccId
+      params: null
+      desc: 搜索账号ID
+    */
+    searchAccId(){
+      console.log(1111)
+    }
   },
 };
 </script>
@@ -276,6 +289,9 @@ export default {
   width: 500px;
   margin: 20px auto;
 }
+
+.tt-accsituation--search
+  width: 180px
 
 .bgcred {
   background-color: red;
