@@ -7,3 +7,7 @@
 <style lang="stylus">
 
 </style>
+<script>
+// import '@/assets/sass/app.scss';
+
+</script>
