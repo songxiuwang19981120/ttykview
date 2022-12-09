@@ -1,7 +1,7 @@
 <template>
     <div>
         <table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
-        <!-- <pagination :total="total" :current="current_page" @change="onPageChange"></pagination> -->
+        <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination"></pagination>
     </div>
 </template>
 
@@ -16,8 +16,8 @@ export default {
     },
     data() {
         return {
-            loading: false,
-            tableData: [],
+            loading: false, //表格加载loading
+            tableData: [],  //表格数据
             columns: [
                 {
                     prop: 'nickName',
@@ -37,37 +37,10 @@ export default {
                     prop: 'url',
                     label: '头像',
                 },
-                {
-                    prop: 'nickName',
-                    label: '签名',
-                },
-                {
-                    prop: 'nickName',
-                    label: '数据来源',
-                },
-                {
-                    prop: 'nickName',
-                    label: '数据标签',
-                },
-                {
-                    prop: 'nickName',
-                    label: '关注/粉丝/获赞',
-                },
-                {
-                    prop: 'nickName',
-                    label: '作品数量',
-                },
-                {
-                    prop: 'nickName',
-                    label: '采集时间',
-                },
-                {
-                    prop: 'nickName',
-                    label: '上次使用时间',
-                }
-            ],
-            total: 100,
-            current_page: 1
+            ],  //表格
+            total: 100,  //数据总量
+            current_page: 1, //当前页
+            current_limit:10, //每页条数
 
         };
     },
@@ -80,8 +53,9 @@ export default {
         /**
              * 翻页回调
              */
-        onPageChange(page) {
-            this.current_page = page;
+        handlePagination(val) {
+            this.current_page = val.page;  //页数
+            this.current_limit = val.limit  //条数
         },
     },
 };

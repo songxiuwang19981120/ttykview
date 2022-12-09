@@ -8,6 +8,4 @@
 
 </style>
 <script>
-// import '@/assets/sass/app.scss';
-
 </script>
