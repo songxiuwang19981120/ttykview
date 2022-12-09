@@ -9,7 +9,10 @@ import '@/plugin/http.plugin'
 
 import 'element-ui/lib/theme-chalk/index.css';
 import '@/assets/css/global.styl'
-
+//bootstrap vue
+import { BootstrapVue } from 'bootstrap-vue';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+Vue.use(BootstrapVue);
 
 
 Vue.prototype.$EventBus = new Vue()
