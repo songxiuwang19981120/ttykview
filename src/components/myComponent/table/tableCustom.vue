@@ -14,9 +14,9 @@
       @selection-change="handleSelectionChange"
       @sort-change="sortChange"
       @expand-change="expandChange"
-      style="width: calc(100% - 32px); margin: 0 auto"
+      style=" margin: 0 auto"
     >
-      <el-table-column type="selection" width="36" :selectable="checkboxJudge" v-if="mutiSelect"></el-table-column>
+      <el-table-column type="selection" width="50" :selectable="checkboxJudge" v-if="mutiSelect"></el-table-column>
       <el-table-column v-if="isExpand" width="24" type="expand">
         <template slot-scope="scope">
           <table-charts ref="tableChartsRef" :scope="scope.row"></table-charts>
