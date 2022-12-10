@@ -133,6 +133,7 @@
 			},
 			// 获取视频任务列表
 			async getVideoTasks(data) {
+				this.loading = true
 				try {
 					const res = await this.$api({
 						type: 'getVideotasks',
@@ -143,6 +144,8 @@
 					this.total = res.count
 				} catch (error) {
 					console.error(error);
+				} finally {
+					this.loading = false
 				}
 			},
 			// 查看详情
