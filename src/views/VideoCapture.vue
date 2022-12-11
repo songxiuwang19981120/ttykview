@@ -113,7 +113,6 @@ export default {
                     label: '国家',
                     fiexd: true,
                     align: 'center',
-
                 },
                 {
 
