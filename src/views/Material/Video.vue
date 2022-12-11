@@ -14,24 +14,26 @@
                     <span class="search-title">素材库:</span>
                     <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryList"
                         v-model="searchTableData.library" placeholder="素材库选择"
-                        style="width:200px;margin-right:20px"></el-cascader>
+                        style="width:180px;margin-right:20px"></el-cascader>
                 </div>
                 <div>
                     <span class="search-title">素材类型:</span>
-                    <el-select v-model="searchTableData.type" placeholder="素材类型" style="width:170px;margin-right:20px">
+                    <el-select v-model="searchTableData.status" placeholder="素材类型" style="width:160px;margin-right:20px">
                         <el-option v-for="item in searchTypeList" :key="item.value" :label="item.label"
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
                 <div>
                     <span class="search-title">时间排序:</span>
-                    <el-select v-model="searchTableData.sort" placeholder="时间排序" style="width:120px;margin-right:20px">
+                    <el-select v-model="searchTableData.sort" placeholder="时间排序" style="width:110px;margin-right:20px">
                         <el-option v-for="item in searchTimeSortList" :key="item.value" :label="item.label"
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
-                <el-button type="primary" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...' : '搜索'
+                <el-button type="primary" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...' :
+                        '搜索'
                 }}</el-button>
+                <el-button type="primary" @click="resetTable">重置</el-button>
             </div>
             <!-- <div>
                 <table border="1" cellspacing="0" cellpading="0">
@@ -50,10 +52,12 @@
                 </table>
             </div> -->
             <div class="tt-accsituation--operation">
-                <el-button type="primary" @click="videoUpLoad">上传</el-button>
+                <el-button type="primary" @click="videoUpLoad">上传视频</el-button>
+                <el-button type="primary" @click="videoUpLoad">批量删除</el-button>
+
             </div>
         </div>
-        <el-dialog title="视频上传" :visible.sync="videoVisible" width="40%" :before-close="videoClose">
+        <el-dialog title="视频上传" :visible.sync="videoUploadVisible" width="40%" :before-close="videoUploadClose">
             <el-form ref="form" :rules="rules" :model="videoForm" label-width="140px" :hide-required-asterisk="true">
                 <el-form-item label="视频:" prop="name">
                     <el-upload class="upload-demo" drag action="#" multiple accept=".mp4" :on-change="onFileListChange">
@@ -63,7 +67,7 @@
                 <video src="url"></video>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="videoClose">取 消</el-button>
+                <el-button @click="videoUploadClose">取 消</el-button>
                 <el-button type="primary" :loading="videoSubmitting" @click="submitForVideo">{{ videoSubmitting ?
                         '提交中...' : '提 交'
                 }}</el-button>
@@ -71,7 +75,13 @@
         </el-dialog>
         <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
             @handleSelectionChange="selectionChange"></table-custom>
-        <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination"></pagination>
+        <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination">
+        </pagination>
+        <el-dialog :visible.sync="videoPlayDialog" width="50%" :before-close="videoPlayClose">
+            <div style="text-align: center;width:100%">
+                <video autoplay controls loop :src='videoUrl' width="40%"></video>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -86,15 +96,25 @@ export default {
     },
     data() {
         return {
+            videoUrl: '',  //播放视频路径
+            videoPlayDialog: false,  //播放视频弹框
             loading: false, //表格加载loading
             tableData: [],  //表格数据
             columns: [
                 {
-                    prop: 'nickName',
+                    prop: 'video_url',
                     label: '视频缩略图',
                     minWidth: 100,
                     fixed: true,
                     align: 'center',
+                    render: (h, { row }) => {
+                        // this.getVideoBase64(row.video_url)
+                        return (
+                            <div>
+                                <video class="videosize" width="100" height="50" src={row.video_url}></video>
+                            </div>
+                        );
+                    },
                 },
                 {
                     prop: 'video_num',
@@ -112,14 +132,22 @@ export default {
                 {
                     prop: 'operation',
                     label: '操作',
-                    width: 150,
+                    width: 160,
                     align: 'center',
                     fixed: 'right',
                     render: (h, { row }) => {
                         return (
                             <div>
-                                <el-button size="mini" type="success" onClick={this.removeHandler.bind(this, row)}>播放</el-button>
-                                <el-button size="mini" type="danger" onClick={this.removeHandler.bind(this, row)}>删除</el-button>
+                                <el-button style="margin-right:10px" size="mini" type="success" onClick={this.videoPlay.bind(this, row.video_url)}>播放</el-button>
+                                {/* <el-button size="mini" type="danger" onClick={this.removeHandler.bind(this, row)}>删除</el-button> */}
+                                <el-popconfirm
+                                    confirm-button-text='删除'
+                                    cancel-button-text='取消'
+                                    title="确认删除此视频？"
+                                    onConfirm={this.removeHandler.bind(this, row)}
+                                >
+                                    <el-button slot="reference" type="danger" size="mini">删除</el-button>
+                                </el-popconfirm>
 
                             </div>
                         );
@@ -148,7 +176,7 @@ export default {
             searchTableData: {
                 equipment: '',
                 library: '',
-                type: '',
+                status: '',
                 sort: '',
             },  //搜索条件
             searchTimeSortList: [
@@ -163,15 +191,15 @@ export default {
             ],  //时间排序
             searchTypeList: [
                 {
-                    value: '1',
+                    value: '0',
                     label: '已用素材'
                 },
                 {
-                    value: '2',
+                    value: '1',
                     label: '可用素材'
                 },
             ],  //素材类型
-            videoVisible: false,  //视频上传弹框
+            videoUploadVisible: false,  //视频上传弹框
             videoSubmitting: false,  //视频上传加载状态
             videoForm: {
                 videoList: [],
@@ -185,6 +213,39 @@ export default {
     },
 
     methods: {
+        // 关闭视频播放
+        videoPlayClose() {
+            this.videoUrl = ''
+            this.videoPlayDialog = false
+        },
+        // 打开视频播放
+        videoPlay(url) {
+            this.videoUrl = url
+            this.videoPlayDialog = true
+        },
+        /**
+         * 获取视频第一帧并转化为图片
+         */
+        getVideoBase64() {
+            let url = 'http://192.168.4.30/uploads/api/202212/6389eb3cc4ca2.mp4'
+            const video = document.createElement("video"); // 获取视频对象
+            // const video = document.createElement("video") // 也可以自己创建video
+            video.src = url; // url地址 url跟 视频流是一样的
+            var canvas = document.createElement("canvas"); // 获取 canvas 对象
+            const ctx = canvas.getContext("2d"); // 绘制2d
+            // video.crossOrigin = "anonymous"; // 解决跨域问题，也就是提示污染资源无法转换视频
+            video.currentTime = 1; // 第一帧
+            video.oncanplay = () => {
+                canvas.width = video.clientWidth; // 获取视频宽度
+                canvas.height = video.clientHeight; //获取视频高度
+                // 利用canvas对象方法绘图
+                ctx.drawImage(video, 0, 0, video.clientWidth, video.clientHeight);
+                // 转换成base64形式
+                let img = canvas.toDataURL("image/png"); // 截取后的视频封面
+                let i = 1
+                console.log(i++, img);
+            };
+        },
         /**
          * 文件改变回调
          */
@@ -213,17 +274,28 @@ export default {
             this.videoSubmitting = true
         },
         // 取消视频上传弹框
-        videoClose() {
-            this.videoVisible = false
+        videoUploadClose() {
+            this.videoUploadVisible = false
         },
         /*
            视频上传弹框
         */
         videoUpLoad() {
-            this.videoVisible = true
+            this.videoUploadVisible = true
         },
-        removeHandler() {
+        async removeHandler(val) {
             console.log('删除');
+            let data = {
+                material_ids: val.material_id,
+            }
+            try {
+                let result = await this.$api({ type: "deleteMaterial", data: data });
+                console.log(result);
+                this.$notify({ title: '删除成功', type: 'success'});
+                this.getMaterialList()
+            } catch (error) {
+                console.error(error);
+            }
         },
         /*
            翻页回调
@@ -262,6 +334,7 @@ export default {
                 order: order,
                 sort: this.searchTableData.sort,
                 grouping_id: this.searchTableData.equipment,
+                status:this.searchTableData.status,
             }
             try {
                 this.loading = true;
@@ -277,6 +350,18 @@ export default {
                 this.submitting = false
                 console.error(error);
             }
+        },
+        /*
+            搜索重置
+        */
+        resetTable(){
+            this.searchTableData={
+                equipment: '',
+                library: '',
+                status: '',
+                sort: '',
+            }
+            this.getMaterialList()
         },
 
     },
@@ -294,6 +379,7 @@ export default {
 .tt-accsituation--operation {
     display: flex;
     justify-content: flex-start;
+    flex-flow: wrap;
     align-items: center;
     padding: 10px;
 }
@@ -301,5 +387,10 @@ export default {
 .search-title {
     font-size: 13px;
     padding-right: 10px;
+}
+
+.videosize {
+    width: 100px;
+    height: 30px;
 }
 </style>
