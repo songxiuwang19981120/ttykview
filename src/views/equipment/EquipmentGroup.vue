@@ -13,6 +13,17 @@
                 <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
             </span>
             </el-dialog>
+            <el-dialog
+            title="编辑分组名称"
+            :visible.sync="dialogVisible2"
+            width="30%"
+            :before-close="handleClose2">
+            <el-input v-model="input2.labela" placeholder="请输入分组名称"></el-input>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible2 = false">关 闭</el-button>
+                <el-button type="primary" @click="sibmit()">确 定</el-button>
+            </span>
+            </el-dialog>
         </div>
         <div>
             <table-custom style="width:100%" :tableData="tableData" :columns="columns"></table-custom>
@@ -34,6 +45,8 @@ export default {
         return {
             input:"",
             dialogVisible: false,
+            input2:{labela:""},
+            dialogVisible2: false,
             tableData: [
             { content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
                 { content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
@@ -67,14 +80,14 @@ export default {
                     render: (h, { row }) => {
                         return (
                             <div>
-                                <span style="color:#409EFF; margin-right:20px;margin-left:20px" onClick={this.examine.bind(this, row)}>编辑</span>
+                                <span style="color:#409EFF;cursor:pointer;margin-right:20px;margin-left:20px" onClick={this.examine.bind(this, row)}>编辑</span>
                                  <el-popconfirm
                                 confirm-button-text='删除'
                                 cancel-button-text='取消'
-                                title="确认清除此设备中异常账号？"
+                                title="确认确认删除此分组？"
                                 onConfirm={this.messageBox.bind(this, row)}
                                 >
-                                    <el-button slot="reference" type="danger" size="mini">删除异常账号</el-button>
+                                    <el-button slot="reference" type="danger" size="mini">删除</el-button>
                                 </el-popconfirm>
                                 
                             </div>
@@ -97,8 +110,15 @@ export default {
 
     methods: {
         //编辑
-        examine(){
-            console.log(123)
+        examine(row){
+            this.dialogVisible2=true;
+            this.input2=row
+        },
+        //编辑提交
+        sibmit(){
+console.log(123)
+//提交到接口,然后刷新
+this.dialogVisible2=false
         },
         //删除
         messageBox(){
@@ -106,6 +126,14 @@ export default {
         },
         //关闭
         handleClose(done) {
+        this.$confirm('确认关闭？')
+          .then(_ => {
+            done();
+          })
+          .catch(_ => {});
+      },
+        //关闭
+        handleClose2(done) {
         this.$confirm('确认关闭？')
           .then(_ => {
             done();
