@@ -14,7 +14,7 @@
     <el-pagination
       :background="background"
       :current-page="currentPage"
-      :page-size="pageSize"
+      :page-size="limit"
       :layout="layout"
       :page-sizes="pageSizes"
       :pager-count="pagerCount"
@@ -38,11 +38,11 @@ export default {
     },
     page: {
       type: Number,
-      default: 1
+      default: Number
     },
     limit: {
       type: Number,
-      default: 20
+      default: Number
     },
     pageSizes: {
       type: Array,
@@ -110,7 +110,9 @@ export default {
 <style scoped>
 .pagination-container {
   background: #fff;
-  padding: 32px 16px;
+  margin: 0 auto;
+  padding: 10px;
+  text-align: right;
 }
 .pagination-container.hidden {
   display: none;

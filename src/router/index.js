@@ -144,7 +144,7 @@ const routes = [
       {
         path:'/usercapture',
         name:'usercapture',
-        component:() => import(/* webpackChunkName: "usercapture" */ '@/views/UserCapture.vue')
+        component:() => import(/* webpackChunkName: "usercapture" */ '@/views/userCollection/UserCapture.vue')
       }
       //素材管理 end
     ]
