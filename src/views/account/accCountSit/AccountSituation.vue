@@ -1,20 +1,37 @@
 <template>
   <div class="tt-accsituation" ref="accsituation">
     <div class="tt-accsituation-searchbar">
+
       <div class="tt-accsituation-setgroup">
         <span class="mr-30">设置分组 ：</span>
+        <el-select
+          clearable
+          v-model="group"
+          placeholder="选择分组"
+        >
+            <el-option
+            v-for="item in groupList"
+            :value="item.grouping_id"
+            :label="item.grouping_name"
+            :key="item.grouping_id"
+          ></el-option>
+        </el-select>
+      </div>
+
+      <div class="ml-15 tt-accsituation-setgroup">
+        <span class="mr-30">设置分类 ：</span>
         <el-cascader
           clearable
-          :props="{ checkStrictly: true }"
+          :props="{ checkStrictly: true, value: 'value' }"
           :options="typeList"
-          v-model="group"
-          placeholder="设置分组选择"
+          v-model="classiFication"
+          placeholder="选择分类"
         ></el-cascader>
       </div>
 
-      <div class="ml-50 tt-accsituation-setfans">
+      <div class="ml-15 tt-accsituation-setfans">
         <span class="mr-30">粉丝量 ：</span>
-        <el-select v-model="fans" placeholder="粉丝量">
+        <el-select clearable v-model="fans" placeholder="粉丝量">
           <el-option
             v-for="item in fans_option"
             :value="item.value"
@@ -24,7 +41,7 @@
         </el-select>
       </div>
 
-      <div class="ml-50 tt-accsituation-setid">
+      <div class="ml-15 tt-accsituation-setid">
         <span class="mr-30">输入ID ：</span>
         <el-input
           @keydown.native.enter="searchAccId"
@@ -36,7 +53,7 @@
         </el-input>
       </div>
 
-      <el-button class="search-btn">搜索</el-button>
+      <el-button class="search-btn" @click="handlerSearch" :disabled="this.isDisabled">搜索</el-button>
     </div>
 
     <div class="tt-accsituation--settask">
@@ -54,7 +71,7 @@
           :value="item"
         ></el-option>
       </el-select>
-      <el-button class="batchedit-btn">批量编辑</el-button>
+      <el-button @click="batchEditor" class="batchedit-btn">批量编辑</el-button>
     </div>
 
     <table-custom
@@ -66,7 +83,12 @@
       :columns="columns"
     ></table-custom>
 
-    <Pagination :total="total" :page="page" :size="current_limit"/>
+    <Pagination
+      :total="total"
+      :page="page"
+      :size="limit"
+      @pagination="handlePagination"
+    />
 
     <VideoDialog
       @closeVideoTask="closeVideoTask"
@@ -84,18 +106,34 @@
       @closeFollowTask="closeFollowTask"
       :showFollowDialog="showFollowDialog"
     />
+    <EditorDialog 
+      @closeEditorDialog="closeEditorDialog"
+      :showEditorDialog="showEditorDialog"
+    />
+    <BatchEditorDialog 
+      @closeBatchEidialog="closeBatchEidialog"
+      :showBatchEiDialog="showBatchEiDialog"
+      :check_all="check_all"
+    />
+    <VideoTabel 
+      @closeVideoTabel="closeVideoTabel"
+      :shwoVideoTabel="shwoVideoTabel"
+      :videoList="videoList"
+    />
   </div>
 </template>
 
 <script>
-import tableCustom from "@/components/base/table/tableCustom";
-import Pagination from "@/components/base/table/pagination";
-
+import tableCustom from "@/components/myComponent/table/tableCustom";
+import Pagination from "@/components/myComponent/table/pagination";
+import EditorDialog from './editoDialog/editorDialog'
 import VideoDialog from "./taskDialog/videoDialog";
 import LikeCommentDialog from "./taskDialog/likeCommentDialog";
 import LetterDialog from "./taskDialog/letterDialog";
 import FollowDialog from "./taskDialog/followDialog";
 import taskStatus from "@/config/accountConfig/taskStatus.config";
+import BatchEditorDialog from './batchEditorDialog/batchEditorDialog'
+import VideoTabel from './videoTabel/videoTabel'
 
 const { STATUS_MAP } = taskStatus;
 export default {
@@ -107,18 +145,28 @@ export default {
     FollowDialog,
     tableCustom,
     Pagination,
+    EditorDialog,
+    BatchEditorDialog,
+    VideoTabel
+  },
+  computed:{
+    isDisabled(){
+      return !this.classiFication || !this.fans || !this.acc_id
+    }
   },
   data() {
     return {
-      STATUS_MAP: STATUS_MAP,
-      showVideoTask: false,
-      showLikeCommentTask: false,
-      showLetterTask: false,
-      showFollowDialog: false,          //showFollowDialog
-      group: "",                        //设置分组
-      typeList: [],                     //设置分组options   从接口拿的，动态渲染
-      loading: false,                   //表格懒加载选项
-      columns: [                        //表格组件options（包含模板）      用来渲染表格                      
+      STATUS_MAP: STATUS_MAP, //任务状态映射，详见config文件夹
+      showVideoTask: false, //控制视频任务dialog显示
+      showLikeCommentTask: false, //控制评论点赞任务dialog显示
+      showLetterTask: false, //控制评论任务dialog显示
+      showFollowDialog: false, //控制关注任务dialog显示
+      classiFication: "", //设置分类
+      typeList: [], //设置分类options   从接口拿的，动态渲染
+      loading: false, //表格懒加载选项
+      groupList:[],//分组options
+      columns: [
+        //表格组件options（包含模板）      用来渲染表格
         {
           prop: "phone_number",
           label: "设备信息",
@@ -164,11 +212,11 @@ export default {
           label: "状态",
           width: "100",
           align: "center",
-          render:(h,{row})=>{
+          render: (h, { row }) => {
             return (
-              <div class={row.status === '1' ? 'bgcgreen':'bgcred'}></div>
-            )
-          }
+              <div class={row.status === "1" ? "bgcgreen" : "bgcred"}></div>
+            );
+          },
         },
         {
           prop: "signature",
@@ -184,7 +232,7 @@ export default {
           render: (h, { row }) => {
             return (
               <span
-                onClick={this.shwoVideoTabel.bind(this, row)}
+                onClick={this.showVideoTabel.bind(this,row)}
                 class="videonum-span"
               >
                 {row.aweme_count}
@@ -197,13 +245,16 @@ export default {
           label: "主页访问人数",
           width: "150",
           align: "center",
-          render:(h,{row})=>{
+          render: (h, { row }) => {
             return (
-              <span class="videonum-span" onClick={this.showViewerTabel.bind(this, row)}>
-              {row.unread_viewer_count}
+              <span
+                class="videonum-span"
+                onClick={this.showViewerTabel.bind(this, row)}
+              >
+                {row.unread_viewer_count}
               </span>
-            )
-          }
+            );
+          },
         },
         {
           prop: "follower_status",
@@ -250,50 +301,140 @@ export default {
           },
         },
       ],
-      acc_id: "",                       //查询框的账号ID
-      fans_option: [                    //粉丝量下拉框options  TODO 数据可能要问后端拿，目前写死了                       
-        { value: "1k-2k", label: "1k-2k" },
-        { value: "2k-9k", label: "2k-9k" },
-        { value: "9k-10k", label: "9k-10k" },
+      acc_id: "", //查询框的账号ID
+      fans_option: [
+        //粉丝量下拉框options  TODO 数据可能要问后端拿，目前写死了
+        { value: [1000, 2000], label: "1k-2k" },
+        { value: [1000, 2000], label: "2k-9k" },
+        { value: [1000, 2000], label: "9k-10k" },
       ],
-      fans: "",                         //粉丝量查询框对应 model
-      page: "",                         //页码
-      taskConfig: "",                   //对应配置任务下拉框 model
-      memberList: [],                   //渲染表格的数据    和后端对接的  对应获取函数为getMemberList
-      accConfigCloumn: [                //任务下拉框的options          
+      fans: "", //粉丝量查询框对应 model
+      page: 1, //页码
+      taskConfig: "", //对应配置任务下拉框 model
+      memberList: [], //渲染表格的数据    和后端对接的  对应获取函数为getMemberList
+      accConfigCloumn: [
+        //任务下拉框的options
         "视频发布",
         "评论区点赞",
         "关注",
         "私信",
       ],
-      check_all: "",                    //是否选择所有账号
-      total: 0,                         //返回的账号总条数
-      fans_total: 0,                    //粉丝总量
-    };    
+      check_all: "", //是否选择所有账号
+      total: 0, //返回的账号总条数
+      fans_total: 0, //粉丝总量
+      group:'', //设置分组
+      limit: 10, //每页请求数据条数
+      showEditorDialog:false, //是否展示编辑按钮界面
+      showBatchEiDialog:false ,//是否展示批量编辑按钮界面
+      shwoVideoTabel:false,
+      user_video_num:0, //视频数量
+      videoList:[]
+    };
   },
 
   mounted() {
     this.getMemberList();
     this.getTypeControlList();
+    this.getGroupList()
   },
 
+  //typecontrol_id 分类ID
   methods: {
+    closeVideoTabel(){
+      this.shwoVideoTabel = false
+    },
+
+    /* 
+        function: getGroupList
+        params: null
+        desc: 获取分组  异步
+    */
+    async getGroupList(){
+      let result = await this.$api({type:'getGrouping'})
+      this.groupList = result.list
+    },
+    /* 
+        function: closeBatchEidialog
+        params: null
+        desc: 批量编辑弹框展示
+    */
+   //TODO 未完成
+    closeBatchEidialog(){
+      this.showBatchEiDialog = false
+    },
+
+    /* 
+        function: handlerSearch
+        params: null
+        desc: 搜索按钮回调
+    */
+    async handlerSearch() {
+      let data = {
+        typecontrol_id: this.classiFication[this.classiFication.length - 1] ?? '',
+        uid: this.acc_id ?? '',
+        min: this.fans[0] ?? '',
+        max: this.fans[1] ?? '',
+        limit: this.limit || 10,
+        page: this.page || 1,
+        grouping_id:this.group
+      };
+      let result = await this.$api({ type: "getMember", data: data });
+      this.memberList = result.list
+      this.classiFication = '',
+      this. acc_id = '',
+      this.fans = '',
+      this.group = '',
+      this.$message.success('查询成功 !')
+    },
+    /* 
+        function: handlePagination
+        params: null
+        desc: 打开访问人数表格
+    */
+    handlePagination(val) {
+      this.limit = val.limit;
+      this.page = val.page;
+      this.getMemberList();
+    },
+
+    /* 
+        function: batchEditor
+        params: null
+        desc: 批量编辑回调
+    */
+    batchEditor(){
+      console.log('批量编辑')
+      this.showBatchEiDialog = true
+    },
+
     /* 
         function: showViewerTabel
         params: null
         desc: 打开访问人数表格
     */
-    showViewerTabel(){
-      console.log('打开访问人数表格')
+    showViewerTabel() {
+      console.log("打开访问人数表格");
+    },
+    /* 
+        function: closeEditorDialog
+        params: null
+        desc: 关闭编辑弹窗
+    */
+    closeEditorDialog(){
+      this.showEditorDialog = false
     },
 
     /* 
         function: shwoVideoTabel
         params: null
-        desc: 打开视频表格
+        desc: 打开视频表格,并进行后续操作
     */
-    shwoVideoTabel() {
-      console.log('打开视频表格')
+    async showVideoTabel(val) {
+      console.log(val.member_id)
+      this.shwoVideoTabel = true
+      let result = await this.$api({type:"getMemberList",data:{member_id: val.member_id}})
+      this.videoList = result.list
+      console.log(this.videoList,result)
     },
 
     /* 
@@ -338,8 +479,11 @@ export default {
         params: null
         desc: 表格多选框改变时的回调
     */
-    handleSelectChange() {
-      console.log("select改变了");
+    handleSelectChange(val) {
+      if(val.length === 10){
+        this.check_all = true
+      }
+      console.log("select改变了",val);
     },
 
     setGroupOption() {
@@ -396,7 +540,6 @@ export default {
       try {
         let result = await this.$api({ type: "getTypecontrol" });
         this.typeList = result;
-        this.typeList = await this.getTreeData(this.typeList);
       } catch (error) {
         console.error(error);
       }
@@ -409,7 +552,10 @@ export default {
     */
     async getMemberList() {
       try {
-        let result = await this.$api({ type: "getMember",data:{limit:10} });
+        let result = await this.$api({
+          type: "getMember",
+          data: { limit: this.limit, page: this.page },
+        });
         this.memberList = result.list;
         this.total = result.count;
         console.log(this.memberList);
@@ -424,7 +570,7 @@ export default {
         desc: 编辑操作时的回调
     */
     handleEdit(row) {
-      console.log(row);
+      this.showEditorDialog = true;
     },
 
     /*
@@ -432,8 +578,9 @@ export default {
         params: index,row | default
         desc: 删除操作时的回调
     */
-    handleDelete(row) {
-      console.log(row);
+    async handleDelete(row) {
+      this.$message.success('删除成功')
+      //TODO 目前不删 //await this.$api({type:'deleteMember',data:{member_ids:row.member_id}})
     },
 
     /*
@@ -512,8 +659,8 @@ export default {
   cursor: pointer;
 }
 
-.ml-50 {
-  margin-left: 50px;
+.ml-15 {
+  margin-left: 15px;
 }
 
 .mr-30 {
@@ -521,19 +668,18 @@ export default {
 }
 
 .bgcred {
-  margin: 0 auto
-  height: 10px
-  width: 10px
+  margin: 0 auto;
+  height: 10px;
+  width: 10px;
   background-color: red;
-  border-radius: 50%
+  border-radius: 50%;
 }
 
 .bgcgreen {
-  margin: 0 auto
-  height: 10px
-  width: 10px
+  margin: 0 auto;
+  height: 10px;
+  width: 10px;
   background-color: green;
-  border-radius: 50%
-
+  border-radius: 50%;
 }
 </style>

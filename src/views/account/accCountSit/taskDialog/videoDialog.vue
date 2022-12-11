@@ -52,6 +52,28 @@ export default {
   },
   data() {
     return {
+      rules:{
+        video_num:[
+          {
+            required:true,
+            message:'视频发布数量必填',
+            trigger:'blur'
+          },
+          {
+            pattern: /^\d+$/,
+            message:'类型必须是数字',
+            trigger:'blur'
+          }
+        ],
+        tag_num:[
+          {
+            required:true,
+            message:'请填写标签内容',
+            trigger:'blur'
+          }
+        ]
+      },
+
       //TODO  需要跟后端对接字段  视频发布任务 提交表单
       vieoTaskForm: {
         video_num: "", //视频发布数量
