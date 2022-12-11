@@ -48,20 +48,14 @@ const routes = [
       {
         path:'/accsituation',
         name:'accsituation',
-        component:() => import(/* webpackChunkName: "accsituation" */ '@/views/account/AccountSituation.vue'),
+        component:() => import(/* webpackChunkName: "accsituation" */ '@/views/account/accCountSit/AccountSituation.vue'),
         //账号情况 详情
-        children:[
-          {
-            path:'/accsituation/:id',
-            name:'accdetail',
-            component:() => import(/* webpackChunkName: "accdetail" */ '@/components/equipmentCom/EquiDetail.vue')
-          },
-        ]
+
       },
       {
         path:'/accclass',
         name:'accclass',
-        component:() => import(/* webpackChunkName: "accclass" */ '@/views/account/AccountClass.vue')
+        component:() => import(/* webpackChunkName: "accclass" */ '@/views/account/acccountClass/AccountClass.vue')
       },
       //账号管理 end
 
@@ -93,13 +87,7 @@ const routes = [
         path:'/video',
         name:'video',
         component:() => import(/* webpackChunkName: "video" */ '@/views/Material/Video.vue'),
-        children:[
-          {
-            path:'/video/:id',
-            name:'videodetail',
-            component:() => import(/* webpackChunkName: "videodetail" */ '@/components/materialCom/videoCom/VideoDetail.vue')
-          },
-        ]
+
       },
       {
         path:'/avartar',
