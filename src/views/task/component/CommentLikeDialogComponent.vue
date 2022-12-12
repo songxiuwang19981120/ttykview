@@ -10,7 +10,12 @@
 			></table-custom>
 			<!-- 分页 -->
 			<el-row type="flex" justify="end">
-				<pagination :total="total" :page="page.page" :limit="page.limit" @pagination="pageChange"></pagination>
+				<pagination
+					:total="total"
+					:page="page.page"
+					:limit="page.limit"
+					@pagination="pageChange"
+				></pagination>
 			</el-row>
 			<!-- 按钮 -->
 			<el-row type="flex" justify="center">
@@ -26,13 +31,13 @@
 <script>
 	import tableCustom from '@/components/myComponent/table/tableCustom.vue';
 	import pagination from '@/components/myComponent/table/pagination.vue';
-	import CommentLikeLogs from './CommentLikeLogs.vue'
+	import CommentLikeLogs from './CommentLikeLogs.vue';
 
 	export default {
 		components: {
 			tableCustom,
 			pagination,
-			CommentLikeLogs
+			CommentLikeLogs,
 		},
 		props: {
 			showDialog: {
@@ -69,7 +74,7 @@
 						uptime: '2022-12-09',
 						cretime: '2022-10-09',
 						status: 'fail',
-					}
+					},
 				],
 				columns: [
 					{
@@ -108,7 +113,7 @@
 						render: (h, { row }) => {
 							return (
 								<div>
-									<img src={row.avatar} style="width: 100px; height: 100px" />
+									<el-image style="width: 100px; height: 100px" src={row.avatar} fit="contain"></el-image>
 								</div>
 							);
 						},
@@ -172,7 +177,11 @@
 										size="mini"
 										onClick={this.delVideoTaskDetails.bind(this)}
 									></el-button>
-									<el-button type="primary" size="mini" onClick={this.toVideoTaskDetails.bind(this)}>
+									<el-button
+										type="primary"
+										size="mini"
+										onClick={this.toVideoTaskDetails.bind(this)}
+									>
 										日志详情
 									</el-button>
 								</div>
@@ -182,10 +191,10 @@
 				],
 				logsDialog: false,
 				page: {
-					curpage: 1,
-					curlimit: 20,
+					page: 1,
+					limit: 20,
 				},
-				total: 1000
+				total: 1000,
 			};
 		},
 		methods: {
@@ -213,19 +222,19 @@
 			// 点击删除按钮
 			async delVideoTaskDetails() {
 				try {
-					await this.$confirm('确定删除吗？')
-					alert('调用删除接口')
+					await this.$confirm('确定删除吗？');
+					alert('调用删除接口');
 				} catch (error) {
 					this.$message('您已取消该操作');
 				}
 			},
 			// 显示视频日志详情弹层
 			toVideoTaskDetails() {
-				this.logsDialog = true
+				this.logsDialog = true;
 			},
 			// 当前页数据条数/页码改变
 			pageChange(obj) {
-				(this.page.curpage = obj.page), (this.page.curlimit = obj.limit);
+				(this.page.page = obj.page), (this.page.limit = obj.limit);
 			},
 			// 关闭弹层
 			btnCancel() {

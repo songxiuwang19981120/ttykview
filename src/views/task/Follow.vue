@@ -2,9 +2,9 @@
 	<div>
 		<el-card style="margin-bottom: 20px">
 			<el-row>
-				<el-select v-model="value" placeholder="请选择状态" size="small">
+				<el-select v-model="searchTableData.state" placeholder="请选择任务状态" size="small">
 					<el-option
-						v-for="item in options"
+						v-for="item in searchStateList"
 						:key="item.value"
 						:label="item.label"
 						:value="item.value"
@@ -39,7 +39,7 @@
 	import FollowDailogComponent from './component/FollowDailogComponent.vue';
 	import pagination from '@/components/myComponent/table/pagination.vue';
 	export default {
-		name: 'TtVideoRelease',
+		name: 'TtFollow',
 		components: {
 			tableCustom,
 			FollowDailogComponent,
@@ -48,7 +48,7 @@
 		data() {
 			return {
 				// 下拉选择数据
-				options: [
+				searchStateList: [
 					{
 						value: '全部',
 						label: '全部',
@@ -66,7 +66,9 @@
 						label: '执行中断',
 					},
 				],
-				value: '',
+				searchTableData: {
+					state: ''
+				},
 				loading: false,
 				tableData: [],
 				columns: [
@@ -113,8 +115,8 @@
 				],
 				dialog: false, // 弹层
 				page: {
-					curpage: 1,
-					curlimit: 20,
+					page: 1,
+					limit: 20,
 				},
 				total: 0,
 			};
@@ -154,7 +156,7 @@
 			},
 			// 当前页数据条数/页码改变
 			pageChange(obj) {
-				(this.page.curpage = obj.page), (this.page.curlimit = obj.limit);
+				(this.page.page = obj.page), (this.page.limit = obj.limit);
 				this.getVideoTasks(this.page);
 			},
 			// 点击查询按钮
