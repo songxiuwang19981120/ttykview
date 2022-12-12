@@ -19,11 +19,12 @@
             width="30%"
             :before-close="handleClose2">
             <el-input v-model="input2.labela" placeholder="请输入分组名称"></el-input>
-            <span slot="footer" class="dialog-footer">
+            <span slot="footer">
                 <el-button @click="dialogVisible2 = false">关 闭</el-button>
                 <el-button type="primary" @click="sibmit()">确 定</el-button>
             </span>
             </el-dialog>
+          
         </div>
         <div>
             <table-custom style="width:100%" :tableData="tableData" :columns="columns"></table-custom>
@@ -47,11 +48,12 @@ export default {
             dialogVisible: false,
             input2:{labela:""},
             dialogVisible2: false,
+            edit:[],//编辑后
             tableData: [
-            { content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
-                { content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
-                { content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
-            ],  //表格数据
+            { key:1,content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
+                {key:2, content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
+                {key:3, content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
+            ],//表格数据
             columns: [
                 {
                     prop: 'labela',
@@ -112,13 +114,22 @@ export default {
         //编辑
         examine(row){
             this.dialogVisible2=true;
-            this.input2=row
+            this.input2=JSON.parse(JSON.stringify(row));
         },
         //编辑提交
         sibmit(){
-console.log(123)
-//提交到接口,然后刷新
-this.dialogVisible2=false
+            let _self = this;
+            for(let item of _self.tableData){
+                if(item.key == _self.input2.key){
+                    _self.edit.push(_self.input2)
+                }else{
+                    _self.edit.push(item)
+                }
+            };
+            console.log(_self.edit)
+            _self.tableData=_self.edit
+            //提交到接口,然后刷新
+            this.dialogVisible2=false
         },
         //删除
         messageBox(){
