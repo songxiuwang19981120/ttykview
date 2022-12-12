@@ -53,14 +53,13 @@
             </div> -->
             <div class="tt-accsituation--operation">
                 <el-button type="primary" @click="videoUpLoad">上传视频</el-button>
-                <el-button type="primary" @click="videoUpLoad">批量删除</el-button>
-
+                <!-- <el-button type="primary" @click="videoUpLoad">批量删除</el-button> -->
             </div>
         </div>
         <el-dialog title="视频上传" :visible.sync="videoUploadVisible" width="40%" :before-close="videoUploadClose">
             <el-form ref="form" :rules="rules" :model="videoForm" label-width="140px" :hide-required-asterisk="true">
                 <el-form-item label="视频:" prop="name">
-                    <el-upload class="upload-demo" drag action="#" multiple accept=".mp4" :on-change="onFileListChange">
+                    <el-upload class="upload-demo" drag action="http://192.168.4.30/api/Base/upload" multiple accept=".mp4" :on-change="onFileListChange">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
                     </el-upload> </el-form-item>
@@ -259,7 +258,7 @@ export default {
                 return false;
             }
             const url = URL.createObjectURL(file.raw);
-            console.log(url);
+            // console.log(url);
             let data = {
                 file: file,
                 url: url
@@ -322,7 +321,7 @@ export default {
         async getMaterialList() {
             var order = ''
             if (this.searchTableData.sort != '') {
-                order = 'add_time_start'
+                order = 'add_time'
             }
             let data = {
                 limit: this.current_limit,
