@@ -48,12 +48,19 @@
         </el-input>
       </div>
 
+      <div class="searchbtn-group">
       <el-button
         class="search-btn"
-        @click="handlerSearch"
-        :disabled="this.isDisabled"
+        @click="handlerSearch" 
         >搜索</el-button
       >
+
+        <el-button
+        class="search-btn"
+        @click="RestQuery" 
+        >重置</el-button
+      >
+      </div>
     </div>
 
     <div class="tt-accsituation--settask">
@@ -121,11 +128,13 @@
       :videoList="videoList"
     />
     <ViewerTabel
-      @updateVisitorList="updateVisitorList($event)"
+      @updateVisitorList="updateVisitorList(arguments)"
       @toogleViewerTabel="toogleViewerTabel"
       :showViewerTabel="showViewerTabel"
       :vistList="vistList"
       :member_id="member_id"
+      :visterTotal="visterTotal"
+      :user_id="user_id"
     />
   </div>
 </template>
@@ -181,13 +190,17 @@ export default {
           label: "设备信息",
           align: "center",
           fixed: true,
+          render:(h,{row})=>{
+            return (
+              <div>
+                <el-tooltip content="Top center" placement="bottom" effect="light">
+                  <span>{row.phone_number}</span>
+                </el-tooltip>
+              </div>
+            )
+          }
         },
-        {
-          prop: "uid",
-          label: "UID",
-          width: "200",
-          align: "center",
-        },
+
         {
           prop: "avatar_thumb",
           label: "头像",
@@ -287,7 +300,7 @@ export default {
         {
           prop: "operation",
           label: "操作",
-          width: "150",
+          width: "190",
           align: "center",
           render: (h, { row }) => {
             return (
@@ -319,7 +332,7 @@ export default {
       ],
       fans: "", //粉丝量查询框对应 model
       page: 1, //页码
-      taskConfig: "", //对应配置任务下拉框 model
+      taskConfig: "", //对应设置任务下拉框 model
       memberList: [], //渲染表格的数据    和后端对接的  对应获取函数为getMemberList
       accConfigCloumn: [
         //任务下拉框的options
@@ -342,6 +355,7 @@ export default {
       vistList: [], //访问列表数据
       member_id: "", //用户ID，获取数据用的
       visterTotal: "", //访问总人数
+      user_id:'', //被选中的用户的UID
     };
   },
 
@@ -353,9 +367,31 @@ export default {
 
   //typecontrol_id 分类ID
   methods: {
-    updateVisitorList(member_id) {
-      console.log(member_id);
-      this.getVisitorList(member_id);
+    /* 
+        function: RestQuery
+        params: null
+        desc: 重置搜索字段
+    */
+    RestQuery(){
+        this.classiFication = "",
+        this.acc_id = "",
+        this.fans = "",
+        this.group = ""
+        this.$message.success('重置成功 ！')
+    },
+
+    /* 
+        function: updateVisitorList
+        params: params | 子组件传的参数，是arguments
+        desc: 用来更新访问人数dialog的数据更新
+    */
+    updateVisitorList(params) {
+      console.log(params);
+      this.getVisitorList({ member_id: params[0], page: params[1] }).then(
+        (res) => {
+          this.vistList = res.list;
+        }
+      );
     },
     /* 
         function: toogleViewerTabel
@@ -365,8 +401,8 @@ export default {
     toogleViewerTabel(val) {
       this.showViewerTabel = !this.showViewerTabel;
       this.member_id = val.member_id;
-
-      this.getVisitorList(this.member_id).then((res) => {
+      this.user_id = val.uid
+      this.getVisitorList({ member_id: this.member_id }).then((res) => {
         this.vistList = res.list;
         this.visterTotal = res.count;
       });
@@ -378,15 +414,19 @@ export default {
         desc: 获取访问列表
         return: 访问列表
     */
-    async getVisitorList(member_id) {
+    async getVisitorList({
+      member_id = "",
+      page = this.page,
+      limit = this.limit,
+    }) {
       let data = {
         member_id: member_id ?? "",
-        limit: this.limit ?? 10,
-        page: this.page ?? 1,
+        limit: limit,
+        page: page,
       };
       let result = await this.$api({ type: "getVistorList", data: data });
 
-      return result;
+      return result.data;
     },
 
     closeVideoTabel() {
@@ -420,22 +460,16 @@ export default {
     */
     async handlerSearch() {
       let data = {
-        typecontrol_id:
-          this.classiFication[this.classiFication.length - 1] ?? "",
+        typecontrol_id: this.classiFication[this.classiFication.length - 1] ?? "",
         uid: this.acc_id ?? "",
         min: this.fans[0] ?? "",
         max: this.fans[1] ?? "",
-        limit: this.limit || 10,
-        page: this.page || 1,
+        limit: this.limit ?? 10,
+        page: this.page ?? 1,
         grouping_id: this.group,
       };
       let result = await this.$api({ type: "getMember", data: data });
       this.memberList = result.data.list;
-      (this.classiFication = ""),
-        (this.acc_id = ""),
-        (this.fans = ""),
-        (this.group = ""),
-        this.$message.success("查询成功 !");
     },
     /* 
         function: handlePagination
@@ -488,6 +522,7 @@ export default {
     */
     closeFollowTask() {
       this.showFollowDialog = false;
+      this.taskConfig = ''
     },
 
     /* 
@@ -496,8 +531,8 @@ export default {
         desc: 关闭私信任务配置
     */
     closeLetterTask() {
-      console.log(1);
       this.showLetterTask = false;
+      this.taskConfig = ''
     },
 
     /* 
@@ -507,6 +542,7 @@ export default {
     */
     closeLikeCommentTask() {
       this.showLikeCommentTask = false;
+      this.taskConfig = ''
     },
 
     /* 
@@ -516,6 +552,7 @@ export default {
     */
     closeVideoTask() {
       this.showVideoTask = false;
+      this.taskConfig = ''
     },
 
     /* 
@@ -651,7 +688,6 @@ export default {
 
 <style lang="stylus">
 .tt-accsituation-searchbar {
-  position: relative;
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -663,9 +699,8 @@ export default {
 }
 
 .search-btn {
-  position: absolute;
-  right: 80px;
-  width: 100px;
+
+  width: 70px;
 }
 
 .tt-accsituation--settask {
@@ -687,7 +722,7 @@ export default {
 
 .batchedit-btn {
   position: absolute;
-  right: 80px;
+  right: 120px;
   width: 100px;
 }
 
@@ -700,7 +735,7 @@ export default {
 }
 
 .mr-30 {
-  margin-right: 30px;
+  margin-right: 10px;
 }
 
 .bgcred {
@@ -718,4 +753,6 @@ export default {
   background-color: green;
   border-radius: 50%;
 }
+
+
 </style>

@@ -6,17 +6,17 @@
       width="80%"
       :before-close="handleClose"
     >
-    <table-custom
+      <table-custom
         :loading="loading"
         :tableData="vistList"
         :columns="columns"
       ></table-custom>
-    <Pagination 
-      :total="visiterLength"
-      :page="page"
-      :size="limit"
-      @pagination="handlePagination"
-    />
+      <Pagination
+        :total="visterTotal"
+        :page="page"
+        :size="limit"
+        @pagination="handlePagination"
+      />
     </el-dialog>
   </div>
 </template>
@@ -30,17 +30,24 @@ export default {
     showViewerTabel: {
       type: Boolean,
     },
-    vistList:{
-        type:Array
+    vistList: {
+      type: Array,
     },
-    member_id:{
-        type:String
-    }
+    member_id: {
+      type: String,
+    },
+    visterTotal: {
+      type: Number,
+      default: 1,
+    },
+    user_id: {
+      type: String,
+    },
   },
-  computed:{
-    visiterLength(){
-        return this.vistList.length
-    }
+  computed: {
+    visiterLength() {
+      return this.vistList.length;
+    },
   },
   components: {
     Pagination,
@@ -48,24 +55,26 @@ export default {
   },
   data() {
     return {
-        loading:false,
-         columns:[
-                            {
+      limit: 10,
+      page: 1,
+      loading: false,
+      columns: [
+        {
           prop: "nickname",
           label: "昵称",
           align: "center",
-          width:'150'
+          width: "150",
         },
-                        {
+        {
           prop: "country",
           label: "国家",
           align: "center",
         },
-                                {
+        {
           prop: "signature",
           label: "签名",
           align: "center",
-          minwidth:'200'
+          minwidth: "200",
         },
 
         {
@@ -84,42 +93,70 @@ export default {
           },
         },
 
-                {
+        {
           prop: "aweme_count",
           label: "视频数量",
           align: "center",
         },
 
-
-                {
-          prop: "comment_count",
+        {
+          prop: "follower_status,follow_status",
           label: "操作",
           align: "center",
-          render:(h,{row})=>{
+          render: (h, { row }) => {
             return (
-                <div>
-                    <el-button>关注</el-button>
-                    <el-button>回关</el-button>
-                    <el-button>私信</el-button>
-                </div>
-            )
-          }
+              <div>
+                <el-button
+                  onClick={this.handleFollow.bind(this, row)}
+                  v-show={
+                    row.follower_status === "0" && row.follow_status === "0"
+                  }
+                >
+                  关注
+                </el-button>
+                <el-button
+                  v-show={
+                    row.follower_status === "1" && row.follow_status === "0"
+                  }
+                >
+                  回关
+                </el-button>
+                <el-button v-show={row.follow_status === "2"}>私信</el-button>
+              </div>
+            );
+          },
         },
-        ] 
+      ],
     };
   },
 
   mounted() {},
 
   methods: {
-
-    handlePagination(){
-        this.$emit('updateVisitorList',this.member_id)
+    handlePagination(val) {
+      (this.page = val.page),
+        this.$emit("updateVisitorList", this.member_id, this.page);
     },
 
-    handleClose(){
-        this.$emit('toogleViewerTabel')
-    }
+    handleClose() {
+      this.$emit("toogleViewerTabel");
+    },
+
+    async handleFollow(val) {
+      try {
+        console.log(val, this.user_id);
+        let data = {
+          user_id: this.user_id,
+          b_user_id: val.uid,
+          b_sec_user_id: val.sec_uid,
+        };
+        let result = await this.$api({ type: "followUser", data: data });
+        result.status === '200' ? this.$message.success(result.msg) : this.$message.error(result.msg)
+        
+      } catch (error) {
+        console.log(error)
+      }
+    },
   },
 };
 </script>

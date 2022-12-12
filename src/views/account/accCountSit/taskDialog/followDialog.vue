@@ -6,14 +6,16 @@
       :before-close="handlerClose"
     >
       <span slot="title">
-        <h1 class="tt-acccountsit--title">关注任务配置</h1>
+        <h1 class="tt-acccountsit--title">私信任务配置</h1>
       </span>
       <el-form
-        v-model="followTaskForm"
+      :rules="rules"
+      ref="followTaskForm"
+        :model="followTaskForm"
         label-position="left"
         label-width="130px"
       >
-        <el-form-item label="选择国家 ：" v-model="followTaskForm.country">
+        <el-form-item label="选择国家 ："  prop="country" v-model="followTaskForm.country">
           <el-select v-model="followTaskForm.country" placeholder="选择国家">
             <el-option
               v-for="item in countryOptions"
@@ -25,6 +27,7 @@
         </el-form-item>
 
         <el-form-item
+          prop="task_remark"
           label="备注任务名称 ："
           v-model="followTaskForm.task_remark"
         >
@@ -35,7 +38,9 @@
           <el-switch v-model="followTaskForm.rest_fans_status"></el-switch>
         </el-form-item>
 
+      
         <div class="followtask-option">
+          <el-form-item prop="letter_data" label="选择私信素材 ：">
           <el-select
             v-model="followTaskForm.letter_data"
             placeholder="私信素材"
@@ -47,14 +52,19 @@
               :value="item.value"
             ></el-option>
           </el-select>
+          </el-form-item>
 
+          <el-form-item label="选择类型 ：" prop="letter_type">
           <el-checkbox-group v-model="followTaskForm.letter_type">
             <el-checkbox
+              :disabled="followTaskForm.letter_type.length === 3"
               v-for="item in letterGroup"
               :key="item"
               :label="item"
             ></el-checkbox>
           </el-checkbox-group>
+          <el-button @click="restType" size="mini">重置</el-button>
+          </el-form-item>
         </div>
       </el-form>
 
@@ -76,8 +86,23 @@ export default {
   },
   data() {
     return {
+      rules:{
+        country:[
+        {required: true,message:"请选择国家",trigger: "change"},
+        
+        ],
+        task_remark:[
+          {required: true,message:"请备注任务名称",trigger: "blur"},
+        ],
+        letter_data:[
+          {required: true,message:"请选择私信素材",trigger: "change"},
+        ],
+        letter_type:[
+          {required: true,message:"请选择类型",trigger: "change"},
+        ],
+      },
       letterOptions: ["1", "2", "3", "4", "5"],
-      letterGroup: ["1", "2", "3", "4", "5"],
+      letterGroup: ["文本话术", "短连接", "好友名片", "作品转发"],
       countryOptions: [
         {
           value: "法国",
@@ -102,7 +127,7 @@ export default {
         task_remark: "", //任务备注
         rest_fans_status: "", //重置粉丝状态
         letter_data: "", //私信素材
-        letter_type: "", //私信类型
+        letter_type: [], //私信类型
       },
     };
   },
@@ -110,12 +135,42 @@ export default {
   mounted() {},
 
   methods: {
+
+    restType(){
+      this.followTaskForm.letter_type = []
+    },
     handlerClose() {
       this.$emit("closeFollowTask");
+      this.resetForm()
     },
+
+    /* 
+        function: handlerConfrim
+        params: null
+        desc: 提交表单
+    */
     handlerConfrim() {
-      console.log(this.followTaskForm);
+       this.$refs["followTaskForm"].validate((valid) => {
+        if (valid) {
+          this.handlerClose()
+          console.log(this.followTaskForm);
+          this.resetForm()
+          console.log(this.followTaskForm);
+          this.$message.success('提交成功')
+          return 
+        }
+        this.$message.error('提交失败')
+      });
     },
+
+    /* 
+        function: resetForm
+        params: null
+        desc: 重置表单字段
+    */
+    resetForm(){
+      this.$refs['followTaskForm'].resetFields()
+    }
   },
 };
 </script>
