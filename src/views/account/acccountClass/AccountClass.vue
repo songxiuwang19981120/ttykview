@@ -113,7 +113,8 @@ export default {
     }
   },
   mounted() {
-    this.Typecontrol();
+    this.Typecontrol();//联动数据
+
 
   },
 
@@ -121,9 +122,8 @@ export default {
 
     //四级联动点完后的事件
     handleChange(value) {
-      this.value2 = value;
-      this.Typecontrol()
-      console.log(this.value2)
+       this.value2=value[value.length - 1] ?? '';
+      
     },
     //undefind联动
     filterTreeDate(arr) {
@@ -135,16 +135,16 @@ export default {
         }
       })
     },
-    //四级联动接口数据
+    //四级联动数据
     async Typecontrol() {
-      let data = {
-        typecontrol_id: this.value2[this.value2.length - 1] ?? '',
-      };
-      console.log(data)
-        let result = await this.$api({ type: "getTypecontrol" ,data:data});
-        console.log(result)
+      try {
+        let result = await this.$api({ type: "getTypecontrol" });
+        
         this.options = result;
-        this.filterTreeDate(result);
+        this.filterTreeDate(result)
+      } catch (error) {
+        console.error(error)
+      }
     },
     //操作
     handleEdit(index, row) {
@@ -181,6 +181,15 @@ export default {
       }
     },
 
+    // //列表数据接口
+    // async viewTypecontrol() {
+    //   let data = {
+    //     typecontrol_id: this.value2,
+    //   };
+    //     let result = await this.$api({
+    //       type: "viewTypecontrol",data:data});
+    //     console.log(result)
+    // },
   },
 };
 </script>
