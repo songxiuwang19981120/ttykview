@@ -51,6 +51,7 @@
                     </tr>
                 </table>
             </div> -->
+            
             <div class="tt-accsituation--operation">
                 <el-button type="primary" @click="videoUpLoad">上传视频</el-button>
                 <!-- <el-button type="primary" @click="videoUpLoad">批量删除</el-button> -->
