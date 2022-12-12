@@ -1,316 +1,187 @@
 <template>
-    <div>
-        <div style="background-color:white;padding:10px">
-            <span style="margin-right:10px">设备分组选择:</span>
-            <el-cascader
-                v-model="value"
-                :options="options"
-                @change="handleChange"></el-cascader>
-        </div>
-        <!-- 表格 -->
-        <el-table
-    :data="tableData1"
-    style="width: 100%"
-    row-key="id"
-    lazy
-    :load="load"
-    :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
-    <el-table-column
-      prop="date"
-      label="编号"
-      align="center"
-      width="180"
-     >
-    </el-table-column>
-    <el-table-column
-      prop="name"
-      label="名称"
-      align="center"
-    >
-    </el-table-column>
-    <el-table-column
-      prop="address"
-      width="180"
-      label="操作"
-      align="center">
-      <template slot-scope="scope">
-        <el-button
-          size="mini"
-          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-        <el-button
-          size="mini"
-          type="danger"
-          @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
+  <div>
+    <div style="background-color:white;padding:10px">
+      <span style="margin-right:10px">设备分组选择:</span>
+      <el-cascader v-model="value" :options="options" :props="{ checkStrictly: true }"
+        @change="handleChange"></el-cascader>
     </div>
+    <!-- 表格 -->
+    <el-table :data="tableData1" style="width: 100%" row-key="id" lazy :load="load"
+      :tree-props="{ children: 'children', hasChildren: 'hasChildren' }">
+      <el-table-column prop="date" label="编号" align="center" width="300">
+      </el-table-column>
+      <el-table-column prop="name" label="名称" align="center">
+      </el-table-column>
+      <el-table-column prop="address" width="180" label="操作" align="center">
+        <template slot-scope="scope">
+          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 分页 -->
+    <pagination style="" :total="total" :page="page" :limit="10" :size="limit" @pagination="handlePagination">
+    </pagination>
+  </div>
 </template>
 
 <script>
+import pagination from '@/components/myComponent/table/pagination.vue';
 export default {
-    name: 'AccountClass',
 
-    data() {
-        return {
-        value: [],//联动绑定数据
-        options: [{
-          value: 'zhinan',
-          label: '指南',
+  name: 'AccountClass',
+  components: { pagination },
+  data() {
+    return {
+      total: 100,  //数据总量
+      page: 1, //当前页
+      limit: 10, //每页条数
+      value: [],//联动绑定数据
+      value2:[],
+      options: [],//联动数据
+      //表格数据
+      tableData1: [{
+        id: 1,
+        date: '2016-05-02',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄',
+        buttonShow: true,
+        hasChildren: true,
+        children: [{
+          id: 31,
+          date: 'g国家',
+          hasChildren: true,
           children: [{
-            value: 'shejiyuanze',
-            label: '设计原则',
+            id: 32,
+            date: '项目',
+            hasChildren: true,
             children: [{
-              value: 'yizhi',
-              label: '一致'
-            }, {
-              value: 'fankui',
-              label: '反馈'
-            }, {
-              value: 'xiaolv',
-              label: '效率'
-            }, {
-              value: 'kekong',
-              label: '可控'
-            }]
-          }, {
-            value: 'daohang',
-            label: '导航',
-            children: [{
-              value: 'cexiangdaohang',
-              label: '侧向导航'
-            }, {
-              value: 'dingbudaohang',
-              label: '顶部导航'
+              id: 33,
+              date: '一级分类',
+              hasChildren: true,
+              children: [{
+                id: 34,
+                date: '二级分类',
+              }]
             }]
           }]
-        }, {
-          value: 'zujian',
-          label: '组件',
-          children: [{
-            value: 'basic',
-            label: 'Basic',
-            children: [{
-              value: 'layout',
-              label: 'Layout 布局'
-            }, {
-              value: 'color',
-              label: 'Color 色彩'
-            }, {
-              value: 'typography',
-              label: 'Typography 字体'
-            }, {
-              value: 'icon',
-              label: 'Icon 图标'
-            }, {
-              value: 'button',
-              label: 'Button 按钮'
-            }]
-          }, {
-            value: 'form',
-            label: 'Form',
-            children: [{
-              value: 'radio',
-              label: 'Radio 单选框'
-            }, {
-              value: 'checkbox',
-              label: 'Checkbox 多选框'
-            }, {
-              value: 'input',
-              label: 'Input 输入框'
-            }, {
-              value: 'input-number',
-              label: 'InputNumber 计数器'
-            }, {
-              value: 'select',
-              label: 'Select 选择器'
-            }, {
-              value: 'cascader',
-              label: 'Cascader 级联选择器'
-            }, {
-              value: 'switch',
-              label: 'Switch 开关'
-            }, {
-              value: 'slider',
-              label: 'Slider 滑块'
-            }, {
-              value: 'time-picker',
-              label: 'TimePicker 时间选择器'
-            }, {
-              value: 'date-picker',
-              label: 'DatePicker 日期选择器'
-            }, {
-              value: 'datetime-picker',
-              label: 'DateTimePicker 日期时间选择器'
-            }, {
-              value: 'upload',
-              label: 'Upload 上传'
-            }, {
-              value: 'rate',
-              label: 'Rate 评分'
-            }, {
-              value: 'form',
-              label: 'Form 表单'
-            }]
-          }, {
-            value: 'data',
-            label: 'Data',
-            children: [{
-              value: 'table',
-              label: 'Table 表格'
-            }, {
-              value: 'tag',
-              label: 'Tag 标签'
-            }, {
-              value: 'progress',
-              label: 'Progress 进度条'
-            }, {
-              value: 'tree',
-              label: 'Tree 树形控件'
-            }, {
-              value: 'pagination',
-              label: 'Pagination 分页'
-            }, {
-              value: 'badge',
-              label: 'Badge 标记'
-            }]
-          }, {
-            value: 'notice',
-            label: 'Notice',
-            children: [{
-              value: 'alert',
-              label: 'Alert 警告'
-            }, {
-              value: 'loading',
-              label: 'Loading 加载'
-            }, {
-              value: 'message',
-              label: 'Message 消息提示'
-            }, {
-              value: 'message-box',
-              label: 'MessageBox 弹框'
-            }, {
-              value: 'notification',
-              label: 'Notification 通知'
-            }]
-          }, {
-            value: 'navigation',
-            label: 'Navigation',
-            children: [{
-              value: 'menu',
-              label: 'NavMenu 导航菜单'
-            }, {
-              value: 'tabs',
-              label: 'Tabs 标签页'
-            }, {
-              value: 'breadcrumb',
-              label: 'Breadcrumb 面包屑'
-            }, {
-              value: 'dropdown',
-              label: 'Dropdown 下拉菜单'
-            }, {
-              value: 'steps',
-              label: 'Steps 步骤条'
-            }]
-          }, {
-            value: 'others',
-            label: 'Others',
-            children: [{
-              value: 'dialog',
-              label: 'Dialog 对话框'
-            }, {
-              value: 'tooltip',
-              label: 'Tooltip 文字提示'
-            }, {
-              value: 'popover',
-              label: 'Popover 弹出框'
-            }, {
-              value: 'card',
-              label: 'Card 卡片'
-            }, {
-              value: 'carousel',
-              label: 'Carousel 走马灯'
-            }, {
-              value: 'collapse',
-              label: 'Collapse 折叠面板'
-            }]
-          }]
-        }, {
-          value: 'ziyuan',
-          label: '资源',
-          children: [{
-            value: 'axure',
-            label: 'Axure Components'
-          }, {
-            value: 'sketch',
-            label: 'Sketch Templates'
-          }, {
-            value: 'jiaohu',
-            label: '组件交互文档'
-          }]
-        }],//联动数据
-        //表格数据
-        tableData1: [{
-          id: 1,
+        }]
+
+      }, {
+        id: 2,
+        date: '2016-05-04',
+        name: '王小',
+        address: '上海市普陀区金沙江路 1517 弄',
+        buttonShow: true,
+        hasChildren: true,
+        buttonShow: true, children: [{
+          id: 41,
           date: '2016-05-02',
           name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          id: 2,
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄'
-        }, {
-          id: 3,
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄',
+          address: '上海市普陀区金沙江路 1518 弄',
           hasChildren: true,
-
-        }, {
-          id: 4,
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄'
         }]
-    }
-},
-    mounted() {
-        
-    },
 
-    methods: {
-        //四级联动
-        handleChange(value) {
-        console.log(value);
-      },
-      //操作
-      handleEdit(index, row) {
-        console.log(index, row);
-      }, 
-      handleDelete(index, row) {
-        console.log(index, row);
-      },
-      //表格树形
-      load(tree, treeNode, resolve) {
-        setTimeout(() => {
-          resolve([
-            {
-              id: 31,
-              date: '2016-05-01',
-              name: '王小虎',
-              address: '上海市普陀区金沙江路 1519 弄'
-            }, {
-              id: 32,
-              date: '2016-05-01',
-              name: '王小虎',
-              address: '上海市普陀区金沙江路 1519 弄',
-              hasChildren: true
-            }
-          ])
-        }, 250)
+      }, {
+        id: 3,
+        date: '2016-05-01',
+        name: '小虎',
+        address: '上海市普陀区金沙江路 1519 弄',
+        hasChildren: true,
+        buttonShow: true, children: [{
+          id: 51,
+          date: '2016-05-02',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄',
+          hasChildren: true,
+        }]
+
+      }, {
+        id: 4,
+        date: '2016-05-03',
+        name: '王虎',
+        address: '上海市普陀区金沙江路 1516 弄',
+        hasChildren: true,
+        buttonShow: true, children: [{
+          id: 61,
+          date: '2016-05-02',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄',
+          hasChildren: true,
+        }]
+      }]
+    }
+  },
+  mounted() {
+    this.Typecontrol();
+
+  },
+
+  methods: {
+
+    //四级联动点完后的事件
+    handleChange(value) {
+      this.value2 = value;
+      this.Typecontrol()
+      console.log(this.value2)
+    },
+    //undefind联动
+    filterTreeDate(arr) {
+      arr.forEach(item => {
+        if (!item.children.length) {
+          item.children = undefined
+        } else {
+          this.filterTreeDate(item.children)
+        }
+      })
+    },
+    //四级联动接口数据
+    async Typecontrol() {
+      let data = {
+        typecontrol_id: this.value2[this.value2.length - 1] ?? '',
+      };
+      console.log(data)
+        let result = await this.$api({ type: "getTypecontrol" ,data:data});
+        console.log(result)
+        this.options = result;
+        this.filterTreeDate(result);
+    },
+    //操作
+    handleEdit(index, row) {
+      console.log(index, row);
+    },
+    handleDelete(index, row) {
+      console.log(index, row);
+
+    },
+    //表格树形
+    load(tree, treeNode, resolve) {
+      console.log(tree)
+      setTimeout(() => {
+        resolve(tree.children)
+      }, 100)
+    },
+    /**
+ * 翻页回调
+ */
+
+    async handlePagination(val) {
+      try {
+        console.log(val)
+        this.page = val.page;
+        this.limit = val.limit
+        let result = await this.$api({
+          type: "getTypecontrol",
+          data: { page: this.page },
+        });
+        console.log(result)
+
+      } catch (error) {
+        console.error(error);
       }
     },
+
+  },
 };
 </script>
 
