@@ -8,12 +8,16 @@
         :tableData="videoList"
         :columns="columns"
       ></table-custom>
-          <el-dialog
-      width="30%"
-      title="内层 Dialog"
-      :visible.sync="innerVisible"
-      append-to-body>
-    </el-dialog>
+      <el-dialog
+        width="40%"
+        title="播放视频"
+        :visible.sync="innerVisible"
+        append-to-body
+      >
+        <div class="video-window">
+            <video autoplay width="40%" :src="videoSrc" controls="controls"></video>
+        </div>
+      </el-dialog>
     </el-dialog>
   </div>
 </template>
@@ -28,46 +32,40 @@ export default {
     shwoVideoTabel: {
       type: Boolean,
     },
-    videoList:{
-        type:Array
+    videoList: {
+      type: Array,
     },
   },
   data() {
     return {
+      innerVisible: false,
+      videoSrc:'',
       loading: false,
       videoInfoList: [],
-      columns:[
-        {
-          prop: "member_id",
-          label: "用户",
-          align: "center",
-          fixed: true,
-        },
-        {
-          prop: "aweme_id",
-          label: "视频ID",
-          align: "center",
-        },
+      columns: [
+ 
         {
           prop: "video_url",
           label: "视频",
           align: "center",
-          render:(h,{row})=>{
+          render: (h, { row }) => {
             return (
-                <video width="80px" height="90px" src={row.video_url}></video>
-            )
-          }
+              <video width="80px" height="90px" src={row.video_url}></video>
+            );
+          },
         },
         {
           prop: "video_desc",
           label: "视频描述",
           align: "center",
           width: "200px",
-          render:(h,{row})=>{
+          render: (h, { row }) => {
             return (
-                <p width="200px" style="overflow: hidden">{row.video_desc}</p>
-            )
-          }
+              <p width="200px" style="overflow: hidden">
+                {row.video_desc}
+              </p>
+            );
+          },
         },
         {
           prop: "comment_count",
@@ -99,23 +97,15 @@ export default {
               <div>
                 <el-button
                   size="mini"
-                  onClick={this.handleEdit.bind(this, row)}
+                  onClick={this.handlerPlayer.bind(this, row)}
                 >
-                  编辑
-                </el-button>
-                <el-button
-                  size="mini"
-                  type="danger"
-                  onClick={this.handleDelete.bind(this, row)}
-                >
-                  删除
+                  播放
                 </el-button>
               </div>
             );
           },
         },
-
-      ]
+      ],
     };
   },
 
@@ -125,10 +115,20 @@ export default {
     handlerClose() {
       this.$emit("closeVideoTabel");
     },
+    handlerPlayer(row) {
+      this.innerVisible = true;
+      this.videoSrc = row.video_url
 
+      console.log(row);
+    },
     handleSelectChange() {},
   },
 };
 </script>
 
-<style lang="stylus" scoped></style>
+<style lang="stylus">
+.video-window
+    display: flex
+    align-items: center
+    justify-content: space-around
+</style>

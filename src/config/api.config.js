@@ -339,6 +339,11 @@ export default {
       },
 
 
+      'getVistorList':{       //获取用户访问列表数据
+        url:'Visitorlist/index',
+        method:'POST'
+      }
+
 
   }
 

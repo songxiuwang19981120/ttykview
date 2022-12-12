@@ -120,6 +120,11 @@
       :shwoVideoTabel="shwoVideoTabel"
       :videoList="videoList"
     />
+    <ViewerTabel
+      @toogleViewerTabel="toogleViewerTabel" 
+      :showVisiteTabel="showVisiteTabel"
+      :vistList="vistList"
+    />
   </div>
 </template>
 
@@ -134,6 +139,8 @@ import FollowDialog from "./taskDialog/followDialog";
 import taskStatus from "@/config/accountConfig/taskStatus.config";
 import BatchEditorDialog from './batchEditorDialog/batchEditorDialog'
 import VideoTabel from './videoTabel/videoTabel'
+import ViewerTabel from './ViewerLabel/viewerTabel'
+
 
 const { STATUS_MAP } = taskStatus;
 export default {
@@ -147,7 +154,8 @@ export default {
     Pagination,
     EditorDialog,
     BatchEditorDialog,
-    VideoTabel
+    VideoTabel,
+    ViewerTabel
   },
   computed:{
     isDisabled(){
@@ -196,13 +204,13 @@ export default {
           },
         },
         {
-          prop: "nickname",
+          prop: "nickname" ?? '匿名用户',
           label: "昵称",
           width: "150",
           align: "center",
         },
         {
-          prop: "type_title",
+          prop: "type_title" ?? '暂无类型',
           label: "账号类型",
           width: "160",
           align: "center",
@@ -219,13 +227,13 @@ export default {
           },
         },
         {
-          prop: "signature",
+          prop: "signature" ?? '暂无签名',
           label: "签名",
           width: "200",
           align: "center",
         },
         {
-          prop: "aweme_count",
+          prop: "aweme_count" ?? 0,
           label: "视频数量",
           width: "100",
           align: "center",
@@ -241,7 +249,7 @@ export default {
           },
         },
         {
-          prop: "unread_viewer_count",
+          prop: "unread_viewer_count" ?? '',
           label: "主页访问人数",
           width: "150",
           align: "center",
@@ -249,7 +257,7 @@ export default {
             return (
               <span
                 class="videonum-span"
-                onClick={this.showViewerTabel.bind(this, row)}
+                onClick={this.toogleViewerTabel.bind(this, row)}
               >
                 {row.unread_viewer_count}
               </span>
@@ -263,7 +271,7 @@ export default {
           align: "center",
         },
         {
-          prop: "following_status,following_count,play_num",
+          prop: "following_status,following_count,play_num" ?? '暂无数据',
           label: "关注/获赞/播放",
           width: "150",
           align: "center",
@@ -326,9 +334,11 @@ export default {
       limit: 10, //每页请求数据条数
       showEditorDialog:false, //是否展示编辑按钮界面
       showBatchEiDialog:false ,//是否展示批量编辑按钮界面
-      shwoVideoTabel:false,
+      shwoVideoTabel:false,   //是否展示视频播放弹窗
+      showVisiteTabel:false, //是否展示访问列表表格
       user_video_num:0, //视频数量
-      videoList:[]
+      videoList:[], //用户视频列表数据
+      vistList:[], //访问列表数据
     };
   },
 
@@ -340,6 +350,24 @@ export default {
 
   //typecontrol_id 分类ID
   methods: {
+    /* 
+        function: toogleViewerTabel
+        params: null
+        desc: 切换访问列表表格显示状态
+    */
+    toogleViewerTabel(){
+      this.showViewerTabel = !this.showViewerTabel
+    },
+
+    /* 
+        function: getVisitorList
+        params: member_id | 用户ID
+        desc: 获取访问列表
+    */
+  getVisitorList(member_id){
+    this.$api({type:'getVistorList',data:{member_id:member_id}})
+  },
+
     closeVideoTabel(){
       this.shwoVideoTabel = false
     },
@@ -407,14 +435,7 @@ export default {
       this.showBatchEiDialog = true
     },
 
-    /* 
-        function: showViewerTabel
-        params: null
-        desc: 打开访问人数表格
-    */
-    showViewerTabel() {
-      console.log("打开访问人数表格");
-    },
+
     /* 
         function: closeEditorDialog
         params: null
@@ -432,7 +453,8 @@ export default {
     async showVideoTabel(val) {
       console.log(val.member_id)
       this.shwoVideoTabel = true
-      let result = await this.$api({type:"getMemberList",data:{member_id: val.member_id}})
+      let data ={member_id:val.member_id,page:this.page,limit:6}
+      let result = await this.$api({type:"getMemberList",data:data})
       this.videoList = result.list
       console.log(this.videoList,result)
     },
@@ -599,15 +621,6 @@ export default {
       } catch (error) {
         console.error(error);
       }
-    },
-
-    /*
-      function: searchAccId
-      params: null
-      desc: 搜索账号ID
-    */
-    searchAccId() {
-      console.log(1111);
     },
   },
 };
