@@ -2,19 +2,21 @@
   <div>
     <el-dialog
       title="提示"
-      :visible.sync="showVisiteTabel"
-      width="30%"
+      :visible="showViewerTabel"
+      width="80%"
       :before-close="handleClose"
     >
     <table-custom
         :loading="loading"
-        :tableData="videoList"
+        :tableData="vistList"
         :columns="columns"
       ></table-custom>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="handleClose">取 消</el-button>
-
-      </span>
+    <Pagination 
+      :total="visiterLength"
+      :page="page"
+      :size="limit"
+      @pagination="handlePagination"
+    />
     </el-dialog>
   </div>
 </template>
@@ -25,9 +27,20 @@ import tableCustom from "@/components/myComponent/table/tableCustom";
 export default {
   name: "TtprojectVisitTabelDialog",
   props: {
-    showVisiteTabel: {
+    showViewerTabel: {
       type: Boolean,
     },
+    vistList:{
+        type:Array
+    },
+    member_id:{
+        type:String
+    }
+  },
+  computed:{
+    visiterLength(){
+        return this.vistList.length
+    }
   },
   components: {
     Pagination,
@@ -36,27 +49,48 @@ export default {
   data() {
     return {
         loading:false,
-        columns:[
+         columns:[
+                            {
+          prop: "nickname",
+          label: "昵称",
+          align: "center",
+          width:'150'
+        },
+                        {
+          prop: "country",
+          label: "国家",
+          align: "center",
+        },
+                                {
+          prop: "signature",
+          label: "签名",
+          align: "center",
+          minwidth:'200'
+        },
+
         {
-          prop: "comment_count",
+          prop: "avatar_thumb",
           label: "头像",
           align: "center",
+          render: (h, { row }) => {
+            return (
+              <div>
+                <el-image
+                  src={row.avatar_thumb}
+                  style="width: 60px; height: 60px"
+                ></el-image>
+              </div>
+            );
+          },
         },
+
                 {
-          prop: "comment_count",
-          label: "账号",
+          prop: "aweme_count",
+          label: "视频数量",
           align: "center",
         },
-                {
-          prop: "comment_count",
-          label: "XX",
-          align: "center",
-        },
-                {
-          prop: "comment_count",
-          label: "XX",
-          align: "center",
-        },
+
+
                 {
           prop: "comment_count",
           label: "操作",
@@ -71,13 +105,18 @@ export default {
             )
           }
         },
-        ]
+        ] 
     };
   },
 
   mounted() {},
 
   methods: {
+
+    handlePagination(){
+        this.$emit('updateVisitorList',this.member_id)
+    },
+
     handleClose(){
         this.$emit('toogleViewerTabel')
     }
