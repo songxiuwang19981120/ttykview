@@ -119,6 +119,7 @@ export default {
         //编辑提交
         sibmit(){
             let _self = this;
+            _self.edit=[];
             for(let item of _self.tableData){
                 if(item.key == _self.input2.key){
                     _self.edit.push(_self.input2)
