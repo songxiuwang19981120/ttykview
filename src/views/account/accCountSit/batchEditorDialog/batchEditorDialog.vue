@@ -78,7 +78,7 @@ export default {
     },
     computed:{
       total(){
-        return this?.total || this?.batchEditorLength
+        return this?.accTotal || this?.batchEditorLength
       }
     },
   data() {
