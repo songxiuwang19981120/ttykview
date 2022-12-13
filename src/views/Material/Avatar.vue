@@ -13,7 +13,8 @@
                 <div>
                     <span class="search-title">素材库:</span>
                     <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryList"
-                        v-model="searchTableData.library" placeholder="素材库选择" style="width:180px;margin-right:20px"></el-cascader>
+                        v-model="searchTableData.library" placeholder="素材库选择"
+                        style="width:180px;margin-right:20px"></el-cascader>
                 </div>
                 <div>
                     <span class="search-title">素材类型:</span>
@@ -48,8 +49,7 @@
             <div style="height:10px"></div>
         </div>
         <el-dialog title="图片上传" :visible.sync="imgUploadVisible" width="40%" :before-close="imgUploadClose">
-            <el-form ref="imgForm" :rules="rulesUpload" :model="imgForm" label-width="140px"
-                :hide-required-asterisk="true">
+            <el-form ref="imgForm" :rules="rulesUpload" :model="imgForm" label-width="140px">
                 <el-form-item label="分组:" prop="group">
                     <el-select v-model="imgForm.group" placeholder="请选择分组">
                         <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
@@ -61,8 +61,8 @@
                         v-model="imgForm.library" placeholder="库选择"></el-cascader>
                 </el-form-item>
                 <el-form-item label="图片:" prop="img">
-                    <el-upload class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple accept=".png,.jpg,.jpeg"
-                        :on-success="handleSucess" :on-remove="handleRemove">
+                    <el-upload class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple
+                        accept=".png,.jpg,.jpeg" :on-success="handleSucess" :on-remove="handleRemove">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
                     </el-upload>
@@ -118,9 +118,8 @@ export default {
                     fixed: true,
                     align: 'center',
                     render: (h, { row }) => {
-                        let imgList= []
-                        imgList[0]=row.image
-                        console.log(imgList);
+                        let imgList = []
+                        imgList[0] = row.image
                         return (
                             <div>
                                 <el-image style="width: 50px; height: 50px" src={row.image} preview-src-list={imgList}></el-image>
@@ -214,7 +213,7 @@ export default {
     mounted() {
         this.getGroupList();
         this.getTypeControlList();
-        this.getMaterialList();
+        this.getHeadimageList();
     },
 
     methods: {
@@ -253,8 +252,12 @@ export default {
         async getTypeControlList() {
             try {
                 let result = await this.$api({ type: "getTypecontrol" });
-                this.libraryList = result;
-                this.getTreeData(result)
+                if (result.status == '200') {
+                    this.libraryList = result.data;
+                    this.getTreeData(result.data)
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
             } catch (error) {
                 console.error(error);
             }
@@ -264,12 +267,16 @@ export default {
         */
         async getGroupList() {
             let result = await this.$api({ type: 'getGrouping' })
-            this.groupList = result.list
+            if (result.status == '200') {
+                this.groupList = result.data.list
+            } else {
+                this.$message.error({ message: result.msg })
+            }
         },
         // 图片上传提交
         submitForimg() {
             if (this.fileList.length == 0) {
-                return this.$message({ message: '请选择需要上传的图片', type: 'warning' });
+                return this.$message.warning({ message: '请选择需要上传的图片'});
             }
             this.$refs['imgForm'].validate((valid) => {
                 if (!valid) return false;
@@ -291,16 +298,19 @@ export default {
         async addHeadimage(data) {
             try {
                 let result = await this.$api({ type: "addHeadimage", data: data });
-                console.log(result);
-                this.$notify({ title: '新增成功', type: 'success' });
-                this.imgSubmitting = false;
-                this.fileList = [];
-                this.imgUploadVisible = false;
-                this.imgForm = {
-                    group: '',  //分组
-                    library: '',  //库
-                };
-                this.getMaterialList()
+                if (result.status == '200') {
+                    this.imgSubmitting = false;
+                    this.fileList = [];
+                    this.imgUploadVisible = false;
+                    this.imgForm = {
+                        group: '',  //分组
+                        library: '',  //库
+                    };
+                    this.getHeadimageList()
+                    this.$message.success({ message: result.msg })
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
             } catch (error) {
                 console.error(error);
             }
@@ -324,9 +334,12 @@ export default {
             }
             try {
                 let result = await this.$api({ type: "deleteHeadimage", data: data });
-                console.log(result);
-                this.$notify({ title: '删除成功', type: 'success' });
-                this.getMaterialList()
+                if (result.status == '200') {
+                    this.$message.success({ message: '图片删除成功' });
+                    this.getHeadimageList()
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
             } catch (error) {
                 console.error(error);
             }
@@ -337,7 +350,7 @@ export default {
         handlePagination(val) {
             this.current_page = val.page;  //页数
             this.current_limit = val.limit;  //请求数据量
-            this.getMaterialList();
+            this.getHeadimageList();
         },
         /*
           获取表格已选择的数据
@@ -348,13 +361,13 @@ export default {
         // 搜索数据
         searchTable() {
             this.submitting = true
-            this.getMaterialList()
+            this.getHeadimageList()
             console.log('搜索数据', this.searchTableData);
         },
         /*
             获取图片
         */
-        async getMaterialList() {
+        async getHeadimageList() {
             let order = ''
             if (this.searchTableData.sort != '') {
                 order = 'usage_time'
@@ -375,14 +388,16 @@ export default {
             try {
                 this.loading = true;
                 let result = await this.$api({ type: "getHeadimageList", data: data });
-                console.log(result);
-                this.tableData = result.list;
-                this.total = result.count
-                this.statisticsData[0].unloadNumber = result.count
-                this.statisticsData[0].name = (result.type_title==''?'全部':result.type_title)
-                this.statisticsData[0].use = result.yy
-                this.statisticsData[0].used = result.count-result.yy
-
+                if (result.status == '200') {
+                    this.tableData = result.data.list;
+                    this.total = result.data.count
+                    this.statisticsData[0].unloadNumber = result.data.count
+                    this.statisticsData[0].name = (result.data.type_title == '' ? '全部' : result.data.type_title)
+                    this.statisticsData[0].use = result.data.yy
+                    this.statisticsData[0].used = result.data.count - result.data.yy
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
                 this.loading = false;
                 this.submitting = false
 
@@ -402,7 +417,7 @@ export default {
                 status: '',
                 sort: '',
             }
-            this.getMaterialList()
+            this.getHeadimageList()
         },
 
     },
@@ -410,9 +425,10 @@ export default {
 </script>
 
 <style scoped>
-::v-deep .el-image-viewer__canvas{
+::v-deep .el-image-viewer__canvas {
     width: 40%;
 }
+
 .tt-accsituation {
     background-color: #fff;
     min-height: 70px;

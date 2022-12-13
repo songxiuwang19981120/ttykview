@@ -347,7 +347,38 @@ export default {
       'followUser':{    //关注用户接口
         url:'apidata/followUser',
         method:'POST'
+      },
+
+      'libraryidIndex':{    //获取素材库
+        url:'Libraryid/index',
+        method:'POST'
+      },
+
+      'libraryidAdd':{    //新增素材库
+        url:'Libraryid/add',
+        method:'POST'
+      },
+
+      'libraryidUpdate':{    //修改素材库
+        url:'Libraryid/update',
+        method:'POST'
+      },
+
+      'libraryidDelete':{    //修改素材库
+        url:'Libraryid/delete',
+        method:'POST'
+      },
+
+      'testGetRestByKeys':{    //通过链接获取tk信息
+        url:'Test/getRestByKeys',
+        method:'POST'
+      },
+
+      'uidlibraryAdd':{    //新增素材
+        url:'Uidlibrary/add',
+        method:'POST'
       }
+      
 
 
   }

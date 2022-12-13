@@ -194,10 +194,6 @@ export default {
                     label: '关注列表',
                     value: 2,
                 },
-                {
-                    label: '评论列表',
-                    value: 3,
-                },
             ],//采集内容
             collectionBlacklistlist: [
                 {
@@ -236,14 +232,10 @@ export default {
             dataSourceList: [
                 {
                     value: '1',
-                    label: '评论列表'
-                },
-                {
-                    value: '2',
                     label: '关注列表'
                 },
                 {
-                    value: '3',
+                    value: '2',
                     label: '粉丝列表'
                 },
             ],  //数据来源

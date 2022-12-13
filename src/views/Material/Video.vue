@@ -13,7 +13,8 @@
                 <div>
                     <span class="search-title">素材库:</span>
                     <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryList"
-                        v-model="searchTableData.library" placeholder="素材库选择" style="width:180px;margin-right:20px"></el-cascader>
+                        v-model="searchTableData.library" placeholder="素材库选择"
+                        style="width:180px;margin-right:20px"></el-cascader>
                 </div>
                 <div>
                     <span class="search-title">素材类型:</span>
@@ -48,8 +49,7 @@
             <div style="height:10px"></div>
         </div>
         <el-dialog title="视频上传" :visible.sync="videoUploadVisible" width="40%" :before-close="videoUploadClose">
-            <el-form ref="videoForm" :rules="rulesUpload" :model="videoForm" label-width="140px"
-                :hide-required-asterisk="true">
+            <el-form ref="videoForm" :rules="rulesUpload" :model="videoForm" label-width="140px">
                 <el-form-item label="分组:" prop="group">
                     <el-select v-model="videoForm.group" placeholder="请选择分组">
                         <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
@@ -62,7 +62,7 @@
                 </el-form-item>
                 <el-form-item label="视频:" prop="video">
                     <el-upload class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple accept=".mp4"
-                        :on-success="handleSucess" :on-remove="handleRemove">
+                        :on-success="handleSucess" :on-error="handleError" :on-remove="handleRemove">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
                     </el-upload>
@@ -228,14 +228,17 @@ export default {
             console.log('视频删除', file, fileList);
             this.fileList = fileList
         },
-        // 视频上传成功
+        // 视频上传成功回调
         handleSucess(response, file, fileList) {
-            console.log('视频上传', response, file, fileList);
             // if(response.status!='200'){
             //     this.$message.warning(response.msg);
             //     fileList.pop()
             // }
             this.fileList = fileList
+        },
+        // 视频上传失败回调
+        handleError(err, file, fileList){
+            this.$message.error(err.msg);
         },
         /*
             function: getTreeData
@@ -258,18 +261,24 @@ export default {
         async getTypeControlList() {
             try {
                 let result = await this.$api({ type: "getTypecontrol" });
-                this.libraryList = result;
-                this.getTreeData(result)
-            } catch (error) {
-                console.error(error);
-            }
+                if (result.status == '200') {
+                    this.libraryList = result.data;
+                    this.getTreeData(result.data)
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) { }
         },
         /* 
             获取分组
         */
         async getGroupList() {
             let result = await this.$api({ type: 'getGrouping' })
-            this.groupList = result.list
+            if (result.status == '200') {
+                this.groupList = result.data.list
+            } else {
+                this.$message.error({ message: result.msg })
+            }
         },
         // 关闭视频播放
         videoPlayClose() {
@@ -307,7 +316,7 @@ export default {
         // 视频上传提交
         submitForVideo() {
             if (this.fileList.length == 0) {
-                return this.$message({ message: '请选择需要上传的视频', type: 'warning' });
+                return this.$message.warning({ message: '请选择需要上传的视频'});
             }
             this.$refs['videoForm'].validate((valid) => {
                 if (!valid) return false;
@@ -325,20 +334,23 @@ export default {
                 this.addMaterial(data)
             })
         },
-
+        // 视频上传提交
         async addMaterial(data) {
             try {
                 let result = await this.$api({ type: "addMaterial", data: data });
-                console.log(result);
-                this.$notify({ title: '新增成功', type: 'success' });
-                this.videoSubmitting = false;
-                this.fileList = [];
-                this.videoUploadVisible = false;
-                this.videoForm = {
-                    group: '',  //分组
-                    library: '',  //库
-                };
-                this.getMaterialList()
+                if (result.status == '200') {
+                    this.videoSubmitting = false;
+                    this.fileList = [];
+                    this.videoUploadVisible = false;
+                    this.videoForm = {
+                        group: '',  //分组
+                        library: '',  //库
+                    };
+                    this.getMaterialList()
+                    this.$message.success({ message: result.msg })
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
             } catch (error) {
                 console.error(error);
             }
@@ -362,9 +374,12 @@ export default {
             }
             try {
                 let result = await this.$api({ type: "deleteMaterial", data: data });
-                console.log(result);
-                this.$notify({ title: '删除成功', type: 'success' });
-                this.getMaterialList()
+                if (result.status == '200') {
+                    this.$message.success({ message: '视频删除成功' });
+                    this.getMaterialList()
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
             } catch (error) {
                 console.error(error);
             }
@@ -412,17 +427,18 @@ export default {
             try {
                 this.loading = true;
                 let result = await this.$api({ type: "getMaterialList", data: data });
-                console.log(result);
-                this.tableData = result.list;
-                this.total = result.count
-                this.statisticsData[0].unloadNumber = result.count
-                this.statisticsData[0].name = (result.type_title==''?'全部':result.type_title)
-                this.statisticsData[0].use = result.yy
-                this.statisticsData[0].used = result.count-result.yy
-
+                if (result.status == '200') {
+                    this.tableData = result.data.list;
+                    this.total = result.data.count
+                    this.statisticsData[0].unloadNumber = result.data.count
+                    this.statisticsData[0].name = (result.data.type_title == '' ? '全部' : result.data.type_title)
+                    this.statisticsData[0].use = result.data.yy
+                    this.statisticsData[0].used = result.data.count - result.data.yy
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
                 this.loading = false;
                 this.submitting = false
-
             } catch (error) {
                 this.loading = false;
                 this.submitting = false
