@@ -347,6 +347,16 @@ export default {
       'followUser':{    //关注用户接口
         url:'apidata/followUser',
         method:'POST'
+      },
+
+      'updateUserInfo':{  //修改用户信息
+        url:'test/edituserinfo',
+        method:'POST'
+      },
+
+      'getUserRandomInfo':{       //随机获取用户信息
+        url:'Autograph/RandomData',
+        method:'POST'
       }
 
 

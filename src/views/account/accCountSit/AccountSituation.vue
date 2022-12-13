@@ -49,46 +49,56 @@
       </div>
 
       <div class="searchbtn-group">
-      <el-button
-        class="search-btn"
-        @click="handlerSearch" 
-        >搜索</el-button
-      >
+        <el-button class="search-btn" @click="handlerSearch" type="primary"
+          >搜索</el-button
+        >
 
-        <el-button
-        class="search-btn"
-        @click="RestQuery" 
-        >重置</el-button
-      >
+        <el-button class="search-btn" @click="RestQuery" type="primary"
+          >重置</el-button
+        >
       </div>
     </div>
 
     <div class="tt-accsituation--settask">
-      <span class="mr-30">设置任务 ：</span>
-      <el-select
-        @change="openTaskDialog"
-        class="tt-accsituation--taskconig"
-        v-model="taskConfig"
-        placeholder="已选账号任务配置"
+      <div>
+        <span class="mr-30">设置任务 ：</span>
+        <el-select
+          :disabled="this.batchEditorList.length === 0"
+          @change="openTaskDialog"
+          class="tt-accsituation--taskconig"
+          v-model="taskConfig"
+          placeholder="已选账号任务配置"
+        >
+          <el-option
+            v-for="item in accConfigCloumn"
+            :key="item"
+            :label="item"
+            :value="item"
+          ></el-option>
+        </el-select>
+      </div>
+      <el-button @click="batchEditor" class="batchedit-btn" type="primary"
+        >批量编辑</el-button
       >
-        <el-option
-          v-for="item in accConfigCloumn"
-          :key="item"
-          :label="item"
-          :value="item"
-        ></el-option>
-      </el-select>
-      <el-button @click="batchEditor" class="batchedit-btn">批量编辑</el-button>
     </div>
 
-    <table-custom
-      class="tt-accsituation--tabel"
-      :mutiSelect="true"
-      @handleSelectionChange="handleSelectChange"
-      :loading="loading"
-      :tableData="memberList"
-      :columns="columns"
-    ></table-custom>
+    <transition
+      v-if="memberList.length > 0"
+      enter-active-class="animate__animated animate__fadeIn"
+      appear
+      mode="out-in"
+    >
+      <table-custom
+        class="tt-accsituation--tabel"
+        :mutiSelect="true"
+        @handleSelectionChange="handleSelectChange"
+        :loading="loading"
+        :tableData="memberList"
+        :columns="columns"
+      ></table-custom>
+    </transition>
+
+    <el-empty v-else description="暂无内容"></el-empty>
 
     <Pagination
       :total="total"
@@ -96,7 +106,6 @@
       :size="limit"
       @pagination="handlePagination"
     />
-
     <VideoDialog
       @closeVideoTask="closeVideoTask"
       :showVideoTask="showVideoTask"
@@ -116,11 +125,18 @@
     <EditorDialog
       @closeEditorDialog="closeEditorDialog"
       :showEditorDialog="showEditorDialog"
+      :typeList="typeList"
+      :user_id="user_id"
+      :groupList="groupList"
     />
     <BatchEditorDialog
       @closeBatchEidialog="closeBatchEidialog"
       :showBatchEiDialog="showBatchEiDialog"
       :check_all="check_all"
+      :typeList="typeList"
+      :groupList="groupList"
+      :batchEditorLength="batchEditorLength"
+      :accTotal="accTotal"
     />
     <VideoTabel
       @closeVideoTabel="closeVideoTabel"
@@ -168,9 +184,12 @@ export default {
     ViewerTabel,
   },
   computed: {
-    isDisabled() {
-      return !this.classiFication || !this.fans || !this.acc_id;
-    },
+      batchEditorLength(){
+        return this.batchEditorList.length
+      },
+      accTotal(){
+        return this.check_all === 'true' ? 100 : 0
+      }
   },
   data() {
     return {
@@ -190,15 +209,19 @@ export default {
           label: "设备信息",
           align: "center",
           fixed: true,
-          render:(h,{row})=>{
+          render: (h, { row }) => {
             return (
               <div>
-                <el-tooltip content="Top center" placement="bottom" effect="light">
+                <el-tooltip
+                  content="Top center"
+                  placement="bottom"
+                  effect="light"
+                >
                   <span>{row.phone_number}</span>
                 </el-tooltip>
               </div>
-            )
-          }
+            );
+          },
         },
 
         {
@@ -308,6 +331,7 @@ export default {
                 <el-button
                   size="mini"
                   onClick={this.handleEdit.bind(this, row)}
+                  type="primary"
                 >
                   编辑
                 </el-button>
@@ -345,7 +369,7 @@ export default {
       total: 0, //返回的账号总条数
       fans_total: 0, //粉丝总量
       group: "", //设置分组
-      limit: 10, //每页请求数据条数
+      limit: 100, //每页请求数据条数
       showEditorDialog: false, //是否展示编辑按钮界面
       showBatchEiDialog: false, //是否展示批量编辑按钮界面
       shwoVideoTabel: false, //是否展示视频播放弹窗
@@ -355,7 +379,9 @@ export default {
       vistList: [], //访问列表数据
       member_id: "", //用户ID，获取数据用的
       visterTotal: "", //访问总人数
-      user_id:'', //被选中的用户的UID
+      user_id: "", //被选中的用户的UID
+      batchEditorList:[] //批量编辑的账号列表
+
     };
   },
 
@@ -372,12 +398,12 @@ export default {
         params: null
         desc: 重置搜索字段
     */
-    RestQuery(){
-        this.classiFication = "",
-        this.acc_id = "",
-        this.fans = "",
-        this.group = ""
-        this.$message.success('重置成功 ！')
+    RestQuery() {
+      (this.classiFication = ""),
+        (this.acc_id = ""),
+        (this.fans = ""),
+        (this.group = "");
+      this.$message.success("重置成功 ！");
     },
 
     /* 
@@ -401,7 +427,7 @@ export default {
     toogleViewerTabel(val) {
       this.showViewerTabel = !this.showViewerTabel;
       this.member_id = val.member_id;
-      this.user_id = val.uid
+      this.user_id = val.uid;
       this.getVisitorList({ member_id: this.member_id }).then((res) => {
         this.vistList = res.list;
         this.visterTotal = res.count;
@@ -425,10 +451,14 @@ export default {
         page: page,
       };
       let result = await this.$api({ type: "getVistorList", data: data });
-
       return result.data;
     },
 
+    /* 
+        function: closeVideoTabel
+        params: null
+        desc: 关闭视频列表
+    */
     closeVideoTabel() {
       this.shwoVideoTabel = false;
     },
@@ -460,7 +490,8 @@ export default {
     */
     async handlerSearch() {
       let data = {
-        typecontrol_id: this.classiFication[this.classiFication.length - 1] ?? "",
+        typecontrol_id:
+          this.classiFication[this.classiFication.length - 1] ?? "",
         uid: this.acc_id ?? "",
         min: this.fans[0] ?? "",
         max: this.fans[1] ?? "",
@@ -468,6 +499,7 @@ export default {
         page: this.page ?? 1,
         grouping_id: this.group,
       };
+      console.log(data)
       let result = await this.$api({ type: "getMember", data: data });
       this.memberList = result.data.list;
     },
@@ -488,7 +520,10 @@ export default {
         desc: 批量编辑回调
     */
     batchEditor() {
-      console.log("批量编辑");
+      if(this.batchEditorList.length === 0){
+        this.$message.error('请选择账号')
+        return false
+      }
       this.showBatchEiDialog = true;
     },
 
@@ -522,7 +557,7 @@ export default {
     */
     closeFollowTask() {
       this.showFollowDialog = false;
-      this.taskConfig = ''
+      this.taskConfig = "";
     },
 
     /* 
@@ -532,7 +567,7 @@ export default {
     */
     closeLetterTask() {
       this.showLetterTask = false;
-      this.taskConfig = ''
+      this.taskConfig = "";
     },
 
     /* 
@@ -542,7 +577,7 @@ export default {
     */
     closeLikeCommentTask() {
       this.showLikeCommentTask = false;
-      this.taskConfig = ''
+      this.taskConfig = "";
     },
 
     /* 
@@ -552,7 +587,7 @@ export default {
     */
     closeVideoTask() {
       this.showVideoTask = false;
-      this.taskConfig = ''
+      this.taskConfig = "";
     },
 
     /* 
@@ -561,10 +596,9 @@ export default {
         desc: 表格多选框改变时的回调
     */
     handleSelectChange(val) {
-      if (val.length === 10) {
-        this.check_all = true;
-      }
-      console.log("select改变了", val);
+      this.batchEditorList = val
+      val.length === 100 ? this.check_all = true : this.check_all = false      
+      console.log("select改变了", this.batchEditorList,this.check_all);
     },
 
     setGroupOption() {
@@ -640,7 +674,6 @@ export default {
         });
         this.memberList = result.data.list;
         this.total = result.data.count;
-        console.log(this.memberList);
       } catch (error) {
         console.error(error);
       }
@@ -652,6 +685,7 @@ export default {
         desc: 编辑操作时的回调
     */
     handleEdit(row) {
+      this.user_id = row.uid
       this.showEditorDialog = true;
     },
 
@@ -689,6 +723,7 @@ export default {
 <style lang="stylus">
 .tt-accsituation-searchbar {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   padding: 0 20px;
   margin-bottom: 10px;
@@ -699,14 +734,13 @@ export default {
 }
 
 .search-btn {
-
   width: 70px;
 }
 
 .tt-accsituation--settask {
-  position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 20px;
   margin-bottom: 10px;
   width: 100%;
@@ -721,9 +755,7 @@ export default {
 }
 
 .batchedit-btn {
-  position: absolute;
-  right: 120px;
-  width: 100px;
+  width: 150px;
 }
 
 .videonum-span {
@@ -754,5 +786,8 @@ export default {
   border-radius: 50%;
 }
 
-
+.searchbtn-group {
+  display: flex;
+  margin-left: 80px;
+}
 </style>

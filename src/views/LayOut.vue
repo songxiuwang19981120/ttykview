@@ -1,26 +1,30 @@
 <template>
   <div>
-    
-      <el-row>
-        <el-col :span="3">
-          <el-aside class="tt-aside--wrap">
-            <BaseAside />
-          </el-aside>
-        </el-col>
+    <el-row>
+      <el-col :span="3">
+        <el-aside class="tt-aside--wrap">
+          <BaseAside />
+        </el-aside>
+      </el-col>
 
-        <el-col :span="21">
-          <el-container>
-            <el-header class="tt-header--wrap">
-              <BaseHeader />
-            </el-header>
+      <el-col :span="21">
+        <el-container>
+          <el-header class="tt-header--wrap">
+            <BaseHeader />
+          </el-header>
 
-            <el-main class="tt-main">
+          <el-main class="tt-main">
+            <transition
+              enter-active-class="animate__animated animate__fadeIn"
+              appear
+              mode="out-in"
+            >
               <router-view></router-view>
-            </el-main>
-          </el-container>
-        </el-col>
-      </el-row>
-    
+            </transition>
+          </el-main>
+        </el-container>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -41,9 +45,8 @@ export default {
 </script>
 
 <style lang="stylus">
-
 .tt-aside--wrap {
-  width: 100% !important
+  width: 100% !important;
 }
 
 .tt-header--wrap {
@@ -53,7 +56,7 @@ export default {
 }
 
 .tt-main {
-    width: 100% !important
+  width: 100% !important;
   height: calc(100vh - 70px);
   box-sizing: border-box;
   background-color: #EFEFEF;

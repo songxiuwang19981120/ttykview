@@ -12,7 +12,7 @@
         :columns="columns"
       ></table-custom>
       <Pagination
-        :total="visterTotal"
+        :total="visterTotal || 0"
         :page="page"
         :size="limit"
         @pagination="handlePagination"
@@ -37,8 +37,7 @@ export default {
       type: String,
     },
     visterTotal: {
-      type: Number,
-      default: 1,
+      type: String,
     },
     user_id: {
       type: String,
@@ -152,9 +151,8 @@ export default {
         };
         let result = await this.$api({ type: "followUser", data: data });
         result.status === '200' ? this.$message.success(result.msg) : this.$message.error(result.msg)
-        
       } catch (error) {
-        console.log(error)
+        console.error(error)
       }
     },
   },
