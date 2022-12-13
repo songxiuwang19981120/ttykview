@@ -11,8 +11,12 @@ const service = axios.create({
 
 service.interceptors.response.use((response) => {
   //剥离最外层
-  let result = response.data
-  return result?.data;
+  let result = response?.data
+  return {
+    data:result?.data,
+    msg:result.msg ?? '未知信息',
+    status:result?.status
+  };
 }, (error) => {
   return Promise.reject(error);
 });

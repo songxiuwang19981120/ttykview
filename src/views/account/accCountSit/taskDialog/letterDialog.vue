@@ -6,14 +6,16 @@
       :before-close="handlerClose"
     >
       <span slot="title">
-        <h1 class="tt-acccountsit--title">私信任务配置</h1>
+        <h1 class="tt-acccountsit--title">关注任务配置</h1>
       </span>
 
       <el-form
+      ref="letterForm"
+        :rules="rules"
         class="lettertask-form"
         label-position="left"
         label-width="216px"
-        v-model="letterTaskForm"
+        :model="letterTaskForm"
       >
         <el-form-item label="选择国家 ：" v-model="letterTaskForm.country">
           <el-select v-model="letterTaskForm.country" placeholder="选择国家">
@@ -78,7 +80,7 @@
 
         <el-form-item
           label="粉丝数量小于："
-          :prop="letterTaskForm.fans_lessnum"
+          prop="fans_lessnum"
         >
           <el-input
             v-model="letterTaskForm.fans_lessnum"
@@ -105,7 +107,7 @@
 
         <el-form-item
           label="关注数量小于："
-          :prop="letterTaskForm.letter_lessnum"
+          prop="letter_lessnum"
         >
           <el-input
             type="text"
@@ -116,7 +118,7 @@
 
         <el-form-item
           label="获赞评论小于 ："
-          :prop="letterTaskForm.like_lessnum"
+          prop="like_lessnum"
         >
           <el-input
             type="text"
@@ -125,11 +127,22 @@
           ></el-input>
         </el-form-item>
 
+        <el-form-item label="黑名单" prop="black_list">
+          <el-checkbox-group v-model="letterTaskForm.black_list">
+            <el-checkbox
+              v-for="item in blackList"
+              :key="item"
+              :label="item"
+            ></el-checkbox>
+          </el-checkbox-group>
+
+        </el-form-item>
+
         <div class="lettertask-checkport">
           <span class="check">执行端选择：</span>
           <el-checkbox-group v-model="letterTaskForm.port">
             <el-checkbox label="协议"></el-checkbox>
-            <el-checkbox label="真机"></el-checkbox>
+            <el-checkbox disabled label="真机"></el-checkbox>
           </el-checkbox-group>
         </div>
       </el-form>
@@ -152,6 +165,24 @@ export default {
   },
   data() {
     return {
+      rules:{
+        fans_lessnum:[
+        {required: true,message:"请填写粉丝量小于次数",trigger: "blur"},
+        { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
+        ],
+        letter_lessnum:[
+          {required: true,message:"请填写关注数量小于次数",trigger: "blur"},
+          {pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
+        ],
+        like_lessnum:[
+          {required: true,message:"请填写获赞评论小于次数",trigger: "blur"},
+          {pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
+        ],
+        black_list:[
+          {required: true,message:"请配置黑名单",trigger: "change"}
+        ]
+      },
+      blackList: ["无昵称", "无作品", "无头像", "历史已操作用户"],
       sourceData: [
         {
           value: "巴西宠物",
@@ -224,6 +255,7 @@ export default {
         letter_lessnum: "", //关注数量小于
         like_lessnum: "", //获赞评论小于
         port: [], //执行端选择
+        black_list:[]
       },
     };
   },
@@ -234,10 +266,35 @@ export default {
     handlerClose() {
       console.log("执行了");
       this.$emit("closeLetterTask");
+      this.resetForm()
     },
+    /* 
+        function: handlerConfrim
+        params: null
+        desc: 提交表单
+    */
     handlerConfrim() {
-      console.log(this.letterTaskForm);
+       this.$refs["letterForm"].validate((valid) => {
+        if (valid) {
+          this.handlerClose()
+          console.log(this.letterTaskForm);
+          this.resetForm()
+          console.log(this.letterTaskForm);
+          this.$message.success('提交成功')
+          return 
+        }
+        this.$message.error('提交失败')
+      });
     },
+
+    /* 
+        function: resetForm
+        params: null
+        desc: 重置表单字段
+    */
+    resetForm(){
+      this.$refs['letterForm'].resetFields()
+    }
   },
 };
 </script>

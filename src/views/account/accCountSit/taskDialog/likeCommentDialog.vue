@@ -10,12 +10,15 @@
       </span>
 
       <el-form
+        :rules="rules"
+        ref="likeCommentForm"
         label-position="left"
         label-width="216px"
-        v-model="likeCommentTaskForm"
+        :model="likeCommentTaskForm"
       >
-        <el-form-item label="选择国家 ：" v-model="likeCommentTaskForm.country">
+        <el-form-item label="选择国家 ：" prop="country" v-model="likeCommentTaskForm.country">
           <el-select
+          clearable
             v-model="likeCommentTaskForm.country"
             placeholder="选择国家"
           >
@@ -29,10 +32,12 @@
         </el-form-item>
 
         <el-form-item
+        prop="source_data"
           label="选择数据来源 ："
           v-model="likeCommentTaskForm.source_data"
         >
           <el-select
+          clearable
             v-model="likeCommentTaskForm.source_data"
             placeholder="选择数据来源"
           >
@@ -46,10 +51,12 @@
         </el-form-item>
 
         <el-form-item
+        prop="need_follow_group"
           label="选择需关注分组 ："
           v-model="likeCommentTaskForm.need_follow_group"
         >
           <el-select
+          clearable
             v-model="likeCommentTaskForm.need_follow_group"
             placeholder="需关注分组"
           >
@@ -64,7 +71,7 @@
 
         <el-form-item
           label="单号作品点赞上限（次）："
-          :prop="likeCommentTaskForm.work_likenum_max"
+          prop="work_likenum_max"
         >
           <el-input
             type="text"
@@ -74,7 +81,7 @@
         </el-form-item>
         <el-form-item
           label="单号点赞上限（次）："
-          :prop="likeCommentTaskForm.acc_likenum_max"
+          prop="acc_likenum_max"
         >
           <el-input
             type="text"
@@ -84,7 +91,7 @@
         </el-form-item>
         <el-form-item
           label="评论获赞小于（次）："
-          :prop="likeCommentTaskForm.comment_likenum_less"
+          prop="comment_likenum_less"
         >
           <el-input
             type="text"
@@ -93,8 +100,8 @@
           ></el-input>
         </el-form-item>
         <el-form-item
-          label="连续失败执行下一个号（次） ："
-          :prop="likeCommentTaskForm.continuity_lose"
+          label="连续失败执行下一个号（次）:"
+          prop="continuity_lose"
         >
           <el-input
             type="text"
@@ -118,7 +125,7 @@
           <span>执行端选择：</span>
           <el-checkbox-group v-model="likeCommentTaskForm.port">
             <el-checkbox label="协议"></el-checkbox>
-            <el-checkbox label="真机"></el-checkbox>
+            <el-checkbox disabled label="真机"></el-checkbox> <!-- TODO  目前没有真机业务 -->
           </el-checkbox-group>
         </div>
       </el-form>
@@ -141,6 +148,23 @@ export default {
   },
   data() {
     return {
+      rules:{
+        work_likenum_max:[
+        {required: true,message:"请填写点赞上限",trigger: "blur"},
+        { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
+        ],
+        acc_likenum_max:[
+          {required: true,message:"请填写点赞上限",trigger: "blur"},
+          {pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
+        ],
+        continuity_lose:[
+          {required: true,message:"请填写失败次数",trigger: "blur"},
+          {pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
+        ],
+        source_data:[
+          {required: true,message:"请选择数据来源",trigger: "change"}
+        ]
+      },
       //TODO 黑名单选择  需要跟后端对接
       blackList: ["无昵称", "无作品", "无头像", "历史已操作用户"],
       //TODO 需关注分组下拉框选择  需要跟后端对接
@@ -215,12 +239,44 @@ export default {
   mounted() {},
 
   methods: {
+
+    /* 
+        function: handlerClose
+        params: null
+        desc: 关闭表单
+    */
     handlerClose() {
       this.$emit("closeLikeCommentTask");
+      this.resetForm()
     },
+
+    /* 
+        function: handlerConfrim
+        params: null
+        desc: 提交表单
+    */
     handlerConfrim() {
-      console.log(this.likeCommentTaskForm);
+       this.$refs["likeCommentForm"].validate((valid) => {
+        if (valid) {
+          this.handlerClose()
+          console.log(this.likeCommentTaskForm);
+          this.resetForm()
+          console.log(this.likeCommentTaskForm);
+          this.$message.success('提交成功')
+          return 
+        }
+        this.$message.error('提交失败')
+      });
     },
+
+    /* 
+        function: resetForm
+        params: null
+        desc: 重置表单字段
+    */
+    resetForm(){
+      this.$refs['likeCommentForm'].resetFields()
+    }
   },
 };
 </script>
