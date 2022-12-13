@@ -2,7 +2,6 @@
   <div>
     <el-dialog :visible="shwoVideoTabel" :before-close="handlerClose">
       <table-custom
-        :mutiSelect="true"
         @handleSelectionChange="handleSelectChange"
         :loading="loading"
         :tableData="videoList"
@@ -50,7 +49,7 @@ export default {
           align: "center",
           render: (h, { row }) => {
             return (
-              <video width="80px" height="90px" src={row.video_url}></video>
+              <video style="cursor:pointer"  onClick={this.handlerPlayer.bind(this, row)} width="80px" height="70px" src={row.video_url}></video>
             );
           },
         },

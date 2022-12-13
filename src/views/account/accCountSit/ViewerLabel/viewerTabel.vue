@@ -2,19 +2,21 @@
   <div>
     <el-dialog
       title="提示"
-      :visible.sync="showVisiteTabel"
-      width="30%"
+      :visible="showViewerTabel"
+      width="80%"
       :before-close="handleClose"
     >
-    <table-custom
+      <table-custom
         :loading="loading"
-        :tableData="videoList"
+        :tableData="vistList"
         :columns="columns"
       ></table-custom>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="handleClose">取 消</el-button>
-
-      </span>
+      <Pagination
+        :total="visterTotal"
+        :page="page"
+        :size="limit"
+        @pagination="handlePagination"
+      />
     </el-dialog>
   </div>
 </template>
@@ -25,8 +27,26 @@ import tableCustom from "@/components/myComponent/table/tableCustom";
 export default {
   name: "TtprojectVisitTabelDialog",
   props: {
-    showVisiteTabel: {
+    showViewerTabel: {
       type: Boolean,
+    },
+    vistList: {
+      type: Array,
+    },
+    member_id: {
+      type: String,
+    },
+    visterTotal: {
+      type: Number,
+      default: 1,
+    },
+    user_id: {
+      type: String,
+    },
+  },
+  computed: {
+    visiterLength() {
+      return this.vistList.length;
     },
   },
   components: {
@@ -35,52 +55,108 @@ export default {
   },
   data() {
     return {
-        loading:false,
-        columns:[
+      limit: 10,
+      page: 1,
+      loading: false,
+      columns: [
         {
-          prop: "comment_count",
+          prop: "nickname",
+          label: "昵称",
+          align: "center",
+          width: "150",
+        },
+        {
+          prop: "country",
+          label: "国家",
+          align: "center",
+        },
+        {
+          prop: "signature",
+          label: "签名",
+          align: "center",
+          minwidth: "200",
+        },
+
+        {
+          prop: "avatar_thumb",
           label: "头像",
           align: "center",
+          render: (h, { row }) => {
+            return (
+              <div>
+                <el-image
+                  src={row.avatar_thumb}
+                  style="width: 60px; height: 60px"
+                ></el-image>
+              </div>
+            );
+          },
         },
-                {
-          prop: "comment_count",
-          label: "账号",
+
+        {
+          prop: "aweme_count",
+          label: "视频数量",
           align: "center",
         },
-                {
-          prop: "comment_count",
-          label: "XX",
-          align: "center",
-        },
-                {
-          prop: "comment_count",
-          label: "XX",
-          align: "center",
-        },
-                {
-          prop: "comment_count",
+
+        {
+          prop: "follower_status,follow_status",
           label: "操作",
           align: "center",
-          render:(h,{row})=>{
+          render: (h, { row }) => {
             return (
-                <div>
-                    <el-button>关注</el-button>
-                    <el-button>回关</el-button>
-                    <el-button>私信</el-button>
-                </div>
-            )
-          }
+              <div>
+                <el-button
+                  onClick={this.handleFollow.bind(this, row)}
+                  v-show={
+                    row.follower_status === "0" && row.follow_status === "0"
+                  }
+                >
+                  关注
+                </el-button>
+                <el-button
+                  v-show={
+                    row.follower_status === "1" && row.follow_status === "0"
+                  }
+                >
+                  回关
+                </el-button>
+                <el-button v-show={row.follow_status === "2"}>私信</el-button>
+              </div>
+            );
+          },
         },
-        ]
+      ],
     };
   },
 
   mounted() {},
 
   methods: {
-    handleClose(){
-        this.$emit('toogleViewerTabel')
-    }
+    handlePagination(val) {
+      (this.page = val.page),
+        this.$emit("updateVisitorList", this.member_id, this.page);
+    },
+
+    handleClose() {
+      this.$emit("toogleViewerTabel");
+    },
+
+    async handleFollow(val) {
+      try {
+        console.log(val, this.user_id);
+        let data = {
+          user_id: this.user_id,
+          b_user_id: val.uid,
+          b_sec_user_id: val.sec_uid,
+        };
+        let result = await this.$api({ type: "followUser", data: data });
+        result.status === '200' ? this.$message.success(result.msg) : this.$message.error(result.msg)
+        
+      } catch (error) {
+        console.log(error)
+      }
+    },
   },
 };
 </script>

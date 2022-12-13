@@ -9,20 +9,30 @@
         <h1 class="tt-acccountsit--title">视频发布任务配置</h1>
       </span>
 
-      <el-form label-position="left" label-width="130px" v-model="vieoTaskForm">
-        <el-form-item label="视频发布数量 :" :prop="vieoTaskForm.video_num">
-          <el-input type="text" v-model="vieoTaskForm.video_num"></el-input>
+      <el-form
+        :rules="rules"
+        ref="videoForm"
+        label-position="left"
+        label-width="130px"
+        :model="vieoTaskForm"
+      >
+        <el-form-item label="视频发布数量 :" prop="video_num">
+          <el-input
+            @blur="test"
+            type="text"
+            v-model="vieoTaskForm.video_num"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="主题标签内容 :" :prop="vieoTaskForm.tag_num">
+        <el-form-item label="主题标签内容 :" prop="tag_num">
           <el-input
             v-model="vieoTaskForm.tag_num"
             autocomplete="off"
           ></el-input>
         </el-form-item>
-        <el-form-item label="@用户数量 :" :prop="vieoTaskForm.user_num">
+        <el-form-item label="@用户数量 :" prop="user_num">
           <el-input v-model="vieoTaskForm.user_num"></el-input>
         </el-form-item>
-        <el-form-item label="主题内容 :" :prop="vieoTaskForm.theme_content">
+        <el-form-item label="主题内容 :" prop="theme_content">
           <el-input
             class="input-textarea"
             type="textarea"
@@ -52,26 +62,14 @@ export default {
   },
   data() {
     return {
-      rules:{
-        video_num:[
+      rules: {
+        video_num: [
           {
-            required:true,
-            message:'视频发布数量必填',
-            trigger:'blur'
+            required: true,
+            message: "请填写发布数量",
+            trigger: "blur",
           },
-          {
-            pattern: /^\d+$/,
-            message:'类型必须是数字',
-            trigger:'blur'
-          }
         ],
-        tag_num:[
-          {
-            required:true,
-            message:'请填写标签内容',
-            trigger:'blur'
-          }
-        ]
       },
 
       //TODO  需要跟后端对接字段  视频发布任务 提交表单
@@ -80,7 +78,7 @@ export default {
         tag_num: "", //主题标签内容
         user_num: "", // @用户数量
         theme_content: "", //主题内容
-        random_content: "", //如果是随机内容的话为TRUE
+        random_content: false, //如果是随机内容的话为TRUE
       },
     };
   },
@@ -88,6 +86,9 @@ export default {
   mounted() {},
 
   methods: {
+    test() {
+      console.log(123);
+    },
     /* 
         function: handlerClose
         params: null
@@ -103,8 +104,27 @@ export default {
         desc: 提交后的回调
     */
     handlerConfrim() {
-      console.log(this.vieoTaskForm);
+      this.$refs["videoForm"].validate((valid) => {
+        if (valid) {
+          console.log("成功");
+          this.handlerClose()
+          console.log(this.vieoTaskForm);
+          this.resetForm()
+          console.log(this.vieoTaskForm);
+          return 
+        }
+        this.$message.error('提交失败')
+      });
     },
+    /* 
+        function: resetForm
+        params: null
+        desc: 重置表单字段
+    */
+    resetForm(){
+      this.$refs['videoForm'].resetFields()
+      this.vieoTaskForm.random_content = false
+    }
   },
 };
 </script>
