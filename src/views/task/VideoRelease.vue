@@ -18,14 +18,12 @@
 			<!-- 表格 -->
 			<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 			<!-- 分页 -->
-			<el-row type="flex" justify="end">
-				<pagination
-					:total="total"
-					:page="page.page"
-					:limit="page.limit"
-					@pagination="pageChange"
-				></pagination>
-			</el-row>
+			<pagination
+				:total="total"
+				:page="page.page"
+				:limit="page.limit"
+				@pagination="pageChange"
+			></pagination>
 			<!-- 弹层 -->
 			<VideoReleaseDialogComponent
 				ref="dialog"
@@ -67,7 +65,7 @@
 					},
 				],
 				searchTableData: {
-					state: ''
+					state: '',
 				},
 				loading: false,
 				tableData: [],
@@ -116,7 +114,7 @@
 				dialog: false, // 弹层
 				page: {
 					page: 1,
-					limit: 20
+					limit: 20,
 				},
 				total: 0,
 			};
@@ -135,19 +133,23 @@
 			},
 			// 获取视频任务列表
 			async getVideoTasks(data) {
-				this.loading = true
+				this.loading = true;
 				try {
 					const res = await this.$api({
 						type: 'getVideotasks',
 						data,
 					});
 					console.log(res, '视频列表数据');
-					this.tableData = res.list;
-					this.total = res.count
+					if (res.status == 200) {
+						this.tableData = res.data.list;
+						this.total = res.data.count;
+					} else {
+						this.$message.error(res.msg);
+					}
 				} catch (error) {
 					console.error(error);
 				} finally {
-					this.loading = false
+					this.loading = false;
 				}
 			},
 			// 查看详情
@@ -164,8 +166,8 @@
 			},
 			// 点击查询按钮
 			searchTasks() {
-				this.page.curpage = 1
-				alert('查询')
+				this.page.curpage = 1;
+				alert('查询');
 			},
 		},
 	};

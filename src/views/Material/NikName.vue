@@ -34,22 +34,6 @@
 					></el-cascader>
 				</div>
 				<div>
-					<span>时间排序：</span>
-					<el-select
-						v-model="searchTableData.sortTime"
-						placeholder="时间排序选择"
-						style="margin-right: 20px"
-					>
-						<el-option
-							v-for="item in searchTimeList"
-							:key="item.value"
-							:label="item.label"
-							:value="item.value"
-						>
-						</el-option>
-					</el-select>
-				</div>
-				<div>
 					<!-- 查询 -->
 					<el-button type="primary" :loading="btnloading" @click="searchNickName">{{
 						btnloading ? '加载中...' : '查询'
@@ -62,109 +46,65 @@
 				</div>
 			</div>
 		</div>
-		<el-card>
+		<el-card v-if="tableData.length">
 			<!-- 表格 -->
 			<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
-			<!-- 分页 -->
-			<pagination
-				:total="total"
-				:page="page.page"
-				:limit="page.limit"
-				@pagination="pageChange"
-			></pagination>
 		</el-card>
 		<!-- 详情弹层 -->
-		<NickNameDetailDialog :outerVisible.sync="showDetailDialog"></NickNameDetailDialog>
+		<NickNameDetailDialog
+			:outerVisible.sync="showDetailDialog"
+			ref="detailDialog"
+			:upParameter="nickData"
+		></NickNameDetailDialog>
 		<!-- 上传弹层 -->
-		<UploadDialog :showDialog.sync="showUploadDialog"></UploadDialog>
+		<NickNameUploadDialog :showDialog.sync="showUploadDialog" :upParameter="searchTableData"></NickNameUploadDialog>
 	</div>
 </template>
 
 <script>
 	import tableCustom from '@/components/myComponent/table/tableCustom.vue';
-	import pagination from '@/components/myComponent/table/pagination.vue';
 	import NickNameDetailDialog from './component/NickNameDetailDialog.vue';
-	import UploadDialog from './component/UploadDialog'
+	import NickNameUploadDialog from './component/NickNameUploadDialog';
 	export default {
 		name: 'NikName',
 		components: {
 			tableCustom,
-			pagination,
 			NickNameDetailDialog,
-			UploadDialog
+			NickNameUploadDialog,
 		},
 		data() {
 			return {
 				searchEquipmentList: [], // 分组数据
 				searchTypecontrolList: [], // 素材库数据
-				searchTimeList: [
-					{
-						value: 'asc',
-						label: '升序排列',
-					},
-					{
-						value: 'desc',
-						label: '降序排列',
-					},
-				], // 时间排序
 				btnloading: false,
 				searchTableData: {
 					equipment: '',
-					typecontrol: '',
-					sortTime: '', // 表格搜索
+					typecontrol: '', // 表格搜索
 				},
 				loading: false, // 表格-分页组件相关
-				tableData: [
-					{
-						type_title: '美国',
-						all_count: 2000,
-						use_count: 1200,
-						nouse_count: 800
-					},
-					{
-						type_title: '美国',
-						all_count: 2000,
-						use_count: 1200,
-						nouse_count: 800
-					},
-					{
-						type_title: '美国',
-						all_count: 2000,
-						use_count: 1200,
-						nouse_count: 800
-					}
-				],
+				tableData: [],
 				columns: [
-					// {
-					// 	label: '国家',
-					// 	align: 'center',
-					// },
-					// {
-					// 	label: '项目',
-					// 	align: 'center',
-					// },
-					// {
-					// 	label: '一级分类',
-					// 	align: 'center',
-					// },
 					{
 						prop: 'type_title',
 						label: '分类名称',
+						// align: 'center'
+					},
+					{
+						label: '已上昵称数量',
+						align: 'center',
+						render: (h, { row }) => {
+							const allCount = Number(row.yy) + Number(row.wy);
+							return <div>{allCount}</div>;
+						},
+					},
+					{
+						prop: 'yy',
+						label: '已用昵称数量',
 						align: 'center',
 					},
 					{
-						prop: 'all_count',
-						label: '已上标签数量',
-						align: 'center',
-					},
-					{
-						prop: 'use_count',
-						label: '已用素材数量',
-						align: 'center',
-					},
-					{
-						prop: 'nouse_count',
-						label: '当前可用素材',
+						prop: 'wy',
+						label: '当前可用昵称',
 						align: 'center',
 					},
 					{
@@ -177,7 +117,7 @@
 										style="margin-right: 5px;"
 										type="primary"
 										size="mini"
-										onClick={this.toNickNameDetail.bind(this,row)}
+										onClick={this.toNickNameDetail.bind(this, row)}
 									>
 										详情
 									</el-button>
@@ -186,25 +126,13 @@
 						},
 					},
 				],
-				page: {
-					page: 1,
-					limit: 20,
-					nickname: '',
-					typecontrol_id: '',
-					status: null,
-					grouping_id: null,
-				},
 				total: 0,
 				showDetailDialog: false,
 				showUploadDialog: false,
 				equipmentLoading: false,
 				typecontrolLoading: false,
+				nickData: {}, // 传递给详情弹层的数据
 			};
-		},
-
-		created() {
-			// 获取昵称素材库数据
-			// this.getNickName(this.page);
 		},
 
 		mounted() {},
@@ -218,7 +146,11 @@
 						type: 'getGrouping',
 					});
 					console.log(res, '设备分组名称');
-					this.searchEquipmentList = res.list;
+					if (res.status == 200) {
+						this.searchEquipmentList = res.data.list;
+					} else {
+						this.$message.error(res.msg);
+					}
 				} catch (error) {
 					console.error(error);
 				} finally {
@@ -232,23 +164,31 @@
 						type: 'getTypecontrol',
 					});
 					console.log(res, '素材分类数据');
-					this.getTreeData(res);
-					this.searchTypecontrolList = res;
+					if (res.status == 200) {
+						this.getTreeData(res.data);
+						this.searchTypecontrolList = res.data;
+					} else {
+						this.$message.error(res.msg);
+					}
 				} catch (error) {
 					console.error(error);
 				}
 			},
-			// 获取昵称素材库数据
-			async getNickName(data) {
+			// 获取昵称分类数据
+			async getNickNameClassify(data) {
 				this.loading = true;
 				try {
 					const res = await this.$api({
-						type: 'getNickName',
+						type: 'getNickNameClassify',
 						data,
 					});
-					console.log(res, '昵称数据列表');
-					this.tableData = res.list;
-					this.total = res.count;
+					console.log(res, '昵称分类列表');
+					if (res.status == 200) {
+						this.tableData = res.data;
+						this.total = res.data.length;
+					} else {
+						this.$message.error(res.msg);
+					}
 				} catch (error) {
 					console.error(error);
 				} finally {
@@ -257,19 +197,32 @@
 			},
 			// 点击查询按钮
 			searchNickName() {
-				console.log(this.searchTableData)
+				console.log(this.searchTableData, '++++++++');
+				const { equipment, typecontrol } = this.searchTableData;
+				const typecontrol_id = typecontrol[typecontrol.length - 1];
+				const grouping_id = equipment;
+				this.getNickNameClassify({
+					typecontrol_id,
+					grouping_id,
+				});
 			},
 			// 点击上传按钮
 			uploadNickName() {
-				this.showUploadDialog = true
+				this.showUploadDialog = true;
 			},
 			// 点击详情按钮
-			toNickNameDetail() {
+			toNickNameDetail(obj) {
 				this.showDetailDialog = true;
-			},
-			// 当前页数据条数/页码改变
-			pageChange(obj) {
-				(this.page.page = obj.page), (this.page.limit = obj.limit);
+				this.nickData = {
+					typecontrol_id: obj.typecontrol_id,
+					grouping_id: this.searchTableData.equipment,
+				};
+				this.$refs.detailDialog.getNickName({
+					page: 1,
+					limit: 20,
+					typecontrol_id: obj.typecontrol_id,
+					grouping_id: this.searchTableData.equipment,
+				});
 			},
 			// 处理树型children问题
 			getTreeData(arr) {

@@ -347,8 +347,12 @@ export default {
       'followUser':{    //关注用户接口
         url:'apidata/followUser',
         method:'POST'
-      }
+      },
 
+      'getNickNameClassify': { // 获取昵称分类
+        url: '/Nickname/listtable',
+        method: 'POST'
+      }
 
   }
 

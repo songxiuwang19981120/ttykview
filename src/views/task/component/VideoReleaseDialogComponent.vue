@@ -9,14 +9,12 @@
 				:columns="columns"
 			></table-custom>
 			<!-- 分页 -->
-			<el-row type="flex" justify="end">
-				<pagination
-					:total="total"
-					:page="page.page"
-					:limit="page.limit"
-					@pagination="pageChange"
-				></pagination>
-			</el-row>
+			<pagination
+				:total="total"
+				:page="page.page"
+				:limit="page.limit"
+				@pagination="pageChange"
+			></pagination>
 			<!-- 按钮 -->
 			<el-row type="flex" justify="center">
 				<el-button size="small" @click="btnCancel">取消</el-button>
@@ -113,7 +111,11 @@
 						render: (h, { row }) => {
 							return (
 								<div>
-									<el-image style="width: 100px; height: 100px" src={row.avatar} fit="contain"></el-image>
+									<el-image
+										style="width: 100px; height: 100px"
+										src={row.avatar}
+										fit="contain"
+									></el-image>
 								</div>
 							);
 						},
@@ -171,15 +173,23 @@
 						render: () => {
 							return (
 								<div>
-									<el-button
-										type="danger"
-										icon="el-icon-delete"
-										size="mini"
-										onClick={this.delVideoTaskDetails.bind(this)}
-									></el-button>
+									<el-popconfirm
+										confirm-button-text="删除"
+										cancel-button-text="取消"
+										title="确认删除该视频吗？"
+										onConfirm={this.delVideoTaskDetails.bind(this)}
+									>
+										<el-button
+											slot="reference"
+											type="danger"
+											icon="el-icon-delete"
+											size="mini"
+										></el-button>
+									</el-popconfirm>
 									<el-button
 										type="primary"
 										size="mini"
+										style="margin-left: 6px;"
 										onClick={this.toVideoTaskDetails.bind(this)}
 									>
 										日志详情
@@ -220,14 +230,7 @@
 				alert('跳转个人信息页面');
 			},
 			// 点击删除按钮
-			async delVideoTaskDetails() {
-				try {
-					await this.$confirm('确定删除吗？');
-					alert('调用删除接口');
-				} catch (error) {
-					this.$message('您已取消该操作');
-				}
-			},
+			async delVideoTaskDetails() {},
 			// 显示视频日志详情弹层
 			toVideoTaskDetails() {
 				this.logsDialog = true;
