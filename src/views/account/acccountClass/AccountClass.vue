@@ -1,9 +1,9 @@
 <template>
   <div class="AccountClass">
-    <div style="background-color:white;padding:10px">
+    <div style="background-color:white;padding:10px;border-radius: 8px">
       <span style="margin-right:10px">设备分组选择:</span>
-      <el-cascader :options="options" v-model="value" style="padding:0" @change="handleChange"
-        :props="{ checkStrictly: true }">
+
+      <el-cascader :options="options" v-model="val2" style="padding:0" :props="{ checkStrictly: true }">
         <template slot-scope="{ node, data }">
           <span>
             <span>{{ data.label }}</span>
@@ -11,9 +11,42 @@
           </span>
         </template>
       </el-cascader>
+      <el-button style="margin-left:20px" type="success" @click="FnNewzh()">重置</el-button>
+      <el-button type="primary" @click="handleChange2">搜索</el-button>
+    </div>
+    <!-- 新增按钮 -->
+    <div style="background-color:white; margin: 10px 0 10px 0; padding: 10px;border-radius: 8px">
+      <el-button type="primary" @click="dialogNewVisibleadd()"><i class="el-icon-plus"></i>新增</el-button>
+      <!-- 新增弹窗 -->
+      <el-dialog title="新增" :visible.sync="dialogNewVisible" width="30%">
+        <div style="margin:0 0 30px 0px">
+          <span style="margin-right:10px">设备分组选择:</span>
+          <el-cascader :disabled="disabled" :options="options" :props="defaultPropsa" v-model="val"
+            @change="menuchange"><template slot-scope="{ node, data }">
+              <span>
+                <span>{{ data.label }}</span>
+                <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
+              </span>
+            </template>
+          </el-cascader>
+          <span @click="addlis()">
+            <el-checkbox style="margin-left:20px" v-model="checked">是否添加根目录分组</el-checkbox>
+          </span>
+        </div>
+        <el-form :model="formNew">
+          <el-form-item label="新增分组名称:" label-width="100px">
+            <el-input v-model="formNew.name" style="width:300px" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button type="success" @click="dialogNewVisible = false">取 消</el-button>
+          <el-button type="primary" @click="TypecontrolAdd()">确 定</el-button>
+        </div>
+
+      </el-dialog>
     </div>
     <!-- 表格 -->
-    <el-table :data="tableData1" style="width: 100%" row-key="value" lazy :load="load"
+    <el-table :data="tableData1" style="width: 100%;border-radius: 8px" row-key="value" lazy :load="load"
       :tree-props="{ children: 'children' }">
       <el-table-column prop="label" label="名称" align="center" width="300">
       </el-table-column>
@@ -58,68 +91,133 @@ export default {
   components: { pagination },
   data() {
     return {
-      pid:"",//编辑的pid
-      typecontrol_id:"",//修改主键ID
+      checked: false,//是否添加根目录
+      disabled: false,//新增下拉是否禁用
+      defaultPropsa: {
+        checkStrictly: true
+      },
+      menudata: [],//下拉数据
+      val: [],
+      vals: [],
+      menudata2: [],
+      val2: [],
+      vals2: [],
+      vals3: [],
+      //新的
+      dialogNewVisible: false,//新增的弹窗显隐
+      value3: [],//新增四级下拉
+      pid: "",//编辑的pid
+      typecontrol_id: "",//修改主键ID
       dialogFormVisible: false,
-      total: 100,  //数据总量
+      // total: 100,  //数据总量
       // page: 1, //当前页
       // limit: 10, //每页条数
       value: [],//联动绑定数据
       value2: [],//联动数据最后一个
-      options: [],//联动数据
+      options: [],//联动的所有数据
       tableData1: [],//表格数据
-      att: [],//表格数据拷贝
+      att: [],//表格数据拷贝用于for循环
       form: {
         name: '',
-      }
+      },
+      formNew: {
+        name: '',
+      }//新增分组名称
 
     }
   },
   mounted() {
     this.Typecontrol();//联动数据
-
-
   },
 
   methods: {
-
-    //四级联动点完后的事件
-    handleChange(value) {
-      this.value2 = value[value.length - 1] ?? '';//传参
-      console.log(this.value2)
-      this.tableData1 = [];
-      this.att = [];
-      for (let i = 0; i < this.options.length; ++i) {
-        if (this.options[i].value == this.value[0]) {
-          this.att.push(this.options[i]);
-          this.tableData1 = this.att;
-          let _self = this;
-          for (let j = 0; j < _self.att[0].children.length; ++j) {
-            if (_self.att[0].children[j].value == value[1]) {
-              _self.tableData1 = [];
-              _self.tableData1.push(_self.att[0].children[j]);
-              _self.att = _self.tableData1
-              for (let g = 0; g < _self.att[0].children.length; ++g) {
-                if (_self.att[0].children[g].value == value[2]) {
-                  _self.tableData1 = [];
-                  _self.tableData1.push(_self.att[0].children[g]);
-                  _self.att = _self.tableData1
-                  for (let f = 0; f < _self.att[0].children.length; ++f) {
-                    if (_self.att[0].children[f].value == value[3]) {
-                      _self.tableData1 = [];
-                      _self.tableData1.push(_self.att[0].children[f]);
-                      _self.att = _self.tableData1
-                      console.log(value)
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-        }
+    //重置按钮
+    FnNewzh() {
+      this.val2 = [];
+      this.Typecontrol()
+    },
+    //新增按钮打开
+    dialogNewVisibleadd() {
+      this.dialogNewVisible = true;
+      this.val = [];
+      this.formNew.name = ""
+    },
+    //是否根目录
+    addlis() {
+      this.val = "";
+      if (this.checked == true) {
+        this.disabled = false;
+        this.pid = 0
+      } else {
+        this.disabled = true;
       }
-      console.log(this.tableData1)
+    },
+    //新增的四级下拉
+    //element组件里的 getCheckedNodes	获取选中的节点	
+    getCascaderObj(val, opt) {
+      return val.map(function (value, index, array) {
+        for (var itm of opt) {
+          if (itm.value == value) {
+            opt = itm.children;
+            return itm;
+          }
+        }
+        return null;
+      });
+    },
+    //联动change事件
+    menuchange() {
+      this.vals = this.getCascaderObj(this.val, this.menudata); //选中节点数据
+      console.log(this.vals)
+      this.vals3 = [];
+      this.vals3.push(this.vals[this.vals.length - 1])
+      this.pid = this.vals3[0].typecontrol_id
+    },
+    //新增按钮确认
+    async TypecontrolAdd() {
+      try {
+        let result = await this.$api({
+          type: "addTypecontrol",
+          data: {
+            type_title: this.formNew.name,
+            pid: this.pid
+          },
+        });
+        if (result.status == '200') {
+          this.$message.success('新增成功');
+        }
+        else {
+          this.$message.error(result.msg)
+        }
+      } catch (error) {
+        console.error(error);
+      }
+      this.Typecontrol()
+      this.dialogNewVisible = false
+      this.checked = false;
+      this.disabled = false;
+      this.formNew.name = ""
+      this.pid = ""
+
+    },
+    //四级联动点完后的事件
+    getCascaderObj2(val2, opt2) {
+      return val2.map(function (value, index, array) {
+        for (var itm of opt2) {
+          if (itm.value == value) {
+            opt2 = itm.children;
+            return itm;
+          }
+        }
+        return null;
+      });
+    },
+    handleChange2() {
+      this.vals2 = this.getCascaderObj2(this.val2, this.menudata2); //选中节点数据
+      console.log(this.vals2);
+      console.log(this.vals2[this.vals2.length - 1]);
+      this.tableData1 = [];
+      this.tableData1.push(this.vals2[this.vals2.length - 1])
     },
     //关闭联动后方无内容
     filterTreeDate(arr) {
@@ -138,7 +236,10 @@ export default {
           type: "getTypecontrol",
         });
         this.options = result.data;
-        this.tableData1 = result.data
+        this.tableData1 = result.data;
+        this.menudata = result.data;
+        this.menudata2 = result.data;
+        console.log(result)
         this.filterTreeDate(result.data)//联动后方无内容
       } catch (error) {
         console.error(error)
@@ -149,27 +250,27 @@ export default {
     handleEdit(index, row) {
 
       this.dialogFormVisible = true;
-      this.form.name=row.label;//名称
-      this.typecontrol_id=row.typecontrol_id//主键ID
-      this.pid=row.pid//pid
+      this.form.name = row.label;//名称
+      this.typecontrol_id = row.typecontrol_id//主键ID
+      this.pid = row.pid//pid
     },
-     handleDelete(index, row) {
+    handleDelete(index, row) {
       this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.leDelete(index, row)
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          });
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });          
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.leDelete(index, row)
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
         });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
     },
     //删除接口
     async leDelete(index, row) {
@@ -177,9 +278,9 @@ export default {
       try {
         let result = await this.$api({
           type: "deleteTypecontrol",
-          data: { 
-            typecontrol_ids:row.typecontrol_id
-           },
+          data: {
+            typecontrol_ids: row.typecontrol_id
+          },
         });
         this.Typecontrol()
       } catch (error) {
@@ -187,52 +288,53 @@ export default {
       }
     },
     //提交修改
-    async edit(){
+    async edit() {
       console.log(this.form.name)
       this.dialogFormVisible = false;
       try {
         let result = await this.$api({
           type: "updateTypecontrol",
-          data: { 
-            typecontrol_id:this.typecontrol_id,//主键
-            type_title:this.form.name,//名称
-            pid:this.pid
-           },
+          data: {
+            typecontrol_id: this.typecontrol_id,//主键
+            type_title: this.form.name,//名称
+            pid: this.pid
+          },
         });
-       console.log(result)
+        console.log(result)
         this.Typecontrol()
       } catch (error) {
         console.error(error);
       }
     },
-    //表格树形
+    //表格树形等待需要的话加入load
     load(tree, treeNode, resolve) {
       console.log(tree)
       setTimeout(() => {
         resolve(tree.children)
       }, 100)
     },
+
     /**
 //  * 翻页回调
 //  */
 
-//     async handlePagination(val) {
-//       try {
-//         console.log(val)
-//         this.page = val.page;
-//         this.limit = val.limit
-//         let result = await this.$api({
-//           type: "getTypecontrol",
-//           data: { page: this.page,
-//           limit:this.limit,
-//           },
-//         });
-//         console.log(result)
-//         this.tableData1=result.data
-//       } catch (error) {
-//         console.error(error);
-//       }
-//     },
+    //     async handlePagination(val) {
+    //       try {
+    //         console.log(val)
+    //         this.page = val.page;
+    //         this.limit = val.limit
+    //         let result = await this.$api({
+    //           type: "getTypecontrol",
+    //           data: { page: this.page,
+    //           limit:this.limit,
+    //           },
+    //         });
+    //         console.log(result)
+    //         this.tableData1=result.data
+    //       } catch (error) {
+    //         console.error(error);
+    //       }
+    //     },
 
 
   },
