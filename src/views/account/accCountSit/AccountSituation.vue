@@ -63,7 +63,7 @@
       <div>
         <span class="mr-30">设置任务 ：</span>
         <el-select
-          :disabled="this.batchEditorList.length === 0"
+          :disabled="isTaskConfigDisabled"
           @change="openTaskDialog"
           class="tt-accsituation--taskconig"
           v-model="taskConfig"
@@ -109,6 +109,8 @@
     <VideoDialog
       @closeVideoTask="closeVideoTask"
       :showVideoTask="showVideoTask"
+      :classiFication="classiFication"
+      :batchEditorList="batchEditorList"
     />
     <LikeCommentDialog
       @closeLikeCommentTask="closeLikeCommentTask"
@@ -124,6 +126,7 @@
     />
     <EditorDialog
       @closeEditorDialog="closeEditorDialog"
+      @updateMemberList="updateMemberList"
       :showEditorDialog="showEditorDialog"
       :typeList="typeList"
       :user_id="user_id"
@@ -137,6 +140,8 @@
       :groupList="groupList"
       :batchEditorLength="batchEditorLength"
       :accTotal="accTotal"
+      :batchEditorList="batchEditorList"
+      :materialTotal="materialTotal"
     />
     <VideoTabel
       @closeVideoTabel="closeVideoTabel"
@@ -189,7 +194,21 @@ export default {
       },
       accTotal(){
         return this.check_all === 'true' ? 100 : 0
+      },
+      isTaskConfigDisabled(){
+        return this.classiFication.length === 0 || this.batchEditorList.length === 0
       }
+  },
+  watch:{
+    classiFication(newVal){
+      console.log(newVal)
+      let data = {
+        typecontrol_id : this.classiFication[this.classiFication.length - 1] ?? "",
+        limit:this.limit,
+        page:this.page
+      }
+      this.getMemberList(data)
+    }
   },
   data() {
     return {
@@ -198,7 +217,7 @@ export default {
       showLikeCommentTask: false, //控制评论点赞任务dialog显示
       showLetterTask: false, //控制评论任务dialog显示
       showFollowDialog: false, //控制关注任务dialog显示
-      classiFication: "", //设置分类
+      classiFication: [], //设置分类
       typeList: [], //设置分类options   从接口拿的，动态渲染
       loading: false, //表格懒加载选项
       groupList: [], //分组options
@@ -380,8 +399,8 @@ export default {
       member_id: "", //用户ID，获取数据用的
       visterTotal: "", //访问总人数
       user_id: "", //被选中的用户的UID
-      batchEditorList:[] //批量编辑的账号列表
-
+      batchEditorList:[], //批量编辑的账号列表
+      materialTotal:0, //素材数量  给批量编辑窗口用的
     };
   },
 
@@ -393,6 +412,10 @@ export default {
 
   //typecontrol_id 分类ID
   methods: {
+
+    updateMemberList(){
+      this.getMemberList()
+    },
     /* 
         function: RestQuery
         params: null
@@ -443,7 +466,7 @@ export default {
     async getVisitorList({
       member_id = "",
       page = this.page,
-      limit = this.limit,
+      limit = 10,    //TODO  后期可能需要变更字段
     }) {
       let data = {
         member_id: member_id ?? "",
@@ -500,8 +523,10 @@ export default {
         grouping_id: this.group,
       };
       console.log(data)
-      let result = await this.$api({ type: "getMember", data: data });
+      let result = await this.getMemberList(data);
+      /* let result = await this.$api({ type: "getMember", data: data }); */
       this.memberList = result.data.list;
+      this.total = result.data.count;
     },
     /* 
         function: handlePagination
@@ -519,12 +544,27 @@ export default {
         params: null
         desc: 批量编辑回调
     */
-    batchEditor() {
+    async batchEditor() {
+      try {
+      if(this.classiFication.length === 0 ){
+        this.$message.error('请选择分类')
+        return false
+      }
       if(this.batchEditorList.length === 0){
         this.$message.error('请选择账号')
         return false
       }
+      let data = {
+        typecontrol_id: this.classiFication[this.classiFication.length - 1] ?? ""
+      }
+      let result = await this.$api({type:'getProjectNum',data:data})
+      console.log(result)
+      this.materialTotal = result.data.num ?? 0
       this.showBatchEiDialog = true;
+      } catch (error) {
+        console.error(error)
+      }
+
     },
 
     /* 
@@ -545,7 +585,8 @@ export default {
       console.log(val.member_id);
       this.shwoVideoTabel = true;
       let data = { member_id: val.member_id, page: this.page, limit: 6 };
-      let result = await this.$api({ type: "getMemberList", data: data });
+      let result = await this.getMemberList(data)
+      /* let result = await this.$api({ type: "getMemberList", data: data }); */
       this.videoList = result.data.list;
       console.log(this.videoList, result);
     },
@@ -613,7 +654,6 @@ export default {
     openTaskDialog(val) {
       let formType = STATUS_MAP[val];
       this[formType] = true;
-      console.log(this[formType]);
     },
 
     /*
@@ -654,7 +694,9 @@ export default {
     */
     async getTypeControlList() {
       try {
+
         let result = await this.$api({ type: "getTypecontrol" });
+
         this.typeList = this.getTreeData(result.data);
       } catch (error) {
         console.error(error);
@@ -666,11 +708,11 @@ export default {
         params: null
         desc: 异步获取memberList，页面渲染时调用
     */
-    async getMemberList() {
+    async getMemberList(data={limit: this.limit, page: this.page }) {
       try {
         let result = await this.$api({
           type: "getMember",
-          data: { limit: this.limit, page: this.page },
+          data: data,
         });
         this.memberList = result.data.list;
         this.total = result.data.count;

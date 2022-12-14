@@ -8,13 +8,14 @@
         :columns="columns"
       ></table-custom>
       <el-dialog
-        width="40%"
+      class="video-dialog"
+        width="30%"
         title="播放视频"
         :visible.sync="innerVisible"
         append-to-body
       >
         <div class="video-window">
-            <video autoplay width="40%" :src="videoSrc" controls="controls"></video>
+          <video autoplay width="40%" :src="videoSrc" controls="controls"></video>
         </div>
       </el-dialog>
     </el-dialog>
@@ -130,4 +131,9 @@ export default {
     display: flex
     align-items: center
     justify-content: space-around
+
+.video-dialog .el-dialog
+  position: fixed !important
+  right: 50px
+
 </style>

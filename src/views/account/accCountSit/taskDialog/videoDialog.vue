@@ -23,22 +23,25 @@
             v-model="vieoTaskForm.video_num"
           ></el-input>
         </el-form-item>
-        <el-form-item label="主题标签内容 :" prop="tag_num">
+        <el-form-item label="主题标签内容 :" prop="label_num">
           <el-input
-            v-model="vieoTaskForm.tag_num"
+            v-model="vieoTaskForm.label_num"
             autocomplete="off"
           ></el-input>
         </el-form-item>
         <el-form-item label="@用户数量 :" prop="user_num">
           <el-input v-model="vieoTaskForm.user_num"></el-input>
         </el-form-item>
-        <el-form-item label="主题内容 :" prop="theme_content">
+        <el-form-item label="主题内容 :" prop="text">
           <el-input
+            :disabled="isTextAreaDisabled"
             class="input-textarea"
             type="textarea"
-            v-model="vieoTaskForm.theme_content"
+            v-model="vieoTaskForm.text"
           ></el-input>
-          <el-checkbox v-model="vieoTaskForm.random_content"
+          <el-checkbox
+            :disabled="isRandomTextDisabled"
+            v-model="vieoTaskForm.text_round"
             >随机主题内容</el-checkbox
           >
         </el-form-item>
@@ -59,7 +62,22 @@ export default {
     showVideoTask: {
       type: Boolean,
     },
+    classiFication: {
+      type: Array,
+    },
+    batchEditorList: {
+      type: Array,
+    },
   },
+  computed: {
+    isRandomTextDisabled() {
+      return this.vieoTaskForm.text.length !== 0;
+    },
+    isTextAreaDisabled() {
+      return this.vieoTaskForm.text_round === true;
+    },
+  },
+
   data() {
     return {
       rules: {
@@ -74,11 +92,13 @@ export default {
 
       //TODO  需要跟后端对接字段  视频发布任务 提交表单
       vieoTaskForm: {
+        typecontrol_id: "", //分类id
+        uid_list: [], // uid数组
         video_num: "", //视频发布数量
-        tag_num: "", //主题标签内容
+        label_num: "", //主题标签内容
         user_num: "", // @用户数量
-        theme_content: "", //主题内容
-        random_content: false, //如果是随机内容的话为TRUE
+        text: "", //主题内容
+        text_round: false, //如果是随机内容的话为1
       },
     };
   },
@@ -104,16 +124,37 @@ export default {
         desc: 提交后的回调
     */
     handlerConfrim() {
+      if (this.classiFication.length === 0) {
+        return false;
+      }
       this.$refs["videoForm"].validate((valid) => {
         if (valid) {
           console.log("成功");
-          this.handlerClose()
-          console.log(this.vieoTaskForm);
-          this.resetForm()
-          console.log(this.vieoTaskForm);
-          return 
+          let userList = this.batchEditorList.map((item) => {
+            return item.uid;
+          });
+          this.vieoTaskForm.typecontrol_id =
+            this.classiFication[this.classiFication.length - 1];
+          this.vieoTaskForm.text_round =
+            this.vieoTaskForm.text_round === true ? 1 : 0;
+          this.vieoTaskForm.uid_list = userList;
+          console.log(this.vieoTaskForm, this.isTextAreaDisabled);
+          this.$api({ type: "uploadVideoTask", data: this.vieoTaskForm }).then(
+            (res) => {
+              if (res.status !== 200) {
+                let msg = res.msg;
+                this.$message.error(msg);
+              }
+            }
+          );
+
+          //this.handlerClose()
+
+          //this.resetForm()
+          //console.log(this.vieoTaskForm);
+          //return
         }
-        this.$message.error('提交失败')
+        this.$message.error("提交失败");
       });
     },
     /* 
@@ -121,10 +162,10 @@ export default {
         params: null
         desc: 重置表单字段
     */
-    resetForm(){
-      this.$refs['videoForm'].resetFields()
-      this.vieoTaskForm.random_content = false
-    }
+    resetForm() {
+      this.$refs["videoForm"].resetFields();
+      this.vieoTaskForm.random_content = false;
+    },
   },
 };
 </script>

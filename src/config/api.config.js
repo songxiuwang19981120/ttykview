@@ -340,22 +340,32 @@ export default {
 
 
       'getVistorList':{       //获取用户访问列表数据
-        url:'Visitorlist/index',
+        url:'Visitorlist/Index',
         method:'POST'
       },
 
       'followUser':{    //关注用户接口
-        url:'apidata/followUser',
+        url:'Apidata/FollowUser',
         method:'POST'
       },
 
       'updateUserInfo':{  //修改用户信息
-        url:'test/edituserinfo',
+        url:'Test/Edituserinfo',
         method:'POST'
       },
 
       'getUserRandomInfo':{       //随机获取用户信息
         url:'Autograph/RandomData',
+        method:'POST'
+      },
+
+      'uploadVideoTask':{   //提交视频配置任务
+        url:'Push/Video',
+        method:'POST'
+      },
+
+      'getProjectNum':{   //获取素材数量（批量编辑窗口调用）
+        url:'Typecontrol/kylistnum',
         method:'POST'
       }
 
