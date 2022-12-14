@@ -374,6 +374,11 @@ export default {
         method:'POST'
       },
 
+      'collertionVideo':{   //通过获取到的tk信息传给后端返回
+        url:'Collection/video',
+        method:'POST'
+      },
+      
       'uidlibraryAdd':{    //新增素材已有
         url:'Uidlibrary/add',
         method:'POST'
@@ -391,6 +396,11 @@ export default {
 
       'uidlibraryDelete':{    //删除素材
         url:'Uidlibrary/delete',
+        method:'POST'
+      },
+
+      'videocaptureIndex':{    //获取视频素材
+        url:'Videocapture/index',
         method:'POST'
       }
   }
