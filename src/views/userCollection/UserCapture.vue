@@ -2,9 +2,11 @@
     <div>
         <div class="tt-accsituation">
             <div class="tt-accsituation--operation">
-                <el-input class="blogger" type="textarea" :rows="2" v-model="bloggerLink"
-                    placeholder="请输入博主主页链接（一行一个）"></el-input>
-                <el-button type="primary" @click="configureParameter">配置采集参数</el-button>
+                <el-input class="blogger" type="textarea" :rows="3" v-model="bloggerLink"
+                    placeholder="请输入博主主页链接（一行一个）,每条链接请求时间大概为20秒，请耐心等待"></el-input>
+                <el-button type="primary" :loading="collectioning" @click="configureParameter">{{ collectioning ? '采集参数中
+                ...' : '配置采集参数'
+                }}</el-button>
             </div>
         </div>
         <el-dialog title="采集配置" :visible.sync="configureVisible" width="40%" :before-close="configureClose">
@@ -59,7 +61,7 @@
                 }}</el-button>
             </div>
         </div>
-        <div  v-if="tableData.length > 0 ? true : false">
+        <div v-if="tableData.length > 0 ? true : false">
             <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
                 @handleSelectionChange="selectionChange"></table-custom>
             <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination">
@@ -79,6 +81,7 @@ export default {
     },
     data() {
         return {
+            collectioning: false,
             loading: false, //表格加载loading
             tableData: [],  //表格数据
             columns: [
@@ -253,6 +256,7 @@ export default {
                 },
             ],  //数据标签
             searchDataLabel: '',  //数据标签搜索
+            allSearchList: [],
         };
     },
 
@@ -261,10 +265,6 @@ export default {
     },
 
     methods: {
-        // removeHandler(val){
-        //     console.log(val);
-
-        // },
         /*
             查询
         */
@@ -315,7 +315,62 @@ export default {
             if (this.bloggerLink == '') {
                 this.$message({ message: '请输入博主主页链接', type: 'warning' });
             } else {
-                this.configureVisible = true
+                let listLink = []
+                this.bloggerLink.split('\n').forEach((item) => {
+                    if (item.replace(/\s/gi, '')) {
+                        listLink.push(item.replace(/\s/gi, ''));
+                    }
+                });
+                this.$nextTick(() => {
+                    let type = 1
+                    listLink.forEach((item) => {
+                        if (item.indexOf('https://www.tiktok.com/@') == -1) {
+                            type = 2
+                            this.$message({ message: '请检查链接是否全部正确，以https://www.tiktok.com/@开头', type: 'warning' });
+                        }
+                    })
+                    this.$nextTick(() => {
+                        if (type == 1) {
+                            // this.getRestByKeys(listLink)
+                            this.allSearchList = []
+                            this.getRestByKeys(listLink)
+                        }
+                    });
+                });
+                // this.configureVisible = true
+            }
+        },
+        getRestByKeys(listLink) {
+            this.collectioning = true
+            listLink.forEach((item, index) => {
+                let data = {
+                    keyword: item.replace('https://www.tiktok.com/@', ''),
+                };
+                this.testGetRestByKeys(data, index, listLink)
+            })
+            this.$nextTick(() => {
+                console.log('全部搜索到的数据', this.allSearchList);
+
+            })
+        },
+        // 搜索链接,获取tk信息
+        async testGetRestByKeys(data, index, listLink) {
+            try {
+                let result = await this.$api({ type: "testGetRestByKeys", data: data });
+                if (result.status == '200') {
+                    let list = result.data[0]
+                    this.allSearchList.push(list)
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+                // if (listLink.length - 1 == index) {
+                //     this.collectioning = false
+                // }
+            } catch (error) {
+                // if (listLink.length - 1 == index) {
+                //     this.collectioning = false
+                // }
+                console.error(error);
             }
         },
         /*
@@ -351,7 +406,7 @@ export default {
 }
 
 .blogger {
-    width: 300px;
+    width: 400px;
     margin-right: 20px;
 }
 </style>
