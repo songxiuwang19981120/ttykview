@@ -209,14 +209,16 @@
 		},
 		methods: {
 			// 获取视频任务详情
-			async getVideoTaskDetails(data) {
+			async getTaskListDetail(id) {
 				try {
 					const res = await this.$api({
-						type: 'getVideotaskdetails',
-						data,
+						type: 'getTaskListDetail',
+						data: {
+							tasklist_id: id
+						},
 					});
 					console.log(res, '视频列表详情数据');
-					this.tableDataDialog = res.list;
+					// this.tableDataDialog = res.list;
 				} catch (error) {
 					console.error(error);
 				}

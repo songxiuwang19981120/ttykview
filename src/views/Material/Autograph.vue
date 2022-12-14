@@ -24,7 +24,6 @@
 				<div>
 					<span>素材库：</span>
 					<el-cascader
-						clearable
 						:props="{ checkStrictly: true }"
 						:options="searchTypecontrolList"
 						v-model="searchTableData.typecontrol"
@@ -35,9 +34,12 @@
 				</div>
 				<div>
 					<!-- 查询 -->
-					<el-button type="primary" :loading="btnloading" @click="searchNickName">{{
-						btnloading ? '加载中...' : '查询'
+					<el-button type="primary" :loading="btnloading" @click="searchNickName" style="margin-right: 20px">{{
+						btnloading ? '加载中...' : '搜索'
 					}}</el-button>
+				</div>
+				<div>
+					<el-button type="primary" @click="btnReset">重置</el-button>
 				</div>
 			</div>
 			<div class="tt-accsituation--operation">
@@ -51,29 +53,26 @@
 			<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 		</el-card>
 		<!-- 详情弹层 -->
-		<NickNameDetailDialog
+		<AutographDetailDialog
 			:outerVisible.sync="showDetailDialog"
 			ref="detailDialog"
 			:upParameter="nickData"
-		></NickNameDetailDialog>
+		></AutographDetailDialog>
 		<!-- 上传弹层 -->
-		<NickNameUploadDialog
-			:showDialog.sync="showUploadDialog"
-			:upParameter="searchTableData"
-		></NickNameUploadDialog>
+		<AutographUploadDialog :showDialog.sync="showUploadDialog" :upParameter="parameterData" :nnClassifyDate="tableData"></AutographUploadDialog>
 	</div>
 </template>
 
 <script>
 	import tableCustom from '@/components/myComponent/table/tableCustom.vue';
-	import NickNameDetailDialog from './component/NickNameDetailDialog.vue';
-	import NickNameUploadDialog from './component/NickNameUploadDialog';
+	import AutographDetailDialog from './component/AutographDetailDialog.vue';
+	import AutographUploadDialog from './component/AutographUploadDialog';
 	export default {
 		name: 'TtAutograph',
 		components: {
 			tableCustom,
-			NickNameDetailDialog,
-			NickNameUploadDialog,
+			AutographDetailDialog,
+			AutographUploadDialog,
 		},
 		data() {
 			return {
@@ -107,7 +106,7 @@
 					},
 					{
 						prop: 'wy',
-						label: '当前签名素材',
+						label: '当前可用签名',
 						align: 'center',
 					},
 					{
@@ -122,7 +121,7 @@
 										size="mini"
 										onClick={this.toNickNameDetail.bind(this, row)}
 									>
-										详情
+										签名列表
 									</el-button>
 								</div>
 							);
@@ -135,6 +134,7 @@
 				equipmentLoading: false,
 				typecontrolLoading: false,
 				nickData: {}, // 传递给详情弹层的数据
+				parameterData: {}
 			};
 		},
 
@@ -163,6 +163,7 @@
 			// 获取素材分类数据
 			async getTypecontrol() {
 				try {
+					this.typecontrolLoading = true
 					const res = await this.$api({
 						type: 'getTypecontrol',
 					});
@@ -175,17 +176,19 @@
 					}
 				} catch (error) {
 					console.error(error);
+				} finally {
+					this.typecontrolLoading = false
 				}
 			},
-			// 获取昵称分类数据
-			async getNickNameClassify(data) {
+			// 获取签名分类数据
+			async getAutographClassify(data) {
 				this.loading = true;
 				try {
 					const res = await this.$api({
-						type: 'getNickNameClassify',
+						type: 'getAutographClassify',
 						data,
 					});
-					console.log(res, '昵称分类列表');
+					console.log(res, '签名分类列表');
 					if (res.status == 200) {
 						this.tableData = res.data;
 						this.total = res.data.length;
@@ -202,12 +205,23 @@
 			searchNickName() {
 				console.log(this.searchTableData, '++++++++');
 				const { equipment, typecontrol } = this.searchTableData;
-				const typecontrol_id = typecontrol[typecontrol.length - 1];
+				const typecontrol_id = typecontrol.length ? typecontrol[typecontrol.length - 1] : '';
 				const grouping_id = equipment;
-				this.getNickNameClassify({
+				this.parameterData = {
+					typecontrol_id, 
+					grouping_id
+				}
+				this.getAutographClassify({
 					typecontrol_id,
 					grouping_id,
 				});
+			},
+			// 点击重置按钮
+			btnReset() {
+				this.searchTableData = {
+					equipment: '',
+					typecontrol: ''
+				}
 			},
 			// 点击上传按钮
 			uploadNickName() {
@@ -220,7 +234,7 @@
 					typecontrol_id: obj.typecontrol_id,
 					grouping_id: this.searchTableData.equipment,
 				};
-				this.$refs.detailDialog.getNickName({
+				this.$refs.detailDialog.getAutograph({
 					page: 1,
 					limit: 20,
 					typecontrol_id: obj.typecontrol_id,
@@ -254,3 +268,5 @@
 		}
 	}
 </style>
+
+	

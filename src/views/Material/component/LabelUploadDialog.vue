@@ -32,13 +32,13 @@
 					@focus="getTypecontrol"
 				></el-cascader>
 			</el-form-item>
-		<!-- 添加签名 -->
-			<el-form-item prop="nickname" label="添加昵称：">
+			<!-- 添加标签 -->
+			<el-form-item prop="label" label="添加标签：">
 				<el-input
 					type="textarea"
-					placeholder="请输入昵称(一行仅限一个)"
+					placeholder="请输入标签(一行仅限一个)"
 					rows="6"
-					v-model="ruleForm.nickname"
+					v-model="ruleForm.label"
 					style="width: 60%"
 				>
 				</el-input>
@@ -66,8 +66,8 @@
 				type: Object,
 			},
 			nnClassifyDate: {
-				type: Array
-			}
+				type: Array,
+			},
 		},
 		data() {
 			return {
@@ -76,13 +76,13 @@
 				equipmentLoading: false,
 				typecontrolLoading: false,
 				ruleForm: {
-					nickname: '',
+					label: '',
 					typecontrol_id: '',
 					typecontrol: [],
 					grouping_id: null,
 				},
 				rules: {
-					nickname: [{ required: true, message: '请输入昵称', trigger: 'blur' }],
+					label: [{ required: true, message: '请输入标签', trigger: 'blur' }],
 					// grouping_id: [{ required: true, message: '请选择设备分组', trigger: 'blur' }],
 					typecontrol: [{ required: true, message: '请选择素材库', trigger: 'blur' }],
 				},
@@ -112,7 +112,7 @@
 			// 获取素材分类数据
 			async getTypecontrol() {
 				try {
-					this.typecontrolLoading = true
+					this.typecontrolLoading = true;
 					const res = await this.$api({
 						type: 'getTypecontrol',
 					});
@@ -126,14 +126,14 @@
 				} catch (error) {
 					console.error(error);
 				} finally {
-					this.typecontrolLoading = true
+					this.typecontrolLoading = true;
 				}
 			},
 			// 新增昵称
-			async addNickName(data) {
+			async addLabel(data) {
 				try {
 					const res = await this.$api({
-						type: 'addNickName',
+						type: 'addLabel',
 						data,
 					});
 					console.log(res, '新增昵称');
@@ -155,30 +155,29 @@
 			async btnOK() {
 				try {
 					await this.$refs.ruleForm.validate();
-					console.log(this.ruleForm.nickname, '文本域数据');
+					console.log(this.ruleForm.label, '文本域数据');
 					let nickNameArr = [];
 					// 处理文本域数据
-					this.ruleForm.nickname.split('\n').forEach((item) => {
+					this.ruleForm.label.split('\n').forEach((item) => {
 						console.log(item.replace(/\s/gi, ''));
 						if (item.replace(/\s/gi, '')) {
 							nickNameArr.push(item.replace(/\s/gi, ''));
 						}
 					});
-					this.ruleForm.nickname = nickNameArr.join('\n');
-					const {typecontrol} = this.ruleForm
-					this.ruleForm.typecontrol_id = typecontrol.length ? typecontrol[typecontrol.length - 1] : ''
-					// 调用新增昵称接口
-					await this.addNickName(this.ruleForm);
+					this.ruleForm.label = nickNameArr.join('\n');
+					const { typecontrol } = this.ruleForm;
+					this.ruleForm.typecontrol_id = typecontrol.length
+						? typecontrol[typecontrol.length - 1]
+						: '';
+					// 调用新增接口
+					await this.addLabel(this.ruleForm);
 					this.$emit('update:showDialog', false);
-					console.log(this.nnClassifyDate,'传递分类数据')
-					console.log(this.ruleForm.typecontrol_id)
 					// 更新数据
-					const arr = this.nnClassifyDate.filter(item => {
-						return item.typecontrol_id == this.ruleForm.typecontrol_id
-					})
-					console.log(arr,'是否存在搜索之内')
-					if(arr.length){
-						this.$parent.getNickNameClassify(this.upParameter)
+					const arr = this.nnClassifyDate.filter((item) => {
+						return item.typecontrol_id == this.ruleForm.typecontrol_id;
+					});
+					if (arr.length) {
+						this.$parent.getLabelClassify(this.upParameter);
 					}
 				} catch (error) {
 					console.log(error);

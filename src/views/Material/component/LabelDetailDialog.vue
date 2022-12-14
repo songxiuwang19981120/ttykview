@@ -19,8 +19,8 @@
 			@close="btnCancel2"
 		>
 			<el-form label-width="70px" :model="ruleForm" :rules="rules" ref="ruleForm">
-				<el-form-item label="昵称：" prop="nickname">
-					<el-input v-model="ruleForm.nickname" style="width: 90%"></el-input>
+				<el-form-item label="标签：" prop="label">
+					<el-input v-model="ruleForm.label" style="width: 90%"></el-input>
 				</el-form-item>
 			</el-form>
 			<!-- 按钮 -->
@@ -46,7 +46,7 @@
 			},
 			upParameter: {
 				type: Object,
-			},
+			}
 		},
 		components: {
 			tableCustom,
@@ -66,8 +66,8 @@
 				tableData: [],
 				columns: [
 					{
-						prop: 'nickname',
-						label: '昵称',
+						prop: 'label',
+						label: '标签',
 						align: 'center',
 					},
 					{
@@ -87,8 +87,8 @@
 									<el-popconfirm
 										confirm-button-text="删除"
 										cancel-button-text="取消"
-										title="确认删除该昵称吗？"
-										onConfirm={this.delBtn.bind(this, row.nickname_id)}
+										title="确认删除该标签吗？"
+										onConfirm={this.delBtn.bind(this, row.label_id)}
 									>
 										<el-button slot="reference" type="danger" size="mini">
 											删除
@@ -106,10 +106,10 @@
 				total: 0,
 				ruleForm: {
 					// 编辑表单表单相关
-					nickname: '',
+					label: '',
 				},
 				rules: {
-					nickname: [
+					label: [
 						{ required: true, message: '请输入昵称', trigger: 'blur' },
 						{ validator: validateNickname, trigger: 'blur' },
 					],
@@ -118,15 +118,15 @@
 			};
 		},
 		methods: {
-			// 获取昵称
-			async getNickName(data) {
+			// 获取标签
+			async getLabel(data) {
 				this.loading = true;
 				try {
 					const res = await this.$api({
-						type: 'getNickName',
+						type: 'getLabel',
 						data,
 					});
-					console.log(res, '昵称数据列表');
+					console.log(res, '标签数据列表');
 					if (res.status == 200) {
 						this.tableData = res.data.list;
 						this.total = res.data.count;
@@ -140,13 +140,13 @@
 				}
 			},
 			// 编辑昵称
-			async editNickName(data) {
+			async editLabel(data) {
 				try {
 					const res = await this.$api({
-						type: 'updateNickName',
+						type: 'updateLabel',
 						data,
 					});
-					console.log(res, '编辑昵称');
+					console.log(res, '编辑标签');
 					if (res.status == 200) {
 						this.$message.success(res.msg);
 					} else {
@@ -156,16 +156,16 @@
 					console.error(error);
 				}
 			},
-			// 删除昵称
-			async delNickName(id) {
+			// 删除标签
+			async delLabel(id) {
 				try {
 					const res = await this.$api({
-						type: 'deleteNickName',
+						type: 'deleteLabel',
 						data: {
-							nickname_ids: id,
+							label_ids: id,
 						},
 					});
-					console.log(res, '删除昵称');
+					console.log(res, '删除标签');
 					if (res.status == 200) {
 						this.$message.success(res.msg);
 					} else {
@@ -179,17 +179,17 @@
 			editBtn(obj) {
 				console.log(obj, '++++++++++++++');
 				this.innerVisible = true;
-				this.curNickName = obj.nickname;
+				this.curNickName = obj.label;
 				// this.ruleForm = obj;
 				this.ruleForm = JSON.parse(JSON.stringify(obj))
 			},
 			// 点击删除按钮
 			async delBtn(id) {
-				await this.delNickName(id);
+				await this.delLabel(id);
 				if(this.tableData.length == 1 && this.nickNameData.page > 1){
 					this.nickNameData.page = this.nickNameData.page - 1
 				}
-				await this.getNickName({
+				await this.getLabel({
 					page: this.nickNameData.page,
 					limit: this.nickNameData.limit,
 					typecontrol_id: this.upParameter.typecontrol_id,
@@ -200,7 +200,7 @@
 			pageChange(obj) {
 				this.nickNameData.page = obj.page;
 				this.nickNameData.limit = obj.limit;
-				this.getNickName({
+				this.getLabel({
 					page: this.nickNameData.page,
 					limit: this.nickNameData.limit,
 					typecontrol_id: this.upParameter.typecontrol_id,
@@ -210,7 +210,7 @@
 			// 点击取消按钮
 			btnCancel() {
 				this.$emit('update:outerVisible', false);
-				this.$parent.searchNickName()
+        this.$parent.searchNickName()
 			},
 			// 点击编辑页面取消按钮
 			btnCancel2() {
@@ -221,9 +221,9 @@
 			async btnOK2() {
 				try {
 					await this.$refs.ruleForm.validate();
-					await this.editNickName(this.ruleForm);
+					await this.editLabel(this.ruleForm);
 					this.innerVisible = false;
-					this.getNickName({
+					this.getLabel({
 						page: this.nickNameData.page,
 						limit: this.nickNameData.limit,
 						typecontrol_id: this.upParameter.typecontrol_id,

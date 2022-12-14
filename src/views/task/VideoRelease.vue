@@ -2,7 +2,7 @@
 	<div>
 		<el-card style="margin-bottom: 20px">
 			<el-row>
-				<el-select v-model="searchTableData.state" placeholder="请选择任务状态" size="small">
+				<el-select v-model="page.status" placeholder="请选择任务状态" size="small">
 					<el-option
 						v-for="item in searchStateList"
 						:key="item.value"
@@ -36,6 +36,7 @@
 	import tableCustom from '@/components/myComponent/table/tableCustom.vue';
 	import VideoReleaseDialogComponent from './component/VideoReleaseDialogComponent.vue';
 	import pagination from '@/components/myComponent/table/pagination.vue';
+	import moment from 'moment';
 	export default {
 		name: 'TtVideoRelease',
 		components: {
@@ -48,32 +49,30 @@
 				// 下拉选择数据
 				searchStateList: [
 					{
-						value: '全部',
+						value: '',
 						label: '全部',
 					},
 					{
-						value: '已完成',
+						value: '0',
 						label: '已完成',
 					},
 					{
-						value: '执行中',
-						label: '执行中',
-					},
-					{
-						value: '执行中断',
-						label: '执行中断',
-					},
+						value: '1',
+						label: '未完成',
+					}
 				],
-				searchTableData: {
-					state: '',
-				},
 				loading: false,
 				tableData: [],
 				columns: [
 					{
-						prop: 'release_time',
+						prop: 'create_time',
 						label: '创建时间',
 						align: 'center',
+						// render(h, { row }) {
+						// 	const newTime = this.formatDate(row.create_time);
+						// 	const newTime = moment(row.create_time).format('YYYY-MM-DD')
+						// 	return <div>{newTime}</div>;
+						// },
 					},
 					{
 						prop: 'task_name',
@@ -81,15 +80,20 @@
 						align: 'center',
 					},
 					{
-						prop: 'mode',
+						prop: 'status',
 						label: '任务状态',
 						align: 'center',
+						render: (h,{row}) => {
+							return <div>{row.status == 0 ? '已完成' : '未完成'}</div>
+						}
 					},
 					{
 						label: '任务进度',
 						align: 'center',
 						render(h, { row }) {
-							const percent = (row.su_total / row.total) * 100 + '%';
+							const {complete_num,fail_num} = row
+							const percent = 
+								((Number(complete_num) / (Number(complete_num) + Number(fail_num))) * 100).toFixed(2) + '%';
 							return <div>{percent}</div>;
 						},
 					},
@@ -102,7 +106,7 @@
 									<el-button
 										type="primary"
 										size="mini"
-										onClick={this.toDetail.bind(this, row.videotasks_id)}
+										onClick={this.toDetail.bind(this, row.tasklist_id)}
 									>
 										查看详情
 									</el-button>
@@ -115,6 +119,8 @@
 				page: {
 					page: 1,
 					limit: 20,
+					task_type: 'GetAwemeList',
+					status: ''
 				},
 				total: 0,
 			};
@@ -136,7 +142,7 @@
 				this.loading = true;
 				try {
 					const res = await this.$api({
-						type: 'getVideotasks',
+						type: 'getTasklist',
 						data,
 					});
 					console.log(res, '视频列表数据');
@@ -154,10 +160,9 @@
 			},
 			// 查看详情
 			toDetail(id) {
+				console.log(id,'id======================')
 				this.dialog = true;
-				this.$refs.dialog.getVideoTaskDetails({
-					id,
-				});
+				this.$refs.dialog.getTaskListDetail(id);
 			},
 			// 当前页数据条数/页码改变
 			pageChange(obj) {
@@ -167,9 +172,19 @@
 			// 点击查询按钮
 			searchTasks() {
 				this.page.curpage = 1;
-				alert('查询');
+				this.getVideoTasks(this.page)
+			},
+			// 时间过滤器
+			formatDate(data, formatStr = 'YYYY-MM-DD') {
+				return moment(data).format(formatStr);
 			},
 		},
+
+		// filters: {
+		// 	formatDate(data, formatStr = 'yyyy-MM-dd') {
+		// 		return moment(data).format(formatStr);
+		// 	},
+		// },
 	};
 </script>
 

@@ -33,12 +33,12 @@
 				></el-cascader>
 			</el-form-item>
 		<!-- 添加签名 -->
-			<el-form-item prop="nickname" label="添加昵称：">
+			<el-form-item prop="autograph" label="添加签名：">
 				<el-input
 					type="textarea"
 					placeholder="请输入昵称(一行仅限一个)"
 					rows="6"
-					v-model="ruleForm.nickname"
+					v-model="ruleForm.autograph"
 					style="width: 60%"
 				>
 				</el-input>
@@ -76,13 +76,14 @@
 				equipmentLoading: false,
 				typecontrolLoading: false,
 				ruleForm: {
-					nickname: '',
+					autograph: '',
 					typecontrol_id: '',
 					typecontrol: [],
 					grouping_id: null,
+					usage_time: ''
 				},
 				rules: {
-					nickname: [{ required: true, message: '请输入昵称', trigger: 'blur' }],
+					autograph: [{ required: true, message: '请输入签名', trigger: 'blur' }],
 					// grouping_id: [{ required: true, message: '请选择设备分组', trigger: 'blur' }],
 					typecontrol: [{ required: true, message: '请选择素材库', trigger: 'blur' }],
 				},
@@ -130,13 +131,13 @@
 				}
 			},
 			// 新增昵称
-			async addNickName(data) {
+			async addAutograph(data) {
 				try {
 					const res = await this.$api({
-						type: 'addNickName',
+						type: 'addAutograph',
 						data,
 					});
-					console.log(res, '新增昵称');
+					console.log(res, '新增签名');
 					if (res.status == 200) {
 						this.$message.success(res.msg);
 					} else {
@@ -155,30 +156,27 @@
 			async btnOK() {
 				try {
 					await this.$refs.ruleForm.validate();
-					console.log(this.ruleForm.nickname, '文本域数据');
+					console.log(this.ruleForm.autograph, '文本域数据');
 					let nickNameArr = [];
 					// 处理文本域数据
-					this.ruleForm.nickname.split('\n').forEach((item) => {
+					this.ruleForm.autograph.split('\n').forEach((item) => {
 						console.log(item.replace(/\s/gi, ''));
 						if (item.replace(/\s/gi, '')) {
 							nickNameArr.push(item.replace(/\s/gi, ''));
 						}
 					});
-					this.ruleForm.nickname = nickNameArr.join('\n');
+					this.ruleForm.autograph = nickNameArr.join('\n');
 					const {typecontrol} = this.ruleForm
 					this.ruleForm.typecontrol_id = typecontrol.length ? typecontrol[typecontrol.length - 1] : ''
-					// 调用新增昵称接口
-					await this.addNickName(this.ruleForm);
+					// 调用新增签名接口
+					await this.addAutograph(this.ruleForm);
 					this.$emit('update:showDialog', false);
-					console.log(this.nnClassifyDate,'传递分类数据')
-					console.log(this.ruleForm.typecontrol_id)
 					// 更新数据
 					const arr = this.nnClassifyDate.filter(item => {
 						return item.typecontrol_id == this.ruleForm.typecontrol_id
 					})
-					console.log(arr,'是否存在搜索之内')
 					if(arr.length){
-						this.$parent.getNickNameClassify(this.upParameter)
+						this.$parent.getAutographClassify(this.upParameter)
 					}
 				} catch (error) {
 					console.log(error);

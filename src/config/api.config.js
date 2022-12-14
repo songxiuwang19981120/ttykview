@@ -352,8 +352,54 @@ export default {
       'getNickNameClassify': { // 获取昵称分类
         url: '/Nickname/listtable',
         method: 'POST'
+      },
+
+      'getAutographClassify': { // 获取签名分类
+        url: '/Autograph/listtable',
+        method: 'POST'
+      },
+
+
+      'getLabelClassify': { // 获取标签分类
+        url: '/Label/listtable',
+        method: 'POST'
+      },
+
+      //Label   API start
+      'getLabel': { // 获取标签
+        url: '/Label/index',
+        method: 'POST',
+      },
+      'addLabel': { // 新增标签
+        url: '/Label/add',
+        method: 'POST',
+      },
+      'updateLabel': { // 修改标签
+        url: '/Label/update',
+        method: 'POST',
+      },
+      'deleteLabel': { // 删除标签
+        url: '/Label/delete',
+        method: 'POST',
+      },
+      'viewLabel': {
+        url: '/Label/view',
+        method: 'POST',
+      },
+      //Nickname  API end
+
+      // Tasklist API start
+      'getTasklist': { // 获取任务
+        url: '/Tasklist/index',
+        method: 'POST'
+      },
+
+      'getTaskListDetail': { // 获取任务详情
+        url: '/TaskListDetail/index',
+        method: 'POST'
       }
 
+      // Tasklist API end
   }
 
 

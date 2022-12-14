@@ -24,7 +24,6 @@
 				<div>
 					<span>素材库：</span>
 					<el-cascader
-						clearable
 						:props="{ checkStrictly: true }"
 						:options="searchTypecontrolList"
 						v-model="searchTableData.typecontrol"
@@ -35,9 +34,12 @@
 				</div>
 				<div>
 					<!-- 查询 -->
-					<el-button type="primary" :loading="btnloading" @click="searchNickName">{{
-						btnloading ? '加载中...' : '查询'
+					<el-button type="primary" :loading="btnloading" @click="searchNickName" style="margin-right: 20px">{{
+						btnloading ? '加载中...' : '搜索'
 					}}</el-button>
+				</div>
+				<div>
+					<el-button type="primary" @click="btnReset">重置</el-button>
 				</div>
 			</div>
 			<div class="tt-accsituation--operation">
@@ -57,7 +59,7 @@
 			:upParameter="nickData"
 		></NickNameDetailDialog>
 		<!-- 上传弹层 -->
-		<NickNameUploadDialog :showDialog.sync="showUploadDialog" :upParameter="searchTableData"></NickNameUploadDialog>
+		<NickNameUploadDialog :showDialog.sync="showUploadDialog" :upParameter="parameterData" :nnClassifyDate="tableData"></NickNameUploadDialog>
 	</div>
 </template>
 
@@ -119,7 +121,7 @@
 										size="mini"
 										onClick={this.toNickNameDetail.bind(this, row)}
 									>
-										详情
+									昵称列表
 									</el-button>
 								</div>
 							);
@@ -132,6 +134,7 @@
 				equipmentLoading: false,
 				typecontrolLoading: false,
 				nickData: {}, // 传递给详情弹层的数据
+				parameterData: {}
 			};
 		},
 
@@ -160,6 +163,7 @@
 			// 获取素材分类数据
 			async getTypecontrol() {
 				try {
+					this.typecontrolLoading = true
 					const res = await this.$api({
 						type: 'getTypecontrol',
 					});
@@ -172,6 +176,8 @@
 					}
 				} catch (error) {
 					console.error(error);
+				} finally {
+					this.typecontrolLoading = false
 				}
 			},
 			// 获取昵称分类数据
@@ -199,12 +205,23 @@
 			searchNickName() {
 				console.log(this.searchTableData, '++++++++');
 				const { equipment, typecontrol } = this.searchTableData;
-				const typecontrol_id = typecontrol[typecontrol.length - 1];
+				const typecontrol_id = typecontrol.length ? typecontrol[typecontrol.length - 1] : '';
 				const grouping_id = equipment;
+				this.parameterData = {
+					typecontrol_id, 
+					grouping_id
+				}
 				this.getNickNameClassify({
 					typecontrol_id,
 					grouping_id,
 				});
+			},
+			// 点击重置按钮
+			btnReset() {
+				this.searchTableData = {
+					equipment: '',
+					typecontrol: ''
+				}
 			},
 			// 点击上传按钮
 			uploadNickName() {
