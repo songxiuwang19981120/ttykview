@@ -1,6 +1,6 @@
 <template>
   <!-- <div> -->
-  <el-dialog :visible.sync="showDialog" title="上传素材" width="60%" :before-close="cancelMaterial">
+  <el-dialog :visible.sync="uploadShowDialog" title="上传素材" width="60%" :before-close="cancelMaterial">
     <el-form ref="newMaterialform" :rules="newMaterialrules" :model="materialForm" label-width="200px">
       <el-form-item label="ID库:" prop="libraryId">
         <el-select v-model="materialForm.libraryId" placeholder="请选择ID库名称" style="width:80%" clearable filterable>
@@ -34,12 +34,14 @@
 
 <script>
 import tableCustom from "@/components/myComponent/table/tableCustom.vue";
+import base from '@/config/base.config'
+const { BASE_URL } = base
 export default {
   props: {
     searchIDList: {
       type: Array
     },
-    showDialog: {
+    uploadShowDialog: {
       type: Boolean,
       default: false,
     },
@@ -49,6 +51,7 @@ export default {
   },
   data() {
     return {
+      baseUrl: BASE_URL,
       searchLinking: false,
       tableData: [],
       columns: [
@@ -107,30 +110,69 @@ export default {
       }
       this.materialSubmitting = false
       this.tableData = []
-      this.$emit('update:showDialog', false)
+      this.$parent.getLibraryidIndex()
+      this.$emit('update:uploadShowDialog', false)
     },
     // 新增素材
     submitMaterial() {
       this.$refs['newMaterialform'].validate((valid) => {
         if (!valid) return false;
-        this.materialSubmitting = true
-        this.uidlibraryAdd()
+        if (this.materialForm.ids == '' && this.tableData.length == 0) {
+          this.$message.warning({ message: '请输入需要添加的素材（已有素材id、新素材链接必选一个）' })
+        } else if (this.materialForm.ids != '') {
+          if (this.tableData.length != 0) {
+            this.uidlibraryJsonList()
+            // return console.log('链接有值,id有值');
+          }
+          // return console.log('id有值');
+          this.uidlibraryAdd()
+        } else {
+          // return console.log('链接有值');
+          this.uidlibraryJsonList()
+        }
       })
     },
-    // 新增素材接口
+    // 新增已有素材接口
     async uidlibraryAdd() {
-      // let urls = this.tableData.map((item) => {
-      //   return item.uid;
-      // }).join("\n");
       let data = {
-        // ids:this.materialForm.ids,
         libraryid_id: this.materialForm.libraryId,
         url: this.materialForm.ids,
       }
       try {
+        this.materialSubmitting = true
         let result = await this.$api({ type: "uidlibraryAdd", data: data });
+        this.materialSubmitting = false
         if (result.status == '200') {
-          this.$message.success({ message: '素材上传成功' })
+          this.$message.success({ message: result.msg })
+          this.cancelMaterial()
+        } else {
+          this.$message.error({ message: result.msg })
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    // 新增新的素材接口（搜索）
+    async uidlibraryJsonList() {
+      let listAll = [];
+      this.tableData.forEach((item, index) => {
+        let list = {
+          uid: item.uid,
+          sec_uid: item.sec_uid,
+          libraryid_id: this.materialForm.libraryId,
+          url: 'https://www.tiktok.com/' + '@' + item.unique_id,
+        }
+        listAll.push(list)
+      });
+      let data = {
+        data: listAll
+      }
+      try {
+        this.materialSubmitting = true
+        let result = await this.$api({ type: "uidlibraryJsonList", data: data });
+        this.materialSubmitting = false
+        if (result.status == '200') {
+          this.$message.success({ message: '新素材上传成功' })
           this.cancelMaterial()
         } else {
           this.$message.error({ message: result.msg })
@@ -167,6 +209,7 @@ export default {
         console.error(error);
       }
     },
+    // 删除
     removeLink(row) {
       let id = row.uid
       this.tableData.forEach((item, index) => {

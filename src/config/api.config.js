@@ -374,13 +374,25 @@ export default {
         method:'POST'
       },
 
-      'uidlibraryAdd':{    //新增素材
+      'uidlibraryAdd':{    //新增素材已有
         url:'Uidlibrary/add',
         method:'POST'
+      },
+
+      'uidlibraryJsonList':{    //新增素材未有
+        url:'Uidlibrary/jsonList',
+        method:'POST'
+      },
+
+      'uidlibraryIndex':{    //获取素材列表
+        url:'Uidlibrary/index',
+        method:'POST'
+      },
+
+      'uidlibraryDelete':{    //删除素材
+        url:'Uidlibrary/delete',
+        method:'POST'
       }
-      
-
-
   }
 
 

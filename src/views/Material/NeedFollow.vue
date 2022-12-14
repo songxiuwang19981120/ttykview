@@ -17,7 +17,7 @@
       </div>
       <div class="tt-accsituation--operation">
         <el-button type="primary" @click="libraryVisible = true">新增ID库</el-button>
-        <el-button type="primary" @click="materialVisible = true">上传素材</el-button>
+        <el-button type="primary" @click="uploadMaterialVisible = true">上传素材</el-button>
       </div>
     </div>
     <table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
@@ -51,26 +51,28 @@
         }}</el-button>
       </span>
     </el-dialog>
-
-
-    <follow-component :showDialog.sync="materialVisible" :searchIDList="searchIDList"></follow-component>
+    <upload-material :uploadShowDialog.sync="uploadMaterialVisible" :searchIDList="searchIDList"></upload-material>
+    <edit-material ref="editMaterial" :editShowDialog.sync="editMaterialVisible"></edit-material>
   </div>
 </template>
 
 <script>
 import tableCustom from "@/components/myComponent/table/tableCustom.vue";
 import pagination from "@/components/myComponent/table/pagination.vue";
-import followComponent from "./component/NeedFollowComponent.vue"
+import uploadMaterial from "./component/NeedFollowUploadMaterial.vue";
+import editMaterial from "./component/NeedFollowEditMaterial.vue"
 export default {
   name: "NeedFollow",
   components: {
     tableCustom,
     pagination,
-    followComponent
+    uploadMaterial,
+    editMaterial,
   },
   data() {
     return {
-      materialVisible:false,
+      uploadMaterialVisible: false,  //上传素材
+      editMaterialVisible: false,  //编辑素材
       editLibrarySubmitting: false, //ID库新增loading
       editLibraryVisible: false,  //编辑ID库
       libraryVisible: false,  //ID库新增
@@ -169,6 +171,11 @@ export default {
         let result = await this.$api({ type: "libraryidDelete", data: data });
         if (result.status == '200') {
           this.$message.success({ message: '删除成功' })
+          if (this.current_page != 1) {
+            if (this.tableData.length == 1) {
+              this.current_page = this.current_page - 1
+            }
+          }
           this.getLibraryidIndex()
           this.getAllLibraryidIndex()
         } else {
@@ -180,7 +187,8 @@ export default {
     },
     // 素材编辑
     materialEdit(row) {
-      console.log('素材编辑', row);
+      this.editMaterialVisible = true
+      this.$refs.editMaterial.getData(row);
     },
     // 新增ID库
     submitlibrary() {
