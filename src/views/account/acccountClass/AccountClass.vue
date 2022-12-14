@@ -11,7 +11,7 @@
           </span>
         </template>
       </el-cascader>
-      <el-button style="margin-left:20px" type="success" @click="FnNewzh()">重置</el-button>
+      <el-button style="margin-left:20px" type="primary" @click="FnNewzh()">重置</el-button>
       <el-button type="primary" @click="handleChange2">搜索</el-button>
     </div>
     <!-- 新增按钮 -->
@@ -39,7 +39,7 @@
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button type="success" @click="dialogNewVisible = false">取 消</el-button>
+          <el-button  type="danger" @click="dialogNewVisible = false">取 消</el-button>
           <el-button type="primary" @click="TypecontrolAdd()">确 定</el-button>
         </div>
 
