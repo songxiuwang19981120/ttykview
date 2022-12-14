@@ -41,7 +41,7 @@
                 }}</el-button>
             </span>
         </el-dialog>
-        <div class="tt-accsituation">
+        <div class="tt-accsituation" v-if="tableData.length > 0 ? true : false">
             <div class="tt-accsituation--operation">
                 <el-select v-model="searchCountry" placeholder="请选择国家" style="width:200px;margin-right:20px">
                     <el-option v-for="item in countryList" :key="item.value" :label="item.label"
@@ -59,9 +59,12 @@
                 }}</el-button>
             </div>
         </div>
-
-        <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true" @handleSelectionChange="selectionChange"></table-custom>
-        <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination"></pagination>
+        <div  v-if="tableData.length > 0 ? true : false">
+            <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
+                @handleSelectionChange="selectionChange"></table-custom>
+            <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination">
+            </pagination>
+        </div>
     </div>
 </template>
 
@@ -77,12 +80,7 @@ export default {
     data() {
         return {
             loading: false, //表格加载loading
-            tableData: [
-                {
-                    nickName: '中国',
-                    id: '1',
-                }
-            ],  //表格数据
+            tableData: [],  //表格数据
             columns: [
                 {
                     prop: 'nickName',
@@ -194,10 +192,6 @@ export default {
                     label: '关注列表',
                     value: 2,
                 },
-                {
-                    label: '评论列表',
-                    value: 3,
-                },
             ],//采集内容
             collectionBlacklistlist: [
                 {
@@ -236,14 +230,10 @@ export default {
             dataSourceList: [
                 {
                     value: '1',
-                    label: '评论列表'
-                },
-                {
-                    value: '2',
                     label: '关注列表'
                 },
                 {
-                    value: '3',
+                    value: '2',
                     label: '粉丝列表'
                 },
             ],  //数据来源

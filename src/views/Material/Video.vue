@@ -6,8 +6,8 @@
                     <span class="search-title">设备分组:</span>
                     <el-select v-model="searchTableData.equipment" placeholder="请选择设备分组"
                         style="width:150px;margin-right:20px">
-                        <el-option v-for="item in searchEquipmentList" :key="item.value" :label="item.label"
-                            :value="item.value"></el-option>
+                        <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
+                            :key="item.grouping_id"></el-option>
                     </el-select>
                 </div>
                 <div>
@@ -18,7 +18,8 @@
                 </div>
                 <div>
                     <span class="search-title">素材类型:</span>
-                    <el-select v-model="searchTableData.status" placeholder="素材类型" style="width:160px;margin-right:20px">
+                    <el-select v-model="searchTableData.status" placeholder="素材类型"
+                        style="width:160px;margin-right:20px">
                         <el-option v-for="item in searchTypeList" :key="item.value" :label="item.label"
                             :value="item.value"></el-option>
                     </el-select>
@@ -35,35 +36,37 @@
                 }}</el-button>
                 <el-button type="primary" @click="resetTable">重置</el-button>
             </div>
-            <!-- <div>
-                <table border="1" cellspacing="0" cellpading="0">
-                    <tr align="center">
-                        <th>序号</th>
-                        <th>名字</th>
-                        <th>性别</th>
-                        <th>年龄</th>
-                    </tr>
-                    <tr align="center">
-                        <td>1</td>
-                        <td>张三</td>
-                        <td>男</td>
-                        <td>18</td>
-                    </tr>
-                </table>
-            </div> -->
             <div class="tt-accsituation--operation">
                 <el-button type="primary" @click="videoUpLoad">上传视频</el-button>
                 <!-- <el-button type="primary" @click="videoUpLoad">批量删除</el-button> -->
             </div>
+            <el-table :data="statisticsData" border style="width:490px;margin: 10px; ">
+                <el-table-column prop="name" label="分类名称" width="120" align="center"></el-table-column>
+                <el-table-column prop="unloadNumber" label="已上传视频数量" width="120" align="center"></el-table-column>
+                <el-table-column prop="use" label="已用视频数量" width="120" align="center"></el-table-column>
+                <el-table-column prop="used" label="当前可用素材" align="center"></el-table-column>
+            </el-table>
+            <div style="height:10px"></div>
         </div>
         <el-dialog title="视频上传" :visible.sync="videoUploadVisible" width="40%" :before-close="videoUploadClose">
-            <el-form ref="form" :rules="rules" :model="videoForm" label-width="140px" :hide-required-asterisk="true">
-                <el-form-item label="视频:" prop="name">
-                    <el-upload class="upload-demo" drag action="http://192.168.4.30/api/Base/upload" multiple accept=".mp4" :on-change="onFileListChange">
+            <el-form ref="videoForm" :rules="rulesUpload" :model="videoForm" label-width="140px">
+                <el-form-item label="分组:" prop="group">
+                    <el-select v-model="videoForm.group" placeholder="请选择分组">
+                        <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
+                            :key="item.grouping_id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="库:" prop="library">
+                    <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryList"
+                        v-model="videoForm.library" placeholder="库选择"></el-cascader>
+                </el-form-item>
+                <el-form-item label="视频:" prop="video">
+                    <el-upload class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple accept=".mp4"
+                        :on-success="handleSucess" :on-error="handleError" :on-remove="handleRemove">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                    </el-upload> </el-form-item>
-                <video src="url"></video>
+                    </el-upload>
+                </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="videoUploadClose">取 消</el-button>
@@ -87,6 +90,9 @@
 <script>
 import tableCustom from '@/components/myComponent/table/tableCustom.vue';
 import pagination from '@/components/myComponent/table/pagination.vue';
+import base from '@/config/base.config'
+const { BASE_URL } = base
+
 export default {
     name: 'TtVideo',
     components: {
@@ -95,6 +101,17 @@ export default {
     },
     data() {
         return {
+            baseUrl: BASE_URL,
+            statisticsData: [
+                {
+                    name: '全部',
+                    unloadNumber: '',
+                    use: '1',
+                    used: '1',
+
+                }
+
+            ],
             videoUrl: '',  //播放视频路径
             videoPlayDialog: false,  //播放视频弹框
             loading: false, //表格加载loading
@@ -157,20 +174,7 @@ export default {
             current_page: 1, //当前页
             current_limit: 10, //每页条数
             submitting: false,  //提交确定
-            searchEquipmentList: [
-                {
-                    value: '1',
-                    label: '供应商A'
-                },
-                {
-                    value: '2',
-                    label: '供应商B'
-                },
-                {
-                    value: '3',
-                    label: '选项三'
-                },
-            ],  //设备分组
+            groupList: [],  //设备分组
             libraryList: [],  //素材库
             searchTableData: {
                 equipment: '',
@@ -201,17 +205,81 @@ export default {
             videoUploadVisible: false,  //视频上传弹框
             videoSubmitting: false,  //视频上传加载状态
             videoForm: {
-                videoList: [],
+                group: '',  //分组
+                library: '',  //库
             },  //视频数据
-            rules: {},  //视频上传弹框校验
+            rulesUpload: {
+                group: [{ required: true, message: '请选择分组', trigger: 'blur' }],
+                library: [{ required: true, message: '请选择库', trigger: 'blur' }],
+            },  //视频上传弹框校验
+            fileList: [],  //已选择需要上传的视频
         };
     },
 
     mounted() {
+        this.getGroupList();
+        this.getTypeControlList();
         this.getMaterialList();
     },
 
     methods: {
+        // 视频删除
+        handleRemove(file, fileList) {
+            console.log('视频删除', file, fileList);
+            this.fileList = fileList
+        },
+        // 视频上传成功回调
+        handleSucess(response, file, fileList) {
+            // if(response.status!='200'){
+            //     this.$message.warning(response.msg);
+            //     fileList.pop()
+            // }
+            this.fileList = fileList
+        },
+        // 视频上传失败回调
+        handleError(err, file, fileList){
+            this.$message.error(err.msg);
+        },
+        /*
+            function: getTreeData
+            params: data | 需要进行递归处理的数组
+            desc: 递归函数，对数组进行处理，设置dhilren长度为0的字段为undefined
+            return: 处理后的数据
+        */
+        getTreeData(arr) {
+            arr.forEach(item => {
+                if (!item.children.length) {
+                    item.children = undefined
+                } else {
+                    this.getTreeData(item.children)
+                }
+            })
+        },
+        /*
+            获取素材
+        */
+        async getTypeControlList() {
+            try {
+                let result = await this.$api({ type: "getTypecontrol" });
+                if (result.status == '200') {
+                    this.libraryList = result.data;
+                    this.getTreeData(result.data)
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) { }
+        },
+        /* 
+            获取分组
+        */
+        async getGroupList() {
+            let result = await this.$api({ type: 'getGrouping' })
+            if (result.status == '200') {
+                this.groupList = result.data.list
+            } else {
+                this.$message.error({ message: result.msg })
+            }
+        },
         // 关闭视频播放
         videoPlayClose() {
             this.videoUrl = ''
@@ -245,32 +313,47 @@ export default {
                 console.log(i++, img);
             };
         },
-        /**
-         * 文件改变回调
-         */
-        onFileListChange(file, fileList) {
-            // console.log(file, fileList);
-            let { name } = file || {};
-            name = name.toLowerCase();
-            if (!name.endsWith('.mp4')) {
-                this.$message.warning('仅支持mp4格式');
-                // this.handleRemove();
-                return false;
-            }
-            const url = URL.createObjectURL(file.raw);
-            // console.log(url);
-            let data = {
-                file: file,
-                url: url
-            }
-            this.videoForm.videoList.push(data);
-            console.log(this.videoForm.videoList);
-            // this.getMediaDetail(file);
-            // return false;
-        },
         // 视频上传提交
         submitForVideo() {
-            this.videoSubmitting = true
+            if (this.fileList.length == 0) {
+                return this.$message.warning({ message: '请选择需要上传的视频'});
+            }
+            this.$refs['videoForm'].validate((valid) => {
+                if (!valid) return false;
+                this.videoSubmitting = true;
+                let fileList = this.fileList.map((item) => {
+                    return item.response.data;
+                }).join(",");
+                console.log(fileList);
+                let typecontrolId = this.videoForm.library[this.videoForm.library.length - 1] ?? ''
+                let data = {
+                    typecontrol_id: typecontrolId,
+                    video_url: fileList,
+                    grouping_id: this.videoForm.group,
+                }
+                this.addMaterial(data)
+            })
+        },
+        // 视频上传提交
+        async addMaterial(data) {
+            try {
+                let result = await this.$api({ type: "addMaterial", data: data });
+                if (result.status == '200') {
+                    this.videoSubmitting = false;
+                    this.fileList = [];
+                    this.videoUploadVisible = false;
+                    this.videoForm = {
+                        group: '',  //分组
+                        library: '',  //库
+                    };
+                    this.getMaterialList()
+                    this.$message.success({ message: result.msg })
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) {
+                console.error(error);
+            }
         },
         // 取消视频上传弹框
         videoUploadClose() {
@@ -282,16 +365,21 @@ export default {
         videoUpLoad() {
             this.videoUploadVisible = true
         },
+        /*
+           删除视频
+        */
         async removeHandler(val) {
-            console.log('删除');
             let data = {
                 material_ids: val.material_id,
             }
             try {
                 let result = await this.$api({ type: "deleteMaterial", data: data });
-                console.log(result);
-                this.$notify({ title: '删除成功', type: 'success'});
-                this.getMaterialList()
+                if (result.status == '200') {
+                    this.$message.success({ message: '视频删除成功' });
+                    this.getMaterialList()
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
             } catch (error) {
                 console.error(error);
             }
@@ -319,31 +407,38 @@ export default {
             获取视频
         */
         async getMaterialList() {
-            var order = ''
+            let order = ''
             if (this.searchTableData.sort != '') {
                 order = 'add_time'
             }
+            let typecontrolId = this.searchTableData.library[this.searchTableData.library.length - 1] ?? ''
             let data = {
                 limit: this.current_limit,
                 page: this.current_page,
                 video_num: '',
                 add_time_start: '',
                 add_time_end: '',
-                typecontrol_id: '',
+                typecontrol_id: typecontrolId,
                 order: order,
                 sort: this.searchTableData.sort,
                 grouping_id: this.searchTableData.equipment,
-                status:this.searchTableData.status,
+                status: this.searchTableData.status,
             }
             try {
                 this.loading = true;
                 let result = await this.$api({ type: "getMaterialList", data: data });
-                console.log(result);
-                this.tableData = result.list;
-                this.total = result.count
+                if (result.status == '200') {
+                    this.tableData = result.data.list;
+                    this.total = result.data.count
+                    this.statisticsData[0].unloadNumber = result.data.count
+                    this.statisticsData[0].name = (result.data.type_title == '' ? '全部' : result.data.type_title)
+                    this.statisticsData[0].use = result.data.yy
+                    this.statisticsData[0].used = result.data.count - result.data.yy
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
                 this.loading = false;
                 this.submitting = false
-
             } catch (error) {
                 this.loading = false;
                 this.submitting = false
@@ -353,8 +448,8 @@ export default {
         /*
             搜索重置
         */
-        resetTable(){
-            this.searchTableData={
+        resetTable() {
+            this.searchTableData = {
                 equipment: '',
                 library: '',
                 status: '',
