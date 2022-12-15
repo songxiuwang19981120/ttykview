@@ -74,9 +74,8 @@
             </div>
         </div>
         <div>
-            <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"@handleSelectionChange="selectionChange"></table-custom>
+            <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true" @handleSelectionChange="selectionChange"></table-custom>
             <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination"></pagination>
-
         </div>
     </div>
 </template>
