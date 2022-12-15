@@ -392,7 +392,19 @@ export default {
       'uidlibraryDelete':{    //删除素材
         url:'Uidlibrary/delete',
         method:'POST'
-      }
+      },
+
+      'collectionUser':{    //用户采集
+        url:'Collection/user',
+        method:'POST'
+      },
+
+      'externalmemberIndex':{    //采集用户首页数据列表
+        url:'Externalmember/index',
+        method:'POST'
+      },
+
+
   }
 
 

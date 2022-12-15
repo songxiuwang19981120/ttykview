@@ -4,32 +4,32 @@
             <div class="tt-accsituation--operation">
                 <el-input class="blogger" type="textarea" :rows="3" v-model="bloggerLink"
                     placeholder="请输入博主主页链接（一行一个）,每条链接请求时间大概为20秒，请耐心等待"></el-input>
-                <el-button type="primary" :loading="collectioning" @click="configureParameter">{{ collectioning ? '采集参数中
-                ...' : '配置采集参数'
+                <el-button type="primary" :loading="collectioning" @click="configureParameter">{{ collectioning ?
+                        '采集参数中...' : '配置采集参数'
                 }}</el-button>
             </div>
         </div>
         <el-dialog title="采集配置" :visible.sync="configureVisible" width="40%" :before-close="configureClose">
             <el-form ref="form" :rules="rules" :model="configureForm" label-width="140px"
                 :hide-required-asterisk="true">
-                <el-form-item label="任务名:" prop="name">
-                    <el-input v-model="configureForm.name" placeholder="请输入任务名" style="width:350px"></el-input>
+                <el-form-item label="任务名:" prop="task_name">
+                    <el-input v-model="configureForm.task_name" placeholder="请输入任务名" style="width:60%"></el-input>
                 </el-form-item>
                 <el-form-item label="采集的数据标签:" prop="label">
-                    <el-input v-model="configureForm.label" placeholder="请输入活动名称" style="width:350px"></el-input>
+                    <el-input v-model="configureForm.label" placeholder="请输入活动名称" style="width:60%"></el-input>
                 </el-form-item>
-                <el-form-item label="采集内容:" prop="content">
-                    <el-checkbox-group v-model="configureForm.content">
+                <el-form-item label="采集内容:" prop="type_list">
+                    <el-checkbox-group v-model="configureForm.type_list">
                         <el-checkbox v-for="(item, index) in collectionContentlist" :label="item.value" :key="index">{{
                                 item.label
                         }}</el-checkbox>
                     </el-checkbox-group>
                 </el-form-item>
-                <el-form-item label="单博主采集上限:" prop="limit">
-                    <el-input-number v-model="configureForm.limit" :min="1"></el-input-number>
+                <el-form-item label="单博主采集上限:" prop="upper_limit">
+                    <el-input-number v-model="configureForm.upper_limit" :min="1"></el-input-number>
                 </el-form-item>
                 <el-form-item label="黑名单:">
-                    <el-checkbox-group v-model="configureForm.blacklist">
+                    <el-checkbox-group v-model="configureForm.black_list">
                         <el-checkbox v-for="(item, index) in collectionBlacklistlist" :label="item.value"
                             :key="index">{{
                                     item.label
@@ -43,29 +43,40 @@
                 }}</el-button>
             </span>
         </el-dialog>
-        <div class="tt-accsituation" v-if="tableData.length > 0 ? true : false">
+        <div class="tt-accsituation">
             <div class="tt-accsituation--operation">
-                <el-select v-model="searchCountry" placeholder="请选择国家" style="width:200px;margin-right:20px">
-                    <el-option v-for="item in countryList" :key="item.value" :label="item.label"
-                        :value="item.value"></el-option>
-                </el-select>
-                <!-- <el-select v-model="searchDataSource" placeholder="请选择数据来源">
-                <el-option v-for="item in dataSourceList" :key="item.value" :label="item.label"
-                    :value="item.value"></el-option>
-            </el-select>
-            <el-select v-model="searchDataLabel" placeholder="请选择数据标签">
-                <el-option v-for="item in dataLabelList" :key="item.value" :label="item.label"
-                    :value="item.value"></el-option>
-            </el-select> -->
-                <el-button type="primary" :loading="submitting" @click="searchTable">{{ submitting ? '查询中 ...' : '查询'
+                <div>
+                    <span style="padding-right:10px;font-size:13px">昵称:</span>
+                    <el-input v-model="searchData.nickname" placeholder="请输入昵称"
+                        style="width:140px;margin-right: 20px;"></el-input>
+                </div>
+                <div>
+                    <span style="padding-right:10px;font-size:13px">uid:</span>
+                    <el-input v-model="searchData.uid" placeholder="请输入uid"
+                        style="width:140px;margin-right: 20px;"></el-input>
+                </div>
+                <div>
+                    <span style="padding-right:10px;font-size:13px">数据来源:</span>
+                    <el-select v-model="searchData.sources" placeholder="请选择数据来源"  style="width:140px;margin-right: 20px;">
+                        <el-option v-for="item in collectionContentlist" :key="item.value" :label="item.label"
+                            :value="item.value"></el-option>
+                    </el-select>
+
+                </div>
+                <div>
+                    <span style="padding-right:10px;font-size:13px">数据标签:</span>
+                    <el-input v-model="searchData.label" placeholder="请输入数据标签"
+                        style="width:140px;margin-right: 20px;"></el-input>
+                </div>
+                <el-button type="primary" :loading="searching" @click="searchTable">{{ searching ? '查询中 ...' : '查 询'
                 }}</el-button>
+                <el-button type="primary" :loading="searching" @click="resetClick">重 置</el-button>
             </div>
         </div>
-        <div v-if="tableData.length > 0 ? true : false">
-            <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
-                @handleSelectionChange="selectionChange"></table-custom>
-            <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination">
-            </pagination>
+        <div>
+            <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"@handleSelectionChange="selectionChange"></table-custom>
+            <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination"></pagination>
+
         </div>
     </div>
 </template>
@@ -81,68 +92,91 @@ export default {
     },
     data() {
         return {
+            searchData: {
+                nickname: '',
+                uid: '',
+                sources: '',
+                label: '',
+            },
+            searching: false,
             collectioning: false,
             loading: false, //表格加载loading
             tableData: [],  //表格数据
             columns: [
                 {
-                    prop: 'nickName',
+                    prop: 'country',
                     label: '国家',
                     minWidth: 100,
                     fixed: true,
                     align: 'center',
                 },
                 {
-                    prop: 'nickName',
+                    prop: 'uid',
                     label: 'uid',
-                    minWidth: 160,
+                    minWidth: 200,
                     fixed: true,
                     align: 'center',
                 },
                 {
-                    prop: 'nickName',
+                    prop: 'nickname',
                     label: '昵称',
                     minWidth: 160,
                     align: 'center',
                 },
                 {
-                    prop: 'nickName',
+                    prop: 'avatar_thumb',
                     label: '头像',
                     minWidth: 150,
                     align: 'center',
+                    render: (h, { row }) => {
+                        let imgList = []
+                        imgList[0] = row.avatar_thumb
+                        return (
+                            <div>
+                                <el-image style="width: 50px; height: 50px" src={row.avatar_thumb} preview-src-list={imgList}></el-image>
+                            </div>
+                        );
+                    },
                 },
                 {
-                    prop: 'nickName',
+                    prop: 'signature',
                     label: '签名',
                     minWidth: 180,
                     align: 'center',
                 },
                 {
-                    prop: 'nickName',
+                    prop: 'sources',
                     label: '数据来源',
                     minWidth: 180,
                     align: 'center',
                 },
                 {
-                    prop: 'nickName',
+                    prop: 'label',
                     label: '数据标签',
                     minWidth: 180,
                     align: 'center',
                 },
                 {
-                    prop: 'nickName',
+                    prop: 'following_count',
                     label: '关注/粉丝/获赞',
                     minWidth: 160,
                     align: 'center',
+                    render: (h, { row }) => {
+                        return (
+                            <div>
+                                <div>{row.following_count}/{row.follower_status}/{row.total_favorited}</div>
+                            </div>
+                        );
+                    },
                 },
                 {
-                    prop: 'nickName',
+                    prop: 'aweme_count',
                     label: '作品数量',
                     minWidth: 150,
                     align: 'center',
                 },
                 {
-                    prop: 'nickName',
+                    prop: 'updata_time',
                     label: '采集时间',
                     minWidth: 180,
                     align: 'center',
@@ -173,45 +207,45 @@ export default {
             bloggerLink: '', //博主主页链接
             configureVisible: false,  //配置采集参数弹框
             configureForm: {
-                name: '',
+                task_name: '',
                 label: '',
-                content: [],
-                blacklist: [],
-                limit: '',
+                type_list: [],
+                upper_limit: '',
+                black_list: [],
             },//配置采集参数弹框数据
             rules: {
-                name: [{ required: true, message: '请输入任务名', trigger: 'blur' }],
+                task_name: [{ required: true, message: '请输入任务名', trigger: 'blur' }],
                 label: [{ required: true, message: '请输入采集的数据标签', trigger: 'blur' }],
-                content: [{ required: true, message: '请选择采集内容', trigger: 'blur' }],
-                limit: [{ required: true, message: '请输入单博主采集上限', trigger: 'blur' }],
+                type_list: [{ required: true, message: '请选择采集内容', trigger: 'blur' }],
+                upper_limit: [{ required: true, message: '请输入单博主采集上限', trigger: 'blur' }],
 
             },  //必填校验
             collectionContentlist: [
                 {
                     label: '粉丝列表',
-                    value: 1,
+                    value: 'CollectionFans',
                 },
                 {
                     label: '关注列表',
-                    value: 2,
+                    value: 'CollectionFollow ',
                 },
             ],//采集内容
             collectionBlacklistlist: [
                 {
                     label: '无头像',
-                    value: 1,
+                    value: 'no_avatar',
                 },
                 {
                     label: '无作品',
-                    value: 2,
+                    value: 'no_aweme',
                 },
                 {
                     label: '历史已操作用户',
-                    value: 3,
+                    value: 'historical_users',
                 },
                 {
                     label: '无昵称',
-                    value: 4,
+                    value: 'no_nickname',
                 },
             ],//黑名单
             submitting: false,  //配置采集参数提交确定
@@ -230,65 +264,52 @@ export default {
                 },
             ],  //国家
             searchCountry: '',  //国家搜索
-            dataSourceList: [
-                {
-                    value: '1',
-                    label: '关注列表'
-                },
-                {
-                    value: '2',
-                    label: '粉丝列表'
-                },
-            ],  //数据来源
-            searchDataSource: '',  //数据来源搜索
-            dataLabelList: [
-                {
-                    value: '1',
-                    label: '巴西美女'
-                },
-                {
-                    value: '2',
-                    label: '日本宠物'
-                },
-                {
-                    value: '3',
-                    label: '英国网赚'
-                },
-            ],  //数据标签
-            searchDataLabel: '',  //数据标签搜索
             allSearchList: [],
+            userList: '',  //暂存搜索到的数据
         };
     },
 
     mounted() {
+        this.externalmemberIndex()
 
     },
 
     methods: {
-        /*
-            查询
-        */
+        // 查询表格
         searchTable() {
-            this.handlerCurrentChange()
-            // this.submitting=true
+            this.current_page = 1;  //页数
+            this.searching = true
+            this.externalmemberIndex()
         },
-        /*
-        function: handlerCurrentChange
-        params: val | default
-        desc: 分页的回调，设置page为val，当val改变时发起请求，获取数据重新渲染页面
-    */
-        async handlerCurrentChange() {
-            // try {
-            //     console.log(val);
-            //     this.page = val;
-            //     let result = await this.$api({
-            //         type: "getMember",
-            //         data: { page: this.page },
-            //     });
-            //     this.memberList = result.list;
-            // } catch (error) {
-            //     console.error(error);
-            // }
+        // 获取表格数据
+        async externalmemberIndex() {
+            let data = {
+                limit: this.current_limit,
+                page: this.current_page,
+                uid: this.searchData.uid,
+                nickname: this.searchData.nickname,   //昵称
+                status: '',  //状态1-正常-封禁2-登出
+                sources: this.searchData.sources,  //数据来源·
+                label: this.searchData.label,  //数据标签·
+                if_collection: '', //1=未用，@=以用
+            }
+            try {
+                this.loading = true
+                let result = await this.$api({ type: "externalmemberIndex", data: data });
+                this.searching = false
+                this.loading = false
+                if (result.status == '200') {
+                    this.tableData = result.data.list
+                    this.total  = result.data.count
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) {
+                this.loading = false
+                this.searching = false
+                console.error(error);
+            }
+
         },
         /*
            获取表格已选择的数据
@@ -303,10 +324,33 @@ export default {
             this.$refs['form'].validate((valid) => {
                 if (!valid) return false;
                 this.submitting = true;
-                console.log(this.configureForm);
-                this.handlerCurrentChange()
-                // const params = Object.assign({}, this.configureForm);
+                this.collectionUser()
             })
+        },
+        // 向后台传参（搜索的用户信息）
+        async collectionUser() {
+            let data = this.configureForm
+            data.uid_list = this.userList
+            try {
+                let result = await this.$api({ type: "collectionUser", data: data });
+                if (result.status == '200') {
+                    this.$message.success({ message: '数据采集中,请稍后刷新页面查看' })
+                    this.configureVisible = false
+                    this.userList = []
+                    this.bloggerLink = ''
+                    this.configureForm = {
+                        task_name: '',
+                        label: '',
+                        type_list: [],
+                        upper_limit: '',
+                        black_list: [],
+                    }//配置采集参数弹框数据
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) {
+                console.error(error);
+            }
         },
         /*
            配置采集参数
@@ -337,39 +381,38 @@ export default {
                         }
                     });
                 });
-                // this.configureVisible = true
             }
         },
-        getRestByKeys(listLink) {
+        // 处理用户信息
+        async getRestByKeys(listLink) {
             this.collectioning = true
-            listLink.forEach((item, index) => {
+            listLink.forEach((item) => {
                 let data = {
                     keyword: item.replace('https://www.tiktok.com/@', ''),
                 };
-                this.testGetRestByKeys(data, index, listLink)
+                this.allSearchList.push(this.testGetRestByKeys(data))
             })
-            this.$nextTick(() => {
-                console.log('全部搜索到的数据', this.allSearchList);
+            this.userList = await Promise.all(this.allSearchList)
+            this.collectioning = false
+            this.configureVisible = true
 
-            })
         },
         // 搜索链接,获取tk信息
-        async testGetRestByKeys(data, index, listLink) {
+        async testGetRestByKeys(data) {
             try {
                 let result = await this.$api({ type: "testGetRestByKeys", data: data });
                 if (result.status == '200') {
                     let list = result.data[0]
-                    this.allSearchList.push(list)
+                    let listType = {
+                        uid: list.uid,
+                        sec_uid: list.sec_uid,
+                        unique_id: list.unique_id,
+                    }
+                    return listType
                 } else {
                     this.$message.error({ message: result.msg })
                 }
-                // if (listLink.length - 1 == index) {
-                //     this.collectioning = false
-                // }
             } catch (error) {
-                // if (listLink.length - 1 == index) {
-                //     this.collectioning = false
-                // }
                 console.error(error);
             }
         },
@@ -378,13 +421,36 @@ export default {
         */
         configureClose() {
             this.configureVisible = false
+            this.userList = []
+            this.bloggerLink = ''
+            this.configureForm = {
+                task_name: '',
+                label: '',
+                type_list: [],
+                upper_limit: '',
+                black_list: [],
+            }//配置采集参数弹框数据
         },
         /*
            翻页回调
         */
         handlePagination(val) {
+            console.log(val);
             this.current_page = val.page;  //页数
             this.current_limit = val.limit  //条数
+            this.externalmemberIndex()
+        },
+        // 重置表格
+        resetClick() {
+            this.searchData = {
+                nickname: '',
+                uid: '',
+                sources: '',
+                label: '',
+            }
+            this.current_page = 1  //当前页
+            this.current_limit = 10 //每页条数
+            this.externalmemberIndex()
         },
     },
 };
@@ -402,6 +468,7 @@ export default {
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    flex-wrap: wrap;
     padding: 10px;
 }
 
