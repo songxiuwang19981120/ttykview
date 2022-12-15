@@ -1,5 +1,5 @@
 <template>
-	<el-dialog title="详情" :visible="outerVisible" @close="btnCancel" width="60%">
+	<el-dialog title="签名列表" :visible="outerVisible" @close="btnCancel" width="60%">
 		<!-- 详情页面内容 -->
 		<!-- 表格 -->
 		<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
@@ -13,7 +13,7 @@
 		<!-- 编辑弹层 -->
 		<el-dialog
 			width="30%"
-			title="编辑"
+			title="签名编辑"
 			:visible.sync="innerVisible"
 			append-to-body
 			@close="btnCancel2"
@@ -55,7 +55,7 @@
 		data() {
 			const validateNickname = (rule, value, callback) => {
 				if (value === this.curNickName) {
-					return callback(new Error('与编辑前昵称一致，请重新编辑'));
+					return callback(new Error('与编辑前签名一致，请重新编辑'));
 				} else {
 					callback();
 				}

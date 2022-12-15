@@ -2,7 +2,7 @@
 	<div>
 		<el-card style="margin-bottom: 20px">
 			<el-row>
-				<el-select v-model="searchTableData.state" placeholder="请选择任务状态" size="small">
+				<el-select v-model="page.status" placeholder="请选择任务状态" size="small">
 					<el-option
 						v-for="item in searchStateList"
 						:key="item.value"
@@ -11,25 +11,24 @@
 					>
 					</el-option>
 				</el-select>
-				<el-button class="btn" type="primary" size="small" @click="searchTasks">查询</el-button>
+				<el-button class="btn" type="primary" size="small" @click="searchTasks">搜索</el-button>
 			</el-row>
 		</el-card>
 		<el-card>
 			<!-- 表格 -->
 			<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 			<!-- 分页 -->
-			<el-row type="flex" justify="end">
-				<pagination
-					:total="total"
-					:page="page.page"
-					:limit="page.limit"
-					@pagination="pageChange"
-				></pagination>
-			</el-row>
+			<pagination
+				:total="total"
+				:page="page.page"
+				:limit="page.limit"
+				@pagination="pageChange"
+			></pagination>
 			<!-- 弹层 -->
 			<PrivateLetterDialogComponent
 				ref="dialog"
 				:showDialog.sync="dialog"
+				:curId='curId'
 			></PrivateLetterDialogComponent>
 		</el-card>
 	</div>
@@ -39,7 +38,7 @@
 	import PrivateLetterDialogComponent from './component/PrivateLetterDialogComponent.vue';
 	import pagination from '@/components/myComponent/table/pagination.vue';
 	export default {
-		name: 'TtPrivateLetter',
+		name: 'TtFollow',
 		components: {
 			tableCustom,
 			PrivateLetterDialogComponent,
@@ -50,30 +49,23 @@
 				// 下拉选择数据
 				searchStateList: [
 					{
-						value: '全部',
+						value: '',
 						label: '全部',
 					},
 					{
-						value: '已完成',
+						value: '0',
 						label: '已完成',
 					},
 					{
-						value: '执行中',
-						label: '执行中',
-					},
-					{
-						value: '执行中断',
-						label: '执行中断',
-					},
+						value: '1',
+						label: '未完成',
+					}
 				],
-				searchTableData: {
-					state: ''
-				},
 				loading: false,
 				tableData: [],
 				columns: [
 					{
-						prop: 'release_time',
+						prop: 'create_time',
 						label: '创建时间',
 						align: 'center',
 					},
@@ -83,15 +75,20 @@
 						align: 'center',
 					},
 					{
-						prop: 'mode',
+						prop: 'status',
 						label: '任务状态',
 						align: 'center',
+						render: (h,{row}) => {
+							return <div>{row.status == 0 ? '已完成' : '未完成'}</div>
+						}
 					},
 					{
 						label: '任务进度',
 						align: 'center',
 						render(h, { row }) {
-							const percent = (row.su_total / row.total) * 100 + '%';
+							const {complete_num,fail_num} = row
+							const percent = 
+								((Number(complete_num) / (Number(complete_num) + Number(fail_num))) * 100).toFixed(2) + '%';
 							return <div>{percent}</div>;
 						},
 					},
@@ -104,7 +101,7 @@
 									<el-button
 										type="primary"
 										size="mini"
-										onClick={this.toDetail.bind(this, row.videotasks_id)}
+										onClick={this.toDetail.bind(this, row.tasklist_id)}
 									>
 										查看详情
 									</el-button>
@@ -117,8 +114,11 @@
 				page: {
 					page: 1,
 					limit: 20,
+					task_type: 'Chat',
+					status: ''
 				},
 				total: 0,
+				curId: null
 			};
 		},
 
@@ -133,25 +133,35 @@
 			toVideoReleaseDialog() {
 				this.dialog = true;
 			},
-			// 获取视频任务列表
+			// 获取私信任务列表
 			async getVideoTasks(data) {
+				this.loading = true;
 				try {
 					const res = await this.$api({
-						type: 'getVideotasks',
+						type: 'getTasklist',
 						data,
 					});
-					console.log(res, '视频列表数据');
-					this.tableData = res.list;
-					this.total = res.count
+					console.log(res, '私信列表数据');
+					if (res.status == 200) {
+						this.tableData = res.data.list;
+						this.total = res.data.count;
+					} else {
+						this.$message.error(res.msg);
+					}
 				} catch (error) {
 					console.error(error);
+				} finally {
+					this.loading = false;
 				}
 			},
 			// 查看详情
 			toDetail(id) {
 				this.dialog = true;
-				this.$refs.dialog.getVideoTaskDetails({
-					id,
+				this.curId = id
+				this.$refs.dialog.getTaskListDetail({
+					page: 1,
+					limit: 10,
+					tasklist_id: id
 				});
 			},
 			// 当前页数据条数/页码改变
@@ -161,9 +171,9 @@
 			},
 			// 点击查询按钮
 			searchTasks() {
-				this.page.curpage = 1
-				alert('查询')
-			},
+				this.page.page = 1;
+				this.getVideoTasks(this.page)
+			}
 		},
 	};
 </script>

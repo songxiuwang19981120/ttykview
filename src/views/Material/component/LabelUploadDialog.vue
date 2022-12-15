@@ -1,5 +1,5 @@
 <template>
-	<el-dialog :visible="showDialog" @close="btnCancel">
+	<el-dialog title="标签上传" :visible="showDialog" @close="btnCancel">
 		<!-- 新增条件选择 -->
 		<el-form :model="ruleForm" ref="ruleForm" :rules="rules" label-width="120px">
 			<el-form-item label="设备分组选择：" prop="grouping_id">
@@ -70,6 +70,21 @@
 			},
 		},
 		data() {
+			const validateLabel = (rule, value, callback) => {
+				let nickNameArr = [];
+				// 处理文本域数据
+				value.split('\n').forEach((item) => {
+					console.log(item.replace(/\s/gi, ''));
+					if (item.replace(/\s/gi, '')) {
+						nickNameArr.push(item.replace(/\s/gi, ''));
+					}
+				});
+				if (nickNameArr.length && nickNameArr[0]) {
+					callback();
+				} else {
+					callback(new Error('标签不能为空'));
+				}
+			};
 			return {
 				searchEquipmentList: [], // 分组数据
 				searchTypecontrolList: [], // 素材库数据
@@ -82,8 +97,10 @@
 					grouping_id: null,
 				},
 				rules: {
-					label: [{ required: true, message: '请输入标签', trigger: 'blur' }],
-					// grouping_id: [{ required: true, message: '请选择设备分组', trigger: 'blur' }],
+					label: [
+						{ required: true, message: '请输入标签', trigger: 'blur' },
+						{ validator: validateLabel, trigger: 'blur' },
+					],
 					typecontrol: [{ required: true, message: '请选择素材库', trigger: 'blur' }],
 				},
 				baseUrl: BASE_URL, // 基地址

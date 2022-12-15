@@ -11,7 +11,7 @@
 					>
 					</el-option>
 				</el-select>
-				<el-button class="btn" type="primary" size="small" @click="searchTasks">查询</el-button>
+				<el-button class="btn" type="primary" size="small" @click="searchTasks">搜索</el-button>
 			</el-row>
 		</el-card>
 		<el-card>
@@ -28,6 +28,7 @@
 			<VideoReleaseDialogComponent
 				ref="dialog"
 				:showDialog.sync="dialog"
+				:curId='curId'
 			></VideoReleaseDialogComponent>
 		</el-card>
 	</div>
@@ -36,7 +37,6 @@
 	import tableCustom from '@/components/myComponent/table/tableCustom.vue';
 	import VideoReleaseDialogComponent from './component/VideoReleaseDialogComponent.vue';
 	import pagination from '@/components/myComponent/table/pagination.vue';
-	import moment from 'moment';
 	export default {
 		name: 'TtVideoRelease',
 		components: {
@@ -68,11 +68,6 @@
 						prop: 'create_time',
 						label: '创建时间',
 						align: 'center',
-						// render(h, { row }) {
-						// 	const newTime = this.formatDate(row.create_time);
-						// 	const newTime = moment(row.create_time).format('YYYY-MM-DD')
-						// 	return <div>{newTime}</div>;
-						// },
 					},
 					{
 						prop: 'task_name',
@@ -119,10 +114,11 @@
 				page: {
 					page: 1,
 					limit: 20,
-					task_type: 'GetAwemeList',
+					task_type: 'PushVideo',
 					status: ''
 				},
 				total: 0,
+				curId: null
 			};
 		},
 
@@ -160,9 +156,13 @@
 			},
 			// 查看详情
 			toDetail(id) {
-				console.log(id,'id======================')
 				this.dialog = true;
-				this.$refs.dialog.getTaskListDetail(id);
+				this.curId = id
+				this.$refs.dialog.getTaskListDetail({
+					page: 1,
+					limit: 10,
+					tasklist_id: id
+				});
 			},
 			// 当前页数据条数/页码改变
 			pageChange(obj) {
@@ -171,20 +171,10 @@
 			},
 			// 点击查询按钮
 			searchTasks() {
-				this.page.curpage = 1;
+				this.page.page = 1;
 				this.getVideoTasks(this.page)
-			},
-			// 时间过滤器
-			formatDate(data, formatStr = 'YYYY-MM-DD') {
-				return moment(data).format(formatStr);
-			},
+			}
 		},
-
-		// filters: {
-		// 	formatDate(data, formatStr = 'yyyy-MM-dd') {
-		// 		return moment(data).format(formatStr);
-		// 	},
-		// },
 	};
 </script>
 

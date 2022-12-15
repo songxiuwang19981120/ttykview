@@ -1,5 +1,5 @@
 <template>
-	<el-dialog :visible="showDialog" @close="btnCancel">
+	<el-dialog title="签名上传" :visible="showDialog" @close="btnCancel">
 		<!-- 新增条件选择 -->
 		<el-form :model="ruleForm" ref="ruleForm" :rules="rules" label-width="120px">
 			<el-form-item label="设备分组选择：" prop="grouping_id">
@@ -32,11 +32,11 @@
 					@focus="getTypecontrol"
 				></el-cascader>
 			</el-form-item>
-		<!-- 添加签名 -->
+			<!-- 添加签名 -->
 			<el-form-item prop="autograph" label="添加签名：">
 				<el-input
 					type="textarea"
-					placeholder="请输入昵称(一行仅限一个)"
+					placeholder="请输入签名(一行仅限一个)"
 					rows="6"
 					v-model="ruleForm.autograph"
 					style="width: 60%"
@@ -66,10 +66,25 @@
 				type: Object,
 			},
 			nnClassifyDate: {
-				type: Array
-			}
+				type: Array,
+			},
 		},
 		data() {
+			const validateAg = (rule, value, callback) => {
+				let nickNameArr = [];
+				// 处理文本域数据
+				value.split('\n').forEach((item) => {
+					console.log(item.replace(/\s/gi, ''));
+					if (item.replace(/\s/gi, '')) {
+						nickNameArr.push(item.replace(/\s/gi, ''));
+					}
+				});
+				if (nickNameArr.length && nickNameArr[0]) {
+					callback();
+				} else {
+					callback(new Error('签名不能为空'));
+				}
+			};
 			return {
 				searchEquipmentList: [], // 分组数据
 				searchTypecontrolList: [], // 素材库数据
@@ -80,11 +95,13 @@
 					typecontrol_id: '',
 					typecontrol: [],
 					grouping_id: null,
-					usage_time: ''
+					usage_time: '',
 				},
 				rules: {
-					autograph: [{ required: true, message: '请输入签名', trigger: 'blur' }],
-					// grouping_id: [{ required: true, message: '请选择设备分组', trigger: 'blur' }],
+					autograph: [
+						{ required: true, message: '请输入签名', trigger: 'blur' },
+						{ validator: validateAg, trigger: 'blur' },
+					],
 					typecontrol: [{ required: true, message: '请选择素材库', trigger: 'blur' }],
 				},
 				baseUrl: BASE_URL, // 基地址
@@ -113,7 +130,7 @@
 			// 获取素材分类数据
 			async getTypecontrol() {
 				try {
-					this.typecontrolLoading = true
+					this.typecontrolLoading = true;
 					const res = await this.$api({
 						type: 'getTypecontrol',
 					});
@@ -127,7 +144,7 @@
 				} catch (error) {
 					console.error(error);
 				} finally {
-					this.typecontrolLoading = true
+					this.typecontrolLoading = true;
 				}
 			},
 			// 新增昵称
@@ -166,17 +183,19 @@
 						}
 					});
 					this.ruleForm.autograph = nickNameArr.join('\n');
-					const {typecontrol} = this.ruleForm
-					this.ruleForm.typecontrol_id = typecontrol.length ? typecontrol[typecontrol.length - 1] : ''
+					const { typecontrol } = this.ruleForm;
+					this.ruleForm.typecontrol_id = typecontrol.length
+						? typecontrol[typecontrol.length - 1]
+						: '';
 					// 调用新增签名接口
 					await this.addAutograph(this.ruleForm);
 					this.$emit('update:showDialog', false);
 					// 更新数据
-					const arr = this.nnClassifyDate.filter(item => {
-						return item.typecontrol_id == this.ruleForm.typecontrol_id
-					})
-					if(arr.length){
-						this.$parent.getAutographClassify(this.upParameter)
+					const arr = this.nnClassifyDate.filter((item) => {
+						return item.typecontrol_id == this.ruleForm.typecontrol_id;
+					});
+					if (arr.length) {
+						this.$parent.getAutographClassify(this.upParameter);
 					}
 				} catch (error) {
 					console.log(error);

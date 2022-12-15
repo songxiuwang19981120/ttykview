@@ -386,7 +386,7 @@ export default {
         url: '/Label/view',
         method: 'POST',
       },
-      //Nickname  API end
+      //Label API end
 
       // Tasklist API start
       'getTasklist': { // 获取任务
@@ -397,9 +397,36 @@ export default {
       'getTaskListDetail': { // 获取任务详情
         url: '/TaskListDetail/index',
         method: 'POST'
-      }
+      },
 
       // Tasklist API end
+
+      //PrivateLetter   API start
+      'getPrivateLetter': { // 获取私信
+        url: '/PrivateLetter/index',
+        method: 'POST',
+      },
+      'addPrivateLetter': { // 新增私信
+        url: '/PrivateLetter/add',
+        method: 'POST',
+      },
+      'updatePrivateLetter': { // 修改私信
+        url: '/PrivateLetter/update',
+        method: 'POST',
+      },
+      'deletePrivateLetter': { // 删除私信
+        url: '/PrivateLetter/delete',
+        method: 'POST',
+      },
+      'viewPrivateLetter': {
+        url: '/PrivateLetter/view',
+        method: 'POST',
+      },
+      'getPrivateLetterClassify': { // 获取昵称分类
+        url: '/PrivateLetter/listtable',
+        method: 'POST'
+      },
+      //PrivateLetter API end
   }
 
 

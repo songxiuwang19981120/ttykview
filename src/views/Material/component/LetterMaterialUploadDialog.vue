@@ -1,5 +1,5 @@
 <template>
-	<el-dialog title="昵称上传" :visible="showDialog" @close="btnCancel">
+	<el-dialog title="私信上传" :visible="showDialog" @close="btnCancel">
 		<!-- 新增条件选择 -->
 		<el-form :model="ruleForm" ref="ruleForm" :rules="rules" label-width="120px">
 			<el-form-item label="设备分组选择：" prop="grouping_id">
@@ -32,13 +32,23 @@
 					@focus="getTypecontrol"
 				></el-cascader>
 			</el-form-item>
-			<!-- 添加签名 -->
-			<el-form-item prop="nickname" label="添加昵称：">
+			<el-form-item label="私信类型选择：" prop="type">
+				<el-select v-model="ruleForm.type" placeholder="私信类型选择" style="margin-right: 20px">
+					<el-option
+						v-for="item in searchTypeList"
+						:key="item.value"
+						:label="item.label"
+						:value="item.value"
+					>
+					</el-option>
+				</el-select>
+			</el-form-item>
+			<!-- 添加私信 -->
+			<el-form-item prop="content" label="添加私信：">
 				<el-input
-					type="textarea"
-					placeholder="请输入昵称(一行仅限一个)"
+					placeholder="请输入私信"
 					rows="6"
-					v-model="ruleForm.nickname"
+					v-model="ruleForm.content"
 					style="width: 60%"
 				>
 				</el-input>
@@ -70,38 +80,50 @@
 			},
 		},
 		data() {
-			const validateNN = (rule, value, callback) => {
-				let nickNameArr = [];
-				// 处理文本域数据
-				value.split('\n').forEach((item) => {
-					console.log(item.replace(/\s/gi, ''));
-					if (item.replace(/\s/gi, '')) {
-						nickNameArr.push(item.replace(/\s/gi, ''));
-					}
-				});
-				if (nickNameArr.length && nickNameArr[0]) {
-					callback();
-				} else {
-					callback(new Error('昵称不能为空'));
-				}
-			};
+      const validateCont = (rule, value, callback) => {
+        if(value.replace(/\s/gi, '')){
+          callback()
+        }else{
+          callback(new Error('私信不能为空'))
+        }
+      }
 			return {
 				searchEquipmentList: [], // 分组数据
 				searchTypecontrolList: [], // 素材库数据
+				searchTypeList: [
+					{
+						label: '文本话术',
+						value: '0',
+					},
+					{
+						label: '短连接',
+						value: '1',
+					},
+					{
+						label: '好友名片',
+						value: '2',
+					},
+					{
+						label: '作品转发',
+						value: '3',
+					},
+				], //私信类型
 				equipmentLoading: false,
 				typecontrolLoading: false,
 				ruleForm: {
-					nickname: '',
+					content: '',
 					typecontrol_id: '',
 					typecontrol: [],
 					grouping_id: null,
+					type: '',
 				},
 				rules: {
-					nickname: [
-						{ required: true, message: '请输入昵称', trigger: 'blur' },
-						{ validator: validateNN, trigger: 'blur' },
+					content: [
+            { required: true, message: '请输入私信', trigger: 'blur' },
+						{ validator: validateCont, trigger: 'blur' },
 					],
 					typecontrol: [{ required: true, message: '请选择素材库', trigger: 'blur' }],
+					type: [{ required: true, message: '请选择私信类型', trigger: 'blur' }],
 				},
 				baseUrl: BASE_URL, // 基地址
 			};
@@ -146,14 +168,14 @@
 					this.typecontrolLoading = true;
 				}
 			},
-			// 新增昵称
-			async addNickName(data) {
+			// 新增签名
+			async addPrivateLetter(data) {
 				try {
 					const res = await this.$api({
-						type: 'addNickName',
+						type: 'addPrivateLetter',
 						data,
 					});
-					console.log(res, '新增昵称');
+					console.log(res, '新增私信');
 					if (res.status == 200) {
 						this.$message.success(res.msg);
 					} else {
@@ -172,32 +194,22 @@
 			async btnOK() {
 				try {
 					await this.$refs.ruleForm.validate();
-					console.log(this.ruleForm.nickname, '文本域数据');
-					let nickNameArr = [];
-					// 处理文本域数据
-					this.ruleForm.nickname.split('\n').forEach((item) => {
-						console.log(item.replace(/\s/gi, ''));
-						if (item.replace(/\s/gi, '')) {
-							nickNameArr.push(item.replace(/\s/gi, ''));
-						}
-					});
-					this.ruleForm.nickname = nickNameArr.join('\n');
+					console.log(this.ruleForm.content, '文本数据');
+					this.ruleForm.content = this.ruleForm.content.replace(/\s/gi, '')
 					const { typecontrol } = this.ruleForm;
 					this.ruleForm.typecontrol_id = typecontrol.length
 						? typecontrol[typecontrol.length - 1]
 						: '';
 					// 调用新增昵称接口
-					await this.addNickName(this.ruleForm);
+					await this.addPrivateLetter(this.ruleForm);
 					this.$emit('update:showDialog', false);
-					console.log(this.nnClassifyDate, '传递分类数据');
-					console.log(this.ruleForm.typecontrol_id);
 					// 更新数据
 					const arr = this.nnClassifyDate.filter((item) => {
 						return item.typecontrol_id == this.ruleForm.typecontrol_id;
 					});
 					console.log(arr, '是否存在搜索之内');
 					if (arr.length) {
-						this.$parent.getNickNameClassify(this.upParameter);
+						this.$parent.getPrivateLetterClassify(this.upParameter);
 					}
 				} catch (error) {
 					console.log(error);
@@ -222,13 +234,4 @@
 		width 60%
 		vertical-align middle
 	}
-</style>
-<style scoped>
-	/* ::v-deep .el-form-item__content {
-		text-align: center !important;
-	} */
-	/* ::v-deep .el-form-item__error {
-		width: 100%;
-		margin-left: 30%;
-	} */
 </style>
