@@ -402,7 +402,13 @@ export default {
       'videocaptureIndex':{    //获取视频素材
         url:'Videocapture/index',
         method:'POST'
-      }
+      },
+
+      'videocaptureDownload':{    //是否下载
+        url:'Videocapture/Download',
+        method:'POST'
+      },
+
   }
 
 
