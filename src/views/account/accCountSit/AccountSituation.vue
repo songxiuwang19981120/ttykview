@@ -84,7 +84,6 @@
 
     <transition
       v-if="memberList.length > 0"
-      enter-active-class="animate__animated animate__fadeIn"
       appear
       mode="out-in"
     >

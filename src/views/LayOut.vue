@@ -15,7 +15,6 @@
 
           <el-main class="tt-main">
             <transition
-              enter-active-class="animate__animated animate__fadeIn"
               appear
               mode="out-in"
             >
