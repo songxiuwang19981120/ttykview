@@ -37,7 +37,7 @@ export default {
       type: String,
     },
     visterTotal: {
-      type: String,
+      type: Number,
     },
     user_id: {
       type: String,
@@ -159,4 +159,4 @@ export default {
 };
 </script>
 
-<style lang="stylus"></style>
+<style lang="stylus" scoped></style>

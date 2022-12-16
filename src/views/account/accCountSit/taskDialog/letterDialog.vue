@@ -1,24 +1,31 @@
 <template>
   <div>
     <el-dialog
-      width="45%"
+      width="40%"
       :visible="showLetterTask"
       :before-close="handlerClose"
     >
       <span slot="title">
         <h1 class="tt-acccountsit--title">关注任务配置</h1>
       </span>
-
       <el-form
-      ref="letterForm"
+        ref="letterForm"
         :rules="rules"
         class="lettertask-form"
         label-position="left"
         label-width="216px"
         :model="letterTaskForm"
       >
-        <el-form-item label="选择国家 ：" v-model="letterTaskForm.country">
-          <el-select v-model="letterTaskForm.country" placeholder="选择国家">
+        <el-form-item
+          label="选择国家 ："
+          v-model="letterTaskForm.account_region"
+          prop="account_region"
+        >
+          <el-select
+            style="width: 38%"
+            v-model="letterTaskForm.account_region"
+            placeholder="选择国家"
+          >
             <el-option
               v-for="item in countryOptions"
               :key="item.value"
@@ -27,103 +34,96 @@
             ></el-option>
           </el-select>
         </el-form-item>
-
         <el-form-item
           label="选择数据来源 ："
-          v-model="letterTaskForm.source_data"
+          v-model="letterTaskForm.tasklist_id_list"
+          prop="tasklist_id_list"
         >
           <el-select
-            v-model="letterTaskForm.source_data"
+            multiple
+            style="width: 38%"
+            v-model="letterTaskForm.tasklist_id_list"
             placeholder="选择数据来源"
           >
             <el-option
               v-for="item in sourceData"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              :key="item.tasklist_id"
+              :label="item.task_name"
+              :value="item.tasklist_id"
             ></el-option>
           </el-select>
         </el-form-item>
 
         <el-form-item
-          label="单号私信上限 :"
-          :prop="letterTaskForm.acc_letter_maxnum"
+          label="单号每日关注上限 :"
+          prop="user_follow_upper_limit"
+          v-model="letterTaskForm.user_follow_upper_limit"
         >
           <el-input
+            style="width: 38%"
             type="text"
-            v-model="letterTaskForm.acc_letter_maxnum"
-            placeholder="输入单号私信上限"
+            v-model="letterTaskForm.user_follow_upper_limit"
+            placeholder="输入单号关注上限"
           ></el-input>
         </el-form-item>
 
-        <el-form-item
-          label-width="150px"
-          label="总私信上限 :"
-          :prop="letterTaskForm.letter_frequency"
-        >
+        <el-form-item label-width="150px" label="关注频率 :" prop="follow_rate">
           <div class="between-input">
             <el-input
+              style="width: 14%"
               class="lettertask-input--between"
-              v-model="letterTaskForm.letter_frequency_minnum"
+              v-model="letterTaskForm.rate_min"
               autocomplete="off"
               placeholder="最小"
             ></el-input
             >&nbsp;&nbsp;
             <el-input
+              style="width: 14%"
               class="lettertask-input--between"
-              v-model="letterTaskForm.letter_frequency_maxnum"
+              v-model="letterTaskForm.rate_max"
               autocomplete="off"
               placeholder="最大"
             ></el-input>
           </div>
         </el-form-item>
 
-        <el-form-item
-          label="粉丝数量小于："
-          prop="fans_lessnum"
-        >
+        <el-form-item label="粉丝数量小于：" prop="follower_status">
           <el-input
-            v-model="letterTaskForm.fans_lessnum"
+            style="width: 38%"
+            v-model="letterTaskForm.follower_status"
             placeholder="输入指定粉丝量"
             autocomplete="off"
           ></el-input>
         </el-form-item>
-        <el-form-item label="@用户数量：" :prop="letterTaskForm.notify_accnum">
+
+        <el-form-item label="连续失败执行下一个号（次） ：" prop="can_fail_num">
           <el-input
-            v-model="letterTaskForm.notify_accnum"
-            placeholder="输入@用户数量"
-          ></el-input>
-        </el-form-item>
-        <el-form-item
-          label="连续失败执行下一个号（次） ："
-          :prop="letterTaskForm.continuity_lose"
-        >
-          <el-input
+            style="width: 38%"
             type="text"
-            v-model="letterTaskForm.continuity_lose"
+            v-model="letterTaskForm.can_fail_num"
             placeholder="输入连续失败次数"
           ></el-input>
         </el-form-item>
 
         <el-form-item
           label="关注数量小于："
-          prop="letter_lessnum"
+          prop="following_count"
+          v-model="letterTaskForm.following_count"
         >
           <el-input
+            style="width: 38%"
             type="text"
-            v-model="letterTaskForm.letter_lessnum"
-            placeholder="输入指定关注数量"
+            v-model="letterTaskForm.following_count"
+            placeholder="输入关注少于次数"
           ></el-input>
         </el-form-item>
 
-        <el-form-item
-          label="获赞评论小于 ："
-          prop="like_lessnum"
-        >
+        <el-form-item label="评论评论小于 ：" prop="total_favorited">
           <el-input
+            style="width: 38%"
             type="text"
-            v-model="letterTaskForm.like_lessnum"
-            placeholder="输入指定评论数量"
+            v-model="letterTaskForm.total_favorited"
+            placeholder="输入获赞小于次数"
           ></el-input>
         </el-form-item>
 
@@ -135,7 +135,6 @@
               :label="item"
             ></el-checkbox>
           </el-checkbox-group>
-
         </el-form-item>
 
         <div class="lettertask-checkport">
@@ -156,69 +155,35 @@
 </template>
 
 <script>
+import formRule from "@/config/accountConfig/formRules.config";
+const { letter } = formRule;
 export default {
   name: "TtprojectVideoDialog",
   props: {
     showLetterTask: {
       type: Boolean,
     },
+    typecontrol_id: {
+      type: Number,
+    },
+    userIdList: {
+      type: Array,
+    },
+    batchEditorList: {
+      type: Array,
+    },
   },
   data() {
     return {
-      rules:{
-        fans_lessnum:[
-        {required: true,message:"请填写粉丝量小于次数",trigger: "blur"},
-        { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
-        ],
-        letter_lessnum:[
-          {required: true,message:"请填写关注数量小于次数",trigger: "blur"},
-          {pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
-        ],
-        like_lessnum:[
-          {required: true,message:"请填写获赞评论小于次数",trigger: "blur"},
-          {pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
-        ],
-        black_list:[
-          {required: true,message:"请配置黑名单",trigger: "change"}
-        ]
-      },
+      rules: letter,
       blackList: ["无昵称", "无作品", "无头像", "历史已操作用户"],
-      sourceData: [
-        {
-          value: "巴西宠物",
-          label: "巴西宠物",
-        },
-        {
-          value: "美国宠物",
-          label: "美国宠物",
-        },
-        {
-          value: "英国宠物",
-          label: "英国宠物",
-        },
-        {
-          value: "法国宠物",
-          label: "法国宠物",
-        },
-      ],
-      letterOptions: [
-        {
-          value: "法国素材",
-          label: "法国素材",
-        },
-        {
-          value: "美国素材",
-          label: "美国素材",
-        },
-        {
-          value: "英国素材",
-          label: "英国素材",
-        },
-        {
-          value: "俄国素材",
-          label: "俄国素材",
-        },
-      ],
+      blackListMap: {
+        无头像: "no_avatar",
+        无作品: "no_aweme",
+        历史已操作用户: "historical_users",
+        无昵称: "no_nickname",
+      },
+      sourceData: [],
       // TODO 国家options
       countryOptions: [
         {
@@ -240,51 +205,89 @@ export default {
       ],
       //关注发布任务 提交表单
       letterTaskForm: {
-        country: "",
-        source_data: "",
-        acc_letter_maxnum: "", //单号私信上限
-        letter_total_maxnum: "", //总私信上限
-        acc_letter_maxnum: "",
-        letter_frequency: "",
-        letter_frequency_maxnum: "",
-        letter_frequency_minmum: "",
-        fans_lessnum: "",
-        theme_content: "",
-        notify_accnum: "",
-        continuity_lose: "",
-        letter_lessnum: "", //关注数量小于
-        like_lessnum: "", //获赞评论小于
+        account_region: "", //国家
+        user_follow_upper_limit: "", //单号关注上限
+        rate_min: "", //关注频率最小值
+        rate_max: "", //关注频率最大值
+        rate_min: "",
+        rate_max: "",
+        follower_status: "", //粉丝量小于
+        tasklist_id_list: [], //数据来源
+        following_count: "", //关注数量小于
+        total_favorited: "", //评论数量小于
+        typecontrol_id: "",
+        can_fail_num: "", //连续失败次数
+        following_count: "", //关注数量小于
         port: [], //执行端选择
-        black_list:[]
+        black_list: [],
+        uid_list: "",
       },
     };
   },
 
-  mounted() {},
+  mounted() {
+    this.getTasklist();
+    this.letterTaskForm.typecontrol_id = this.typecontrol_id;
+  },
 
   methods: {
+    async getTasklist() {
+      let result = await this.$api();
+    },
+
     handlerClose() {
       console.log("执行了");
       this.$emit("closeLetterTask");
-      this.resetForm()
+      this.resetForm();
     },
     /* 
         function: handlerConfrim
         params: null
         desc: 提交表单
     */
-    handlerConfrim() {
-       this.$refs["letterForm"].validate((valid) => {
+    async handlerConfrim() {
+      /*       let maxNum = this.letterTaskForm.rate_man
+      let minNum = this.letterTaskForm.rate_min
+      let isPass = (maxNum === 0 || minNum === 0) || ( minNum > maxNum)
+      if(!isPass){
+        this.$message.error('关注频率参数错误')
+        return false
+      } */
+      await this.$refs["letterForm"].validate((valid) => {
         if (valid) {
-          this.handlerClose()
-          console.log(this.letterTaskForm);
-          this.resetForm()
-          console.log(this.letterTaskForm);
-          this.$message.success('提交成功')
-          return 
+          let userList = this.batchEditorList.map((item) => {
+            return item.uid;
+          });
+          this.letterTaskForm.uid_list = userList;
+          this.letterTaskForm.typecontrol_id = this.typecontrol_id;
+          this.letterTaskForm.black_list = this.letterTaskForm.black_list.map(
+            (item) => {
+              return this.blackListMap[item];
+            }
+          );
+          let data = this.letterTaskForm;
+          this.aaa(data)
         }
-        this.$message.error('提交失败')
       });
+    },
+    async aaa(data){
+      let result = await this.$api({ type: "pushFollowTask", data: data });
+          if (result.status == 200) {
+            this.$message.success(res.msg);
+            this.resetForm();
+            this.handlerClose();
+          }else{
+            console.log('11111111111111111',result);
+          this.$message.warning(result.msg);
+
+          }
+
+    },
+
+    async getTasklist() {
+      let data = { task_type: "CollectionUser" };
+      let result = await this.$api({ type: "getTasklist", data });
+      this.sourceData = result.data.list;
     },
 
     /* 
@@ -292,14 +295,14 @@ export default {
         params: null
         desc: 重置表单字段
     */
-    resetForm(){
-      this.$refs['letterForm'].resetFields()
-    }
+    resetForm() {
+      this.$refs["letterForm"].resetFields();
+    },
   },
 };
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .lettertask-form {
   box-sizing: border-box;
   padding-left: 30px;
@@ -320,5 +323,10 @@ export default {
   .check {
     margin-right: 130px;
   }
+}
+
+.tt-acccountsit--title {
+  margin-bottom: 20px;
+  font-size: 20px;
 }
 </style>

@@ -2,7 +2,6 @@
   <div>
     <el-dialog :visible="shwoVideoTabel" :before-close="handlerClose">
       <table-custom
-        @handleSelectionChange="handleSelectChange"
         :loading="loading"
         :tableData="videoList"
         :columns="columns"
@@ -18,13 +17,21 @@
           <video autoplay width="40%" :src="videoSrc" controls="controls"></video>
         </div>
       </el-dialog>
+          <Pagination 
+      :total="videoCount"
+      :page="page"
+      :size="limit"
+      @pagination="handlePagination"
+    />
     </el-dialog>
+
   </div>
 </template>
 
 <script>
 import Pagination from "@/components/myComponent/table/pagination";
 import tableCustom from "@/components/myComponent/table/tableCustom";
+
 export default {
   name: "TtprojectVideoTabel",
   components: { Pagination, tableCustom },
@@ -35,15 +42,22 @@ export default {
     videoList: {
       type: Array,
     },
+    videoCount:{
+      type:Number
+    },
+    member_id:{
+      type:String
+    }
   },
   data() {
     return {
+      page:1,
+      limit:10,
       innerVisible: false,
       videoSrc:'',
       loading: false,
       videoInfoList: [],
-      columns: [
- 
+      columns:  [
         {
           prop: "video_url",
           label: "视频",
@@ -105,7 +119,7 @@ export default {
             );
           },
         },
-      ],
+      ], 
     };
   },
 
@@ -121,12 +135,21 @@ export default {
 
       console.log(row);
     },
-    handleSelectChange() {},
+    async handlePagination(val) {
+      console.log(val)
+      let data = {
+        page:val.page,
+        limit: 10,
+        member_id:this.member_id
+      }
+      let result = await this.$parent.getVideoList(data)
+      console.log(result)
+    },
   },
 };
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .video-window
     display: flex
     align-items: center

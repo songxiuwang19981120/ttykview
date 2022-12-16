@@ -9,8 +9,9 @@
         <h1 class="tt-acccountsit--title">账号编辑</h1>
       </span>
       <el-form ref="editorForm" :rules="rules" :model="accUpdateForm">
-        <el-form-item label="选择分组 :" prop="class">
+        <el-form-item class="ml-8" label="选择分组 :" prop="class">
           <el-select
+            style="width: 42%"
             clearable
             v-model="accUpdateForm.grouping_id"
             placeholder="选择分组"
@@ -25,36 +26,40 @@
         </el-form-item>
 
         <el-form-item label="选择分类 :" prop="typecontrol_id">
-          <div>
-            <el-cascader
-              clearable
-              :props="{ checkStrictly: true, value: 'value' }"
-              :options="typeList"
-              v-model="accUpdateForm.typecontrol_id"
-              placeholder="选择分类"
-            ></el-cascader>
-          </div>
+          <el-cascader
+            style="width: 42%"
+            clearable
+            :props="{ checkStrictly: true, value: 'value' }"
+            :options="typeList"
+            v-model="accUpdateForm.typecontrol_id"
+            placeholder="选择分类"
+          ></el-cascader>
         </el-form-item>
 
-        <el-form-item label="编辑昵称 :" prop="nickname">
-          <div>
-            <el-input type="text" v-model="accUpdateForm.nickname"></el-input>
-            <el-button class="ml-36" @click="getRendomNickname" type="primary"
-              >随机获取</el-button
-            >
-          </div>
+        <el-form-item class="ml-8" label="编辑昵称 :" prop="nickname">
+          <el-input
+            style="width: 42%"
+            type="text"
+            v-model="accUpdateForm.nickname"
+          ></el-input>
+          <el-button class="ml-8" @click="getRendomNickname" type="primary"
+            >随机获取</el-button
+          >
         </el-form-item>
 
-        <el-form-item label="编辑签名 :" prop="signature">
-          <div>
-            <el-input type="text" v-model="accUpdateForm.signature"></el-input>
-            <el-button class="ml-36" @click="getRendomAutograph" type="primary"
-              >随机获取</el-button
-            >
-          </div>
+        <el-form-item class="ml-8" label="编辑签名 :" prop="signature">
+          <el-input
+            style="width: 42%"
+            type="text"
+            v-model="accUpdateForm.signature"
+          ></el-input>
+          <el-button class="ml-8" @click="getRendomAutograph" type="primary"
+            >随机获取</el-button
+          >
+ 
         </el-form-item>
 
-        <el-form-item class="upload-wrap" label="上传头像 ：">
+        <el-form-item class="upload-wrap ml-8" label="上传头像 :">
           <el-upload
             ref="upload"
             class="avatar-uploader"
@@ -64,19 +69,32 @@
             :before-upload="beforeAvatarUpload"
             :on-error="handleAvatarError"
           >
-            <img v-if="accUpdateForm.avatar_uri" :src="accUpdateForm.avatar_uri" class="avatar" />
+            <img
+              v-if="accUpdateForm.avatar_uri"
+              :src="accUpdateForm.avatar_uri"
+              class="avatar"
+            />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
+          <div>
+            <el-button
+              class="avatar-random--btn ml-52"
+              type="primary"
+              @click="getRendomAvatar"
+              >随机获取</el-button
+            >
 
-          <el-button type="primary" @click="getRendomAvatar"
-            >随机获取</el-button
-          >
+          </div>
         </el-form-item>
       </el-form>
-
       <span slot="footer" class="dialog-footer">
         <el-button @click="handlerClose">取 消</el-button>
-        <el-button type="primary" @click="handlerConfrim">确认并执行</el-button>
+        <el-button
+          type="primary"
+          @click="handlerConfrim"
+          :loading="submitting"
+          >{{ submitting ? "提交中 ..." : "确 定" }}</el-button
+        >
       </span>
     </el-dialog>
   </div>
@@ -86,7 +104,8 @@
 import tableCustom from "@/components/myComponent/table/tableCustom";
 import Pagination from "@/components/myComponent/table/pagination";
 import base from "@/config/base.config";
-
+import formRule from "@/config/accountConfig/formRules.config";
+const { editorDialog } = formRule;
 const { BASE_URL } = base;
 export default {
   name: "TtprojectEditorDialog",
@@ -106,21 +125,18 @@ export default {
   },
   computed: {
     actionUrl() {
-      return "http://192.168.4.30/api/Base/upload";
+      return `${BASE_URL}Base/upload`;
     },
   },
   components: { tableCustom, Pagination },
   data() {
     return {
-      rules: {
-        typecontrol_id: [
-          { required: true, message: "请选择分类", trigger: "change" },
-        ],
-      },
-      showImageUrl: "",
+      BASE_URL: BASE_URL, //图片BASE地址
+      rules: editorDialog, //表单校验规则  详见formRules文件
+      submitting: false,
       type_id: "",
       accUpdateForm: {
-        user_id: this.user_id,
+        //更新数据的表单
         type: "",
         nickname: "",
         signature: "",
@@ -128,12 +144,23 @@ export default {
         typecontrol_id: "",
         avatar_uri: "",
       },
+      randomInfo: {
+        //编辑时随机获取的信息
+        typecontrol_id: "",
+        nickname_id: "",
+        autograph_id: "",
+        headimage_id: "",
+      },
     };
   },
 
-  mounted() {},
+  mounted() {
+    //this.accUpdateForm.user_id = this.user_id
+  },
 
   methods: {
+
+  
     /* 
         function: handleAvatarError
         params: null
@@ -145,15 +172,14 @@ export default {
 
     /* 
         function: beforeAvatarUpload
-        params: null
-        desc: upload之前回调
+        params: file | 默认参数
+        desc: upload之前回调，判断文件是否符合规则
     */
     beforeAvatarUpload(file) {
       let { size, type } = file;
       let isPass = true;
       isPass = /(jpeg | png | jpg |image)/g.test(type);
       isPass = size < 500 * 1024;
-      console.log(isPass);
       if (!isPass) {
         let errMsg = /(jpeg | png | jpg | image)/g.test(type)
           ? "文件不得大于5kb"
@@ -162,7 +188,6 @@ export default {
         this.$refs.upload[0].abort(file);
         return false;
       }
-      console.log(file);
     },
 
     /* 
@@ -171,8 +196,7 @@ export default {
         desc: upload成功回调
     */
     handleAvatarSuccess(res) {
-      console.log(res);
-      if (res.status !== '200') {
+      if (res.status !== "200") {
         this.$message.error(res?.msg || "未知错误");
         return false;
       }
@@ -190,14 +214,17 @@ export default {
       this.resetForm();
     },
 
+
+    
+
     /* 
         function: handlerConfrim
         params: null
-        desc: 提交表单回调
+        desc: 提交表单回调 
     */
-    handlerConfrim() {
-      console.log(this.accUpdateForm);
-      let typeMap = {
+    async handlerConfrim() {
+      this.submitting = true;
+      /*  let typeMap = {
         nickname: 1,
         signature: 2,
         avatar_uri: 3,
@@ -207,43 +234,55 @@ export default {
         this.$message.error("请选择分类");
         return false;
       }
-      Object.entries(this.accUpdateForm)
-        .filter((item) => {
-          return (
-            item[0] === "nickname" ||
-            item[0] === "signature" ||
-            item[0] === "avatar_uri"
-          );
-        })
-        .forEach((item) => {
+      let updateArr = Object.entries(this.accUpdateForm).filter((item) => {
+        return (
+          item[0] === "nickname" ||
+          item[0] === "signature" ||
+          item[0] === "avatar_uri" ||
+          item[0] === "typecontrol_id"
+        );
+      });
+      await Promise.all(
+        updateArr.map(async (item) => {
           if (item[1].length !== 0) {
             let typeData = typeMap[item[0]];
-            let typeId =
-              this.accUpdateForm.typecontrol_id[
-                this.accUpdateForm.typecontrol_id.length - 1
-              ];
+            let typeId = updateArr[2][1][updateArr[2][1].length - 1];
             let key = item[0];
+            let grouping_id = this.accUpdateForm.grouping_id
+            console.log(grouping_id)
             let keyData = this.accUpdateForm[key];
             let data = Object.fromEntries([
               ["user_id", this.user_id],
-              ["typecontrol_id", typeId],
               ["type", typeData],
               [key, keyData],
             ]);
-            console.log(data);
-            this.$api({ type: "updateUserInfo", data: data })
-              .then((res) => {
-                console.log(res);
-                this.handlerClose();
-                this.$parent.updateMemberList();
-                this.$message.success("操作成功");
-              })
-              .catch((err) => {
-                this.$message.error(err);
-                return false;
+            await this.$api({ type: "updateUserInfo", data: data }).then(() => {
+              this.randomInfo.typecontrol_id = typeId;
+              this.$api({ type: "destroyedUserInfo", data: data }).then(() => {
+                this.$api({
+                  type: "setMemberId",
+                  data: { user_id: this.user_id, typecontrol_id: typeId,grouping_id: grouping_id},
+                }).then(() => {
+                  this.$parent.updateMemberList();
+                });
               });
+            });
           }
-        });
+        })
+      ); */
+      this.$message.success("操作成功");
+      this.submitting = true;
+      this.resetForm();
+      this.accUpdateForm.avatar_uri = "";
+      this.accUpdateForm.grouping_id = "";
+      this.handlerClose();
+      this.$parent.updateMemberList();
+      this.randomInfo = {
+        typecontrol_id: "",
+        nickname_id: "",
+        autograph_id: "",
+        headimage_id: "",
+      };
     },
 
     /* 
@@ -277,10 +316,11 @@ export default {
     */
     async getRendomNickname() {
       let result = await this.getRendomInfo(1);
-      console.log(result);
-      if (result?.data?.[0]?.nick_name) {
-        this.accUpdateForm.nickname = result.data[0].nick_name;
+      if (result?.data?.[0]?.nickname) {
+        this.disNickNameBtn = false;
+        this.accUpdateForm.nickname = result.data[0].nickname;
         this.$message.success("获取成功");
+        this.randomInfo.nickname_id = result.data[0].nickname_id;
         return true;
       }
       this.$message.error("素材库为空");
@@ -292,10 +332,12 @@ export default {
         desc: 随机获取签名
     */
     async getRendomAutograph() {
-      if (result?.data?.[0]?.signature) {
-        this.accUpdateForm.signature = result.data[0].signature;
+      let result = await this.getRendomInfo(2);
+      if (result?.data?.[0]?.autograph) {
+        this.disAutographBtn = false
+        this.accUpdateForm.signature = result.data[0].autograph;
         this.$message.success("获取成功");
-        let result = await this.getRendomInfo(2);
+        this.randomInfo.autograph_id = result.data[0].autograph_id;
         return true;
       }
       this.$message.error("素材库为空");
@@ -307,10 +349,12 @@ export default {
         desc: 随机获取头像
     */
     async getRendomAvatar() {
+      let result = await this.getRendomInfo(3);
       if (result?.data?.[0]?.image) {
-        this.accUpdateForm.avatar_uri = result.data[0].image;
+        this.disAvatarBtn = false
+        this.accUpdateForm.avatar_uri = result.data?.[0]?.image;
         this.$message.success("获取成功");
-        let result = await this.getRendomInfo(3);
+        this.randomInfo.headimage_id = result.data?.[0]?.headimage_id;
         return true;
       }
       this.$message.error("素材库为空");
@@ -329,21 +373,41 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.avatar-uploader .el-upload-dragger {
-  width: 200px !important;
+.tt-acccountsit--title {
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.upload-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .el-form-item__content {
+    display: flex !important;
+  }
+}
+
+.avatar-uploader {
+  border: 1px dashed #d9d9d9;
 }
 
 .avatar-uploader .el-upload {
   width: 200px;
-  border: 1px dashed #d9d9d9;
+  border: 1px dashed #d9d9d9 !important;
   border-radius: 6px;
   cursor: pointer;
-  position: relative;
   overflow: hidden;
 }
 
 .avatar-uploader .el-upload:hover {
   border-color: #409EFF;
+}
+
+.avatar-random--btn {
+  position: absolute;
+  left: 182px;
+  bottom: 70px;
 }
 
 .avatar-uploader-icon {
@@ -359,5 +423,13 @@ export default {
   width: 178px;
   height: 178px;
   display: block;
+}
+
+.ml-8 {
+  margin-left: 10px !important;
+}
+
+.ml-52 {
+  margin-left: 52px;
 }
 </style>
