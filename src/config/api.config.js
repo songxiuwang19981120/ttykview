@@ -349,6 +349,16 @@ export default {
     method: 'POST'
   },
 
+  'getNickNameClassify': { // 获取昵称分类
+    url: '/Nickname/listtable',
+    method: 'POST'
+  },
+
+  'getAutographClassify': { // 获取签名分类
+    url: '/Autograph/listtable',
+    method: 'POST'
+  },
+
   'libraryidIndex': {    //获取素材库
     url: 'Libraryid/index',
     method: 'POST'
@@ -409,11 +419,6 @@ export default {
     method: 'POST'
   },
 
-  'getNickNameClassify': { // 获取昵称分类
-    url: '/Nickname/listtable',
-    method: 'POST'
-  },
-
   'subjectcontentAdd': { // 主题内容新增
     url: '/Subjectcontent/add',
     method: 'POST'
@@ -440,7 +445,86 @@ export default {
   },
 
 
-}
+
+      'collectionUser':{    //用户采集
+        url:'Collection/user',
+        method:'POST'
+      },
+
+      'externalmemberIndex':{    //采集用户首页数据列表
+        url:'Externalmember/index',
+        method:'POST'
+      },
+
+
+      'getLabelClassify': { // 获取标签分类
+        url: '/Label/listtable',
+        method: 'POST'
+      },
+
+      //Label   API start
+      'getLabel': { // 获取标签
+        url: '/Label/index',
+        method: 'POST',
+      },
+      'addLabel': { // 新增标签
+        url: '/Label/add',
+        method: 'POST',
+      },
+      'updateLabel': { // 修改标签
+        url: '/Label/update',
+        method: 'POST',
+      },
+      'deleteLabel': { // 删除标签
+        url: '/Label/delete',
+        method: 'POST',
+      },
+      'viewLabel': {
+        url: '/Label/view',
+        method: 'POST',
+      },
+      //Label API end
+
+      // Tasklist API start
+      'getTasklist': { // 获取任务
+        url: '/Tasklist/index',
+        method: 'POST'
+      },
+
+      'getTaskListDetail': { // 获取任务详情
+        url: '/TaskListDetail/index',
+        method: 'POST'
+      },
+
+      // Tasklist API end
+
+      //PrivateLetter   API start
+      'getPrivateLetter': { // 获取私信
+        url: '/PrivateLetter/index',
+        method: 'POST',
+      },
+      'addPrivateLetter': { // 新增私信
+        url: '/PrivateLetter/add',
+        method: 'POST',
+      },
+      'updatePrivateLetter': { // 修改私信
+        url: '/PrivateLetter/update',
+        method: 'POST',
+      },
+      'deletePrivateLetter': { // 删除私信
+        url: '/PrivateLetter/delete',
+        method: 'POST',
+      },
+      'viewPrivateLetter': {
+        url: '/PrivateLetter/view',
+        method: 'POST',
+      },
+      'getPrivateLetterClassify': { // 获取昵称分类
+        url: '/PrivateLetter/listtable',
+        method: 'POST'
+      },
+      //PrivateLetter API end
+  }
 
 
 

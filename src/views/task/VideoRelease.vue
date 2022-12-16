@@ -1,35 +1,53 @@
 <template>
 	<div>
 		<el-card style="margin-bottom: 20px">
-			<el-row>
-				<el-select v-model="searchTableData.state" placeholder="请选择任务状态" size="small">
-					<el-option
-						v-for="item in searchStateList"
-						:key="item.value"
-						:label="item.label"
-						:value="item.value"
-					>
-					</el-option>
-				</el-select>
-				<el-button class="btn" type="primary" size="small" @click="searchTasks">查询</el-button>
-			</el-row>
+			<div class="tt-accsituation">
+				<div class="tt-accsituation--operation">
+					<div style="margin-right: 20px">
+						<span>任务状态：</span>
+						<el-select v-model="page.status" placeholder="请选择任务状态">
+							<el-option
+								v-for="item in searchStateList"
+								:key="item.value"
+								:label="item.label"
+								:value="item.value"
+							>
+							</el-option>
+						</el-select>
+					</div>
+					<div>
+						<!-- 查询 -->
+						<el-button
+							type="primary"
+							:loading="btnloading"
+							@click="searchTasks"
+							style="margin-right: 20px"
+							>{{ btnloading ? '加载中...' : '搜索' }}</el-button
+						>
+					</div>
+					<div>
+						<el-button type="primary" :loading="resetloading" @click="btnReset">{{
+						btnloading ? '加载中...' : '重置'
+					}}</el-button>
+					</div>
+				</div>
+			</div>
 		</el-card>
 		<el-card>
 			<!-- 表格 -->
 			<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 			<!-- 分页 -->
-			<el-row type="flex" justify="end">
-				<pagination
-					:total="total"
-					:page="page.page"
-					:limit="page.limit"
-					@pagination="pageChange"
-				></pagination>
-			</el-row>
+			<pagination
+				:total="total"
+				:page="page.page"
+				:limit="page.limit"
+				@pagination="pageChange"
+			></pagination>
 			<!-- 弹层 -->
 			<VideoReleaseDialogComponent
 				ref="dialog"
 				:showDialog.sync="dialog"
+				:curId="curId"
 			></VideoReleaseDialogComponent>
 		</el-card>
 	</div>
@@ -50,30 +68,20 @@
 				// 下拉选择数据
 				searchStateList: [
 					{
-						value: '全部',
-						label: '全部',
-					},
-					{
-						value: '已完成',
+						value: '0',
 						label: '已完成',
 					},
 					{
-						value: '执行中',
-						label: '执行中',
-					},
-					{
-						value: '执行中断',
-						label: '执行中断',
+						value: '1',
+						label: '未完成',
 					},
 				],
-				searchTableData: {
-					state: ''
-				},
 				loading: false,
+				btnloading: false,
 				tableData: [],
 				columns: [
 					{
-						prop: 'release_time',
+						prop: 'create_time',
 						label: '创建时间',
 						align: 'center',
 					},
@@ -83,15 +91,28 @@
 						align: 'center',
 					},
 					{
-						prop: 'mode',
+						prop: 'status',
 						label: '任务状态',
 						align: 'center',
+						render: (h, { row }) => {
+							return <div>{row.status == 0 ? '已完成' : '未完成'}</div>;
+						},
 					},
 					{
 						label: '任务进度',
 						align: 'center',
 						render(h, { row }) {
-							const percent = (row.su_total / row.total) * 100 + '%';
+							const { complete_num, fail_num } = row;
+							let percent;
+							if (Number(complete_num) + Number(fail_num) == 0) {
+								percent = '0.00%';
+							} else {
+								percent =
+									(
+										(Number(complete_num) / (Number(complete_num) + Number(fail_num))) *
+										100
+									).toFixed(2) + '%';
+							}
 							return <div>{percent}</div>;
 						},
 					},
@@ -104,7 +125,7 @@
 									<el-button
 										type="primary"
 										size="mini"
-										onClick={this.toDetail.bind(this, row.videotasks_id)}
+										onClick={this.toDetail.bind(this, row.tasklist_id)}
 									>
 										查看详情
 									</el-button>
@@ -116,9 +137,13 @@
 				dialog: false, // 弹层
 				page: {
 					page: 1,
-					limit: 20
+					limit: 20,
+					task_type: 'PushVideo',
+					status: '',
 				},
 				total: 0,
+				curId: null,
+				resetloading: false
 			};
 		},
 
@@ -135,26 +160,35 @@
 			},
 			// 获取视频任务列表
 			async getVideoTasks(data) {
-				this.loading = true
 				try {
+					this.loading = true
 					const res = await this.$api({
-						type: 'getVideotasks',
+						type: 'getTasklist',
 						data,
 					});
 					console.log(res, '视频列表数据');
-					this.tableData = res.list;
-					this.total = res.count
+					if (res.status == 200) {
+						this.tableData = res.data.list;
+						this.total = res.data.count;
+					} else {
+						this.$message.error(res.msg);
+					}
 				} catch (error) {
 					console.error(error);
 				} finally {
-					this.loading = false
+					this.loading = false;
+					this.btnloading = false
+					this.resetloading = false
 				}
 			},
 			// 查看详情
 			toDetail(id) {
 				this.dialog = true;
-				this.$refs.dialog.getVideoTaskDetails({
-					id,
+				this.curId = id;
+				this.$refs.dialog.getTaskListDetail({
+					page: 1,
+					limit: 10,
+					tasklist_id: id,
 				});
 			},
 			// 当前页数据条数/页码改变
@@ -164,18 +198,35 @@
 			},
 			// 点击查询按钮
 			searchTasks() {
-				this.page.curpage = 1
-				alert('查询')
+				this.btnloading = true
+				this.page.page = 1;
+				this.getVideoTasks(this.page);
+			},
+			// 点击重置按钮
+			btnReset() {
+				this.resetloading = true
+				this.page = {
+					page: 1,
+					limit: 20,
+					task_type: 'PushVideo',
+					status: '',
+				};
+				this.getVideoTasks(this.page)
 			},
 		},
 	};
 </script>
 
 <style lang="stylus" scoped>
-	.el-select{
-		margin-bottom: 20px
-	}
-	.btn.el-button{
-		margin-left: 15px
+	.tt-accsituation{
+		background-color #fff
+		margin-bottom  20px
+		border-radius 4px
+		padding 0 12px
+		.tt-accsituation--operation{
+			display flex
+			height 70px
+			line-height 70px
+		}
 	}
 </style>

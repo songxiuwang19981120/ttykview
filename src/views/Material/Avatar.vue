@@ -50,7 +50,7 @@
         </div>
         <el-dialog title="图片上传" :visible.sync="imgUploadVisible" width="40%" :before-close="imgUploadClose">
             <el-form ref="imgForm" :rules="rulesUpload" :model="imgForm" label-width="140px">
-                <el-form-item label="分组:" prop="group">
+                <el-form-item label="分组:">
                     <el-select v-model="imgForm.group" placeholder="请选择分组">
                         <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
                             :key="item.grouping_id"></el-option>
@@ -61,7 +61,7 @@
                         v-model="imgForm.library" placeholder="库选择"></el-cascader>
                 </el-form-item>
                 <el-form-item label="图片:" prop="img">
-                    <el-upload class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple
+                    <el-upload ref="imgUnload" class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple
                         accept=".png,.jpg,.jpeg" :on-success="handleSucess" :on-remove="handleRemove">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -134,12 +134,12 @@ export default {
                 //     fixed: true,
                 //     align: 'center',
                 // },
-                {
-                    prop: 'usage_time',
-                    label: '上传时间',
-                    minWidth: 160,
-                    align: 'center',
-                },
+                // {
+                //     prop: 'usage_time',
+                //     label: '上传时间',
+                //     minWidth: 160,
+                //     align: 'center',
+                // },
                 {
                     prop: 'operation',
                     label: '操作',
@@ -203,7 +203,7 @@ export default {
                 library: '',  //库
             },  //图片数据
             rulesUpload: {
-                group: [{ required: true, message: '请选择分组', trigger: 'blur' }],
+                // group: [{ required: true, message: '请选择分组', trigger: 'blur' }],
                 library: [{ required: true, message: '请选择库', trigger: 'blur' }],
             },  //图片上传弹框校验
             fileList: [],  //已选择需要上传的图片
@@ -276,7 +276,7 @@ export default {
         // 图片上传提交
         submitForimg() {
             if (this.fileList.length == 0) {
-                return this.$message.warning({ message: '请选择需要上传的图片'});
+                return this.$message.warning({ message: '请选择需要上传的图片' });
             }
             this.$refs['imgForm'].validate((valid) => {
                 if (!valid) return false;
@@ -306,6 +306,7 @@ export default {
                         group: '',  //分组
                         library: '',  //库
                     };
+                    this.$refs.imgUnload.clearFiles()
                     this.getHeadimageList()
                     this.$message.success({ message: result.msg })
                 } else {
@@ -317,12 +318,24 @@ export default {
         },
         // 取消图片上传弹框
         imgUploadClose() {
+            this.fileList = [];
+            this.imgForm = {
+                group: '',  //分组
+                library: '',  //库
+            };
+            this.$refs.imgUnload.clearFiles()
             this.imgUploadVisible = false
         },
         /*
            图片上传弹框
         */
         imgUpLoad() {
+            this.fileList = [];
+            this.imgForm = {
+                group: '',  //分组
+                library: '',  //库
+            };
+            this.$refs.imgUnload.clearFiles()
             this.imgUploadVisible = true
         },
         /*

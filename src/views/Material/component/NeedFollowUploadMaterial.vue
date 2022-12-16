@@ -186,6 +186,8 @@ export default {
     searchLink() {
       if (this.materialForm.link == '') {
         this.$message.warning({ message: '请输入查询链接' })
+      } else if(this.materialForm.link.indexOf('https://www.tiktok.com/@')==-1){
+        this.$message.warning({ message: '请输入正确的查询链接，以https://www.tiktok.com/@开头' })
       } else {
         this.testGetRestByKeys()
       }
