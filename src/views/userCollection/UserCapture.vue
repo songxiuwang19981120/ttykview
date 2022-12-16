@@ -175,13 +175,13 @@ export default {
                     align: 'center',
                 },
                 {
-                    prop: 'updata_time',
+                    prop: 'addtime',
                     label: '采集时间',
                     minWidth: 180,
                     align: 'center',
                 },
                 {
-                    prop: 'nickName',
+                    prop: 'updata_time',
                     label: '上次使用时间',
                     minWidth: 180,
                     align: 'center',
