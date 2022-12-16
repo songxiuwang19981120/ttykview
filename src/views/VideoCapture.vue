@@ -25,10 +25,8 @@
             </div>
         </div>
   
-        <table-custom style="width:100%; " :mutiSelect="true" :loading="loading" :tableData="tableData"
-            :columns="columns" @handleSelectionChange="selectionChange"></table-custom>
-        <pagination style="" :total="total" :page="current_page" :limit="current_limit" 
-            @pagination="handlePagination"></pagination>
+        <table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns" @handleSelectionChange="selectionChange"></table-custom>
+        <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination"></pagination>
         <el-dialog :visible.sync="dialogVisible" width="40%" >
             
             <div v-for="(item, index) of CommentLists.list" :key="index" >
@@ -51,7 +49,7 @@
                             <img :src="item1.avatar_medium" style="width:20px; margin-top: 20px; border-radius:10px;float: left;" alt="">
                             <div style="margin:20px 0 10px 10px;float: left;width:80%">
                                 <div style="font-size:12px;color: #999;height: 10px;line-height: 10px;">{{item1.nickname}}:</div>
-                                <div style=" font-size: 8px; position: absolute;right: 15%;"><i class="el-icon-success"></i>获赞数:{{item.digg_count}}</div>
+                                <div style=" font-size: 8px; position: absolute;right: 15%;"><i class="el-icon-success"></i>获赞数:{{item1.digg_count}}</div>
                                 <div style="font-size:8px;margin-top: 5px;margin-left:5px;padding-right: 30%;">{{item1.text}}</div>
                                 <div style="font-size:8px;margin-left:5px;color:#9999;">回复时间:{{item1.create_time}}</div>
                                <div style="clear:both"></div>
@@ -133,18 +131,16 @@ export default {
             tableData: [],
             columns: [
                 {
-
                     prop: 'country',
                     label: '国家',
                     fiexd: true,
+                    minWidth: 100,
                     align: 'center',
                 },
                 {
-
                     prop: 'video_url',
                     label: '视频',
-     
-                    fiexd: true,
+                    minWidth: 120,
                     align: 'center',
                     render(h, { row }) {
                         return (
@@ -157,32 +153,32 @@ export default {
                 {
                     prop: 'video_desc',
                     label: '视频描述',
-                    fiexd: true,
+                    minWidth:250,
                     align: 'center',
                 },
                 {
                     prop: 'uid',
                     label: '用户ID',
-                    fiexd: true,
+                    minWidth:140,
                     align: 'center',
                 },
                 {
                     prop: 'aweme_id',
                     label: '视频ID',
-                    fiexd: true,
+                    minWidth:140,
                     align: 'center',
 
                 },
                 {
                     prop: 'play_count',
                     label: '播放量',
-                    fiexd: true,
+                    minWidth:80,
                     align: 'center',
                 },
                 {
                     prop: 'comment_count',
                     label: '评论量',
-                    fiexd: true,
+                    minWidth:80,
                     align: 'center',
                     render: (h, { row }) => {
                         return (
@@ -195,13 +191,13 @@ export default {
                 {
                     prop: 'digg_count',
                     label: '点赞量',
-                    fiexd: true,
                     align: 'center',
+                    minWidth:80,
                 },
                 {
                     prop: 'addtime',
                     label: '抓取时间',
-                    fiexd: true,
+                    minWidth:120,
                     align: 'center',
                     render: (h, { row }) => {
                         return (
@@ -214,7 +210,7 @@ export default {
                 {
                     prop: 'ifvideo',
                     label: '状态',
-                    fiexd: true,
+                    minWidth:80,
                     align: 'center',
                     render: (h, { row }) => {
                         return (
@@ -229,8 +225,9 @@ export default {
                 {
                     prop: 'ifvideo',
                     label: '操作',
-                    width: 160,
+                    width: 80,
                     align: 'center',
+                    fiexd: true,
                     fixed: 'right',
                     render: (h, { row }) => {
                         return (
