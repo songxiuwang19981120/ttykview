@@ -106,10 +106,10 @@
 				total: 0,
 				ruleForm: {
 					// 编辑表单表单相关
-					nickname: '',
+					autograph: '',
 				},
 				rules: {
-					nickname: [
+					autograph: [
 						{ required: true, message: '请输入昵称', trigger: 'blur' },
 						{ validator: validateNickname, trigger: 'blur' },
 					],
@@ -120,8 +120,8 @@
 		methods: {
 			// 获取昵称
 			async getAutograph(data) {
-				this.loading = true;
 				try {
+					this.loading = true;
 					const res = await this.$api({
 						type: 'getAutograph',
 						data,

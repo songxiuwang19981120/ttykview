@@ -26,7 +26,9 @@
 						>
 					</div>
 					<div>
-						<el-button type="primary" @click="btnReset">重置</el-button>
+						<el-button type="primary" :loading="resetloading" @click="btnReset">{{
+						btnloading ? '加载中...' : '重置'
+					}}</el-button>
 					</div>
 				</div>
 			</div>
@@ -101,10 +103,16 @@
 						align: 'center',
 						render(h, { row }) {
 							const { complete_num, fail_num } = row;
-							const percent =
-								((Number(complete_num) / (Number(complete_num) + Number(fail_num))) * 100).toFixed(
-									2
-								) + '%';
+							let percent;
+							if (Number(complete_num) + Number(fail_num) == 0) {
+								percent = '0.00%';
+							} else {
+								percent =
+									(
+										(Number(complete_num) / (Number(complete_num) + Number(fail_num))) *
+										100
+									).toFixed(2) + '%';
+							}
 							return <div>{percent}</div>;
 						},
 					},
@@ -135,6 +143,7 @@
 				},
 				total: 0,
 				curId: null,
+				resetloading: false
 			};
 		},
 
@@ -151,8 +160,8 @@
 			},
 			// 获取评论区点赞任务列表
 			async getVideoTasks(data) {
-				this.loading = true;
 				try {
+					this.loading = true;
 					const res = await this.$api({
 						type: 'getTasklist',
 						data,
@@ -169,6 +178,7 @@
 				} finally {
 					this.loading = false;
 					this.btnloading = false;
+					this.resetloading = false
 				}
 			},
 			// 查看详情
@@ -194,12 +204,14 @@
 			},
 			// 点击重置按钮
 			btnReset() {
+				this.resetloading = true
 				this.page = {
 					page: 1,
 					limit: 20,
 					task_type: 'CommentDigg',
 					status: '',
 				};
+				this.getVideoTasks(this.page)
 			},
 		},
 	};

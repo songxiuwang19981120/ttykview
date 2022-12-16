@@ -34,12 +34,18 @@
 				</div>
 				<div>
 					<!-- 查询 -->
-					<el-button type="primary" :loading="btnloading" @click="searchNickName" style="margin-right: 20px">{{
-						btnloading ? '加载中...' : '搜索'
-					}}</el-button>
+					<el-button
+						type="primary"
+						:loading="btnloading"
+						@click="searchNickName"
+						style="margin-right: 20px"
+						>{{ btnloading ? '加载中...' : '搜索' }}</el-button
+					>
 				</div>
 				<div>
-					<el-button type="primary" @click="btnReset">重置</el-button>
+					<el-button type="primary" :loading="resetloading" @click="btnReset">{{
+						btnloading ? '加载中...' : '重置'
+					}}</el-button>
 				</div>
 			</div>
 			<div class="tt-accsituation--operation">
@@ -48,7 +54,7 @@
 				</div>
 			</div>
 		</div>
-		<el-card v-if="tableData.length">
+		<el-card>
 			<!-- 表格 -->
 			<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 		</el-card>
@@ -59,7 +65,11 @@
 			:upParameter="nickData"
 		></NickNameDetailDialog>
 		<!-- 上传弹层 -->
-		<NickNameUploadDialog :showDialog.sync="showUploadDialog" :upParameter="parameterData" :nnClassifyDate="tableData"></NickNameUploadDialog>
+		<NickNameUploadDialog
+			:showDialog.sync="showUploadDialog"
+			:upParameter="parameterData"
+			:nnClassifyDate="tableData"
+		></NickNameUploadDialog>
 	</div>
 </template>
 
@@ -121,7 +131,7 @@
 										size="mini"
 										onClick={this.toNickNameDetail.bind(this, row)}
 									>
-									昵称列表
+										昵称列表
 									</el-button>
 								</div>
 							);
@@ -134,8 +144,13 @@
 				equipmentLoading: false,
 				typecontrolLoading: false,
 				nickData: {}, // 传递给详情弹层的数据
-				parameterData: {}
+				parameterData: {},
+				resetloading: false,
 			};
+		},
+
+		created() {
+			this.getNickNameClassify(this.page);
 		},
 
 		mounted() {},
@@ -163,7 +178,7 @@
 			// 获取素材分类数据
 			async getTypecontrol() {
 				try {
-					this.typecontrolLoading = true
+					this.typecontrolLoading = true;
 					const res = await this.$api({
 						type: 'getTypecontrol',
 					});
@@ -177,13 +192,13 @@
 				} catch (error) {
 					console.error(error);
 				} finally {
-					this.typecontrolLoading = false
+					this.typecontrolLoading = false;
 				}
 			},
 			// 获取昵称分类数据
 			async getNickNameClassify(data) {
-				this.loading = true;
 				try {
+					this.loading = true;
 					const res = await this.$api({
 						type: 'getNickNameClassify',
 						data,
@@ -199,19 +214,20 @@
 					console.error(error);
 				} finally {
 					this.loading = false;
-					this.btnloading = false
+					this.btnloading = false;
+					this.resetloading = false;
 				}
 			},
 			// 点击查询按钮
 			searchNickName() {
-				this.btnloading = true
+				this.btnloading = true;
 				const { equipment, typecontrol } = this.searchTableData;
 				const typecontrol_id = typecontrol.length ? typecontrol[typecontrol.length - 1] : '';
 				const grouping_id = equipment;
 				this.parameterData = {
-					typecontrol_id, 
-					grouping_id
-				}
+					typecontrol_id,
+					grouping_id,
+				};
 				this.getNickNameClassify({
 					typecontrol_id,
 					grouping_id,
@@ -219,10 +235,19 @@
 			},
 			// 点击重置按钮
 			btnReset() {
+				this.resetloading = true;
 				this.searchTableData = {
 					equipment: '',
-					typecontrol: ''
-				}
+					typecontrol: '',
+				};
+				const { equipment, typecontrol } = this.searchTableData;
+				const typecontrol_id = typecontrol.length ? typecontrol[typecontrol.length - 1] : '';
+				const grouping_id = equipment;
+				this.parameterData = {
+					typecontrol_id,
+					grouping_id,
+				};
+				this.getNickNameClassify();
 			},
 			// 点击上传按钮
 			uploadNickName() {

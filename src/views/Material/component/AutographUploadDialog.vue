@@ -49,7 +49,9 @@
 		<!-- 按钮 -->
 		<el-row type="flex" justify="end" slot="footer">
 			<el-button size="small" @click="btnCancel">取消</el-button>
-			<el-button size="small" type="primary" @click="btnOK">确定</el-button>
+			<el-button type="primary" :loading="btnloading" @click="btnOK">{{
+				btnloading ? '上传中...' : '确定'
+			}}</el-button>
 		</el-row>
 	</el-dialog>
 </template>
@@ -105,6 +107,7 @@
 					typecontrol: [{ required: true, message: '请选择素材库', trigger: 'blur' }],
 				},
 				baseUrl: BASE_URL, // 基地址
+				btnloading: false
 			};
 		},
 		methods: {
@@ -162,6 +165,8 @@
 					}
 				} catch (error) {
 					console.error(error);
+				} finally {
+					this.btnloading = false
 				}
 			},
 			// 点击取消按钮
@@ -182,21 +187,20 @@
 							nickNameArr.push(item.replace(/\s/gi, ''));
 						}
 					});
-					this.ruleForm.autograph = nickNameArr.join('\n');
+					if (nickNameArr.length && nickNameArr[0]){
+						this.ruleForm.autograph = nickNameArr.join('\n');
+					} else {
+						return this.$message.warning('签名内容不能为空')
+					}
 					const { typecontrol } = this.ruleForm;
 					this.ruleForm.typecontrol_id = typecontrol.length
 						? typecontrol[typecontrol.length - 1]
 						: '';
 					// 调用新增签名接口
+					this.btnloading = true
 					await this.addAutograph(this.ruleForm);
 					this.$emit('update:showDialog', false);
-					// 更新数据
-					const arr = this.nnClassifyDate.filter((item) => {
-						return item.typecontrol_id == this.ruleForm.typecontrol_id;
-					});
-					if (arr.length) {
-						this.$parent.getAutographClassify(this.upParameter);
-					}
+					this.$parent.getAutographClassify(this.upParameter);
 				} catch (error) {
 					console.log(error);
 				}
@@ -222,11 +226,4 @@
 	}
 </style>
 <style scoped>
-	/* ::v-deep .el-form-item__content {
-		text-align: center !important;
-	} */
-	/* ::v-deep .el-form-item__error {
-		width: 100%;
-		margin-left: 30%;
-	} */
 </style>

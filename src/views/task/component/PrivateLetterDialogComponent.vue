@@ -45,7 +45,9 @@
 						>
 					</div>
 					<div>
-						<el-button type="primary" @click="btnReset" size="small">重置</el-button>
+						<el-button type="primary" :loading="resetloading" @click="btnReset" size="small">{{
+							btnloading ? '加载中...' : '重置'
+						}}</el-button>
 					</div>
 				</div>
 			</div>
@@ -197,6 +199,7 @@
 					task_type: '',
 				},
 				total: 0,
+				resetloading: false
 			};
 		},
 		methods: {
@@ -232,6 +235,7 @@
 					limit: 20,
 					tasklist_id: '',
 					status: '',
+					task_type: ''
 				};
 			},
 			// 点击查询按钮
@@ -243,13 +247,15 @@
 			},
 			// 点击重置
 			btnReset() {
+				this.resetloading = true
 				this.page = {
 					page: 1,
 					limit: 20,
-					tasklist_id: '',
+					tasklist_id: this.curId,
 					status: '',
 					task_type: '',
 				}
+				this.getTaskListDetail(this.page)
 			},
 		},
 	};

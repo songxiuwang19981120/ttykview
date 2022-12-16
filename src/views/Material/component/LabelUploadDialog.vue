@@ -49,7 +49,9 @@
 		<!-- 按钮 -->
 		<el-row type="flex" justify="end" slot="footer">
 			<el-button size="small" @click="btnCancel">取消</el-button>
-			<el-button size="small" type="primary" @click="btnOK">确定</el-button>
+			<el-button type="primary" :loading="btnloading" @click="btnOK">{{
+				btnloading ? '上传中...' : '确定'
+			}}</el-button>
 		</el-row>
 	</el-dialog>
 </template>
@@ -70,21 +72,6 @@
 			},
 		},
 		data() {
-			const validateLabel = (rule, value, callback) => {
-				let nickNameArr = [];
-				// 处理文本域数据
-				value.split('\n').forEach((item) => {
-					console.log(item.replace(/\s/gi, ''));
-					if (item.replace(/\s/gi, '')) {
-						nickNameArr.push(item.replace(/\s/gi, ''));
-					}
-				});
-				if (nickNameArr.length && nickNameArr[0]) {
-					callback();
-				} else {
-					callback(new Error('标签不能为空'));
-				}
-			};
 			return {
 				searchEquipmentList: [], // 分组数据
 				searchTypecontrolList: [], // 素材库数据
@@ -98,12 +85,12 @@
 				},
 				rules: {
 					label: [
-						{ required: true, message: '请输入标签', trigger: 'blur' },
-						{ validator: validateLabel, trigger: 'blur' },
+						{ required: true, message: '请输入标签', trigger: 'blur' }
 					],
 					typecontrol: [{ required: true, message: '请选择素材库', trigger: 'blur' }],
 				},
 				baseUrl: BASE_URL, // 基地址
+				btnloading: false
 			};
 		},
 		methods: {
@@ -161,6 +148,8 @@
 					}
 				} catch (error) {
 					console.error(error);
+				} finally {
+					this.btnloading = false
 				}
 			},
 			// 点击取消按钮
@@ -181,21 +170,20 @@
 							nickNameArr.push(item.replace(/\s/gi, ''));
 						}
 					});
-					this.ruleForm.label = nickNameArr.join('\n');
+					if (nickNameArr.length && nickNameArr[0]){
+						this.ruleForm.label = nickNameArr.join('\n');
+					} else {
+						return this.$message.warning('标签内容不能为空')
+					}
 					const { typecontrol } = this.ruleForm;
 					this.ruleForm.typecontrol_id = typecontrol.length
 						? typecontrol[typecontrol.length - 1]
 						: '';
 					// 调用新增接口
+					this.btnloading = true
 					await this.addLabel(this.ruleForm);
 					this.$emit('update:showDialog', false);
-					// 更新数据
-					const arr = this.nnClassifyDate.filter((item) => {
-						return item.typecontrol_id == this.ruleForm.typecontrol_id;
-					});
-					if (arr.length) {
-						this.$parent.getLabelClassify(this.upParameter);
-					}
+					this.$parent.getLabelClassify(this.upParameter);
 				} catch (error) {
 					console.log(error);
 				}
@@ -221,11 +209,4 @@
 	}
 </style>
 <style scoped>
-	/* ::v-deep .el-form-item__content {
-		text-align: center !important;
-	} */
-	/* ::v-deep .el-form-item__error {
-		width: 100%;
-		margin-left: 30%;
-	} */
 </style>

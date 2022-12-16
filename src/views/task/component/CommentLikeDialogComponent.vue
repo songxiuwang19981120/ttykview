@@ -33,7 +33,9 @@
 						>
 					</div>
 					<div>
-						<el-button type="primary" @click="btnReset" size="small">重置</el-button>
+						<el-button type="primary" :loading="resetloading" @click="btnReset" size="small">{{
+							btnloading ? '加载中...' : '重置'
+						}}</el-button>
 					</div>
 				</div>
 			</div>
@@ -166,13 +168,14 @@
 					status: '',
 				},
 				total: 0,
+				resetloading: false
 			};
 		},
 		methods: {
 			// 获取评论区点赞详情
 			async getTaskListDetail(data) {
 				try {
-					this.loading = true
+					this.loading = true;
 					const res = await this.$api({
 						type: 'getTaskListDetail',
 						data,
@@ -183,8 +186,8 @@
 				} catch (error) {
 					console.error(error);
 				} finally {
-					this.loading = false
-					this.btnloading = false
+					this.loading = false;
+					this.btnloading = false;
 				}
 			},
 			// 当前页数据条数/页码改变
@@ -199,19 +202,21 @@
 			},
 			// 点击查询按钮
 			searchTasks() {
-				this.btnloading = true
+				this.btnloading = true;
 				this.page.page = 1;
 				this.page.tasklist_id = this.curId;
 				this.getTaskListDetail(this.page);
 			},
 			// 点击重置
 			btnReset() {
+				this.resetloading = true
 				this.page = {
 					page: 1,
 					limit: 20,
-					tasklist_id: '',
+					tasklist_id: this.curId,
 					status: '',
 				};
+				this.getTaskListDetail(this.page)
 			},
 		},
 	};

@@ -120,8 +120,8 @@
 		methods: {
 			// 获取标签
 			async getLabel(data) {
-				this.loading = true;
 				try {
+					this.loading = true;
 					const res = await this.$api({
 						type: 'getLabel',
 						data,

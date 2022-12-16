@@ -29,7 +29,9 @@
 					>
 				</div>
 				<div>
-					<el-button type="primary" @click="btnReset" size="small">重置</el-button>
+					<el-button type="primary" :loading="resetloading" @click="btnReset" size="small">{{
+						btnloading ? '加载中...' : '重置'
+					}}</el-button>
 				</div>
 			</div>
 		</div>
@@ -95,10 +97,6 @@
 			};
 			return {
 				searchTypeList: [
-					{
-						label: '全部',
-						value: '',
-					},
 					{
 						label: '文本话术',
 						value: '0',
@@ -168,19 +166,20 @@
 					content: '',
 				},
 				rules: {
-					nickname: [
-						{ required: true, message: '请输入昵称', trigger: 'blur' },
+					content: [
+						{ required: true, message: '请输入私信', trigger: 'blur' },
 						{ validator: validateNickname, trigger: 'blur' },
 					],
 				},
 				curNickName: '', // 点击当前编辑按钮的id
+				resetloading: false
 			};
 		},
 		methods: {
 			// 获取私信
 			async getPrivateLetter(data) {
-				this.loading = true;
 				try {
+					this.loading = true;
 					const res = await this.$api({
 						type: 'getPrivateLetter',
 						data,
@@ -197,6 +196,7 @@
 				} finally {
 					this.loading = false;
 					this.btnloading = false
+					this.resetloading = false
 				}
 			},
 			// 编辑昵称
@@ -248,9 +248,16 @@
       },
 			// 点击重置按钮
 			btnReset() {
+				this.resetloading = true
 				this.searchTableData = {
 					type: '',
 				};
+				this.getPrivateLetter({
+					page: this.nickNameData.page,
+					limit: this.nickNameData.limit,
+					typecontrol_id: this.upParameter.typecontrol_id,
+					grouping_id: this.upParameter.grouping_id
+				});
 			},
 			// 点击编辑按钮
 			editBtn(obj) {
@@ -288,6 +295,9 @@
 			// 点击取消按钮
 			btnCancel() {
 				this.$emit('update:outerVisible', false);
+				this.searchTableData = {
+					type: ''
+				};
 				this.$parent.searchNickName();
 			},
 			// 点击编辑页面取消按钮

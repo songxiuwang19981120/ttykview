@@ -26,7 +26,9 @@
 						>
 					</div>
 					<div>
-						<el-button type="primary" @click="btnReset">重置</el-button>
+						<el-button type="primary" :loading="resetloading" @click="btnReset">{{
+						btnloading ? '加载中...' : '重置'
+					}}</el-button>
 					</div>
 				</div>
 			</div>
@@ -141,6 +143,7 @@
 				},
 				total: 0,
 				curId: null,
+				resetloading: false
 			};
 		},
 
@@ -157,8 +160,8 @@
 			},
 			// 获取私信任务列表
 			async getVideoTasks(data) {
-				this.loading = true;
 				try {
+					this.loading = true;
 					const res = await this.$api({
 						type: 'getTasklist',
 						data,
@@ -175,6 +178,7 @@
 				} finally {
 					this.loading = false;
 					this.btnloading = false
+					this.resetloading = false
 				}
 			},
 			// 查看详情
@@ -200,12 +204,14 @@
 			},
 			// 点击重置按钮
 			btnReset() {
+				this.resetloading = true
 				this.page = {
 					page: 1,
 					limit: 20,
 					task_type: 'Chat',
 					status: '',
 				};
+				this.getVideoTasks(this.page)
 			},
 		},
 	};

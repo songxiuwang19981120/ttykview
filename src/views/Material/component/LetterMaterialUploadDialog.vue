@@ -45,12 +45,7 @@
 			</el-form-item>
 			<!-- 添加私信 -->
 			<el-form-item prop="content" label="添加私信：">
-				<el-input
-					placeholder="请输入私信"
-					rows="6"
-					v-model="ruleForm.content"
-					style="width: 60%"
-				>
+				<el-input placeholder="请输入私信" rows="6" v-model="ruleForm.content" style="width: 60%">
 				</el-input>
 			</el-form-item>
 		</el-form>
@@ -59,7 +54,9 @@
 		<!-- 按钮 -->
 		<el-row type="flex" justify="end" slot="footer">
 			<el-button size="small" @click="btnCancel">取消</el-button>
-			<el-button size="small" type="primary" @click="btnOK">确定</el-button>
+			<el-button type="primary" :loading="btnloading" @click="btnOK">{{
+				btnloading ? '上传中...' : '确定'
+			}}</el-button>
 		</el-row>
 	</el-dialog>
 </template>
@@ -80,13 +77,13 @@
 			},
 		},
 		data() {
-      const validateCont = (rule, value, callback) => {
-        if(value.replace(/\s/gi, '')){
-          callback()
-        }else{
-          callback(new Error('私信不能为空'))
-        }
-      }
+			const validateCont = (rule, value, callback) => {
+				if (value.replace(/\s/gi, '')) {
+					callback();
+				} else {
+					callback(new Error('私信不能为空'));
+				}
+			};
 			return {
 				searchEquipmentList: [], // 分组数据
 				searchTypecontrolList: [], // 素材库数据
@@ -119,13 +116,14 @@
 				},
 				rules: {
 					content: [
-            { required: true, message: '请输入私信', trigger: 'blur' },
+						{ required: true, message: '请输入私信', trigger: 'blur' },
 						{ validator: validateCont, trigger: 'blur' },
 					],
 					typecontrol: [{ required: true, message: '请选择素材库', trigger: 'blur' }],
 					type: [{ required: true, message: '请选择私信类型', trigger: 'blur' }],
 				},
 				baseUrl: BASE_URL, // 基地址
+				btnloading: false
 			};
 		},
 		methods: {
@@ -183,6 +181,8 @@
 					}
 				} catch (error) {
 					console.error(error);
+				} finally {
+					this.btnloading = false
 				}
 			},
 			// 点击取消按钮
@@ -195,22 +195,20 @@
 				try {
 					await this.$refs.ruleForm.validate();
 					console.log(this.ruleForm.content, '文本数据');
-					this.ruleForm.content = this.ruleForm.content.replace(/\s/gi, '')
+					if(this.ruleForm.content.replace(/\s/gi, '')){
+						this.ruleForm.content = this.ruleForm.content.replace(/\s/gi, '');
+					} else {
+						return this.$message.warning('私信内容不能为空')
+					}
 					const { typecontrol } = this.ruleForm;
 					this.ruleForm.typecontrol_id = typecontrol.length
 						? typecontrol[typecontrol.length - 1]
 						: '';
 					// 调用新增昵称接口
+					this.btnloading = true
 					await this.addPrivateLetter(this.ruleForm);
 					this.$emit('update:showDialog', false);
-					// 更新数据
-					const arr = this.nnClassifyDate.filter((item) => {
-						return item.typecontrol_id == this.ruleForm.typecontrol_id;
-					});
-					console.log(arr, '是否存在搜索之内');
-					if (arr.length) {
-						this.$parent.getPrivateLetterClassify(this.upParameter);
-					}
+					this.$parent.getPrivateLetterClassify(this.upParameter);
 				} catch (error) {
 					console.log(error);
 				}

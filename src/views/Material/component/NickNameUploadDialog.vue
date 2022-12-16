@@ -49,7 +49,9 @@
 		<!-- 按钮 -->
 		<el-row type="flex" justify="end" slot="footer">
 			<el-button size="small" @click="btnCancel">取消</el-button>
-			<el-button size="small" type="primary" @click="btnOK">确定</el-button>
+			<el-button type="primary" :loading="btnloading" @click="btnOK">{{
+				btnloading ? '上传中...' : '确定'
+			}}</el-button>
 		</el-row>
 	</el-dialog>
 </template>
@@ -70,21 +72,6 @@
 			},
 		},
 		data() {
-			const validateNN = (rule, value, callback) => {
-				let nickNameArr = [];
-				// 处理文本域数据
-				value.split('\n').forEach((item) => {
-					console.log(item.replace(/\s/gi, ''));
-					if (item.replace(/\s/gi, '')) {
-						nickNameArr.push(item.replace(/\s/gi, ''));
-					}
-				});
-				if (nickNameArr.length && nickNameArr[0]) {
-					callback();
-				} else {
-					callback(new Error('昵称不能为空'));
-				}
-			};
 			return {
 				searchEquipmentList: [], // 分组数据
 				searchTypecontrolList: [], // 素材库数据
@@ -98,12 +85,12 @@
 				},
 				rules: {
 					nickname: [
-						{ required: true, message: '请输入昵称', trigger: 'blur' },
-						{ validator: validateNN, trigger: 'blur' },
+						{ required: true, message: '请输入昵称', trigger: 'blur' }
 					],
 					typecontrol: [{ required: true, message: '请选择素材库', trigger: 'blur' }],
 				},
 				baseUrl: BASE_URL, // 基地址
+				btnloading: false
 			};
 		},
 		methods: {
@@ -161,6 +148,8 @@
 					}
 				} catch (error) {
 					console.error(error);
+				} finally {
+					this.btnloading = false
 				}
 			},
 			// 点击取消按钮
@@ -181,24 +170,20 @@
 							nickNameArr.push(item.replace(/\s/gi, ''));
 						}
 					});
-					this.ruleForm.nickname = nickNameArr.join('\n');
+					if (nickNameArr.length && nickNameArr[0]){
+						this.ruleForm.nickname = nickNameArr.join('\n');
+					} else {
+						return this.$message.warning('昵称内容不能为空')
+					}
 					const { typecontrol } = this.ruleForm;
 					this.ruleForm.typecontrol_id = typecontrol.length
 						? typecontrol[typecontrol.length - 1]
 						: '';
 					// 调用新增昵称接口
+					this.btnloading = true
 					await this.addNickName(this.ruleForm);
 					this.$emit('update:showDialog', false);
-					console.log(this.nnClassifyDate, '传递分类数据');
-					console.log(this.ruleForm.typecontrol_id);
-					// 更新数据
-					const arr = this.nnClassifyDate.filter((item) => {
-						return item.typecontrol_id == this.ruleForm.typecontrol_id;
-					});
-					console.log(arr, '是否存在搜索之内');
-					if (arr.length) {
-						this.$parent.getNickNameClassify(this.upParameter);
-					}
+					this.$parent.getNickNameClassify(this.upParameter);
 				} catch (error) {
 					console.log(error);
 				}
@@ -223,12 +208,4 @@
 		vertical-align middle
 	}
 </style>
-<style scoped>
-	/* ::v-deep .el-form-item__content {
-		text-align: center !important;
-	} */
-	/* ::v-deep .el-form-item__error {
-		width: 100%;
-		margin-left: 30%;
-	} */
-</style>
+<style scoped></style>

@@ -43,7 +43,9 @@
 					>
 				</div>
 				<div>
-					<el-button type="primary" @click="btnReset">重置</el-button>
+					<el-button type="primary" :loading="resetloading" @click="btnReset">{{
+						btnloading ? '加载中...' : '重置'
+					}}</el-button>
 				</div>
 			</div>
 			<div class="tt-accsituation--operation">
@@ -52,7 +54,7 @@
 				</div>
 			</div>
 		</div>
-		<el-card v-if="tableData.length">
+		<el-card>
 			<!-- 表格 -->
 			<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 		</el-card>
@@ -130,7 +132,12 @@
 				typecontrolLoading: false,
 				nickData: {}, // 传递给详情弹层的数据
 				parameterData: {},
+				resetloading: false
 			};
+		},
+
+		created() {
+			this.getPrivateLetterClassify(this.page)
 		},
 
 		mounted() {},
@@ -177,8 +184,8 @@
 			},
 			// 获取私信数据
 			async getPrivateLetterClassify(data) {
-				this.loading = true;
 				try {
+					this.loading = true;
 					const res = await this.$api({
 						type: 'getPrivateLetterClassify',
 						data,
@@ -195,6 +202,7 @@
 				} finally {
 					this.loading = false;
 					this.btnloading = false
+					this.resetloading = false
 				}
 			},
 			// 点击查询按钮
@@ -214,10 +222,19 @@
 			},
 			// 点击重置按钮
 			btnReset() {
+				this.resetloading = true
 				this.searchTableData = {
 					equipment: '',
 					typecontrol: '',
 				};
+				const { equipment, typecontrol } = this.searchTableData;
+				const typecontrol_id = typecontrol.length ? typecontrol[typecontrol.length - 1] : '';
+				const grouping_id = equipment;
+				this.parameterData = {
+					typecontrol_id,
+					grouping_id,
+				};
+				this.getPrivateLetterClassify()
 			},
 			// 点击上传按钮
 			uploadNickName() {

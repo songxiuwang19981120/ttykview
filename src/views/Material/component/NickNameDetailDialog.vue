@@ -120,8 +120,8 @@
 		methods: {
 			// 获取昵称
 			async getNickName(data) {
-				this.loading = true;
 				try {
+					this.loading = true;
 					const res = await this.$api({
 						type: 'getNickName',
 						data,
