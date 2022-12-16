@@ -199,11 +199,12 @@
 					console.error(error);
 				} finally {
 					this.loading = false;
+					this.btnloading = false
 				}
 			},
 			// 点击查询按钮
 			searchNickName() {
-				console.log(this.searchTableData, '++++++++');
+				this.btnloading = true
 				const { equipment, typecontrol } = this.searchTableData;
 				const typecontrol_id = typecontrol.length ? typecontrol[typecontrol.length - 1] : '';
 				const grouping_id = equipment;

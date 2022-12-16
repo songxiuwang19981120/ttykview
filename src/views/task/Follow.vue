@@ -1,18 +1,35 @@
 <template>
 	<div>
 		<el-card style="margin-bottom: 20px">
-			<el-row>
-				<el-select v-model="page.status" placeholder="请选择任务状态" size="small">
-					<el-option
-						v-for="item in searchStateList"
-						:key="item.value"
-						:label="item.label"
-						:value="item.value"
-					>
-					</el-option>
-				</el-select>
-				<el-button class="btn" type="primary" size="small" @click="searchTasks">搜索</el-button>
-			</el-row>
+			<div class="tt-accsituation">
+				<div class="tt-accsituation--operation">
+					<div style="margin-right: 20px">
+						<span>任务状态：</span>
+						<el-select v-model="page.status" placeholder="请选择任务状态">
+							<el-option
+								v-for="item in searchStateList"
+								:key="item.value"
+								:label="item.label"
+								:value="item.value"
+							>
+							</el-option>
+						</el-select>
+					</div>
+					<div>
+						<!-- 查询 -->
+						<el-button
+							type="primary"
+							:loading="btnloading"
+							@click="searchTasks"
+							style="margin-right: 20px"
+							>{{ btnloading ? '加载中...' : '搜索' }}</el-button
+						>
+					</div>
+					<div>
+						<el-button type="primary" @click="btnReset">重置</el-button>
+					</div>
+				</div>
+			</div>
 		</el-card>
 		<el-card>
 			<!-- 表格 -->
@@ -28,7 +45,7 @@
 			<FollowDailogComponent
 				ref="dialog"
 				:showDialog.sync="dialog"
-				:curId='curId'
+				:curId="curId"
 			></FollowDailogComponent>
 		</el-card>
 	</div>
@@ -49,19 +66,16 @@
 				// 下拉选择数据
 				searchStateList: [
 					{
-						value: '',
-						label: '全部',
-					},
-					{
 						value: '0',
 						label: '已完成',
 					},
 					{
 						value: '1',
 						label: '未完成',
-					}
+					},
 				],
 				loading: false,
+				btnloading: false,
 				tableData: [],
 				columns: [
 					{
@@ -78,17 +92,19 @@
 						prop: 'status',
 						label: '任务状态',
 						align: 'center',
-						render: (h,{row}) => {
-							return <div>{row.status == 0 ? '已完成' : '未完成'}</div>
-						}
+						render: (h, { row }) => {
+							return <div>{row.status == 0 ? '已完成' : '未完成'}</div>;
+						},
 					},
 					{
 						label: '任务进度',
 						align: 'center',
 						render(h, { row }) {
-							const {complete_num,fail_num} = row
-							const percent = 
-								((Number(complete_num) / (Number(complete_num) + Number(fail_num))) * 100).toFixed(2) + '%';
+							const { complete_num, fail_num } = row;
+							const percent =
+								((Number(complete_num) / (Number(complete_num) + Number(fail_num))) * 100).toFixed(
+									2
+								) + '%';
 							return <div>{percent}</div>;
 						},
 					},
@@ -115,15 +131,15 @@
 					page: 1,
 					limit: 20,
 					task_type: 'Follow',
-					status: ''
+					status: '',
 				},
 				total: 0,
-				curId: null
+				curId: null,
 			};
 		},
 
 		created() {
-			// 获取视频任务列表
+			// 获取关注列表
 			this.getVideoTasks(this.page);
 		},
 
@@ -133,7 +149,7 @@
 			toVideoReleaseDialog() {
 				this.dialog = true;
 			},
-			// 获取视频任务列表
+			// 获取关注任务列表
 			async getVideoTasks(data) {
 				this.loading = true;
 				try {
@@ -141,7 +157,7 @@
 						type: 'getTasklist',
 						data,
 					});
-					console.log(res, '视频列表数据');
+					console.log(res, '关注列表数据');
 					if (res.status == 200) {
 						this.tableData = res.data.list;
 						this.total = res.data.count;
@@ -152,16 +168,17 @@
 					console.error(error);
 				} finally {
 					this.loading = false;
+					this.btnloading = false
 				}
 			},
 			// 查看详情
 			toDetail(id) {
 				this.dialog = true;
-				this.curId = id
+				this.curId = id;
 				this.$refs.dialog.getTaskListDetail({
 					page: 1,
 					limit: 10,
-					tasklist_id: id
+					tasklist_id: id,
 				});
 			},
 			// 当前页数据条数/页码改变
@@ -171,18 +188,33 @@
 			},
 			// 点击查询按钮
 			searchTasks() {
+				this.btnloading = true
 				this.page.page = 1;
-				this.getVideoTasks(this.page)
-			}
+				this.getVideoTasks(this.page);
+			},
+			// 点击重置按钮
+			btnReset() {
+				this.page = {
+					page: 1,
+					limit: 20,
+					task_type: 'Follow',
+					status: '',
+				};
+			},
 		},
 	};
 </script>
 
 <style lang="stylus" scoped>
-	.el-select{
-		margin-bottom: 20px
-	}
-	.btn.el-button{
-		margin-left: 15px
+	.tt-accsituation{
+		background-color #fff
+		margin-bottom  20px
+		border-radius 4px
+		padding 0 12px
+		.tt-accsituation--operation{
+			display flex
+			height 70px
+			line-height 70px
+		}
 	}
 </style>

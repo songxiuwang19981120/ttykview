@@ -7,6 +7,7 @@
 					v-model="searchTableData.type"
 					placeholder="私信类型选择"
 					style="margin-right: 20px"
+					size="small"
 				>
 					<el-option
 						v-for="item in searchTypeList"
@@ -23,11 +24,12 @@
 						:loading="btnloading"
 						@click="searchNickName"
 						style="margin-right: 20px"
+						size="small"
 						>{{ btnloading ? '加载中...' : '搜索' }}</el-button
 					>
 				</div>
 				<div>
-					<el-button type="primary" @click="btnReset">重置</el-button>
+					<el-button type="primary" @click="btnReset" size="small">重置</el-button>
 				</div>
 			</div>
 		</div>
@@ -194,6 +196,7 @@
 					console.error(error);
 				} finally {
 					this.loading = false;
+					this.btnloading = false
 				}
 			},
 			// 编辑昵称
@@ -234,6 +237,7 @@
 			},
 			// 点击查询按钮
 			searchNickName() {
+				this.btnloading = true
         this.getPrivateLetter({
 					page: this.nickNameData.page,
 					limit: this.nickNameData.limit,

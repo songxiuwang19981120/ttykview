@@ -99,16 +99,6 @@
 							return <div>{allCount}</div>;
 						},
 					},
-					// {
-					// 	prop: 'yy',
-					// 	label: '已用标签数量',
-					// 	align: 'center',
-					// },
-					// {
-					// 	prop: 'wy',
-					// 	label: '当前可用标签',
-					// 	align: 'center',
-					// },
 					{
 						label: '操作',
 						align: 'center',
@@ -199,11 +189,12 @@
 					console.error(error);
 				} finally {
 					this.loading = false;
+					this.btnloading = false
 				}
 			},
 			// 点击查询按钮
 			searchNickName() {
-				console.log(this.searchTableData, '++++++++');
+				this.btnloading = true
 				const { equipment, typecontrol } = this.searchTableData;
 				const typecontrol_id = typecontrol.length ? typecontrol[typecontrol.length - 1] : '';
 				const grouping_id = equipment;

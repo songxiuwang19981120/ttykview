@@ -2,18 +2,53 @@
 	<div>
 		<el-dialog :visible="showDialog" title="私信详情" @close="btnCancel" width="68%">
 			<!-- 搜索 -->
-			<el-row>
-				<el-select v-model="page.status" placeholder="请选择任务状态" size="small">
-					<el-option
-						v-for="item in searchStateList"
-						:key="item.value"
-						:label="item.label"
-						:value="item.value"
-					>
-					</el-option>
-				</el-select>
-				<el-button class="btn" type="primary" size="small" @click="searchTasks">查询</el-button>
-			</el-row>
+			<div class="tt-accsituation">
+				<div class="tt-accsituation--operation">
+					<div>
+						<span>任务状态：</span>
+						<el-select v-model="page.status" placeholder="请选择任务状态" size="small" style="margin-right: 20px">
+							<el-option
+								v-for="item in searchStateList"
+								:key="item.value"
+								:label="item.label"
+								:value="item.value"
+							>
+							</el-option>
+						</el-select>
+					</div>
+					<div>
+						<span>私信类型：</span>
+						<el-select
+							v-model="page.task_type"
+							placeholder="私信类型选择"
+							style="margin-right: 20px"
+							size="small"
+						>
+							<el-option
+								v-for="item in searchTypeList"
+								:key="item.value"
+								:label="item.label"
+								:value="item.value"
+							>
+							</el-option>
+						</el-select>
+					</div>
+					<div>
+						<!-- 查询 -->
+						<el-button
+							type="primary"
+							:loading="btnloading"
+							@click="searchTasks"
+							style="margin-right: 20px"
+							size="small"
+							>{{ btnloading ? '加载中...' : '搜索' }}</el-button
+						>
+					</div>
+					<div>
+						<el-button type="primary" @click="btnReset" size="small">重置</el-button>
+					</div>
+				</div>
+			</div>
 			<!-- 表格 -->
 			<table-custom
 				:mutiSelect="true"
@@ -44,7 +79,7 @@
 	export default {
 		components: {
 			tableCustom,
-			pagination
+			pagination,
 		},
 		props: {
 			showDialog: {
@@ -60,10 +95,6 @@
 				// 下拉选择数据
 				searchStateList: [
 					{
-						value: '',
-						label: '全部',
-					},
-					{
 						value: '0',
 						label: '成功',
 					},
@@ -76,6 +107,25 @@
 						label: '未开始',
 					},
 				],
+				searchTypeList: [
+					{
+						value: 'ChatText',
+						label: '文本',
+					},
+					{
+						value: 'ChatProfile',
+						label: '好友名片',
+					},
+					{
+						value: 'ChatAweme',
+						label: '私信作品',
+					},
+					{
+						value: 'ChatLink ',
+						label: '短链接',
+					},
+				],
+				btnloading: false,
 				loading: false,
 				tableData: [],
 				columns: [
@@ -133,7 +183,7 @@
 							} else if (row.status == 2) {
 								return <div>暂无失败原因</div>;
 							} else {
-								return <div style="color: grey; font-size: 12px;">失败状态展示</div>;
+								return <div style="color: grey; font-size: 12px;">(非失败状态)</div>;
 							}
 						},
 					},
@@ -144,6 +194,7 @@
 					limit: 20,
 					tasklist_id: '',
 					status: '',
+					task_type: '',
 				},
 				total: 0,
 			};
@@ -152,6 +203,7 @@
 			// 获取私信任务详情
 			async getTaskListDetail(data) {
 				try {
+					this.loading = true
 					const res = await this.$api({
 						type: 'getTaskListDetail',
 						data,
@@ -161,6 +213,9 @@
 					this.total = res.data.count;
 				} catch (error) {
 					console.error(error);
+				} finally {
+					this.loading = false
+					this.btnloading = false
 				}
 			},
 			// 当前页数据条数/页码改变
@@ -181,16 +236,35 @@
 			},
 			// 点击查询按钮
 			searchTasks() {
+				this.btnloading = true;
 				this.page.page = 1;
 				this.page.tasklist_id = this.curId;
 				this.getTaskListDetail(this.page);
+			},
+			// 点击重置
+			btnReset() {
+				this.page = {
+					page: 1,
+					limit: 20,
+					tasklist_id: '',
+					status: '',
+					task_type: '',
+				}
 			},
 		},
 	};
 </script>
 
-<style scoped>
-	.btn.el-button {
-		margin-left: 15px;
+<style lang="stylus" scoped>
+	.tt-accsituation{
+		background-color #fff
+		margin-bottom  20px
+		border-radius 4px
+		padding 0 12px
+		.tt-accsituation--operation{
+			display flex
+			height 70px
+			line-height 70px
+		}
 	}
 </style>
