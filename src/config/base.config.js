@@ -9,7 +9,7 @@ if (process.env.NODE_ENV == "development") {
 }
 export default {
     'BASE_URL': url,
-    'TIMEOUT': 50000,
+    'TIMEOUT': 60000,
     'TOKEN_NAME': 'ua_jot',
     'PUBKEY_NAME': 'ua_publicKay',
     'LIKES_NAME': 'ua_likes'
