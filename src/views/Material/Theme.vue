@@ -39,10 +39,10 @@
 		<el-dialog title="编辑" :visible="contentVisibleUpdate" @close="contentCancelUpdate" width="20%" style="margin-top:20px">
 			<el-input style="width:50%" type="text" v-model="UpdateText" size="mini"></el-input>
 			<el-button style="margin-left:20px" size="mini" @click="btnCancel">取消</el-button>
-			<el-button size="mini" type="primary"  @click="btnOK()">确定</el-button>
+			<el-button  size="mini" type="primary"  @click="btnOK()">确认</el-button>
 		</el-dialog>
 		<!-- 表格 -->
-		<el-dialog title="主图内容列表" :visible="contentVisible" @close="contentCancel" width="30%">
+		<el-dialog title="主题内容列表" :visible="contentVisible" @close="contentCancel" width="30%">
 			<table-custom :loading="loadingList" :tableData="tableDataList" :columns="columnsList"></table-custom>
 		</el-dialog>
 		<!-- 上传弹层 -->
@@ -102,6 +102,7 @@ export default {
 					},
 				},
 			],
+			btnUpdateloading:false,
 			classifytypecontrol_id:"",//获取的数据
 			classifygrouping_id:"",
 			loadingList: false,
@@ -163,12 +164,12 @@ export default {
 			},
 			//确认
 			btnOK(){
-				
-				this.subjectcontentUpdate()	
+				this.btnUpdateloading=true
+				this.subjectcontentUpdate();//修改提交数据
 				setTimeout(() => {
-					this.getNickNameClassify();
-					this.contentVisibleUpdate=false;
-				}, 500);
+				this.getNickNameClassify();//获取当前index
+				this.contentVisibleUpdate=false;
+				}, 50);
 				
 			},
 
@@ -214,19 +215,34 @@ export default {
 				}
 			} catch (error) {
 				console.error(error);
-			} finally {
-		
-			}
+			} 
 		},
 		//删除按钮
 		delete(row){
-			console.log(row)
 			this.subjectcontent_id=row.subjectcontent_id;
-			this.subjectcontentDelete()
-			setTimeout(() => {
+			this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+			let subjectcontentDelete=this.subjectcontentDelete();
+			let getNickNameClassify =setTimeout(() => {
 				this.getNickNameClassify();
-			}, 500);
+			}, 50);
+          this.$message({
+			subjectcontentDelete,
+			getNickNameClassify,
+            type: 'success',
+            message: '删除成功!'
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
 			
+		
 		},
 		async subjectcontentDelete() {
 			try {
@@ -307,12 +323,12 @@ export default {
 
 		// 获取index分类数据
 		async getNickNameClassify() {
+			this.loadingList=true
 			let data = {
 				typecontrol_id:this.classifytypecontrol_id, //点击设备分组的grouping_id
 				grouping: this.classifygrouping_id,//点击分类的typecontrol_id
 			}
 			try {
-				this.loadingList = true;
 				const res = await this.$api({
 					type: 'subjectcontentIndex',
 					data: data
@@ -327,12 +343,12 @@ export default {
 			} finally {
 				this.loadingList = false;
 			}
+			
 		},
 		// 点击查询按钮
 		searchNickName() {
-			let data = this.searchTableData;
-			console.log(data)
 			this.btnloading = true;
+			let data = this.searchTableData;
 			this.subjectcontentListtable2(data);
 			this.btnloading = false;
 		},
