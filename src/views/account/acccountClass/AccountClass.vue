@@ -18,7 +18,7 @@
     <div style="background-color:white; margin: 10px 0 10px 0; padding: 10px;border-radius: 8px">
       <el-button type="primary" @click="dialogNewVisibleadd()"><i class="el-icon-plus"></i>新增</el-button>
       <!-- 新增弹窗 -->
-      <el-dialog title="新增分组" :visible.sync="dialogNewVisible" width="30%">
+      <el-dialog title="新增" :visible.sync="dialogNewVisible" width="30%">
         <div style="margin:0 0 30px 0px">
           <span style="margin-right:10px">设备分组选择:</span>
           <el-cascader :disabled="disabled" :options="options" :props="defaultPropsa" v-model="val"
