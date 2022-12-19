@@ -1,7 +1,7 @@
 <template>
     <div>
         <div style="background-color:white; margin-bottom:10px; padding:10px">
-            <el-button  type="primary" size="mini" @click="dialogVisible = true"><i class="el-icon-plus"></i>添加分组</el-button>
+            <el-button  type="primary"  @click="dialogVisible = true"><i class="el-icon-plus"></i>添加分组</el-button>
             <el-dialog
             title="添加分组"
             :visible.sync="dialogVisible"

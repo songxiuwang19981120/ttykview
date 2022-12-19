@@ -4,20 +4,20 @@
       <div class="tt-accsituation--operation">
         <div style="float:left">
           <span>显示分组：</span>
-          <el-select v-model="equipment" placeholder="请选择分组" style="width:150px; margin-right:20px">
+          <el-select v-model="equipment" placeholder="请选择分组" style="width:150px;">
             <el-option v-for="item in searchEquipentList" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
         </div>
-        <div style="float:left">
-          <span>显示状态：</span>
-          <el-select v-model="equipmentState" placeholder="请选择状态" style="width:150px; margin-right:20px">
+        <div style="float:left;margin-left: 40px;">
+          <span style="width:100px">显示状态：</span>
+          <el-select v-model="equipmentState" placeholder="请选择状态" style="width:150px;">
             <el-option v-for="item in searchEquipentListState" :key="item.value" :label="item.label"
               :value="item.value">
             </el-option>
           </el-select>
         </div>
-        <div style="float:left">
+        <div style="float:left;margin-left: 40px;">
           <el-button type="primary" @click="dialog = true">修改分组</el-button>
           <el-drawer title="修改分组" :before-close="handleClose" :visible.sync="dialog" direction="rtl"
             custom-class="demo-drawer" ref="drawer">
@@ -32,7 +32,7 @@
               </el-form>
               <!-- 更改显示状态的列表 -->
               <table-custom :loading="loading" :tableData="tableData2" :columns="columns2"></table-custom>
-              <div class="tt-equisituationSibmit">
+              <div style="float: right;margin-right: 20px;margin-top: 20px;">
                 <el-button @click="cancelForm">关 闭</el-button>
                 <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading
                     ?
@@ -66,6 +66,7 @@
             </div>
           </el-dialog>
         </div>
+        <div style="clear: both;"></div>
       </div>
     </div>
     <table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
@@ -355,6 +356,7 @@ export default {
         {
           prop: 'abnor',
           label: '账号管理',
+          width:400,
           fiexd: true,
           align: 'center',
           render: (h, { row }) => {
@@ -368,6 +370,7 @@ export default {
                 >
                   <el-button slot="reference" type="danger" size="mini">删除异常账号</el-button>
                 </el-popconfirm>
+                
                 <el-button style="margin-left:20px" type="primary" size="mini" onClick={this.examine.bind(this, row)}>查看详情</el-button>
               </div>
             );
@@ -439,6 +442,7 @@ export default {
     //查看详情
     examine() {
       console.log("查看详情")
+      this.$router.push('/index')
     },
     //dialog弹出框
     handleCloseDialog(done) {
