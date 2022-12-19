@@ -9,7 +9,7 @@
             </el-option>
           </el-select>
         </div>
-        <div style="float:left;margin-left: 40px;">
+        <div style="float:left;margin-left: 80px;">
           <span style="width:100px">显示状态：</span>
           <el-select v-model="equipmentState" placeholder="请选择状态" style="width:150px;">
             <el-option v-for="item in searchEquipentListState" :key="item.value" :label="item.label"
@@ -17,7 +17,7 @@
             </el-option>
           </el-select>
         </div>
-        <div style="float:left;margin-left: 40px;">
+        <div style="float:left;margin-left: 80px;">
           <el-button type="primary" @click="dialog = true">修改分组</el-button>
           <el-drawer title="修改分组" :before-close="handleClose" :visible.sync="dialog" direction="rtl"
             custom-class="demo-drawer" ref="drawer">
@@ -442,7 +442,15 @@ export default {
     //查看详情
     examine() {
       console.log("查看详情")
-      this.$router.push('/index')
+      this.$router.push(
+        {
+    name:  'accsituation',
+    params: {//路由传值
+      id: '001',
+      title: '消息00'
+    },
+  }
+      )
     },
     //dialog弹出框
     handleCloseDialog(done) {
