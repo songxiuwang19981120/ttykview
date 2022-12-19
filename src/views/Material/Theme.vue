@@ -189,7 +189,7 @@ export default {
 		},
 		//修改按钮
 		editBtnB(row){
-			console.log(row);
+			
 			this.contentVisibleUpdate=true;
 			this.UpdateText=row.content;
 			this.subjectcontent_id=row.subjectcontent_id;
@@ -318,7 +318,7 @@ export default {
 			} finally {
 				this.loading = false
 			}
-			console.log(this.searchTableData)
+		
 		},
 
 		// 获取index分类数据
@@ -363,7 +363,7 @@ export default {
 						grouping_id:data.equipment
 					}
 				});
-				console.log(res)
+				
 				this.loading = false
 				if (res.status == 200) {
 					this.tableData = res.data;
@@ -376,7 +376,7 @@ export default {
 				this.loading = false
 			}
 			
-			console.log(this.searchTableData)
+			
 		},
 		
 		// 点击重置按钮
