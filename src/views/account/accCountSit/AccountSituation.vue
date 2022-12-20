@@ -49,18 +49,16 @@
           ></el-option>
         </el-select>
       </el-col>
-
+      
       <el-col :span="7" class="ml-50 tt-accsituation-setid">
         <span class="mr-15">输入ID ：</span>
         <el-input style="width: 48%" placeholder="输入账号ID" v-model="acc_id" clearable>
         </el-input>
       </el-col>
-
       <el-col :span="10" class="searchbtn-group">
         <el-button class="search-btn" @click="handlerSearch" type="primary"
           >搜索</el-button
         >
-
         <el-button class="search-btn" @click="RestQuery" type="primary"
           >重置</el-button
         >
@@ -75,7 +73,7 @@
           @change="openTaskDialog"
           class="tt-accsituation--taskconig"
           v-model="taskConfig"
-          placeholder="已选账号任务配置"
+          :placeholder="isTaskConfigDisabled?'请先选择分组、分类、账号':'选择任务配置'"
         >
           <el-option
             v-for="item in accConfigCloumn"
@@ -156,12 +154,10 @@
       :showBatchEiDialog="showBatchEiDialog"
       :check_all="check_all"
       :typeList="typeList"
-      :groupList="groupList"
       :batchEditorLength="batchEditorLength"
       :accTotal="accTotal"
       :batchEditorList="batchEditorList"
       :materialTotal="materialTotal"
-      :group="group"
       :groupString="groupString"
       :typecontrol_id="this.classiFication[this.classiFication.length - 1]"
     />
@@ -749,20 +745,6 @@ export default {
       });
       return data;
     },
-
-    /*
-        function: getFansList
-        params: null
-        desc: 获取粉丝列表
-    */
-    /*     async getFansList() {
-      try {
-        let result = await this.$api({ type: "getFansList" });
-        this.fans_total = result.data.list;
-      } catch (error) {
-        console.error(error);
-      }
-    }, */
 
     /*
         function: getTypeControlList

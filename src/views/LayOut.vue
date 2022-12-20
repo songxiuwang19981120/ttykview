@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="ttproject-wrap">
     <el-row>
       <el-col :span="3">
         <el-aside class="tt-aside--wrap">
@@ -45,6 +45,8 @@ export default {
 </script>
 
 <style lang="stylus">
+
+
 .tt-aside--wrap {
   width: 100% !important;
 }
