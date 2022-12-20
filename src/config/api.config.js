@@ -340,12 +340,119 @@ export default {
 
 
   'getVistorList': {       //获取用户访问列表数据
-    url: 'Visitorlist/Index',
+    url: 'Visitorlist/index',
     method: 'POST'
   },
 
   'followUser': {    //关注用户接口
-    url: 'Apidata/FollowUser',
+    url: 'apidata/followUser',
+    method: 'POST'
+  },
+
+  'getNickNameClassify': { // 获取昵称分类
+    url: '/Nickname/listtable',
+    method: 'POST'
+  },
+
+  'getAutographClassify': { // 获取签名分类
+    url: '/Autograph/listtable',
+    method: 'POST'
+  },
+
+  'libraryidIndex': {    //获取素材库
+    url: 'Libraryid/index',
+    method: 'POST'
+  },
+
+  'libraryidAdd': {    //新增素材库
+    url: 'Libraryid/add',
+    method: 'POST'
+  },
+
+  'libraryidUpdate': {    //修改素材库
+    url: 'Libraryid/update',
+    method: 'POST'
+  },
+
+  'libraryidDelete': {    //修改素材库
+    url: 'Libraryid/delete',
+    method: 'POST'
+  },
+
+  'testGetRestByKeys': {    //通过链接获取tk信息
+    url: 'Test/getRestByKeys',
+    method: 'POST'
+  },
+
+  'collertionVideo': {   //通过获取到的tk信息传给后端返回
+    url: 'Collection/video',
+    method: 'POST'
+  },
+
+  'uidlibraryAdd': {    //新增素材已有
+    url: 'Uidlibrary/add',
+    method: 'POST'
+  },
+
+  'uidlibraryJsonList': {    //新增素材未有
+    url: 'Uidlibrary/jsonList',
+    method: 'POST'
+  },
+
+  'uidlibraryIndex': {    //获取素材列表
+    url: 'Uidlibrary/index',
+    method: 'POST'
+  },
+
+  'uidlibraryDelete': {    //删除素材
+    url: 'Uidlibrary/delete',
+    method: 'POST'
+  },
+
+  'videocaptureIndex': {    //获取视频素材
+    url: 'Videocapture/index',
+    method: 'POST'
+  },
+
+  'videocaptureDownload': {    //是否下载
+    url: 'Videocapture/Download',
+    method: 'POST'
+  },
+
+  'subjectcontentAdd': { // 主题内容新增
+    url: '/Subjectcontent/add',
+    method: 'POST'
+  },
+
+  'subjectcontentIndex': { // 获取主题内容
+    url: '/Subjectcontent/index',
+    method: 'POST'
+  },
+
+  'subjectcontentListtable': { // 获取素材库
+    url: '/Subjectcontent/listtable',
+    method: 'POST'
+  },
+
+  'subjectcontentUpdate': { // 获取素材库
+    url: '/Subjectcontent/update',
+    method: 'POST'
+  },
+
+  'subjectcontentDelete': { //删除
+    url: 'Subjectcontent/delete',
+    method: 'POST'
+  },
+
+
+
+  'collectionUser': {    //用户采集
+    url: 'Collection/user',
+    method: 'POST'
+  },
+
+  'externalmemberIndex': {    //采集用户首页数据列表
+    url: 'Externalmember/index',
     method: 'POST'
   },
 
@@ -381,16 +488,8 @@ export default {
     url: 'member/BatchUpdateUserData',
     method: 'POST'
   },
-  'getPrivateLetter': { // 获取私信
-    url: '/PrivateLetter/index',
-    method: 'POST',
-  },
   'pushLetter': { //用户发布私信任务配置
     url: 'Push/chat',
-    method: 'POST'
-  },
-  'getTasklist': { // 获取任务
-    url: '/Tasklist/index',
     method: 'POST'
   },
   'pushFollowTask': { //用户关注任务
@@ -400,10 +499,77 @@ export default {
   'pushCommentTask': {  //用户评论点赞任务
     url: 'Push/commentDigg',
     method: 'POST'
-  }
+  },
 
+  'getLabelClassify': { // 获取标签分类
+    url: '/Label/listtable',
+    method: 'POST'
+  },
 
+  //Label   API start
+  'getLabel': { // 获取标签
+    url: '/Label/index',
+    method: 'POST',
+  },
+  'addLabel': { // 新增标签
+    url: '/Label/add',
+    method: 'POST',
+  },
+  'updateLabel': { // 修改标签
+    url: '/Label/update',
+    method: 'POST',
+  },
+  'deleteLabel': { // 删除标签
+    url: '/Label/delete',
+    method: 'POST',
+  },
+  'viewLabel': {
+    url: '/Label/view',
+    method: 'POST',
+  },
+  //Label API end
+
+  // Tasklist API start
+  'getTasklist': { // 获取任务
+    url: '/Tasklist/index',
+    method: 'POST'
+  },
+
+  'getTaskListDetail': { // 获取任务详情
+    url: '/TaskListDetail/index',
+    method: 'POST'
+  },
+
+  // Tasklist API end
+
+  //PrivateLetter   API start
+  'getPrivateLetter': { // 获取私信
+    url: '/PrivateLetter/index',
+    method: 'POST',
+  },
+  'addPrivateLetter': { // 新增私信
+    url: '/PrivateLetter/add',
+    method: 'POST',
+  },
+  'updatePrivateLetter': { // 修改私信
+    url: '/PrivateLetter/update',
+    method: 'POST',
+  },
+  'deletePrivateLetter': { // 删除私信
+    url: '/PrivateLetter/delete',
+    method: 'POST',
+  },
+  'viewPrivateLetter': {
+    url: '/PrivateLetter/view',
+    method: 'POST',
+  },
+  'getPrivateLetterClassify': { // 获取昵称分类
+    url: '/PrivateLetter/listtable',
+    method: 'POST'
+  },
+  //PrivateLetter API end
 }
+
 
 
 

@@ -1,6 +1,44 @@
 <template>
 	<div>
-		<el-dialog :visible="showDialog" @close="btnCancel" width="60%">
+		<el-dialog :visible="showDialog" title="评论区点赞详情" @close="btnCancel" width="66%">
+			<!-- 搜索 -->
+			<div class="tt-accsituation">
+				<div class="tt-accsituation--operation">
+					<div>
+						<span>任务状态：</span>
+						<el-select
+							v-model="page.status"
+							placeholder="请选择任务状态"
+							size="small"
+							style="margin-right: 20px"
+						>
+							<el-option
+								v-for="item in searchStateList"
+								:key="item.value"
+								:label="item.label"
+								:value="item.value"
+							>
+							</el-option>
+						</el-select>
+					</div>
+					<div>
+						<!-- 查询 -->
+						<el-button
+							type="primary"
+							:loading="btnloading"
+							@click="searchTasks"
+							style="margin-right: 20px"
+							size="small"
+							>{{ btnloading ? '加载中...' : '搜索' }}</el-button
+						>
+					</div>
+					<div>
+						<el-button type="primary" :loading="resetloading" @click="btnReset" size="small">{{
+							btnloading ? '加载中...' : '重置'
+						}}</el-button>
+					</div>
+				</div>
+			</div>
 			<!-- 表格 -->
 			<table-custom
 				:mutiSelect="true"
@@ -9,183 +47,116 @@
 				:columns="columns"
 			></table-custom>
 			<!-- 分页 -->
-			<el-row type="flex" justify="end">
-				<pagination
-					:total="total"
-					:page="page.page"
-					:limit="page.limit"
-					@pagination="pageChange"
-				></pagination>
-			</el-row>
+			<pagination
+				:total="total"
+				:page="page.page"
+				:limit="page.limit"
+				@pagination="pageChange"
+			></pagination>
 			<!-- 按钮 -->
-			<el-row type="flex" justify="center">
+			<el-row type="flex" justify="end">
 				<el-button size="small" @click="btnCancel">取消</el-button>
-				<el-button size="small" type="primary" @click="btnCancel">确定</el-button>
+				<!-- <el-button size="small" type="primary" @click="btnCancel">确定</el-button> -->
 			</el-row>
 		</el-dialog>
-		<!-- 日志详情弹层 -->
-		<CommentLikeLogs :showLogsDialog.sync="logsDialog"></CommentLikeLogs>
 	</div>
 </template>
 
 <script>
 	import tableCustom from '@/components/myComponent/table/tableCustom.vue';
 	import pagination from '@/components/myComponent/table/pagination.vue';
-	import CommentLikeLogs from './CommentLikeLogs.vue';
 
 	export default {
 		components: {
 			tableCustom,
 			pagination,
-			CommentLikeLogs,
 		},
 		props: {
 			showDialog: {
 				type: Boolean,
 				default: false,
 			},
+			curId: {
+				type: String,
+			},
 		},
 		data() {
 			return {
-				loading: false,
-				tableData: [
+				// 下拉选择数据
+				searchStateList: [
 					{
-						info: '供应商a',
-						type: '法国/行和/美女/jk',
-						avatar:
-							'https://img2.baidu.com/it/u=2015865969,3401990894&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=546',
-						id: '1212313',
-						op: '1213',
-						cur: '213',
-						fail: '988',
-						uptime: '2022-12-09',
-						cretime: '2022-10-09',
-						status: 'fail',
+						value: '0',
+						label: '成功',
 					},
 					{
-						info: '供应商a',
-						type: '法国/行和/美女/jk',
-						avatar:
-							'https://img2.baidu.com/it/u=2015865969,3401990894&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=546',
-						id: '1212312313',
-						op: '1213',
-						cur: '213',
-						fail: '988',
-						uptime: '2022-12-09',
-						cretime: '2022-10-09',
-						status: 'fail',
+						value: '2',
+						label: '失败',
+					},
+					{
+						value: '1',
+						label: '未开始',
 					},
 				],
+				loading: false,
+				btnloading: false,
+				tableData: [],
 				columns: [
 					{
-						label: '设备信息',
-						minWidth: 120,
+						label: '任务类型',
+						prop: 'task_type',
 						align: 'center',
-						render: (h, { row }) => {
-							return (
-								<div>
-									<el-popover placement="top-start" width="200" trigger="hover">
-										<el-row>设备分组：</el-row>
-										<el-row>设备编号：</el-row>
-										<el-row>设备名称：</el-row>
-										<el-button slot="reference" size="small">
-											设备信息
-										</el-button>
-									</el-popover>
-								</div>
-							);
+						render() {
+							return <div>评论区点赞</div>;
 						},
-					},
-					{
-						label: '账号分类',
-						prop: 'type',
-						minWidth: 150,
-						align: 'center',
-						render: (h, { row }) => {
-							return <div onClick={this.toAccount.bind(this)}>法国/行和/美女/jk</div>;
-						},
-					},
-					{
-						label: '头像',
-						prop: 'avatar',
-						minWidth: 120,
-						align: 'center',
-						render: (h, { row }) => {
-							return (
-								<div>
-									<el-image style="width: 100px; height: 100px" src={row.avatar} fit="contain"></el-image>
-								</div>
-							);
-						},
-					},
-					{
-						label: 'uid',
-						prop: 'id',
-						minWidth: 120,
-						align: 'center',
-						render: (h, { row }) => {
-							return <div onClick={this.toPersonInfo.bind(this)}>43244324</div>;
-						},
-					},
-					{
-						label: '发布数量',
-						prop: 'op',
-						minWidth: 80,
-						align: 'center',
-					},
-					{
-						label: '当前发布量',
-						width: 120,
-						prop: 'cur',
-						minWidth: 80,
-						align: 'center',
-					},
-					{
-						label: '失败次数',
-						prop: 'fail',
-						minWidth: 80,
-						align: 'center',
-					},
-					{
-						label: '更新时间',
-						prop: 'uptime',
-						minWidth: 120,
-						align: 'center',
 					},
 					{
 						label: '创建时间',
-						prop: 'cretime',
-						minWidth: 120,
+						prop: 'create_time',
+						align: 'center',
+					},
+					{
+						label: '领取时间',
+						prop: 'receive_time',
+						align: 'center',
+					},
+					{
+						label: '完成时间',
+						prop: 'complete_time',
 						align: 'center',
 					},
 					{
 						label: '状态',
 						prop: 'status',
-						minWidth: 120,
 						align: 'center',
+						render(h, { row }) {
+							const { status } = row;
+							let state;
+							if (status == 0) {
+								state = '成功';
+							} else if (status == 1) {
+								state = '未开始';
+							} else if (status == 2) {
+								state = '失败';
+							}
+							return <div>{state}</div>;
+						},
 					},
 					{
-						label: '操作',
-						minWidth: 200,
+						label: '失败原因',
+						prop: 'reason',
 						align: 'center',
-						render: () => {
-							return (
-								<div>
-									<el-button
-										type="danger"
-										icon="el-icon-delete"
-										size="mini"
-										onClick={this.delVideoTaskDetails.bind(this)}
-									></el-button>
-									<el-button
-										type="primary"
-										size="mini"
-										onClick={this.toVideoTaskDetails.bind(this)}
-									>
-										日志详情
-									</el-button>
-								</div>
-							);
+						render(h, { row }) {
+							if (
+								row.reason &&
+								JSON.parse(row.reason).detail &&
+								JSON.parse(row.reason).detail.length
+							) {
+								return <div>{JSON.parse(row.reason).detail[0].msg}</div>;
+							} else if (row.status == 2) {
+								return <div>暂无失败原因</div>;
+							} else {
+								return <div style="color: grey; font-size: 12px;">(非失败状态)</div>;
+							}
 						},
 					},
 				],
@@ -193,55 +164,74 @@
 				page: {
 					page: 1,
 					limit: 20,
+					tasklist_id: '',
+					status: '',
 				},
-				total: 1000,
+				total: 0,
+				resetloading: false
 			};
 		},
 		methods: {
-			// 获取视频任务详情
-			async getVideoTaskDetails(data) {
+			// 获取评论区点赞详情
+			async getTaskListDetail(data) {
 				try {
+					this.loading = true;
 					const res = await this.$api({
-						type: 'getVideotaskdetails',
+						type: 'getTaskListDetail',
 						data,
 					});
-					console.log(res, '视频列表详情数据');
-					this.tableDataDialog = res.list;
+					console.log(res, '评论区点赞列表详情数据');
+					this.tableData = res.data.list;
+					this.total = res.data.count;
 				} catch (error) {
 					console.error(error);
+				} finally {
+					this.loading = false;
+					this.btnloading = false;
 				}
-			},
-			// 点击账号分类
-			toAccount() {
-				alert('跳转账号管理页面');
-			},
-			// 点击uid
-			toPersonInfo() {
-				alert('跳转个人信息页面');
-			},
-			// 点击删除按钮
-			async delVideoTaskDetails() {
-				try {
-					await this.$confirm('确定删除吗？');
-					alert('调用删除接口');
-				} catch (error) {
-					this.$message('您已取消该操作');
-				}
-			},
-			// 显示视频日志详情弹层
-			toVideoTaskDetails() {
-				this.logsDialog = true;
 			},
 			// 当前页数据条数/页码改变
 			pageChange(obj) {
 				(this.page.page = obj.page), (this.page.limit = obj.limit);
+				this.page.tasklist_id = this.curId;
+				this.getTaskListDetail(this.page);
 			},
 			// 关闭弹层
 			btnCancel() {
 				this.$emit('update:showDialog', false);
 			},
+			// 点击查询按钮
+			searchTasks() {
+				this.btnloading = true;
+				this.page.page = 1;
+				this.page.tasklist_id = this.curId;
+				this.getTaskListDetail(this.page);
+			},
+			// 点击重置
+			btnReset() {
+				this.resetloading = true
+				this.page = {
+					page: 1,
+					limit: 20,
+					tasklist_id: this.curId,
+					status: '',
+				};
+				this.getTaskListDetail(this.page)
+			},
 		},
 	};
 </script>
 
-<style></style>
+<style scoped lang="stylus">
+	.tt-accsituation{
+		background-color #fff
+		margin-bottom  20px
+		border-radius 4px
+		padding 0 12px
+		.tt-accsituation--operation{
+			display flex
+			height 70px
+			line-height 70px
+		}
+	}
+</style>

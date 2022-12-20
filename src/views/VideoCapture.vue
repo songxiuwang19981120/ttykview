@@ -1,67 +1,81 @@
 <template>
 
-    <div class="VideoCapture">
-
-        <!-- 搜索框 -->
-        <div class="background">
-            <div style="float:left">
-                <div style=" margin-right: 20px; ">
-                        <el-form :model="numberValidateForm" ref="numberValidateForm" class="demo-ruleForm">
-                            <el-form-item label="主页链接:" label-width="100px" style="width:350px;" prop="age" :rules="[
-                                { required: true, message: '请输入内容', trigger: 'blur' },
-                            ]">
-                                <el-input v-model.number="numberValidateForm.age" clearable autocomplete="off"
-                                    placeholder="请输入博主主页链接">
-                                </el-input>
-                            </el-form-item>
-                        </el-form>
-
-                    </div>
+    <div>
+        <div class="tt-accsituation">
+            <div class="tt-accsituation--operation">
+                <el-input  v-model="numberValidateForm.age" placeholder="请输入完整素材链接https://www.tiktok.com/@..." style="width:40%" clearable>
+                    <el-button slot="append" @click="searchLink">获取TT视频</el-button>
+                </el-input>
             </div>
-            <div style="float:left">
-                <span>视频状态：</span>
-                    <el-select v-model="searchTableData.equipment" placeholder="请选择状态"
-                        style="width:150px; margin-right:20px">
-                        <el-option v-for="item in searchEquipentList" :key="item.value" :label="item.label"
-                            :value="item.value">
-                        </el-option>
-                    </el-select>
+        </div>
+        <div class="tt-accsituation">
+            <div class="tt-accsituation--operation">
+                <el-select v-model="searchTableData.equipment" placeholder="请选择状态"
+                    style="width:150px; margin-right:20px">
+                    <el-option v-for="item in searchEquipentList" :key="item.value" :label="item.label"
+                        :value="item.value">
+                    </el-option>
+                </el-select>
+                <el-button type="primary" @click="videocaptureIndex">搜 索</el-button>
+                <el-button type="primary" @click="videocaptureIndexs">重 置</el-button>
             </div>
-            <div style="float:left">
-                <el-button style="" type="primary" icon="el-icon-search"
-                        @click="showBox('numberValidateForm')">获取TT视频</el-button>
+            <div class="tt-accsituation--operation">
+                <el-button  type="primary" :disabled="disableda"
+                @click="transition()">导出下载地址</el-button>
             </div>
-           <div style="clear:both">
-            <el-button style="margin-left:10px;  margin-right: 10px;" type="primary" size="mini"
-                        @click="dialogTableVisible = true" round>导出下载地址</el-button>
-                    <!-- 下载地址弹出框 -->
-                    <el-dialog title="导出下载地址" :visible.sync="dialogTableVisible">
-                        <table-custom style="width:100%; " :tableData="gridData" :columns="columns"></table-custom>
-                        <div slot="footer" class="dialog-footer">
-                            <el-button @click="dialogTableVisible = false">取 消</el-button>
-                            <el-button type="primary" @click="transition()">确 定</el-button>
-                        </div>
-                    </el-dialog>
-           </div>
+        </div>
+  
+        <table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns" @handleSelectionChange="selectionChange"></table-custom>
+        <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination"></pagination>
+        <el-dialog :visible.sync="dialogVisible" width="40%" >
             
-        </div>
-        <!-- v-show显隐 -->
-        <div v-show="tableBox" style="margin-top: 10px;">
-            <!-- 表格 -->
-            <table-custom style="width:100%; " :mutiSelect="true" :loading="loading" :tableData="tableData"
-                :columns="columns" @handleSelectionChange="selectionChange"></table-custom>
-            <!-- 评论弹框 -->
-            <el-dialog :visible.sync="dialogVisible" width="40%">
-                <div v-for="(item, index) of content" :key="index">
-                    <div>{{ item }}</div>
+            <div v-for="(item, index) of CommentLists.list" :key="index" >
+                <div style="margin:0 0 40px 0;height:100%;">
+                    <img :src="item.avatar_medium" style="width:50px; border-radius:25px;float: left;" alt="">
+                    <div style="margin-left: 10px;float: left;width:80%" >
+                        <div style="font-size:24px;color: #999;height: 25px;line-height: 25px;">{{item.nickname}}:</div>
+                        <div style=" float: right;margin-top: 5px;"><i class="el-icon-success"></i>获赞数:{{item.digg_count}}</div>
+                        <div style="font-size:16px;margin-top: 5px;padding-right: 30%;">{{item.text}}</div>
+                        
+                        <div style="font-size:12px;color:#9999;margin-top: 5px;margin-bottom: 10px;">评论时间:{{item.create_time}}</div>
+                        <el-collapse v-model="activeNames" @change="showCommentLists(item)" accordion>
+                            <el-collapse-item :title='"展开"+item.reply_comment_total+"条回复"' :name="item.uid">
+                            
+                                <div style=""
+                            v-for="(item1, index1) of  getCommentListstoo.list"
+                            :key="index1"
+                        > <el-collapse v-model="activeName2" accordion>
+                           
+                            <img :src="item1.avatar_medium" style="width:20px; margin-top: 20px; border-radius:10px;float: left;" alt="">
+                            <div style="margin:20px 0 10px 10px;float: left;width:80%">
+                                <div style="font-size:12px;color: #999;height: 10px;line-height: 10px;">{{item1.nickname}}:</div>
+                                <div style=" font-size: 8px; position: absolute;right: 15%;"><i class="el-icon-success"></i>获赞数:{{item1.digg_count}}</div>
+                                <div style="font-size:8px;margin-top: 5px;margin-left:5px;padding-right: 30%;">{{item1.text}}</div>
+                                <div style="font-size:8px;margin-left:5px;color:#9999;">回复时间:{{item1.create_time}}</div>
+                               <div style="clear:both"></div>
+                           
+                        </div>
+                        </el-collapse>
+                            <div style="clear:both"></div>
+                        </div>
+                            </el-collapse-item>
+                        </el-collapse>
+                      
+                        <!-- 回复 -->
+                        
+                    </div>
                 </div>
-                <pagination :total="total2" :page="current_page2" :size="current_limit2" :limit="10"
-                    @pagination="handlePagination"></pagination>
-            </el-dialog>
-            <!-- 分页 -->
-            <pagination style="" :total="total" :page="current_page" :limit="10" :size="current_limit"
-                @pagination="handlePagination"></pagination>
-        </div>
+                <div style="clear:both"></div>
+                <div>
+                    
+                </div>
+            </div>
+        </el-dialog>
+        <el-dialog :visible.sync="videoPlayDialog" width="50%" :before-close="videoPlayClose">
+            <div style="text-align: center;width:100%">
+                <video autoplay controls loop :src='videoUrl' width="40%"></video>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -77,115 +91,151 @@ export default {
 
     data() {
         return {
+            videoUrl: '',  //播放视频路径
+            videoPlayDialog: false,  //播放视频弹框
+
+           getCommentListstoo:{},
+           activeNames: [],
+           activeName2:[],
+           
+            icon:true,
+            icon2:false,
+            aweme_id:"",
+            CommentLists:[],
+            addtime:"",
+            disableda:false,
+            video_capture_ids:"",
             searchTableData: {
                 equipment: "",//搜索框绑定数据
             },
             searchEquipentList: [
-                { value: "1", label: "已下载" },
-                { value: "2", label: "未下载" },
+                { value: "0", label: "已下载" },
+                { value: "1", label: "未下载" },
             ],//已下载状态
             numberValidateForm: {
                 age: ''
             },//表单校验
             dialogTableVisible: false,//导出
             tableBox: false,//显隐
-            total: 100,  //数据总量
-            current_page: 1, //当前页
+            total: 0,  //数据总量
+            current_page: 0, //当前页
             current_limit: 10, //每页条数
-            total2: 100,  //数据总量2
+            total2: 0,  //数据总量2
             current_page2: 1, //当前页2
             current_limit2: 10, //每页条数2
             tateKey: "",//已下载未下载
             dialogVisible: false,//评论弹框
             inputhttp: "",//搜索输入
-            loading: true,
-            content: "",
+            loading: false,
             gridData: [],
-            tableData: [
-                { content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
-                { content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
-                { content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
-            ],
+            tableData: [],
             columns: [
                 {
-
-                    prop: 'ch',
+                    prop: 'country',
                     label: '国家',
                     fiexd: true,
+                    minWidth: 100,
                     align: 'center',
                 },
                 {
-
-                    prop: 'video',
+                    prop: 'video_url',
                     label: '视频',
-                    minWidth: 50,
-                    maxWidth: 50,
-                    fiexd: true,
+                    minWidth: 120,
                     align: 'center',
-
                     render(h, { row }) {
                         return (
-                            <div>
-                                <img src={row.video} style="height=40px; width=40px"></img>
+                            <div >
+                                <video width="100" height="50" src={row.video_url} class="videosize"></video>
                             </div>
                         )
                     }
                 },
                 {
-                    prop: 'labela',
-                    label: '标签',
-                    fiexd: true,
+                    prop: 'video_desc',
+                    label: '视频描述',
+                    minWidth:250,
                     align: 'center',
                 },
                 {
-                    prop: 'userId',
+                    prop: 'uid',
                     label: '用户ID',
-                    fiexd: true,
+                    minWidth:140,
                     align: 'center',
                 },
                 {
-                    prop: 'videoId',
+                    prop: 'aweme_id',
                     label: '视频ID',
-                    fiexd: true,
+                    minWidth:140,
                     align: 'center',
 
                 },
                 {
-                    prop: 'play',
+                    prop: 'play_count',
                     label: '播放量',
-                    fiexd: true,
+                    minWidth:80,
                     align: 'center',
                 },
                 {
-                    prop: 'comment',
+                    prop: 'comment_count',
                     label: '评论量',
-                    fiexd: true,
+                    minWidth:80,
                     align: 'center',
                     render: (h, { row }) => {
                         return (
                             <div>
-                                <el-button type="primary" size="mini" onClick={this.messageBox.bind(this, row.content)} >{row.comment}</el-button>
+                                <el-button type="primary" size="mini" onClick={this.messageBox.bind(this, row)} >{row.comment_count}</el-button>
                             </div>
                         );
                     },
                 },
                 {
-                    prop: 'like',
+                    prop: 'digg_count',
                     label: '点赞量',
-                    fiexd: true,
                     align: 'center',
+                    minWidth:80,
                 },
                 {
-                    prop: 'Time',
+                    prop: 'addtime',
                     label: '抓取时间',
-                    fiexd: true,
+                    minWidth:120,
                     align: 'center',
+                    render: (h, { row }) => {
+                        return (
+                            <div>
+                                    {row.addtime}
+                            </div>
+                        );
+                    },
                 },
                 {
-                    prop: 'tate',
+                    prop: 'ifvideo',
                     label: '状态',
-                    fiexd: true,
+                    minWidth:80,
                     align: 'center',
+                    render: (h, { row }) => {
+                        return (
+                            <div>
+                            <span  v-show={row.ifvideo=='1'}>未下载</span>
+                            <span  v-show={row.ifvideo=='0'}>已下载</span>
+                            </div>
+                            
+                        );
+                    },
+                },
+                {
+                    prop: 'ifvideo',
+                    label: '操作',
+                    width: 80,
+                    align: 'center',
+                    fiexd: true,
+                    fixed: 'right',
+                    render: (h, { row }) => {
+                        return (
+                            <div>
+                                <el-button style="margin-right:10px" size="mini" type="success" onClick={this.videoPlay.bind(this, row)}>播放</el-button>
+                            </div>
+                        );
+                    },
                 },
 
             ],
@@ -193,10 +243,115 @@ export default {
     },
 
     mounted() {
-
+this.videocaptureIndex()
     },
 
     methods: {
+     //展开评论
+     showCommentLists(item){
+        console.log(item);//当前点击的对象
+            this.icon=!this.icon
+            this.icon2=!this.icon2
+            this.getCommentListstoo=item
+            this.getCommentListstooFn()
+  },
+  //评论回复接口
+  async getCommentListstooFn() {
+            try {
+                let result = await this.$api({ type: "getCommentList", data:
+                {
+                    reply_id:this.getCommentListstoo.cid
+                }});
+                if (result.status == '200') {
+                    this.getCommentListstoo=result.data
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) {
+            }
+        },
+//
+  // 关闭视频播放
+  videoPlayClose() {
+            this.videoUrl = ''
+            this.videoPlayDialog = false
+        },
+        // 打开视频播放
+        videoPlay(row) {
+            this.videoUrl = row.video_url
+            this.videoPlayDialog = true
+        },
+
+        videocaptureIndexs(){
+            this.searchTableData.equipment="";
+            this.videocaptureIndex()
+        } ,
+        async videocaptureIndex() {
+           let data={
+            limit:this.current_limit,
+            page:this.current_page,
+            ifvideo:this.searchTableData.equipment,
+           }
+           this.loading = true
+            let result = await this.$api({ type: "videocaptureIndex", data: data });
+            this.loading = false
+            this.tableData=result.data.list
+            this.total=result.data.count;
+            //日期格式
+            // this.tableData.forEach(item => {
+            //     let time1= item.addtime;
+            //     var time2 = new Date(time1);
+            //     console.log(item.addtime)
+            //     var   year=time2.getFullYear();   
+            //     var   month=time2.getMonth()+1;  
+            //     var   date=time2.getDate();  
+            //     var   hour=time2.getHours();   
+            //     var   minute=time2.getMinutes();    
+            //     var   second=time2.getSeconds();   
+            //     item.addtime=year+"年"+month+"月"+date+"日   "+hour+":"+minute+":"+second;
+            //     console.log(item.addtime)
+            //     return year+"年"+month+"月"+date+"日   "+hour+":"+minute+":"+second
+            // })
+            
+        },
+        // 搜索链接
+        searchLink() {
+            if (this.numberValidateForm.age == '') {
+                this.$message.warning({ message: '请输入查询链接' })
+            } else {
+                this.testGetRestByKeys()
+            }
+        },
+        // 搜索链接,获取tk信息
+        async testGetRestByKeys() {
+            let data = {
+                keyword: this.numberValidateForm.age.replace('https://www.tiktok.com/@', ''),
+            };
+            try {
+                let result = await this.$api({ type: "testGetRestByKeys", data: data });
+                if (result.status == '200') {
+                    let list = result.data[0]
+                    let list1 = []
+                    let list2 = {
+                        uid: list.uid,
+                        sec_uid: list.sec_uid,
+                        unique_id: list.unique_id
+                    }
+                    list1.push(list2)
+                    this.pushs(list1)
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) {
+               
+            }
+        },
+        async pushs(list1) {
+            let list = {
+                data: list1
+            }
+            let result = await this.$api({ type: "collertionVideo", data: list });
+        },
         //导出TXT
         transition() {
             let _self = this;
@@ -204,7 +359,7 @@ export default {
             var title = '已导出下载地址'
             var str = ''
             this.gridData.forEach(item => {
-                str += item.ch + '\r\n'
+                str += item.video_url + '\r\n'
             })
             var allStr = title + '\r\n' + '\r\n' + str
             var export_blob = new Blob([allStr]);
@@ -212,6 +367,27 @@ export default {
             save_link.href = window.URL.createObjectURL(export_blob);
             save_link.download = '下载地址' + '.txt';
             this.fakeClick(save_link);
+      
+            //获取已下载视频地址的video_capture_ids
+            this.gridData.forEach(item => {
+                this.video_capture_ids = this.video_capture_ids+item.video_capture_id+",";
+            })
+            //这里不加定时器的话页面不刷新已下载
+            this.videocaptureDownload()
+            this.disableda=true
+            setTimeout(() => {
+                this.videocaptureIndexs();
+                this.disableda=false
+            }, 1000);
+            
+        },
+        //是否下载
+        async videocaptureDownload() {
+            let result = await this.$api({ 
+                type: "videocaptureDownload", 
+                data: {
+                    video_capture_id:this.video_capture_ids
+                } });
         },
         //导出后格式
         fakeClick(obj) {
@@ -241,54 +417,43 @@ export default {
             let _self = this;
             _self.gridData = val
         },
-
-        //定时器函数加载动画
-        showBox2() {
-            let _self = this;
-            _self.loading = false;
-        },
-        //显隐切换
-        showBox(formName) {
-            //校验
-            this.$refs[formName].validate((valid) => {
-                if (valid) {
-                    let _self = this;
-                    _self.tableBox = true;
-                    if (_self.loading == false) {
-                        _self.loading = true
-                    }
-                    setTimeout(this.showBox2, 1000);
-                } else {
-                    console.log('error submit!!');
-                    return false;
-                }
-            });
-
-            //下面写接口，inputhttp输入框输入的数据,然后重新渲染tabledata
-        },
         /**
            * 翻页回调
            */
         handlePagination(val) {
             this.current_page = val.page;  //页数
             this.current_limit = val.limit  //条数
+            this.videocaptureIndexs()
         },
-        /**
-           * 翻页回调2
-           */
-        handlePagination(val) {
-            this.current_page2 = val.page;  //页数
-            this.current_limit2 = val.limit  //条数
-        },
+
 
 
         //评论弹窗
-        messageBox(content) {
+        messageBox(row) {
             let _self = this;
             _self.dialogVisible = true;
-            _self.content = content
-        },
+            
+            _self.aweme_id=row.aweme_id
+            console.log(_self.aweme_id);
+            _self.CommentLists =[];
+            _self.getCommentLists();
 
+        },
+         //获取评论详情
+      async getCommentLists() {
+            try {
+                let result = await this.$api({ type: "getCommentList", data:
+                {
+                    aweme_id:this.aweme_id
+                }});
+                if (result.status == '200') {
+                    this.CommentLists=result.data
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) {
+            }
+        },
         toggleSelection(rows) {
             if (rows) {
                 rows.forEach(row => {
@@ -301,34 +466,29 @@ export default {
         handleSelectionChange(val) {
             this.multipleSelection = val;
         },
-        // //导出下载地址弹窗
-        // open() {
-        //     this.$prompt('请输入下载地址', '提示', {
-        //         confirmButtonText: '确定',
-        //         cancelButtonText: '取消',
-        //         inputErrorMessage: '邮箱格式不正确'
-        //     }).then(({ value }) => {
-        //         this.$message({
-        //             type: 'success',
-        //             message: '你的下载地址为 ' + value,
-
-        //         });
-        //     }).catch(() => {
-        //         this.$message({
-        //             type: 'info',
-        //             message: '取消导出'
-        //         });
-        //     });
-        // }
+       
     },
 };
 </script>
 
-<style lang="stylus" scoped>
-.background{
-    background-color: white;
-    padding-bottom: 15px;
-    padding-top:10px
+<style scoped>
+.tt-accsituation {
+    background-color: #fff;
+    min-height: 70px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.tt-accsituation--operation {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 10px;
+}
+.videosize {
+    width: 100px;
+    height: 30px;
+   
 }
 
 </style>
