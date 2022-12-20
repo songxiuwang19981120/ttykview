@@ -4,6 +4,9 @@ import router from './router'
 import store from './store'
 import animated from 'animate.css'
 
+
+
+
 import '@/plugin/element.plugin'
 import '@/plugin/http.plugin'
 
