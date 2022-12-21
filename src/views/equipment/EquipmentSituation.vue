@@ -356,7 +356,7 @@ export default {
         {
           prop: 'abnor',
           label: '账号管理',
-          width:400,
+          width: 400,
           fiexd: true,
           align: 'center',
           render: (h, { row }) => {
@@ -370,7 +370,7 @@ export default {
                 >
                   <el-button slot="reference" type="danger" size="mini">删除异常账号</el-button>
                 </el-popconfirm>
-                
+
                 <el-button style="margin-left:20px" type="primary" size="mini" onClick={this.examine.bind(this, row)}>查看详情</el-button>
               </div>
             );
@@ -444,12 +444,12 @@ export default {
       console.log("查看详情")
       this.$router.push(
         {
-    name:  'accsituation',
-    params: {//路由传值
-      id: '001',
-      title: '消息00'
-    },
-  }
+          name: 'accsituation',
+          params: {//路由传值
+            id: '001',
+            title: '消息00'
+          },
+        }
       )
     },
     //dialog弹出框

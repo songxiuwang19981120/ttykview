@@ -7,11 +7,11 @@
             :visible.sync="dialogVisible"
             width="30%"
             :before-close="handleClose">
-            <el-input v-model="input" placeholder="请输入分组名称"></el-input>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-            </span>
+                <el-input v-model="input" placeholder="请输入分组名称"></el-input>
+                    <span slot="footer" class="dialog-footer">
+                        <el-button @click="dialogVisible = false">取 消</el-button>
+                        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+                    </span>
             </el-dialog>
             <el-dialog
             title="编辑分组名称"
@@ -32,7 +32,6 @@
         </div>
     </div>
 </template>
-
 <script>
 import tableCustom from '@/components/myComponent/table/tableCustom.vue';
 import pagination from '@/components/myComponent/table/pagination.vue';
@@ -50,9 +49,9 @@ export default {
             dialogVisible2: false,
             edit:[],//编辑后
             tableData: [
-            { key:1,content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
-                {key:2, content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
-                {key:3, content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
+            {key:1,content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
+            {key:2, content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
+            {key:3, content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
             ],//表格数据
             columns: [
                 {
@@ -107,7 +106,7 @@ export default {
     },
 
     mounted() {
-        
+
     },
 
     methods: {
@@ -144,7 +143,7 @@ export default {
           })
           .catch(_ => {});
       },
-        //关闭
+        //关闭2
         handleClose2(done) {
         this.$confirm('确认关闭？')
           .then(_ => {
