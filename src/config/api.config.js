@@ -446,85 +446,130 @@ export default {
 
 
 
-      'collectionUser':{    //用户采集
-        url:'Collection/user',
-        method:'POST'
-      },
+  'collectionUser': {    //用户采集
+    url: 'Collection/user',
+    method: 'POST'
+  },
 
-      'externalmemberIndex':{    //采集用户首页数据列表
-        url:'Externalmember/index',
-        method:'POST'
-      },
+  'externalmemberIndex': {    //采集用户首页数据列表
+    url: 'Externalmember/index',
+    method: 'POST'
+  },
 
+  'updateUserInfo': {  //修改用户信息
+    url: 'Test/Edituserinfo',
+    method: 'POST'
+  },
 
-      'getLabelClassify': { // 获取标签分类
-        url: '/Label/listtable',
-        method: 'POST'
-      },
+  'getUserRandomInfo': {       //随机获取用户信息
+    url: 'Autograph/RandomData',
+    method: 'POST'
+  },
 
-      //Label   API start
-      'getLabel': { // 获取标签
-        url: '/Label/index',
-        method: 'POST',
-      },
-      'addLabel': { // 新增标签
-        url: '/Label/add',
-        method: 'POST',
-      },
-      'updateLabel': { // 修改标签
-        url: '/Label/update',
-        method: 'POST',
-      },
-      'deleteLabel': { // 删除标签
-        url: '/Label/delete',
-        method: 'POST',
-      },
-      'viewLabel': {
-        url: '/Label/view',
-        method: 'POST',
-      },
-      //Label API end
+  'uploadVideoTask': {   //提交视频配置任务
+    url: 'Push/Video',
+    method: 'POST'
+  },
 
-      // Tasklist API start
-      'getTasklist': { // 获取任务
-        url: '/Tasklist/index',
-        method: 'POST'
-      },
+  'getProjectNum': {   //获取素材数量（批量编辑窗口调用）
+    url: 'Typecontrol/kylistnum',
+    method: 'POST'
+  },
 
-      'getTaskListDetail': { // 获取任务详情
-        url: '/TaskListDetail/index',
-        method: 'POST'
-      },
+  'destroyedUserInfo': {     //销毁素材（编辑账号信息随机获取时调用）
+    url: 'Typecontrol/feedback',
+    method: 'POST'
+  },
+  'setMemberId': {       //设置memberID
+    url: 'member/UpdateMemberTypecontrol',
+    method: 'POST'
+  },
+  'updateUserDate': {    //更新用户数据
+    url: 'member/BatchUpdateUserData',
+    method: 'POST'
+  },
+  'pushLetter': { //用户发布私信任务配置
+    url: 'Push/chat',
+    method: 'POST'
+  },
+  'pushFollowTask': { //用户关注任务
+    url: 'Push/follow',
+    method: 'POST'
+  },
+  'pushCommentTask': {  //用户评论点赞任务
+    url: 'Push/commentDigg',
+    method: 'POST'
+  },
 
-      // Tasklist API end
+  'getLabelClassify': { // 获取标签分类
+    url: '/Label/listtable',
+    method: 'POST'
+  },
 
-      //PrivateLetter   API start
-      'getPrivateLetter': { // 获取私信
-        url: '/PrivateLetter/index',
-        method: 'POST',
-      },
-      'addPrivateLetter': { // 新增私信
-        url: '/PrivateLetter/add',
-        method: 'POST',
-      },
-      'updatePrivateLetter': { // 修改私信
-        url: '/PrivateLetter/update',
-        method: 'POST',
-      },
-      'deletePrivateLetter': { // 删除私信
-        url: '/PrivateLetter/delete',
-        method: 'POST',
-      },
-      'viewPrivateLetter': {
-        url: '/PrivateLetter/view',
-        method: 'POST',
-      },
-      'getPrivateLetterClassify': { // 获取昵称分类
-        url: '/PrivateLetter/listtable',
-        method: 'POST'
-      },
-      //PrivateLetter API end
-  }
+  //Label   API start
+  'getLabel': { // 获取标签
+    url: '/Label/index',
+    method: 'POST',
+  },
+  'addLabel': { // 新增标签
+    url: '/Label/add',
+    method: 'POST',
+  },
+  'updateLabel': { // 修改标签
+    url: '/Label/update',
+    method: 'POST',
+  },
+  'deleteLabel': { // 删除标签
+    url: '/Label/delete',
+    method: 'POST',
+  },
+  'viewLabel': {
+    url: '/Label/view',
+    method: 'POST',
+  },
+  //Label API end
+
+  // Tasklist API start
+  'getTasklist': { // 获取任务
+    url: '/Tasklist/index',
+    method: 'POST'
+  },
+
+  'getTaskListDetail': { // 获取任务详情
+    url: '/TaskListDetail/index',
+    method: 'POST'
+  },
+
+  // Tasklist API end
+
+  //PrivateLetter   API start
+  'getPrivateLetter': { // 获取私信
+    url: '/PrivateLetter/index',
+    method: 'POST',
+  },
+  'addPrivateLetter': { // 新增私信
+    url: '/PrivateLetter/add',
+    method: 'POST',
+  },
+  'updatePrivateLetter': { // 修改私信
+    url: '/PrivateLetter/update',
+    method: 'POST',
+  },
+  'deletePrivateLetter': { // 删除私信
+    url: '/PrivateLetter/delete',
+    method: 'POST',
+  },
+  'viewPrivateLetter': {
+    url: '/PrivateLetter/view',
+    method: 'POST',
+  },
+  'getPrivateLetterClassify': { // 获取昵称分类
+    url: '/PrivateLetter/listtable',
+    method: 'POST'
+  },
+  //PrivateLetter API end
+}
+
 
 
 

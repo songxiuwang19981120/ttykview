@@ -18,27 +18,29 @@
       >
         <el-form-item label="视频发布数量 :" prop="video_num">
           <el-input
-            @blur="test"
             type="text"
             v-model="vieoTaskForm.video_num"
           ></el-input>
         </el-form-item>
-        <el-form-item label="主题标签内容 :" prop="tag_num">
+        <el-form-item label="主题标签内容 :" prop="label_num">
           <el-input
-            v-model="vieoTaskForm.tag_num"
+            v-model="vieoTaskForm.label_num"
             autocomplete="off"
           ></el-input>
         </el-form-item>
         <el-form-item label="@用户数量 :" prop="user_num">
           <el-input v-model="vieoTaskForm.user_num"></el-input>
         </el-form-item>
-        <el-form-item label="主题内容 :" prop="theme_content">
+        <el-form-item label="主题内容 :" prop="text">
           <el-input
+            :disabled="isTextAreaDisabled"
             class="input-textarea"
             type="textarea"
-            v-model="vieoTaskForm.theme_content"
+            v-model="vieoTaskForm.text"
           ></el-input>
-          <el-checkbox v-model="vieoTaskForm.random_content"
+          <el-checkbox
+            :disabled="isRandomTextDisabled"
+            v-model="vieoTaskForm.text_round"
             >随机主题内容</el-checkbox
           >
         </el-form-item>
@@ -53,32 +55,43 @@
 </template>
 
 <script>
+import formRule from "@/config/accountConfig/formRules.config";
+const { video } = formRule;
 export default {
   name: "TtprojectVideoDialog",
   props: {
     showVideoTask: {
       type: Boolean,
     },
+    classiFication: {
+      type: Array,
+    },
+    batchEditorList: {
+      type: Array,
+    },
   },
+  computed: {
+    isRandomTextDisabled() {
+      return this.vieoTaskForm.text.length !== 0;
+    },
+    isTextAreaDisabled() {
+      return this.vieoTaskForm.text_round === true;
+    },
+  },
+
   data() {
     return {
-      rules: {
-        video_num: [
-          {
-            required: true,
-            message: "请填写发布数量",
-            trigger: "blur",
-          },
-        ],
-      },
+      rules: video,
 
       //TODO  需要跟后端对接字段  视频发布任务 提交表单
       vieoTaskForm: {
+        typecontrol_id: "", //分类id
+        uid_list: [], // uid数组
         video_num: "", //视频发布数量
-        tag_num: "", //主题标签内容
+        label_num: "", //主题标签内容
         user_num: "", // @用户数量
-        theme_content: "", //主题内容
-        random_content: false, //如果是随机内容的话为TRUE
+        text: "", //主题内容
+        text_round: false, //如果是随机内容的话为1
       },
     };
   },
@@ -86,9 +99,6 @@ export default {
   mounted() {},
 
   methods: {
-    test() {
-      console.log(123);
-    },
     /* 
         function: handlerClose
         params: null
@@ -96,6 +106,7 @@ export default {
     */
     handlerClose() {
       this.$emit("closeVideoTask");
+      this.resetForm();
     },
 
     /* 
@@ -103,33 +114,51 @@ export default {
         params: null
         desc: 提交后的回调
     */
-    handlerConfrim() {
-      this.$refs["videoForm"].validate((valid) => {
-        if (valid) {
-          console.log("成功");
-          this.handlerClose()
-          console.log(this.vieoTaskForm);
-          this.resetForm()
-          console.log(this.vieoTaskForm);
-          return 
-        }
-        this.$message.error('提交失败')
-      });
+    async handlerConfrim() {
+      try {
+        await this.$refs["videoForm"].validate((valid) => {
+          if (valid) {
+            let userList = this.batchEditorList.map((item) => {
+              return item.uid;
+            });
+            this.vieoTaskForm.typecontrol_id =
+              this.classiFication[this.classiFication.length - 1];
+            this.vieoTaskForm.text_round =
+              this.vieoTaskForm.text_round === true ? 1 : 0;
+            this.vieoTaskForm.uid_list = userList;
+            this.$api({ type: "uploadVideoTask", data: this.vieoTaskForm })
+              .then((res) => {
+                if (res.status == 200) {
+                  this.$message.success(res.msg);
+                  this.handlerClose();
+                  this.resetForm();
+                  return;
+                }
+                this.$message.error(res.msg ?? "未知错误");
+              })
+              .cathch(() => {
+                this.$message.error("未知错误");
+              });
+          }
+        });
+      } catch (error) {
+        console.error(error);
+      }
     },
     /* 
         function: resetForm
         params: null
         desc: 重置表单字段
     */
-    resetForm(){
-      this.$refs['videoForm'].resetFields()
-      this.vieoTaskForm.random_content = false
-    }
+    resetForm() {
+      this.$refs["videoForm"].resetFields();
+      this.vieoTaskForm.random_content = false;
+    },
   },
 };
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .tt-acccountsit--title {
   margin-bottom: 20px;
   font-size: 20px;

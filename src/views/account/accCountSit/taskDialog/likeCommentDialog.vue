@@ -8,7 +8,6 @@
       <span slot="title">
         <h1 class="tt-acccountsit--title">评论区点赞任务配置</h1>
       </span>
-
       <el-form
         :rules="rules"
         ref="likeCommentForm"
@@ -16,10 +15,15 @@
         label-width="216px"
         :model="likeCommentTaskForm"
       >
-        <el-form-item label="选择国家 ：" prop="country" v-model="likeCommentTaskForm.country">
+        <el-form-item
+          label="选择国家 ："
+          prop="account_region"
+          v-model="likeCommentTaskForm.account_region"
+        >
           <el-select
-          clearable
-            v-model="likeCommentTaskForm.country"
+            style="width: 46%"
+            clearable
+            v-model="likeCommentTaskForm.account_region"
             placeholder="选择国家"
           >
             <el-option
@@ -30,106 +34,77 @@
             ></el-option>
           </el-select>
         </el-form-item>
-
         <el-form-item
-        prop="source_data"
+          prop="tasklist_id_list"
           label="选择数据来源 ："
-          v-model="likeCommentTaskForm.source_data"
+          v-model="likeCommentTaskForm.tasklist_id_list"
         >
           <el-select
-          clearable
-            v-model="likeCommentTaskForm.source_data"
+            style="width: 46%"
+            clearable
+            v-model="likeCommentTaskForm.tasklist_id_list"
             placeholder="选择数据来源"
           >
             <el-option
               v-for="item in sourceData"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              :key="item.tasklist_id"
+              :label="item.task_name"
+              :value="item.tasklist_id"
             ></el-option>
           </el-select>
         </el-form-item>
-
-        <el-form-item
-        prop="need_follow_group"
-          label="选择需关注分组 ："
-          v-model="likeCommentTaskForm.need_follow_group"
-        >
-          <el-select
-          clearable
-            v-model="likeCommentTaskForm.need_follow_group"
-            placeholder="需关注分组"
-          >
-            <el-option
-              v-for="item in groupData"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item
-          label="单号作品点赞上限（次）："
-          prop="work_likenum_max"
-        >
+        <el-form-item label="单号点赞上限（次）：" prop="user_digg_upper_limit">
           <el-input
+            style="width: 46%"
             type="text"
-            v-model="likeCommentTaskForm.work_likenum_max"
-            placeholder="输入作品点赞上限"
-          ></el-input>
-        </el-form-item>
-        <el-form-item
-          label="单号点赞上限（次）："
-          prop="acc_likenum_max"
-        >
-          <el-input
-            type="text"
-            v-model="likeCommentTaskForm.acc_likenum_max"
+            v-model="likeCommentTaskForm.user_digg_upper_limit"
             placeholder="输入单号点赞上限 "
           ></el-input>
         </el-form-item>
         <el-form-item
           label="评论获赞小于（次）："
-          prop="comment_likenum_less"
+          prop="comment_digg_count_lower_limit"
         >
           <el-input
+            style="width: 46%"
             type="text"
-            v-model="likeCommentTaskForm.comment_likenum_less"
+            v-model="likeCommentTaskForm.comment_digg_count_lower_limit"
             placeholder="输入评论获赞小于"
           ></el-input>
         </el-form-item>
-        <el-form-item
-          label="连续失败执行下一个号（次）:"
-          prop="continuity_lose"
-        >
+        <el-form-item label="连续失败执行下一个号（次）:" prop="can_fail_num">
           <el-input
+            style="width: 46%"
             type="text"
-            v-model="likeCommentTaskForm.continuity_lose"
+            v-model="likeCommentTaskForm.can_fail_num"
             placeholder="输入连续失败次数"
           ></el-input>
         </el-form-item>
 
-        <div class="tt-acccountsit-liketask--blacklist">
-          <span class="blacklist-label">黑名单：</span>
-          <el-checkbox-group v-model="likeCommentTaskForm.black_list">
+        <el-form-item label="黑名单 :" prop="black_list">
+          <el-checkbox-group
+            style="width: 101%"
+            v-model="likeCommentTaskForm.black_list"
+          >
             <el-checkbox
               v-for="item in blackList"
               :key="item"
               :label="item"
             ></el-checkbox>
           </el-checkbox-group>
-        </div>
-
-        <div>
-          <span>执行端选择：</span>
+        </el-form-item>
+        <el-form-item class="port" label="执行端协议">
           <el-checkbox-group v-model="likeCommentTaskForm.port">
             <el-checkbox label="协议"></el-checkbox>
-            <el-checkbox disabled label="真机"></el-checkbox> <!-- TODO  目前没有真机业务 -->
+            <el-checkbox disabled label="真机"></el-checkbox>
+            <!-- TODO  目前没有真机业务 -->
           </el-checkbox-group>
-        </div>
+        </el-form-item>
+        <!--        <div>
+          <span>执行端选择：</span>
+          
+        </div> -->
       </el-form>
-
       <span slot="footer" class="dialog-footer">
         <el-button @click="handlerClose">取 消</el-button>
         <el-button type="primary" @click="handlerConfrim">确认并执行</el-button>
@@ -139,34 +114,34 @@
 </template>
 
 <script>
+import formRule from "@/config/accountConfig/formRules.config";
+const { likeComment } = formRule;
 export default {
   name: "TtprojectVideoDialog",
   props: {
     showLikeCommentTask: {
       type: Boolean,
     },
+    typecontrol_id: {
+      type: Number,
+    },
+        userIdList:{
+      type:Array
+    },
+        batchEditorList: {
+      type: Array,
+    },
   },
   data() {
     return {
-      rules:{
-        work_likenum_max:[
-        {required: true,message:"请填写点赞上限",trigger: "blur"},
-        { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
-        ],
-        acc_likenum_max:[
-          {required: true,message:"请填写点赞上限",trigger: "blur"},
-          {pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
-        ],
-        continuity_lose:[
-          {required: true,message:"请填写失败次数",trigger: "blur"},
-          {pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
-        ],
-        source_data:[
-          {required: true,message:"请选择数据来源",trigger: "change"}
-        ]
-      },
-      //TODO 黑名单选择  需要跟后端对接
+      rules: likeComment,
       blackList: ["无昵称", "无作品", "无头像", "历史已操作用户"],
+      blackListMap: {
+        无头像: "no_avatar",
+        无作品: "no_aweme",
+        历史已操作用户: "historical_users",
+        无昵称: "no_nickname",
+      },
       //TODO 需关注分组下拉框选择  需要跟后端对接
       groupData: [
         {
@@ -182,26 +157,8 @@ export default {
           label: "美国商城",
         },
       ],
-
       //TODO 数据来源  需要跟后端对接
-      sourceData: [
-        {
-          value: "巴西宠物",
-          label: "巴西宠物",
-        },
-        {
-          value: "美国宠物",
-          label: "美国宠物",
-        },
-        {
-          value: "英国宠物",
-          label: "英国宠物",
-        },
-        {
-          value: "法国宠物",
-          label: "法国宠物",
-        },
-      ],
+      sourceData: [],
       //TODO 国家选择下拉框数据到时候要跟后端对接
       countryOptions: [
         {
@@ -223,22 +180,30 @@ export default {
       ],
       //TODO 字段名称要跟后端协商   视频发布任务 提交表单
       likeCommentTaskForm: {
-        country: "", //选择国家
-        source_data: "", //数据来源
-        need_follow_group: "", //需关注分组
-        work_likenum_max: "", //单号作品点赞上限
-        acc_likenum_max: "", //单号点赞上限
-        comment_likenum_less: "", //评论获赞小于
-        continuity_lose: "", //连续失败执行下一个号
+        account_region: "", //选择国家
+        tasklist_id_list: "", //数据来源
+        user_digg_upper_limit: "", //单号点赞上限
+        comment_digg_count_lower_limit: "", //评论获赞小于
+        can_fail_num: "", //连续失败执行下一个号
         black_list: [], //黑名单
         port: [], //执行端协议
+        typecontrol_id: "",
+        uid_list:'',
       },
     };
   },
 
-  mounted() {},
+  mounted() {
+    this.getTasklist();
+  },
 
   methods: {
+    async getTasklist() {
+      let data = { task_type: "CollectionVideo" };
+      let result = await this.$api({ type: "getTasklist", data });
+      this.sourceData = result.data.list;
+      console.log(result);
+    },
 
     /* 
         function: handlerClose
@@ -247,7 +212,7 @@ export default {
     */
     handlerClose() {
       this.$emit("closeLikeCommentTask");
-      this.resetForm()
+      this.resetForm();
     },
 
     /* 
@@ -255,18 +220,34 @@ export default {
         params: null
         desc: 提交表单
     */
-    handlerConfrim() {
-       this.$refs["likeCommentForm"].validate((valid) => {
-        if (valid) {
-          this.handlerClose()
-          console.log(this.likeCommentTaskForm);
-          this.resetForm()
-          console.log(this.likeCommentTaskForm);
-          this.$message.success('提交成功')
-          return 
-        }
-        this.$message.error('提交失败')
-      });
+    async handlerConfrim() {
+      try {
+        await this.$refs["likeCommentForm"].validate((valid) => {
+          if (valid) {
+            let userList = this.batchEditorList.map((item) => {
+              return item.uid;
+            });
+            this.likeCommentTaskForm.uid_list = userList;
+            this.likeCommentTaskForm.typecontrol_id = this.typecontrol_id;
+            this.likeCommentTaskForm.black_list =
+              this.likeCommentTaskForm.black_list.map((item) => {
+                return this.blackListMap[item];
+              });
+            let result = this.$api({
+              type: "pushCommentTask",
+              data: this.likeCommentTaskForm,
+            });
+            if (result.status == 200) {
+              this.$message.success(result.msg ?? '操作成功');
+              return
+            }
+            this.resetForm();
+            this.handlerClose();
+          }
+        });
+      } catch (error) {
+        console.error(error)
+      }
     },
 
     /* 
@@ -274,14 +255,14 @@ export default {
         params: null
         desc: 重置表单字段
     */
-    resetForm(){
-      this.$refs['likeCommentForm'].resetFields()
-    }
+    resetForm() {
+      this.$refs["likeCommentForm"].resetFields();
+    },
   },
 };
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .tt-acccountsit-liketask--blacklist {
   display: flex;
   justify-content: space-around;
@@ -290,5 +271,10 @@ export default {
   .blacklist-label {
     margin-right: 14px;
   }
+}
+
+.tt-acccountsit--title {
+  margin-bottom: 20px;
+  font-size: 20px;
 }
 </style>
