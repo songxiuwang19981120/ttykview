@@ -79,6 +79,12 @@ const routes = [
         name:'private',
         component:() => import(/* webpackChunkName: "private" */ '@/views/task/PrivateLetter.vue')
       },
+      {
+        path:'/accountcreation',
+        name:'AccountCreation',
+        component:() => import(/* webpackChunkName: "private" */ '@/views/task/AccountCreation.vue')
+      },
+
       //任务管理 end
 
       //素材管理 start

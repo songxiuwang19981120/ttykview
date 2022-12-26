@@ -64,6 +64,12 @@ export default {
                     to: '/private',
                     icon: '',
                 },
+                {
+                    title: '账号创建',
+                    to: '/accountcreation',
+                    icon: '',
+                },
+                
             ]
         },
         {
