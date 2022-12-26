@@ -88,12 +88,7 @@
       >
     </div>
 
-    <transition
-      v-if="memberList.length > 0"
-      enter-active-class="animate__animated animate__fadeIn"
-      appear
-      mode="out-in"
-    >
+
       <table-custom
         class="tt-accsituation--tabel"
         :mutiSelect="true"
@@ -102,9 +97,9 @@
         :tableData="memberList"
         :columns="columns"
       ></table-custom>
-    </transition>
+   
 
-    <el-empty v-else description="暂无内容"></el-empty>
+    
 
     <Pagination
       :total="total"
