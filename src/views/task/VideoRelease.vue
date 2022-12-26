@@ -166,7 +166,6 @@
 						type: 'getTasklist',
 						data,
 					});
-					console.log(res, '视频列表数据');
 					if (res.status == 200) {
 						this.tableData = res.data.list;
 						this.total = res.data.count;

@@ -166,7 +166,6 @@
 						type: 'getTasklist',
 						data,
 					});
-					console.log(res, '私信列表数据');
 					if (res.status == 200) {
 						this.tableData = res.data.list;
 						this.total = res.data.count;

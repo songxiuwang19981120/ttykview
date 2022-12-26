@@ -172,7 +172,7 @@
 			};
 		},
 		methods: {
-			// 获取视频任务详情
+			// 获取关注详情
 			async getTaskListDetail(data) {
 				try {
 					this.loading = true
@@ -180,7 +180,6 @@
 						type: 'getTaskListDetail',
 						data,
 					});
-					console.log(res, '关注详情数据');
 					this.tableData = res.data.list;
 					this.total = res.data.count;
 				} catch (error) {

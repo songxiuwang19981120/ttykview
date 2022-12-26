@@ -72,21 +72,6 @@
 			},
 		},
 		data() {
-			const validateAg = (rule, value, callback) => {
-				let nickNameArr = [];
-				// 处理文本域数据
-				value.split('\n').forEach((item) => {
-					console.log(item.replace(/\s/gi, ''));
-					if (item.replace(/\s/gi, '')) {
-						nickNameArr.push(item.replace(/\s/gi, ''));
-					}
-				});
-				if (nickNameArr.length && nickNameArr[0]) {
-					callback();
-				} else {
-					callback(new Error('签名不能为空'));
-				}
-			};
 			return {
 				searchEquipmentList: [], // 分组数据
 				searchTypecontrolList: [], // 素材库数据
@@ -102,7 +87,6 @@
 				rules: {
 					autograph: [
 						{ required: true, message: '请输入签名', trigger: 'blur' },
-						{ validator: validateAg, trigger: 'blur' },
 					],
 					typecontrol: [{ required: true, message: '请选择素材库', trigger: 'blur' }],
 				},
@@ -118,7 +102,6 @@
 					const res = await this.$api({
 						type: 'getGrouping',
 					});
-					console.log(res, '设备分组名称');
 					if (res.status == 200) {
 						this.searchEquipmentList = res.data.list;
 					} else {
@@ -137,7 +120,6 @@
 					const res = await this.$api({
 						type: 'getTypecontrol',
 					});
-					console.log(res, '素材分类数据');
 					if (res.status == 200) {
 						this.getTreeData(res.data);
 						this.searchTypecontrolList = res.data;
@@ -157,7 +139,6 @@
 						type: 'addAutograph',
 						data,
 					});
-					console.log(res, '新增签名');
 					if (res.status == 200) {
 						this.$message.success(res.msg);
 					} else {
@@ -178,11 +159,9 @@
 			async btnOK() {
 				try {
 					await this.$refs.ruleForm.validate();
-					console.log(this.ruleForm.autograph, '文本域数据');
 					let nickNameArr = [];
 					// 处理文本域数据
 					this.ruleForm.autograph.split('\n').forEach((item) => {
-						console.log(item.replace(/\s/gi, ''));
 						if (item.replace(/\s/gi, '')) {
 							nickNameArr.push(item.replace(/\s/gi, ''));
 						}
@@ -202,7 +181,7 @@
 					this.$emit('update:showDialog', false);
 					this.$parent.getAutographClassify(this.upParameter);
 				} catch (error) {
-					console.log(error);
+					// console.error(error);
 				}
 			},
 			// 处理树型children问题

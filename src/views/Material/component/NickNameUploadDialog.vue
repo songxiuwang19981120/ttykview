@@ -101,7 +101,6 @@
 					const res = await this.$api({
 						type: 'getGrouping',
 					});
-					console.log(res, '设备分组名称');
 					if (res.status == 200) {
 						this.searchEquipmentList = res.data.list;
 					} else {
@@ -120,7 +119,6 @@
 					const res = await this.$api({
 						type: 'getTypecontrol',
 					});
-					console.log(res, '素材分类数据');
 					if (res.status == 200) {
 						this.getTreeData(res.data);
 						this.searchTypecontrolList = res.data;
@@ -140,7 +138,6 @@
 						type: 'addNickName',
 						data,
 					});
-					console.log(res, '新增昵称');
 					if (res.status == 200) {
 						this.$message.success(res.msg);
 					} else {
@@ -161,11 +158,9 @@
 			async btnOK() {
 				try {
 					await this.$refs.ruleForm.validate();
-					console.log(this.ruleForm.nickname, '文本域数据');
 					let nickNameArr = [];
 					// 处理文本域数据
 					this.ruleForm.nickname.split('\n').forEach((item) => {
-						console.log(item.replace(/\s/gi, ''));
 						if (item.replace(/\s/gi, '')) {
 							nickNameArr.push(item.replace(/\s/gi, ''));
 						}
@@ -185,7 +180,7 @@
 					this.$emit('update:showDialog', false);
 					this.$parent.getNickNameClassify(this.upParameter);
 				} catch (error) {
-					console.log(error);
+					// console.error(error);
 				}
 			},
 			// 处理树型children问题

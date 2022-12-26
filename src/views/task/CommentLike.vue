@@ -166,7 +166,6 @@
 						type: 'getTasklist',
 						data,
 					});
-					console.log(res, '评论区点赞数据');
 					if (res.status == 200) {
 						this.tableData = res.data.list;
 						this.total = res.data.count;

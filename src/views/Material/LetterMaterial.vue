@@ -150,7 +150,6 @@
 					const res = await this.$api({
 						type: 'getGrouping',
 					});
-					console.log(res, '设备分组名称');
 					if (res.status == 200) {
 						this.searchEquipmentList = res.data.list;
 					} else {
@@ -169,7 +168,6 @@
 					const res = await this.$api({
 						type: 'getTypecontrol',
 					});
-					console.log(res, '素材分类数据');
 					if (res.status == 200) {
 						this.getTreeData(res.data);
 						this.searchTypecontrolList = res.data;
@@ -190,7 +188,6 @@
 						type: 'getPrivateLetterClassify',
 						data,
 					});
-					console.log(res, '昵称分类列表');
 					if (res.status == 200) {
 						this.tableData = res.data;
 						this.total = res.data.length;
@@ -227,12 +224,9 @@
 					equipment: '',
 					typecontrol: '',
 				};
-				const { equipment, typecontrol } = this.searchTableData;
-				const typecontrol_id = typecontrol.length ? typecontrol[typecontrol.length - 1] : '';
-				const grouping_id = equipment;
 				this.parameterData = {
-					typecontrol_id,
-					grouping_id,
+					typecontrol_id: '',
+					grouping_id: '',
 				};
 				this.getPrivateLetterClassify()
 			},
@@ -245,13 +239,13 @@
 				this.showDetailDialog = true;
 				this.nickData = {
 					typecontrol_id: obj.typecontrol_id,
-					grouping_id: this.searchTableData.equipment,
+					grouping_id: obj.grouping_id
 				};
 				this.$refs.detailDialog.getPrivateLetter({
 					page: 1,
 					limit: 20,
 					typecontrol_id: obj.typecontrol_id,
-					grouping_id: this.searchTableData.equipment,
+					grouping_id: obj.grouping_id
 				});
 			},
 			// 处理树型children问题
