@@ -339,7 +339,6 @@ export default {
                 group: '',  //分组
                 library: '',  //库
             };
-            this.$refs.imgUnload.clearFiles()
             this.imgUploadVisible = true
         },
         /*
