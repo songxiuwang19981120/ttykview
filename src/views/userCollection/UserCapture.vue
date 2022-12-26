@@ -26,7 +26,9 @@
                     </el-checkbox-group>
                 </el-form-item>
                 <el-form-item label="单博主采集上限:" prop="upper_limit">
-                    <el-input-number v-model="configureForm.upper_limit" :min="1"></el-input-number>
+                    <el-input type="number" placeholder="请输入采集上限" v-model="configureForm.upper_limit" min="0">
+                    </el-input>
+                    <!-- <el-input-number v-model="configureForm.upper_limit" :min="1"></el-input-number> -->
                 </el-form-item>
                 <el-form-item label="黑名单:">
                     <el-checkbox-group v-model="configureForm.black_list">
@@ -57,7 +59,8 @@
                 </div>
                 <div>
                     <span style="padding-right:10px;font-size:13px">数据来源:</span>
-                    <el-select v-model="searchData.sources" placeholder="请选择数据来源"  style="width:140px;margin-right: 20px;">
+                    <el-select v-model="searchData.sources" placeholder="请选择数据来源"
+                        style="width:140px;margin-right: 20px;">
                         <el-option v-for="item in collectionContentlist" :key="item.value" :label="item.label"
                             :value="item.value"></el-option>
                     </el-select>
@@ -74,8 +77,10 @@
             </div>
         </div>
         <div>
-            <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true" @handleSelectionChange="selectionChange"></table-custom>
-            <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination"></pagination>
+            <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
+                @handleSelectionChange="selectionChange"></table-custom>
+            <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination">
+            </pagination>
         </div>
     </div>
 </template>
@@ -216,7 +221,10 @@ export default {
                 task_name: [{ required: true, message: '请输入任务名', trigger: 'blur' }],
                 label: [{ required: true, message: '请输入采集的数据标签', trigger: 'blur' }],
                 type_list: [{ required: true, message: '请选择采集内容', trigger: 'blur' }],
-                upper_limit: [{ required: true, message: '请输入单博主采集上限', trigger: 'blur' }],
+                upper_limit: [
+                    { required: true, message: '请输入单博主采集上限', trigger: 'blur' },
+                    { pattern: /^[0-9]*[1-9][0-9]*$/,message:'请输入正整数', trigger: 'blur' }
+                ],
 
             },  //必填校验
             collectionContentlist: [
@@ -299,7 +307,7 @@ export default {
                 this.loading = false
                 if (result.status == '200') {
                     this.tableData = result.data.list
-                    this.total  = result.data.count
+                    this.total = result.data.count
                 } else {
                     this.$message.error({ message: result.msg })
                 }
@@ -392,9 +400,13 @@ export default {
                 this.allSearchList.push(this.testGetRestByKeys(data))
             })
             this.userList = await Promise.all(this.allSearchList)
-            this.collectioning = false
-            this.configureVisible = true
-
+            this.$nextTick(() => {
+                console.log('', this.userList);
+                // if(this.userList.indexOf(undefined)==-1){
+                this.configureVisible = true
+                // }
+                this.collectioning = false
+            })
         },
         // 搜索链接,获取tk信息
         async testGetRestByKeys(data) {

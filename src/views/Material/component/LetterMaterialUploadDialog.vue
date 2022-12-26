@@ -21,13 +21,13 @@
 					</el-option>
 				</el-select>
 			</el-form-item>
-			<el-form-item label="素材库选择：" prop="typecontrol">
+			<el-form-item label="账号分类选择：" prop="typecontrol">
 				<el-cascader
 					clearable
 					:props="{ checkStrictly: true }"
 					:options="searchTypecontrolList"
 					v-model="ruleForm.typecontrol"
-					placeholder="素材库选择"
+					placeholder="账号分类选择"
 					style="margin-right: 20px"
 					@focus="getTypecontrol"
 				></el-cascader>
@@ -86,7 +86,7 @@
 			};
 			return {
 				searchEquipmentList: [], // 分组数据
-				searchTypecontrolList: [], // 素材库数据
+				searchTypecontrolList: [], // 账号分类数据
 				searchTypeList: [
 					{
 						label: '文本话术',
@@ -118,7 +118,7 @@
 					content: [
 						{ required: true, message: '请输入私信', trigger: 'blur' },
 					],
-					typecontrol: [{ required: true, message: '请选择素材库', trigger: 'blur' }],
+					typecontrol: [{ required: true, message: '请选择账号分类', trigger: 'blur' }],
 					type: [{ required: true, message: '请选择私信类型', trigger: 'blur' }],
 				},
 				baseUrl: BASE_URL, // 基地址

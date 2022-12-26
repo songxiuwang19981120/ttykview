@@ -1,5 +1,5 @@
 <template>
-	<el-dialog title="昵称上传" :visible="showDialog" @close="btnCancel">
+	<el-dialog title="主题内容上传" :visible="showDialog" @close="btnCancel">
 		<!-- 新增条件选择 -->
 		<el-form :model="ruleForm" ref="ruleForm" :rules="rules" label-width="120px">
 			<el-form-item label="设备分组选择：" prop="grouping_id">
@@ -7,7 +7,7 @@
 					v-model="ruleForm.grouping_id"
 					placeholder="设备分组选择"
 					style="margin-right: 20px"
-					@focus="getEquipmentGroup"
+					@focus="getEquipmentGroup()"
 					:loading="equipmentLoading"
 					loading-text="数据加载中..."
 					clearable
@@ -33,10 +33,10 @@
 				></el-cascader>
 			</el-form-item>
 			<!-- 添加签名 -->
-			<el-form-item prop="nickname" label="添加昵称：">
+			<el-form-item prop="nickname" label="添加主题内容：">
 				<el-input
 					type="textarea"
-					placeholder="请输入昵称(一行仅限一个)"
+					placeholder="请输入主题内容(一行仅限一个)"
 					rows="6"
 					v-model="ruleForm.nickname"
 					style="width: 60%"
@@ -49,9 +49,7 @@
 		<!-- 按钮 -->
 		<el-row type="flex" justify="end" slot="footer">
 			<el-button size="small" @click="btnCancel">取消</el-button>
-			<el-button type="primary" :loading="btnloading" @click="btnOK">{{
-				btnloading ? '上传中...' : '确定'
-			}}</el-button>
+			<el-button size="small" type="primary" @click="btnOK">确定</el-button>
 		</el-row>
 	</el-dialog>
 </template>
@@ -66,9 +64,6 @@
 			},
 			upParameter: {
 				type: Object,
-			},
-			nnClassifyDate: {
-				type: Array,
 			},
 		},
 		data() {
@@ -85,12 +80,11 @@
 				},
 				rules: {
 					nickname: [
-						{ required: true, message: '请输入昵称', trigger: 'blur' }
+						{ required: true, message: '请输入昵称', trigger: 'blur' },
 					],
 					typecontrol: [{ required: true, message: '请选择账号分类', trigger: 'blur' }],
 				},
 				baseUrl: BASE_URL, // 基地址
-				btnloading: false
 			};
 		},
 		methods: {
@@ -101,6 +95,7 @@
 					const res = await this.$api({
 						type: 'getGrouping',
 					});
+					console.log(res, '设备分组名称');
 					if (res.status == 200) {
 						this.searchEquipmentList = res.data.list;
 					} else {
@@ -111,6 +106,8 @@
 				} finally {
 					this.equipmentLoading = false;
 				}
+			
+	
 			},
 			// 获取素材分类数据
 			async getTypecontrol() {
@@ -119,6 +116,7 @@
 					const res = await this.$api({
 						type: 'getTypecontrol',
 					});
+					console.log(res, '素材分类数据');
 					if (res.status == 200) {
 						this.getTreeData(res.data);
 						this.searchTypecontrolList = res.data;
@@ -135,18 +133,23 @@
 			async addNickName(data) {
 				try {
 					const res = await this.$api({
-						type: 'addNickName',
-						data,
+						type: 'subjectcontentAdd',
+						data:{
+							content:data.nickname,
+							typecontrol_id: data.typecontrol[data.typecontrol.length - 1] ?? "", //点击设备分组的grouping_id
+							grouping:data.grouping_id,//点击分类的typecontrol_id
+						}
 					});
 					if (res.status == 200) {
+						this.$emit('update:showDialog', false);
+						this.$refs.ruleForm.resetFields();
+						this.$parent.getNickNameClassify(this.upParameter);
 						this.$message.success(res.msg);
 					} else {
 						this.$message.error(res.msg);
 					}
 				} catch (error) {
 					console.error(error);
-				} finally {
-					this.btnloading = false
 				}
 			},
 			// 点击取消按钮
@@ -161,26 +164,16 @@
 					let nickNameArr = [];
 					// 处理文本域数据
 					this.ruleForm.nickname.split('\n').forEach((item) => {
+						console.log(item.replace(/\s/gi, ''));
 						if (item.replace(/\s/gi, '')) {
 							nickNameArr.push(item.replace(/\s/gi, ''));
 						}
 					});
-					if (nickNameArr.length && nickNameArr[0]){
-						this.ruleForm.nickname = nickNameArr.join('\n');
-					} else {
-						return this.$message.warning('昵称内容不能为空')
-					}
-					const { typecontrol } = this.ruleForm;
-					this.ruleForm.typecontrol_id = typecontrol.length
-						? typecontrol[typecontrol.length - 1]
-						: '';
+					this.ruleForm.nickname = nickNameArr.join('\n');
 					// 调用新增昵称接口
-					this.btnloading = true
-					await this.addNickName(this.ruleForm);
-					this.$emit('update:showDialog', false);
-					this.$parent.getNickNameClassify(this.upParameter);
+					this.addNickName(this.ruleForm);
 				} catch (error) {
-					// console.error(error);
+					console.log(error);
 				}
 			},
 			// 处理树型children问题
@@ -203,4 +196,12 @@
 		vertical-align middle
 	}
 </style>
-<style scoped></style>
+<style scoped>
+	/* ::v-deep .el-form-item__content {
+		text-align: center !important;
+	} */
+	/* ::v-deep .el-form-item__error {
+		width: 100%;
+		margin-left: 30%;
+	} */
+</style>
