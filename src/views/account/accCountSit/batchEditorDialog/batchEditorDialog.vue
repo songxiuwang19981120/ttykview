@@ -56,9 +56,9 @@ export default {
     check_all: {
       type: Boolean,
     },
-    groupList: {
+/*     groupList: {
       type: Array,
-    },
+    }, */
     typeList: {
       type: Array,
     },
@@ -73,9 +73,6 @@ export default {
     },
     materialTotal: {
       type: Number,
-    },
-    group:{
-      type:String
     },
     groupString:{
       type:String

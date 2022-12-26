@@ -14,13 +14,9 @@
           </el-header>
 
           <el-main class="tt-main">
-            <transition
-              enter-active-class="animate__animated animate__fadeIn"
-              appear
-              mode="out-in"
-            >
+
               <router-view></router-view>
-            </transition>
+           
           </el-main>
         </el-container>
       </el-col>

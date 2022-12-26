@@ -132,9 +132,10 @@ export default {
                   this.$message.success(res.msg);
                   this.handlerClose();
                   this.resetForm();
+                  this.$message.success(res.msg ?? '操作成功')
                   return;
                 }
-                this.$message.error(res.msg ?? "未知错误");
+                this.$message.error(res.msg ?? "操作失败");
               })
               .cathch(() => {
                 this.$message.error("未知错误");

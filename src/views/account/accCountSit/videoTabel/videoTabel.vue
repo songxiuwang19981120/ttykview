@@ -126,6 +126,11 @@ export default {
   mounted() {},
 
   methods: {
+    /* 
+        function: handlerClose
+        params: null
+        desc: 关闭窗口
+    */
     handlerClose() {
       this.$emit("closeVideoTabel");
     },

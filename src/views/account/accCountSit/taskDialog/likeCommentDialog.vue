@@ -125,10 +125,10 @@ export default {
     typecontrol_id: {
       type: Number,
     },
-        userIdList:{
-      type:Array
+    userIdList: {
+      type: Array,
     },
-        batchEditorList: {
+    batchEditorList: {
       type: Array,
     },
   },
@@ -177,7 +177,36 @@ export default {
           value: "俄国",
           label: "俄国",
         },
+        {
+          value: "新加坡",
+          label: "新加坡",
+        },
+        {
+          value: "泰国",
+          label: "泰国",
+        },
+        {
+          value: "菲律宾",
+          label: "菲律宾",
+        },
+        {
+          value: "印度尼西亚",
+          label: "印度尼西亚",
+        },
+        {
+          value: "越南",
+          label: "越南",
+        },
+        {
+          value: "马来西亚",
+          label: "马来西亚",
+        },
+        {
+          value: "巴西",
+          label: "巴西",
+        },
       ],
+      //新加坡，泰国，菲律宾，印度尼西亚，越南，马来西亚，巴西
       //TODO 字段名称要跟后端协商   视频发布任务 提交表单
       likeCommentTaskForm: {
         account_region: "", //选择国家
@@ -188,7 +217,7 @@ export default {
         black_list: [], //黑名单
         port: [], //执行端协议
         typecontrol_id: "",
-        uid_list:'',
+        uid_list: "",
       },
     };
   },
@@ -233,20 +262,21 @@ export default {
               this.likeCommentTaskForm.black_list.map((item) => {
                 return this.blackListMap[item];
               });
-            let result = this.$api({
+            this.$api({
               type: "pushCommentTask",
               data: this.likeCommentTaskForm,
-            });
-            if (result.status == 200) {
-              this.$message.success(result.msg ?? '操作成功');
-              return
-            }
+            }).then((res)=>{
+            this.$message.success(res.msg ?? "操作成功");
             this.resetForm();
             this.handlerClose();
+            return
+            }).catch(()=>{
+              this.$message.error(res.msg ?? "操作失败");
+            })
           }
         });
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
     },
 

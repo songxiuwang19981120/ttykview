@@ -256,6 +256,13 @@ export default {
         fans: "",
         acc_id: "",
       },
+      accStatusMap:{
+        '1':'正常',
+        '0':'封禁',
+        '2':'登出',
+        '2096':'私密账号',
+        '3002290':'个人资料，查看历史记录不可用'
+      },//账号状态
       classiFication: [], //设置分类
       typeList: [], //设置分类options   从接口拿的，动态渲染
       loading: false, //表格懒加载选项
@@ -266,6 +273,7 @@ export default {
           prop: "phone_number",
           label: "设备信息",
           align: "center",
+          width:'160',
           fixed: true,
           render: (h, { row }) => {
             return (
@@ -317,7 +325,7 @@ export default {
           align: "center",
           render: (h, { row }) => {
             return (
-              <div class={row.status === "1" ? "bgcgreen" : "bgcred"}></div>
+              <div class={this.accStatusMap[row.status]}></div>
             );
           },
         },
@@ -388,8 +396,9 @@ export default {
               <div>
                 <el-button
                   size="mini"
-                  type="danger"
+                 type="primary"
                   onClick={this.handleEdit.bind(this, row)}
+
                 >
                   编辑
                 </el-button>
@@ -469,12 +478,13 @@ export default {
         desc: 重置搜索字段
     */
     RestQuery() {
-      (this.classiFication = ""),
-        (this.acc_id = ""),
-        (this.fans = ""),
-        (this.searchForm.grouping_id = "");
-      this.getMemberList();
-      this.$message.success("重置成功");
+      this.classiFication = []
+      this.acc_id = ""
+      this.fans = ""
+      this.searchForm.grouping_id = ""
+      this.group = ''
+      this.getMemberList()
+      this.$message.success("重置成功")
     },
 
     /* 
@@ -497,12 +507,13 @@ export default {
     */
     toogleViewerTabel(val) {
       this.showViewerTabel = !this.showViewerTabel;
-      this.member_id = val.member_id;
-      this.user_id = val.uid;
+      this.member_id = val?.member_id;
+      this.user_id = val?.uid;
       this.getVisitorList({ member_id: this.member_id }).then((res) => {
         this.vistList = res.list;
         this.visterTotal = res.count;
       });
+      this.member_id = ''
     },
 
     /* 
@@ -572,8 +583,8 @@ export default {
       };
       let result = await this.getMemberList(data);
       console.log(result);
-      this.memberList = result.data.list;
-      this.total = result.data.count;
+      this.memberList = result?.data?.list ?? [];
+      this.total = result?.data?.count ?? 0;
     },
 
     /* 
@@ -582,7 +593,7 @@ export default {
         desc: 打开访问人数表格
     */
     handlePagination(val) {
-      this.limit = val.limit;
+      console.log(val)
       this.page = val.page;
       this.getMemberList();
     },
@@ -812,7 +823,7 @@ export default {
         params: val | default
         desc: 分页的回调，设置page为val，当val改变时发起请求，获取数据重新渲染页面
     */
-    async handlerCurrentChange(val) {
+/*     async handlerCurrentChange(val) {
       try {
         this.page = val;
         let result = await this.$api({
@@ -823,7 +834,7 @@ export default {
       } catch (error) {
         console.error(error);
       }
-    },
+    }, */
   },
 };
 </script>

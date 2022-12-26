@@ -163,9 +163,7 @@ export default {
     },
   },
   components: { tableCustom, Pagination },
-  watch: {
 
-  },
   data() {
     return {
       BASE_URL: BASE_URL, //图片BASE地址
@@ -251,12 +249,13 @@ export default {
     handlerClose() {
       this.$emit("closeEditorDialog");
       this.resetForm();
+      this.grouping_id = ''
     },
 
     /* 
-        function: destroyUserInfo
-        params: null
-        desc: 依次销毁用户信息，用于提交表单之后 
+        function: updateInfo
+        params: data | 表单数据
+        desc: 更新用户数据 
     */
     async updateInfo(data = {}) {
       try {
@@ -276,6 +275,19 @@ export default {
         );
       } catch (error) {
         console.error(error);
+      }
+    },
+
+    /* 
+        function: resetDestroyInfo
+        params: nu;;
+        desc: 重置需要摧毁素材数据
+    */
+    resetDestroyInfo(){
+      this.destroyInfo = {
+        nickname_id: "",
+        autograph_id: "",
+        headimage_id: "",
       }
     },
 
@@ -321,7 +333,7 @@ export default {
         });
         let accUpdateForm = Object.entries(this.accUpdateForm).filter(
           (item) => {
-            return item[1] !== "" && item[0] !== "typecontrol_id";
+            return item[1] !== "" && item[0] !== "typecontrol_id"  && item[0] !== "grouping_id";
           }
         );
         let memberInfo = {
@@ -329,16 +341,17 @@ export default {
           grouping_id: this.grouping_id,
           typecontrol_id: typecontrol_id,
         };
-        console.log(typecontrol_id, destroyInfo, accUpdateForm, memberInfo);
-        if (accUpdateForm.length > 0) {
-        }
-        this.updateInfo(Object.fromEntries(accUpdateForm));
-        let result = await Promise.all(
-          this.updateInfo(Object.fromEntries(accUpdateForm)),
-          this.delInfo(Object.fromEntries(destroyInfo)),
-          this.$api({ type: "setMemberId", data: memberInfo })
-        );
-        console.log(result);
+          await this.updateInfo(Object.fromEntries(accUpdateForm)),
+          await this.delInfo(Object.fromEntries(destroyInfo)),
+          await this.$api({ type: "setMemberId", data: memberInfo })
+          this.$message.success('操作成功')
+          this.handlerClose()
+          this.resetDestroyInfo()
+          this.accUpdateForm.avatar_uri = ''
+          this.$nextTick(()=>{
+            this.$parent.updateMemberList()
+          })
+          
       } catch (error) {
         this.$message.error("未知错误");
       }
