@@ -11,9 +11,9 @@
                     </el-select>
                 </div>
                 <div>
-                    <span class="search-title">素材库:</span>
+                    <span class="search-title">账号分类:</span>
                     <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryList"
-                        v-model="searchTableData.library" placeholder="素材库选择"
+                        v-model="searchTableData.library" placeholder="账号分类选择"
                         style="width:180px;margin-right:20px"></el-cascader>
                 </div>
                 <div>
@@ -175,7 +175,7 @@ export default {
             current_limit: 10, //每页条数
             submitting: false,  //提交确定
             groupList: [],  //设备分组
-            libraryList: [],  //素材库
+            libraryList: [],  //账号分类
             searchTableData: {
                 equipment: '',
                 library: '',
@@ -193,6 +193,10 @@ export default {
                 },
             ],  //时间排序
             searchTypeList: [
+                {
+                    value: '',
+                    label: '全部素材'
+                },
                 {
                     value: '0',
                     label: '已用素材'
@@ -237,7 +241,7 @@ export default {
             this.fileList = fileList
         },
         // 视频上传失败回调
-        handleError(err, file, fileList){
+        handleError(err, file, fileList) {
             this.$message.error(err.msg);
         },
         /*
@@ -316,7 +320,7 @@ export default {
         // 视频上传提交
         submitForVideo() {
             if (this.fileList.length == 0) {
-                return this.$message.warning({ message: '请选择需要上传的视频'});
+                return this.$message.warning({ message: '请选择需要上传的视频' });
             }
             this.$refs['videoForm'].validate((valid) => {
                 if (!valid) return false;

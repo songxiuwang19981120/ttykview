@@ -22,12 +22,12 @@
 					</el-select>
 				</div>
 				<div>
-					<span>素材库：</span>
+					<span>账号分类：</span>
 					<el-cascader
 						:props="{ checkStrictly: true }"
 						:options="searchTypecontrolList"
 						v-model="searchTableData.typecontrol"
-						placeholder="素材库选择"
+						placeholder="账号分类选择"
 						style="margin-right: 20px"
 						@focus="getTypecontrol"
 					></el-cascader>
@@ -88,7 +88,7 @@
 		data() {
 			return {
 				searchEquipmentList: [], // 分组数据
-				searchTypecontrolList: [], // 素材库数据
+				searchTypecontrolList: [], // 账号分类数据
 				btnloading: false,
 				searchTableData: {
 					equipment: '',

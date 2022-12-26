@@ -1,178 +1,85 @@
 <template>
   <div class="tt-accsituation" ref="accsituation">
     <div class="tt-accsituation-searchbar">
-      
+
       <div class="tt-accsituation-setgroup">
-        <span class="mr-30">设置分组 ：</span>
-        <el-select ref="gropuSelect"  clearable v-model="group" placeholder="选择分组">
-          <el-option
-          
-            v-for="item in groupList"
-            :value="item.grouping_id"
-            :label="item.grouping_name"
-            :key="item.grouping_id"
-          ></el-option>
+        <span class="mr-30">设备分组 ：</span>
+        <el-select ref="gropuSelect" clearable v-model="group" placeholder="选择分组">
+          <el-option value="" label="全部"></el-option>
+          <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
+            :key="item.grouping_id"></el-option>
         </el-select>
       </div>
 
       <div class="ml-15 tt-accsituation-setgroup">
-        <span class="mr-30">设置分类 ：</span>
-        <el-cascader
-          clearable
-          :props="{ checkStrictly: true, value: 'value' }"
-          :options="typeList"
-          v-model="classiFication"
-          placeholder="选择分类"
-        ></el-cascader>
+        <span class="mr-30">账号分类 ：</span>
+        <el-cascader clearable :props="{ checkStrictly: true, value: 'value' }" :options="typeList"
+          v-model="classiFication" placeholder="选择分类"></el-cascader>
       </div>
 
       <div class="ml-15 tt-accsituation-setfans">
         <span class="mr-30">粉丝量 ：</span>
         <el-select clearable v-model="fans" placeholder="粉丝量">
-          <el-option
-            v-for="item in fans_option"
-            :value="item.value"
-            :label="item.label"
-            :key="item.label"
-          ></el-option>
+          <el-option v-for="item in fans_option" :value="item.value" :label="item.label" :key="item.label"></el-option>
         </el-select>
       </div>
 
       <div class="ml-15 tt-accsituation-setid">
         <span class="mr-30">输入ID ：</span>
-        <el-input
-          placeholder="输入账号ID"
-          v-model="acc_id"
-          clearable
-        >
+        <el-input placeholder="输入账号ID" v-model="acc_id" clearable>
         </el-input>
-      </div> 
+      </div>
 
       <div class="searchbtn-group">
-        <el-button class="search-btn" @click="handlerSearch" type="primary"
-          >搜索</el-button
-        >
+        <el-button class="search-btn" @click="handlerSearch" type="primary">搜索</el-button>
 
-        <el-button class="search-btn" @click="RestQuery" type="primary"
-          >重置</el-button
-        >
+        <el-button class="search-btn" @click="RestQuery" type="primary">重置</el-button>
       </div>
     </div>
 
     <div class="tt-accsituation--settask">
       <div>
         <span class="mr-30">设置任务 ：</span>
-        <el-select
-          :disabled="isTaskConfigDisabled"
-          @change="openTaskDialog"
-          class="tt-accsituation--taskconig"
-          v-model="taskConfig"
-          placeholder="已选账号任务配置"
-        >
-          <el-option
-            v-for="item in accConfigCloumn"
-            :key="item"
-            :label="item"
-            :value="item"
-          ></el-option>
+        <el-select :disabled="isTaskConfigDisabled" @change="openTaskDialog" class="tt-accsituation--taskconig"
+          v-model="taskConfig" placeholder="已选账号任务配置">
+          <el-option v-for="item in accConfigCloumn" :key="item" :label="item" :value="item"></el-option>
         </el-select>
       </div>
-      <el-button @click="batchEditor" class="batchedit-btn" type="primary"
-        >批量编辑</el-button
-      >
+      <el-button @click="batchEditor" class="batchedit-btn" type="primary">批量编辑</el-button>
     </div>
 
-    <transition
-      v-if="memberList.length > 0"
-      appear
-      mode="out-in"
-    >
-      <table-custom
-        class="tt-accsituation--tabel"
-        :mutiSelect="true"
-        @handleSelectionChange="handleSelectChange"
-        :loading="loading"
-        :tableData="memberList"
-        :columns="columns"
-      ></table-custom>
+    <transition v-if="memberList.length > 0" appear mode="out-in">
+      <table-custom class="tt-accsituation--tabel" :mutiSelect="true" @handleSelectionChange="handleSelectChange"
+        :loading="loading" :tableData="memberList" :columns="columns"></table-custom>
     </transition>
 
     <el-empty v-else description="暂无内容"></el-empty>
 
-    <Pagination
-      :total="total"
-      :page="page"
-      :size="limit"
-      @pagination="handlePagination"
-    />
-    <VideoDialog
-      @closeVideoTask="closeVideoTask"
-      :showVideoTask="showVideoTask"
-      :classiFication="classiFication"
-      :batchEditorList="batchEditorList"
-    />
-    <LikeCommentDialog
-      @closeLikeCommentTask="closeLikeCommentTask"
-      :showLikeCommentTask="showLikeCommentTask"
-      :typecontrol_id="this.classiFication[this.classiFication.length - 1]"
-      :userIdList="userIdList"
-      :batchEditorList="batchEditorList"
-    />
-    <LetterDialog
-      @closeLetterTask="closeLetterTask"
-      :showLetterTask="showLetterTask"
-      :typecontrol_id="this.classiFication[this.classiFication.length - 1]"
-      :userIdList="userIdList"
-      :batchEditorList="batchEditorList"
-    />
-    <FollowDialog
-      @closeFollowTask="closeFollowTask"
-      :showFollowDialog="showFollowDialog"
-      :typecontrol_id="this.classiFication[this.classiFication.length - 1]"
-      :userIdList="userIdList"
-      :batchEditorList="batchEditorList"
-    />
-    <EditorDialog
-      @closeEditorDialog="closeEditorDialog"
-      @updateMemberList="updateMemberList"
-      :showEditorDialog="showEditorDialog"
-      :typeList="typeList"
-      :user_id="user_id"
-      :groupList="groupList"
-      :userIdList="userIdList"
-      
-    />
-    <BatchEditorDialog
-      @updateProjectNum="updateProjectNum(arguments)"
-      @closeBatchEidialog="closeBatchEidialog"
-      :showBatchEiDialog="showBatchEiDialog"
-      :check_all="check_all"
-      :typeList="typeList"
-      :groupList="groupList"
-      :batchEditorLength="batchEditorLength"
-      :accTotal="accTotal"
-      :batchEditorList="batchEditorList"
-      :materialTotal="materialTotal"
-      :group="group"
-      :groupString="groupString"
-      :typecontrol_id="this.classiFication[this.classiFication.length - 1]"
-    />
-    <VideoTabel
-      @closeVideoTabel="closeVideoTabel"
-      :shwoVideoTabel="shwoVideoTabel"
-      :videoList="videoList"
-      :videoCount="videoCount"
-      :member_id="member_id"
-    />
-    <ViewerTabel
-      @updateVisitorList="updateVisitorList(arguments)"
-      @toogleViewerTabel="toogleViewerTabel"
-      :showViewerTabel="showViewerTabel"
-      :vistList="vistList"
-      :member_id="member_id"
-      :visterTotal="visterTotal"
-      :user_id="user_id"
-    />
+    <Pagination :total="total" :page="page" :size="limit" @pagination="handlePagination" />
+    <VideoDialog @closeVideoTask="closeVideoTask" :showVideoTask="showVideoTask" :classiFication="classiFication"
+      :batchEditorList="batchEditorList" />
+    <LikeCommentDialog @closeLikeCommentTask="closeLikeCommentTask" :showLikeCommentTask="showLikeCommentTask"
+      :typecontrol_id="this.classiFication[this.classiFication.length - 1]" :userIdList="userIdList"
+      :batchEditorList="batchEditorList" />
+    <LetterDialog @closeLetterTask="closeLetterTask" :showLetterTask="showLetterTask"
+      :typecontrol_id="this.classiFication[this.classiFication.length - 1]" :userIdList="userIdList"
+      :batchEditorList="batchEditorList" />
+    <FollowDialog @closeFollowTask="closeFollowTask" :showFollowDialog="showFollowDialog"
+      :typecontrol_id="this.classiFication[this.classiFication.length - 1]" :userIdList="userIdList"
+      :batchEditorList="batchEditorList" />
+    <EditorDialog @closeEditorDialog="closeEditorDialog" @updateMemberList="updateMemberList"
+      :showEditorDialog="showEditorDialog" :typeList="typeList" :user_id="user_id" :groupList="groupList"
+      :userIdList="userIdList" />
+    <BatchEditorDialog @updateProjectNum="updateProjectNum(arguments)" @closeBatchEidialog="closeBatchEidialog"
+      :showBatchEiDialog="showBatchEiDialog" :check_all="check_all" :typeList="typeList" :groupList="groupList"
+      :batchEditorLength="batchEditorLength" :accTotal="accTotal" :batchEditorList="batchEditorList"
+      :materialTotal="materialTotal" :group="group" :groupString="groupString"
+      :typecontrol_id="this.classiFication[this.classiFication.length - 1]" />
+    <VideoTabel @closeVideoTabel="closeVideoTabel" :shwoVideoTabel="shwoVideoTabel" :videoList="videoList"
+      :videoCount="videoCount" :member_id="member_id" />
+    <ViewerTabel @updateVisitorList="updateVisitorList(arguments)" @toogleViewerTabel="toogleViewerTabel"
+      :showViewerTabel="showViewerTabel" :vistList="vistList" :member_id="member_id" :visterTotal="visterTotal"
+      :user_id="user_id" />
   </div>
 </template>
 
@@ -205,33 +112,33 @@ export default {
     ViewerTabel,
   },
   computed: {
-      batchEditorLength(){
-        return this.batchEditorList.length
-      },
-      accTotal(){
-        return this.check_all === 'true' ? 100 : 0
-      },
-      isTaskConfigDisabled(){
-        return this.classiFication.length === 0 || this.batchEditorList.length === 0
-      }
+    batchEditorLength() {
+      return this.batchEditorList.length
+    },
+    accTotal() {
+      return this.check_all === 'true' ? 100 : 0
+    },
+    isTaskConfigDisabled() {
+      return this.classiFication.length === 0 || this.batchEditorList.length === 0
+    }
   },
-  watch:{
-/*     classiFication(newVal){
-      console.log(newVal)
-      let data = {
-        typecontrol_id : this.classiFication[this.classiFication.length - 1] ?? "",
-        limit:this.limit,
-        page:this.page,
-        
-      }
-      this.getMemberList(data)
-    }, */
-    group(newVal){
-      let arr = Object.entries(this.groupList).find(item=>{
-       return item[1].grouping_id === newVal
+  watch: {
+    /*     classiFication(newVal){
+          console.log(newVal)
+          let data = {
+            typecontrol_id : this.classiFication[this.classiFication.length - 1] ?? "",
+            limit:this.limit,
+            page:this.page,
+            
+          }
+          this.getMemberList(data)
+        }, */
+    group(newVal) {
+      let arr = Object.entries(this.groupList).find(item => {
+        return item[1].grouping_id === newVal
       })
       this.groupString = arr[1].grouping_name
-      console.log(newVal,this.groupString)
+      console.log(newVal, this.groupString)
     }
   },
   data() {
@@ -241,18 +148,18 @@ export default {
       showLikeCommentTask: false, //控制评论点赞任务dialog显示
       showLetterTask: false, //控制评论任务dialog显示
       showFollowDialog: false, //控制关注任务dialog显示
-      searchForm:{
-        grouping_id:'',
-        typecontrol_id:'',
-        uid:'',
-        fans:'',
-        acc_id:''
+      searchForm: {
+        grouping_id: '',
+        typecontrol_id: '',
+        uid: '',
+        fans: '',
+        acc_id: ''
       },
-      classiFication: [], //设置分类
-      typeList: [], //设置分类options   从接口拿的，动态渲染
+      classiFication: [], //账号分类
+      typeList: [], //账号分类options   从接口拿的，动态渲染
       loading: false, //表格懒加载选项
       groupList: [], //分组options
-      columns:  [
+      columns: [
         //表格组件options（包含模板）      用来渲染表格
         {
           prop: "phone_number",
@@ -297,7 +204,7 @@ export default {
           align: "center",
         },
         {
-          prop: "type_title" ,
+          prop: "type_title",
           label: "账号类型",
           width: "160",
           align: "center",
@@ -314,22 +221,22 @@ export default {
           },
         },
         {
-          prop: "signature" ,
+          prop: "signature",
           label: "签名",
           width: "200",
           align: "center",
         },
         {
-          prop: "aweme_count" ,
+          prop: "aweme_count",
           label: "视频数量",
           width: "100",
           align: "center",
           render: (h, { row }) => {
             return (
               <span
-              style="cursor: pointer"
+                style="cursor: pointer"
                 onClick={this.showVideoTabel.bind(this, row)}
-                
+
               >
                 {row.aweme_count}
               </span>
@@ -390,7 +297,7 @@ export default {
             );
           },
         },
-      ], 
+      ],
       acc_id: "", //查询框的账号ID
       fans_option: [
         //粉丝量下拉框options  TODO 数据可能要问后端拿，目前写死了
@@ -412,8 +319,8 @@ export default {
       check_all: "", //是否选择所有账号
       total: 0, //返回的账号总条数
       fans_total: 0, //粉丝总量
-      groupString:'',
-      group: "", //设置分组
+      groupString: '',
+      group: "", //设备分组
       limit: 100, //每页请求数据条数
       showEditorDialog: false, //是否展示编辑按钮界面
       showBatchEiDialog: false, //是否展示批量编辑按钮界面
@@ -425,10 +332,10 @@ export default {
       member_id: "", //用户ID，获取数据用的
       visterTotal: 0, //访问总人数
       user_id: "", //被选中的用户的UID
-      batchEditorList:[], //批量编辑的账号列表
-      materialTotal:0, //素材数量  给批量编辑窗口用的
-      videoCount:0,
-      userIdList:[],//选中用户的UID  组件通信之间会用到
+      batchEditorList: [], //批量编辑的账号列表
+      materialTotal: 0, //素材数量  给批量编辑窗口用的
+      videoCount: 0,
+      userIdList: [],//选中用户的UID  组件通信之间会用到
     };
   },
 
@@ -436,7 +343,7 @@ export default {
     this.getMemberList();
     this.getTypeControlList();
     this.getGroupList();
-   
+
   },
 
   //typecontrol_id 分类ID
@@ -446,7 +353,7 @@ export default {
         params: null
         desc: 刷新界面，用于更新操作之后
     */
-    updateMemberList(){
+    updateMemberList() {
       this.getMemberList()
     },
 
@@ -456,11 +363,11 @@ export default {
         desc: 重置搜索字段
     */
     RestQuery() {
-        this.classiFication = "",
+      this.classiFication = "",
         this.acc_id = "",
         this.fans = "",
         this.searchForm.grouping_id = '';
-        this.getMemberList()
+      this.getMemberList()
       this.$message.success("重置成功");
     },
 
@@ -578,24 +485,24 @@ export default {
     */
     async batchEditor() {
       try {
-      if(this.group.toString().length === 0 ){
-        this.$message.error('请选择分组')
-        return false
-      }
-      if(this.classiFication.length === 0 ){
-        this.$message.error('请选择分类')
-        return false
-      }
-      if(this.batchEditorList.length === 0){
-        this.$message.error('请选择账号')
-        return false
-      }
-      let data = {
-        typecontrol_id: this.classiFication[this.classiFication.length - 1] ?? ""
-      }
-      let result = await this.$api({type:'getProjectNum',data:data})
-      this.materialTotal = result.data.num ?? 0
-      this.showBatchEiDialog = true;
+        if (this.group.toString().length === 0) {
+          this.$message.error('请选择分组')
+          return false
+        }
+        if (this.classiFication.length === 0) {
+          this.$message.error('请选择分类')
+          return false
+        }
+        if (this.batchEditorList.length === 0) {
+          this.$message.error('请选择账号')
+          return false
+        }
+        let data = {
+          typecontrol_id: this.classiFication[this.classiFication.length - 1] ?? ""
+        }
+        let result = await this.$api({ type: 'getProjectNum', data: data })
+        this.materialTotal = result.data.num ?? 0
+        this.showBatchEiDialog = true;
       } catch (error) {
         console.error(error)
       }
@@ -616,8 +523,8 @@ export default {
         params: null
         desc: 获取用户视频列表
     */
-    async getVideoList(data={member_id:'',page:this.page,limit:10}) {
-      let result = await this.$api({type:'getMemberList',data:data})
+    async getVideoList(data = { member_id: '', page: this.page, limit: 10 }) {
+      let result = await this.$api({ type: 'getMemberList', data: data })
       this.videoList = result.data.list ?? [];
       this.videoCount = result.data.count ?? 0;
     },
@@ -627,9 +534,9 @@ export default {
         params: params | arguments
         desc: 更新可用素材，由子组件触发的自定义事件
     */
-    async updateProjectNum(params){
-      let data= {typecontrol_id:params[0]}
-      let result = await this.$api({type:'getProjectNum',data:data})
+    async updateProjectNum(params) {
+      let data = { typecontrol_id: params[0] }
+      let result = await this.$api({ type: 'getProjectNum', data: data })
       this.materialTotal = result.data.num ?? 0
     },
 
@@ -638,7 +545,7 @@ export default {
         params: val | 默认参数，获取相应用户的member_id
         desc: 打开视频表格,并进行后续操作
     */
-    async showVideoTabel(val){
+    async showVideoTabel(val) {
       this.member_id = val.member_id
       this.shwoVideoTabel = true;
       let data = { member_id: val.member_id, page: this.page, limit: 10 };
@@ -693,9 +600,9 @@ export default {
     handleSelectChange(val) {
       this.batchEditorList = val
       val.length === 100 ? this.check_all = true : this.check_all = false
-      this.userIdList = this.batchEditorList.map(item=>{
+      this.userIdList = this.batchEditorList.map(item => {
         return item.uid
-      })   
+      })
     },
 
     /*
@@ -703,10 +610,10 @@ export default {
         params: val | 
         desc: 设置账号任务配置
     */
-     openTaskDialog(val) {
+    openTaskDialog(val) {
       let formType = STATUS_MAP[val];
       this[formType] = true;
-    }, 
+    },
 
     /*
         function: getTreeData
@@ -730,14 +637,14 @@ export default {
         params: null
         desc: 获取粉丝列表
     */
-/*     async getFansList() {
-      try {
-        let result = await this.$api({ type: "getFansList" });
-        this.fans_total = result.data.list;
-      } catch (error) {
-        console.error(error);
-      }
-    }, */
+    /*     async getFansList() {
+          try {
+            let result = await this.$api({ type: "getFansList" });
+            this.fans_total = result.data.list;
+          } catch (error) {
+            console.error(error);
+          }
+        }, */
 
     /*
         function: getTypeControlList
@@ -758,7 +665,7 @@ export default {
         params: null
         desc: 异步获取memberList，页面渲染时调用
     */
-    async getMemberList(data={limit: this.limit, page: this.page }) {
+    async getMemberList(data = { limit: this.limit, page: this.page }) {
       try {
         this.loading = true
         let result = await this.$api({
@@ -790,13 +697,13 @@ export default {
     */
     async handleDelete(row) {
       try {
-            this.$message.success("删除成功");
-            let result = await this.$api({type:'deleteMember',data:{member_ids:row.member_id}})
-            if(result.status == 200){
-              this.$message.success(result.msg ?? '操作成功')
-              return
-            }
-            this.$message.error(result.msg ?? '操作失败')
+        this.$message.success("删除成功");
+        let result = await this.$api({ type: 'deleteMember', data: { member_ids: row.member_id } })
+        if (result.status == 200) {
+          this.$message.success(result.msg ?? '操作成功')
+          return
+        }
+        this.$message.error(result.msg ?? '操作失败')
       } catch (error) {
         console.error(error)
       }
