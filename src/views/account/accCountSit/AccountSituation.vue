@@ -323,7 +323,7 @@ export default {
           align: "center",
           render: (h, { row }) => {
             return (
-              <div class={this.accStatusMap[row.status]}></div>
+              <div>{this.accStatusMap[row.status]}</div>
             );
           },
         },
