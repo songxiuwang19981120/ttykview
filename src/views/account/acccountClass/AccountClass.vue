@@ -11,7 +11,7 @@
 					</el-select>
 
       <span style="margin-right:10px">设备分类选择:</span>
-      <el-cascader :options="options" v-model="val2" style="padding:0" :props="{ checkStrictly: true }">
+      <el-cascader :options="options" v-model="val_Tw" style="padding:0" :props="{ checkStrictly: true }">
         <template slot-scope="{ node, data }">
           <span>
             <span>{{ data.label }}</span>
@@ -38,7 +38,7 @@
         </div>
         <div style="margin:0 0 30px 0px">
           <span style="margin-right:10px">设备分类选择:</span>
-          <el-cascader :disabled="disabled" :options="options2" :props="defaultPropsa" v-model="val"
+          <el-cascader :disabled="disabled" :options="options_tw" :props="defaultPropsa" v-model="val"
             @change="menuchange"><template slot-scope="{ node, data }">
               <span>
                 <span>{{ data.label }}</span>
@@ -63,7 +63,7 @@
       </el-dialog>
     </div>
     <!-- 表格 -->
-    <el-table :data="tableData1" style="width: 100%;border-radius: 8px" row-key="value" lazy :load="load"
+    <el-table :data="tableData_tw_t" style="width: 100%;border-radius: 8px" row-key="value" lazy :load="load"
       :tree-props="{ children: 'children' }">
       <el-table-column prop="label" label="名称" align="center" width="300">
       </el-table-column>
@@ -124,13 +124,12 @@ export default {
       menudata: [],//下拉数据
       val: [],
       vals: [],
-      menudata2: [],
-      val2: [],
-      vals2: [],
-      vals3: [],
+      menudata_t: [],
+      val_Tw: [],
+      vals_tee: [],
+      vals_tree_t: [],
       //新的
       dialogNewVisible: false,//新增的弹窗显隐
-      value3: [],//新增四级下拉
       pid: "",//编辑的pid
       typecontrol_id: "",//修改主键ID
       dialogFormVisible: false,
@@ -138,9 +137,8 @@ export default {
       // page: 1, //当前页
       // limit: 10, //每页条数
       value: [],//联动绑定数据
-      value2: [],//联动数据最后一个
       options: [],//联动的所有数据
-      tableData1: [],//表格数据
+      tableData_tw_t: [],//表格数据
       att: [],//表格数据拷贝用于for循环
       form: {
         name: '',
@@ -148,7 +146,7 @@ export default {
       formNew: {
         name: '',
       },//新增分组名称
-      options2:[],
+      options_tw:[],
 
     }
   },
@@ -171,9 +169,6 @@ export default {
         });
   
         this.options = result.data;
-        this.tableData1 = result.data;
-        this.menudata = result.data;
-        this.menudata2 = result.data;
         this.filterTreeDate(result.data)//联动后方无内容
       } catch (error) {
         console.error(error)
@@ -189,7 +184,7 @@ export default {
           }
         });
         if(result.status == 200){
-            this.options2 = result.data;
+            this.options_tw = result.data;
           this.$nextTick(() => {
             this.filterTreeDate(result.data)//联动后方无内容
 
@@ -221,7 +216,7 @@ export default {
 		},
     //重置按钮
     FnNewzh() {
-      this.val2 = [];
+      this.val_Tw = [];
       this.searchTableData={}
       this.Typecontrol()
     },
@@ -258,9 +253,9 @@ export default {
     //联动change事件
     menuchange() {
       this.vals = this.getCascaderObj(this.val, this.menudata); //选中节点数据
-      this.vals3 = [];
-      this.vals3.push(this.vals[this.vals.length - 1])
-      this.pid = this.vals3[0].typecontrol_id
+      this.vals_tree_t = [];
+      this.vals_tree_t.push(this.vals[this.vals.length - 1])
+      this.pid = this.vals_tree_t[0].typecontrol_id
     },
     //新增按钮确认
     async TypecontrolAdd() {
@@ -302,8 +297,8 @@ export default {
       this.pid = ""
     },
     //四级联动点完后的事件
-    getCascaderObj2(val2, opt2) {
-      return val2.map(function (value, index, array) {
+    getCascaderObj2(val_Tw, opt2) {
+      return val_Tw.map(function (value, index, array) {
         for (var itm of opt2) {
           if (itm.value == value) {
             opt2 = itm.children;
@@ -314,11 +309,11 @@ export default {
       });
     },
     handleChange2() {
-      this.vals2 = this.getCascaderObj2(this.val2, this.menudata2); //选中节点数据 
-      this.tableData1 = [];
-      this.vals2.forEach(item => {
+      this.vals_tee = this.getCascaderObj2(this.val_Tw, this.menudata_t); //选中节点数据 
+      this.tableData_tw_t = [];
+      this.vals_tee.forEach(item => {
         if (item.grouping_id==this.searchTableData.equipment) {
-          this.tableData1.push(this.vals2[this.vals2.length - 1])//手动筛选只有使用分类没有分组
+          this.tableData_tw_t.push(this.vals_tee[this.vals_tee.length - 1])//手动筛选只有使用分类没有分组
         } 
       })
       
@@ -342,9 +337,9 @@ export default {
           type: "getTypecontrol",
         });
         this.options = result.data;
-        this.tableData1 = result.data;
+        this.tableData_tw_t = result.data;
         this.menudata = result.data;
-        this.menudata2 = result.data;
+        this.menudata_t = result.data;
         this.filterTreeDate(result.data)//联动后方无内容
       } catch (error) {
         console.error(error)
