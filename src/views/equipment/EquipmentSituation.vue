@@ -31,7 +31,7 @@
                 </el-form-item>
               </el-form>
               <!-- 更改显示状态的列表 -->
-              <table-custom :loading="loading" :tableData="tableData2" :columns="columns2"></table-custom>
+              <table-custom :loading="loading" :tableData="tableData2" :columns="columns_T"></table-custom>
               <div style="float: right;margin-right: 20px;margin-top: 20px;">
                 <el-button @click="cancelForm">关 闭</el-button>
                 <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading
@@ -403,7 +403,7 @@ export default {
       ],  //表格
       tableData2: [
       ],//抽屉中的数据
-      columns2: [{
+      columns_T: [{
 
         prop: 'num',
         label: '设备编号',

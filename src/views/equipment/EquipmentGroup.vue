@@ -62,9 +62,6 @@ export default {
                 grouping_id:'',
             },
             dialogVisible: false,
-            input2: { labela: "" },
-            dialogVisible2: false,
-            edit: [],//编辑后
             tableData: [],//表格数据
             columns: [
                 {
