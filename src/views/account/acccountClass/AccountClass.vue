@@ -1,8 +1,16 @@
 <template>
   <div class="AccountClass">
     <div style="background-color:white;padding:10px;border-radius: 8px">
-      <span style="margin-right:10px">设备分组选择:</span>
+      
+      <span>设备分组选择：</span>
+					<el-select v-model="searchTableData.equipment" placeholder="设备分组选择" style="margin-right: 20px"
+						@change="getEquipmentGroup" :loading="equipmentLoading" loading-text="数据加载中...">
+						<el-option v-for="item in searchEquipmentList" :key="item.grouping_id"
+							:label="item.grouping_name" :value="item.grouping_id">
+						</el-option>
+					</el-select>
 
+      <span style="margin-right:10px">设备分类选择:</span>
       <el-cascader :options="options" v-model="val2" style="padding:0" :props="{ checkStrictly: true }">
         <template slot-scope="{ node, data }">
           <span>
@@ -19,9 +27,18 @@
       <el-button type="primary" @click="dialogNewVisibleadd()"><i class="el-icon-plus"></i>新增</el-button>
       <!-- 新增弹窗 -->
       <el-dialog title="新增" :visible.sync="dialogNewVisible" width="30%">
+        <div  style="margin-bottom:30px">
+        <span>设备分组选择：</span>
+					<el-select v-model="searchTableData1.equipment" placeholder="设备分组选择" style="margin-right: 20px"
+						@change="getEquipmentGroupAdd" >
+						<el-option v-for="item in searchEquipmentList" :key="item.grouping_id"
+							:label="item.grouping_name" :value="item.grouping_id">
+						</el-option>
+					</el-select>
+        </div>
         <div style="margin:0 0 30px 0px">
-          <span style="margin-right:10px">设备分组选择:</span>
-          <el-cascader :disabled="disabled" :options="options" :props="defaultPropsa" v-model="val"
+          <span style="margin-right:10px">设备分类选择:</span>
+          <el-cascader :disabled="disabled" :options="options2" :props="defaultPropsa" v-model="val"
             @change="menuchange"><template slot-scope="{ node, data }">
               <span>
                 <span>{{ data.label }}</span>
@@ -34,12 +51,12 @@
           </span>
         </div>
         <el-form :model="formNew">
-          <el-form-item label="新增分组名称:" label-width="100px">
+          <el-form-item label="新增分类名称:" label-width="100px">
             <el-input v-model="formNew.name" style="width:300px" autocomplete="off"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button  @click="dialogNewVisible = false">取 消</el-button>
+          <el-button  @click="closeadd()">取 消</el-button>
           <el-button type="primary" @click="TypecontrolAdd()">确 定</el-button>
         </div>
 
@@ -91,6 +108,14 @@ export default {
   components: { pagination },
   data() {
     return {
+      searchEquipmentList:[],
+      equipmentLoading:false,
+      searchTableData:{
+        equipment:""
+      },//设备分组选择
+      searchTableData1:{
+        equipment:""
+      },
       checked: false,//是否添加根目录
       disabled: false,//新增下拉是否禁用
       defaultPropsa: {
@@ -122,20 +147,85 @@ export default {
       },
       formNew: {
         name: '',
-      }//新增分组名称
+      },//新增分组名称
+      options2:[],
 
     }
   },
   mounted() {
     this.Typecontrol();//联动数据
+    this.getEquipmentGroup2();
   },
 
   methods: {
+    
+    //查询
+    async getEquipmentGroup(){
+      this.getEquipmentGroup2();
+      try {
+        let result = await this.$api({
+          type: "getTypecontrol",
+          data:{
+            grouping_id:this.searchTableData.equipment
+          }
+        });
+  
+        this.options = result.data;
+        this.tableData1 = result.data;
+        this.menudata = result.data;
+        this.menudata2 = result.data;
+        this.filterTreeDate(result.data)//联动后方无内容
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    //查询
+    async getEquipmentGroupAdd(){
+      try {
+        let result = await this.$api({
+          type: "getTypecontrol",
+          data:{
+            grouping_id:this.searchTableData1.equipment
+          }
+        });
+        if(result.status == 200){
+            this.options2 = result.data;
+          this.$nextTick(() => {
+            this.filterTreeDate(result.data)//联动后方无内容
+
+          })
+        
+        }
+     
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    		// 获取设备分组数据
+		async getEquipmentGroup2() {
+			try {
+				this.equipmentLoading = true;
+				const res = await this.$api({
+					type: 'getGrouping',
+				});
+				if (res.status == 200) {
+					this.searchEquipmentList = res.data.list;
+				} else {
+					this.$message.error(res.msg);
+				}
+			} catch (error) {
+				console.error(error);
+			} finally {
+				this.equipmentLoading = false;
+			}
+		},
     //重置按钮
     FnNewzh() {
       this.val2 = [];
+      this.searchTableData={}
       this.Typecontrol()
     },
+  
     //新增按钮打开
     dialogNewVisibleadd() {
       this.dialogNewVisible = true;
@@ -168,7 +258,6 @@ export default {
     //联动change事件
     menuchange() {
       this.vals = this.getCascaderObj(this.val, this.menudata); //选中节点数据
-      console.log(this.vals)
       this.vals3 = [];
       this.vals3.push(this.vals[this.vals.length - 1])
       this.pid = this.vals3[0].typecontrol_id
@@ -180,7 +269,8 @@ export default {
           type: "addTypecontrol",
           data: {
             type_title: this.formNew.name,
-            pid: this.pid
+            pid: this.pid,
+            grouping_id:this.searchTableData1.equipment
           },
         });
         if (result.status == '200') {
@@ -198,7 +288,18 @@ export default {
       this.disabled = false;
       this.formNew.name = ""
       this.pid = ""
+      this.searchTableData1.equipment=""
 
+    },
+    closeadd(){
+      this.dialogNewVisible = false
+      this.searchTableData1.equipment=""
+      this.Typecontrol()
+      this.dialogNewVisible = false
+      this.checked = false;
+      this.disabled = false;
+      this.formNew.name = ""
+      this.pid = ""
     },
     //四级联动点完后的事件
     getCascaderObj2(val2, opt2) {
@@ -213,21 +314,26 @@ export default {
       });
     },
     handleChange2() {
-      this.vals2 = this.getCascaderObj2(this.val2, this.menudata2); //选中节点数据
-      console.log(this.vals2);
-      console.log(this.vals2[this.vals2.length - 1]);
+      this.vals2 = this.getCascaderObj2(this.val2, this.menudata2); //选中节点数据 
       this.tableData1 = [];
-      this.tableData1.push(this.vals2[this.vals2.length - 1])
+      this.vals2.forEach(item => {
+        if (item.grouping_id==this.searchTableData.equipment) {
+          this.tableData1.push(this.vals2[this.vals2.length - 1])//手动筛选只有使用分类没有分组
+        } 
+      })
+      
     },
     //关闭联动后方无内容
     filterTreeDate(arr) {
-      arr.forEach(item => {
+      if(arr){
+        arr.forEach(item => {
         if (!item.children.length) {
           item.children = undefined
         } else {
           this.filterTreeDate(item.children)
         }
       })
+      }
     },
     //四级联动数据
     async Typecontrol() {
@@ -239,7 +345,6 @@ export default {
         this.tableData1 = result.data;
         this.menudata = result.data;
         this.menudata2 = result.data;
-        console.log(result)
         this.filterTreeDate(result.data)//联动后方无内容
       } catch (error) {
         console.error(error)
@@ -274,7 +379,6 @@ export default {
     },
     //删除接口
     async leDelete(index, row) {
-      console.log(index, row);
       try {
         let result = await this.$api({
           type: "deleteTypecontrol",
@@ -289,7 +393,6 @@ export default {
     },
     //提交修改
     async edit() {
-      console.log(this.form.name)
       this.dialogFormVisible = false;
       try {
         let result = await this.$api({
@@ -300,7 +403,6 @@ export default {
             pid: this.pid
           },
         });
-        console.log(result)
         this.Typecontrol()
       } catch (error) {
         console.error(error);
@@ -308,35 +410,10 @@ export default {
     },
     //表格树形等待需要的话加入load
     load(tree, treeNode, resolve) {
-      console.log(tree)
       setTimeout(() => {
         resolve(tree.children)
       }, 100)
     },
-
-    /**
-//  * 翻页回调
-//  */
-
-    //     async handlePagination(val) {
-    //       try {
-    //         console.log(val)
-    //         this.page = val.page;
-    //         this.limit = val.limit
-    //         let result = await this.$api({
-    //           type: "getTypecontrol",
-    //           data: { page: this.page,
-    //           limit:this.limit,
-    //           },
-    //         });
-    //         console.log(result)
-    //         this.tableData1=result.data
-    //       } catch (error) {
-    //         console.error(error);
-    //       }
-    //     },
-
-
   },
 };
 </script>

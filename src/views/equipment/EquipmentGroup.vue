@@ -1,35 +1,44 @@
 <template>
     <div>
         <div style="background-color:white; margin-bottom:10px; padding:10px">
-            <el-button  type="primary"  @click="dialogVisible = true"><i class="el-icon-plus"></i>添加分组</el-button>
-            <el-dialog
-            title="添加分组"
-            :visible.sync="dialogVisible"
-            width="30%"
-            :before-close="handleClose">
-                <el-input v-model="input" placeholder="请输入分组名称"></el-input>
-                    <span slot="footer" class="dialog-footer">
-                        <el-button @click="dialogVisible = false">取 消</el-button>
-                        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-                    </span>
-            </el-dialog>
-            <el-dialog
-            title="编辑分组名称"
-            :visible.sync="dialogVisible2"
-            width="30%"
-            :before-close="handleClose2">
-            <el-input v-model="input2.labela" placeholder="请输入分组名称"></el-input>
-            <span slot="footer">
-                <el-button @click="dialogVisible2 = false">关 闭</el-button>
-                <el-button type="primary" @click="sibmit()">确 定</el-button>
+            <el-button type="primary" @click="dialogVisible = true"><i class="el-icon-plus"></i>添加分组</el-button>
+        </div>
+
+
+
+        <el-dialog title="添加分组" :visible.sync="dialogVisible" width="40%" :before-close="addhandleClose">
+            <el-form ref="form" :rules="addRules" :model="addform" label-width="140px">
+                <el-form-item label="分组名称:" prop="grouping_name">
+                    <el-input v-model="addform.grouping_name" placeholder="请输入分组名称" style="width:60%"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="addhandleClose">取 消</el-button>
+                <el-button type="primary" :loading="submitting" @click="addSubmitForm">{{ submitting ? '提交中 ...' : '确 定'
+                }}</el-button>
             </span>
-            </el-dialog>
-          
-        </div>
-        <div>
-            <table-custom style="width:100%" :tableData="tableData" :columns="columns"></table-custom>
-            <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination"></pagination>
-        </div>
+        </el-dialog>
+
+
+
+        <el-dialog title="编辑分组名称" :visible.sync="exitDialogVisible" width="40%" :before-close="exithandleClose">
+            <el-form ref="form" :rules="exitRules" :model="exitform" label-width="140px">
+                <el-form-item label="分组名称:" prop="grouping_name">
+                    <el-input v-model="exitform.grouping_name" placeholder="请输入分组名称" style="width:60%"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="exithandleClose">取 消</el-button>
+                <el-button type="primary" :loading="submitting" @click="exitSubmitForm">{{ submitting ? '提交中 ...' : '确 定'
+                }}</el-button>
+            </span>
+        </el-dialog>
+
+
+
+        <table-custom style="width:100%" :tableData="tableData" :columns="columns"></table-custom>
+        <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination">
+        </pagination>
     </div>
 </template>
 <script>
@@ -43,33 +52,37 @@ export default {
     },
     data() {
         return {
-            input:"",
+            submitting:false,
+            exitDialogVisible:false,
+            addform:{
+                grouping_name:''
+            },
+            exitform:{
+                grouping_name:'',
+                grouping_id:'',
+            },
             dialogVisible: false,
-            input2:{labela:""},
+            input2: { labela: "" },
             dialogVisible2: false,
-            edit:[],//编辑后
-            tableData: [
-            {key:1,content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
-            {key:2, content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
-            {key:3, content: ["123", "12", "1"], ch: "中国", video: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", labela: "标签", userId: "用户ID", videoId: "视频ID", play: "播放量", comment: "评论量", like: "点赞量", Time: "抓取时间", tate: "已下载", tateKey: true },
-            ],//表格数据
+            edit: [],//编辑后
+            tableData: [],//表格数据
             columns: [
                 {
-                    prop: 'labela',
+                    prop: 'grouping_name',
                     label: '分组名称',
                     fiexd: true,
                     align: 'center',
-                    render: (h, { row }) => {
-                        return (
-                            <div>
-                                <el-button type="primary" plain size="mini">{row.labela}</el-button>
-                            </div>
-                        );
-                    },
+                    // render: (h, { row }) => {
+                    //     return (
+                    //         <div>
+                    //             <el-button type="primary" plain size="mini">{row.grouping_name}</el-button>
+                    //         </div>
+                    //     );
+                    // },
                 },
                 {
-                    prop: 'ch',
-                    label: '账号数量',
+                    prop: 'add_time',
+                    label: '时间',
                     fiexd: true,
                     align: 'center',
                 },
@@ -82,79 +95,139 @@ export default {
                         return (
                             <div>
                                 <span style="color:#409EFF;cursor:pointer;margin-right:20px;margin-left:20px" onClick={this.examine.bind(this, row)}>编辑</span>
-                                 <el-popconfirm
-                                confirm-button-text='删除'
-                                cancel-button-text='取消'
-                                title="确认确认删除此分组？"
-                                onConfirm={this.messageBox.bind(this, row)}
+                                <el-popconfirm
+                                    confirm-button-text='删除'
+                                    cancel-button-text='取消'
+                                    title="确认确认删除此分组？"
+                                    onConfirm={this.deleteData.bind(this, row)}
                                 >
                                     <el-button slot="reference" type="danger" size="mini">删除</el-button>
                                 </el-popconfirm>
-                                
+
                             </div>
                         );
                     },
                 },
-              
+
 
             ],  //表格
-            total: 100,  //数据总量
+            total: 0,  //数据总量
             current_page: 1, //当前页
-            current_limit:10, //每页条数
+            current_limit: 10, //每页条数
+            addRules:{
+                grouping_name:[{ required: true, message: '请输入分组名称', trigger: 'blur' }],
+            },
+            exitRules:{
+                grouping_name:[{ required: true, message: '请输入分组名称', trigger: 'blur' }],
+            },
 
         };
     },
 
     mounted() {
-
+        this.getGrouping()
     },
 
     methods: {
-        //编辑
-        examine(row){
-            this.dialogVisible2=true;
-            this.input2=JSON.parse(JSON.stringify(row));
-        },
-        //编辑提交
-        sibmit(){
-            let _self = this;
-            _self.edit=[];
-            for(let item of _self.tableData){
-                if(item.key == _self.input2.key){
-                    _self.edit.push(_self.input2)
-                }else{
-                    _self.edit.push(item)
+        //新增
+        async addSubmitForm(){
+            try {
+                let result = await this.$api({
+                    type: "addGrouping",
+                    data: {
+                        grouping_name:this.addform.grouping_name
+                    }
+                });
+                if (result.status == 200) {
+                   this.getGrouping()
+                   this.dialogVisible=false
+                   this.addform.grouping_name=''
+                   
+                } else {
+                    this.$message.error({ message: result.msg })
                 }
-            };
-            console.log(_self.edit)
-            _self.tableData=_self.edit
-            //提交到接口,然后刷新
-            this.dialogVisible2=false
+            } catch (error) {
+            }
+      
+        },
+        //编辑        
+        async exitSubmitForm(){
+            try {
+                let result = await this.$api({
+                    type: "updateGrouping",
+                    data: {
+                        grouping_id:this.exitform.grouping_id,
+                        grouping_name:this.exitform.grouping_name
+                    }
+                });
+                if (result.status == 200) {
+                   this.getGrouping()
+                   this.exitDialogVisible=false
+               
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) {
+            }
+        },
+        addhandleClose(){
+            this.dialogVisible=false
+            this.addform.grouping_name=''
+        },
+        exithandleClose(){
+            this.exitDialogVisible=false
+            this.exitform.input=''
+        },
+        //index
+        async getGrouping() {
+           
+            try {
+                this.submitting=true;
+                let result = await this.$api({
+                    type: "getGrouping",
+                    data: {
+                        limit: this.current_limit,
+                        page: this.current_page
+                    }
+                });
+                if (result.status == 200) {
+                  
+                    this.total = result.data.count
+                    this.tableData = result.data.list;
+                    this.submitting=false;
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) {
+            }
+        },
+        //编辑
+        examine(row) {
+            this.exitDialogVisible = true;
+            this.exitform = JSON.parse(JSON.stringify(row));
         },
         //删除
-        messageBox(){
-            console.log(123)
+        async deleteData(row) {
+            console.log(row)
+            try {
+                let result = await this.$api({
+                    type: "deletaGrouping",
+                    data: {
+                        grouping_ids:row.grouping_id
+                    }
+                });
+                if (result.status == 200) {
+                    this.getGrouping()
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) {
+            }
         },
-        //关闭
-        handleClose(done) {
-        this.$confirm('确认关闭？')
-          .then(_ => {
-            done();
-          })
-          .catch(_ => {});
-      },
-        //关闭2
-        handleClose2(done) {
-        this.$confirm('确认关闭？')
-          .then(_ => {
-            done();
-          })
-          .catch(_ => {});
-      },
-       /**
-             * 翻页回调
-             */
-             handlePagination(val) {
+        /**
+              * 翻页回调
+              */
+        handlePagination(val) {
             this.current_page = val.page;  //页数
             this.current_limit = val.limit  //条数
         },

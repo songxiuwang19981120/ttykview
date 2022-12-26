@@ -48,12 +48,27 @@
           <el-dialog title="创建账号" style="width:50%; margin:0 auto" :visible.sync="dialogFormVisible"
             :before-close="handleCloseDialog">
             <!-- 四级联动 -->
-
+          
+            
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
+              <el-form-item label="选择分组:" :disabled="false" prop="equipment" label-width="100px">
+                <el-select :disabled="disabled" v-model="ruleForm.equipment" placeholder="设备分组选择" style="margin-right: 10px"
+                  @focus="getEquipmentGroup" :loading="equipmentLoading" loading-text="数据加载中...">
+                  <el-option v-for="item in searchEquipmentList" :key="item.grouping_id"
+                    :label="item.grouping_name" :value="item.grouping_id">
+                  </el-option>
+                </el-select>
+                <span @click="addlis()">
+            <el-checkbox  v-model="checked">选择全部分组</el-checkbox>
+          </span>
+              </el-form-item>
+
               <el-form-item label="选择分类:" prop="classify" label-width="100px">
                 <el-cascader v-model="ruleForm.classify" :options="options" @change="handleChange">
                 </el-cascader>
               </el-form-item>
+
+            
               <el-form-item label="最大容量:" label-width="100px">
                 <!-- 计数器 -->
                 <el-input-number v-model="ruleForm.num" @change="handleChangeNum" :min="1" :max="10"
@@ -88,6 +103,8 @@ export default {
   },
   data() {
     return {
+      checked: false,//是否添加根目录分组
+      disabled:false,
       //联级选择器
       options: [{
         value: 'zhinan',
@@ -284,6 +301,8 @@ export default {
           label: '组件交互文档'
         }]
       }],
+      searchEquipmentList:[],
+      equipmentLoading:false,
       //计数器
       visibleDelete: false,
       dialog: false,//抽屉1显隐
@@ -295,10 +314,14 @@ export default {
       ruleForm: {
         classify: [],
         num: '',
+        equipment:[]
       },
       rules: {
         classify: [
           { required: true, message: '请选择分类', trigger: 'blur' },
+        ],
+        equipment: [
+          { required: true, message: '请选择分组', trigger: 'blur' },
         ],
       },//弹框
       formLabelWidth: '80px',//宽
@@ -410,6 +433,38 @@ export default {
   },
 
   methods: {
+    // 获取设备分组数据
+		async getEquipmentGroup() {
+			try {
+				this.equipmentLoading = true;
+				const res = await this.$api({
+					type: 'getGrouping',
+				});
+				if (res.status == 200) {
+					this.searchEquipmentList = res.data.list;
+				} else {
+					this.$message.error(res.msg);
+				}
+			} catch (error) {
+				console.error(error);
+			} finally {
+				this.equipmentLoading = false;
+			}
+		},
+        //是否根目录
+        addlis() {
+      this.ruleForm.equipment = [];
+      if (this.checked == true) {
+        this.disabled = false;
+          this.rules. equipment=[
+          { required: true, message: '请选择分组', trigger: 'blur' },
+        ]
+      } else {
+        this.disabled = true;
+        this.rules.equipment=[]
+      
+      }
+    },
     //表单验证
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
