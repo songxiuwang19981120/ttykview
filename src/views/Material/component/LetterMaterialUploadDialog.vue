@@ -21,13 +21,13 @@
 					</el-option>
 				</el-select>
 			</el-form-item>
-			<el-form-item label="素材库选择：" prop="typecontrol">
+			<el-form-item label="账号分类选择：" prop="typecontrol">
 				<el-cascader
 					clearable
 					:props="{ checkStrictly: true }"
 					:options="searchTypecontrolList"
 					v-model="ruleForm.typecontrol"
-					placeholder="素材库选择"
+					placeholder="账号分类选择"
 					style="margin-right: 20px"
 					@focus="getTypecontrol"
 				></el-cascader>
@@ -86,7 +86,7 @@
 			};
 			return {
 				searchEquipmentList: [], // 分组数据
-				searchTypecontrolList: [], // 素材库数据
+				searchTypecontrolList: [], // 账号分类数据
 				searchTypeList: [
 					{
 						label: '文本话术',
@@ -117,9 +117,8 @@
 				rules: {
 					content: [
 						{ required: true, message: '请输入私信', trigger: 'blur' },
-						{ validator: validateCont, trigger: 'blur' },
 					],
-					typecontrol: [{ required: true, message: '请选择素材库', trigger: 'blur' }],
+					typecontrol: [{ required: true, message: '请选择账号分类', trigger: 'blur' }],
 					type: [{ required: true, message: '请选择私信类型', trigger: 'blur' }],
 				},
 				baseUrl: BASE_URL, // 基地址
@@ -134,7 +133,6 @@
 					const res = await this.$api({
 						type: 'getGrouping',
 					});
-					console.log(res, '设备分组名称');
 					if (res.status == 200) {
 						this.searchEquipmentList = res.data.list;
 					} else {
@@ -153,7 +151,6 @@
 					const res = await this.$api({
 						type: 'getTypecontrol',
 					});
-					console.log(res, '素材分类数据');
 					if (res.status == 200) {
 						this.getTreeData(res.data);
 						this.searchTypecontrolList = res.data;
@@ -173,7 +170,6 @@
 						type: 'addPrivateLetter',
 						data,
 					});
-					console.log(res, '新增私信');
 					if (res.status == 200) {
 						this.$message.success(res.msg);
 					} else {
@@ -194,7 +190,6 @@
 			async btnOK() {
 				try {
 					await this.$refs.ruleForm.validate();
-					console.log(this.ruleForm.content, '文本数据');
 					if(this.ruleForm.content.replace(/\s/gi, '')){
 						this.ruleForm.content = this.ruleForm.content.replace(/\s/gi, '');
 					} else {
@@ -210,7 +205,7 @@
 					this.$emit('update:showDialog', false);
 					this.$parent.getPrivateLetterClassify(this.upParameter);
 				} catch (error) {
-					console.log(error);
+					// console.error(error);
 				}
 			},
 			// 处理树型children问题

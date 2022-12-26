@@ -5,7 +5,9 @@ if (process.env.NODE_ENV == "development") {
     url = "http://192.168.4.30/api/"
 } else {
     // 生产环境中
-    url = "http://47.245.30.4:8086/api/"
+        url = "http://192.168.4.30/api/"
+
+    // url = "http://47.245.30.4:8086/api/"
 }
 export default {
     'BASE_URL': url,

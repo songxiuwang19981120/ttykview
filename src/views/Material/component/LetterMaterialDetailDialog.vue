@@ -29,9 +29,7 @@
 					>
 				</div>
 				<div>
-					<el-button type="primary" :loading="resetloading" @click="btnReset" size="small">{{
-						btnloading ? '加载中...' : '重置'
-					}}</el-button>
+					<el-button type="primary" @click="btnReset">重置</el-button>
 				</div>
 			</div>
 		</div>
@@ -184,7 +182,6 @@
 						type: 'getPrivateLetter',
 						data,
 					});
-					console.log(res, '私信数据列表');
 					if (res.status == 200) {
 						this.tableData = res.data.list;
 						this.total = res.data.count;
@@ -206,7 +203,6 @@
 						type: 'updatePrivateLetter',
 						data,
 					});
-					console.log(res, '编辑私信');
 					if (res.status == 200) {
 						this.$message.success(res.msg);
 					} else {
@@ -225,7 +221,6 @@
 							privateletter_ids: id,
 						},
 					});
-					console.log(res, '删除私信');
 					if (res.status == 200) {
 						this.$message.success(res.msg);
 					} else {
@@ -235,16 +230,20 @@
 					console.error(error);
 				}
 			},
-			// 点击查询按钮
-			searchNickName() {
-				this.btnloading = true
-        this.getPrivateLetter({
+			// 更新页面
+			updatePageData() {
+				this.getPrivateLetter({
 					page: this.nickNameData.page,
 					limit: this.nickNameData.limit,
 					typecontrol_id: this.upParameter.typecontrol_id,
 					grouping_id: this.upParameter.grouping_id,
-          type: this.searchTableData.type
+					type: this.searchTableData.type
 				});
+			},
+			// 点击查询按钮
+			searchNickName() {
+				this.btnloading = true
+				this.updatePageData()
       },
 			// 点击重置按钮
 			btnReset() {
@@ -252,16 +251,10 @@
 				this.searchTableData = {
 					type: '',
 				};
-				this.getPrivateLetter({
-					page: this.nickNameData.page,
-					limit: this.nickNameData.limit,
-					typecontrol_id: this.upParameter.typecontrol_id,
-					grouping_id: this.upParameter.grouping_id
-				});
+				this.updatePageData()
 			},
 			// 点击编辑按钮
 			editBtn(obj) {
-				console.log(obj, '++++++++++++++');
 				this.innerVisible = true;
 				this.curNickName = obj.content;
 				this.ruleForm = JSON.parse(JSON.stringify(obj));
@@ -272,25 +265,13 @@
 				if (this.tableData.length == 1 && this.nickNameData.page > 1) {
 					this.nickNameData.page = this.nickNameData.page - 1;
 				}
-				await this.getPrivateLetter({
-					page: this.nickNameData.page,
-					limit: this.nickNameData.limit,
-					typecontrol_id: this.upParameter.typecontrol_id,
-					grouping_id: this.upParameter.grouping_id,
-          type: this.searchTableData.type
-				});
+				this.updatePageData()
 			},
 			// 当前页数据条数/页码改变
 			pageChange(obj) {
 				this.nickNameData.page = obj.page;
 				this.nickNameData.limit = obj.limit;
-				this.getPrivateLetter({
-					page: this.nickNameData.page,
-					limit: this.nickNameData.limit,
-					typecontrol_id: this.upParameter.typecontrol_id,
-					grouping_id: this.upParameter.grouping_id,
-          type: this.searchTableData.type
-				});
+				this.updatePageData()
 			},
 			// 点击取消按钮
 			btnCancel() {
@@ -314,15 +295,9 @@
 					await this.$refs.ruleForm.validate();
 					await this.editPrivateLetter(this.ruleForm);
 					this.innerVisible = false;
-					this.getPrivateLetter({
-						page: this.nickNameData.page,
-						limit: this.nickNameData.limit,
-						typecontrol_id: this.upParameter.typecontrol_id,
-						grouping_id: this.upParameter.grouping_id,
-            type: this.searchTableData.type
-					});
+					this.updatePageData()
 				} catch (error) {
-					console.log(error);
+					// console.error(error);
 				}
 			},
 		},

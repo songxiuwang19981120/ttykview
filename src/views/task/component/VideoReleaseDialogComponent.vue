@@ -180,7 +180,6 @@
 						type: 'getTaskListDetail',
 						data,
 					});
-					console.log(res, '视频列表详情数据');
 					this.tableData = res.data.list;
 					this.total = res.data.count;
 				} catch (error) {

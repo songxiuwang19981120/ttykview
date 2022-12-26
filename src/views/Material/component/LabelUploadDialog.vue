@@ -21,13 +21,13 @@
 					</el-option>
 				</el-select>
 			</el-form-item>
-			<el-form-item label="素材库选择：" prop="typecontrol">
+			<el-form-item label="账号分类选择：" prop="typecontrol">
 				<el-cascader
 					clearable
 					:props="{ checkStrictly: true }"
 					:options="searchTypecontrolList"
 					v-model="ruleForm.typecontrol"
-					placeholder="素材库选择"
+					placeholder="账号分类选择"
 					style="margin-right: 20px"
 					@focus="getTypecontrol"
 				></el-cascader>
@@ -74,7 +74,7 @@
 		data() {
 			return {
 				searchEquipmentList: [], // 分组数据
-				searchTypecontrolList: [], // 素材库数据
+				searchTypecontrolList: [], // 账号分类数据
 				equipmentLoading: false,
 				typecontrolLoading: false,
 				ruleForm: {
@@ -87,7 +87,7 @@
 					label: [
 						{ required: true, message: '请输入标签', trigger: 'blur' }
 					],
-					typecontrol: [{ required: true, message: '请选择素材库', trigger: 'blur' }],
+					typecontrol: [{ required: true, message: '请选择账号分类', trigger: 'blur' }],
 				},
 				baseUrl: BASE_URL, // 基地址
 				btnloading: false
@@ -101,7 +101,6 @@
 					const res = await this.$api({
 						type: 'getGrouping',
 					});
-					console.log(res, '设备分组名称');
 					if (res.status == 200) {
 						this.searchEquipmentList = res.data.list;
 					} else {
@@ -120,7 +119,6 @@
 					const res = await this.$api({
 						type: 'getTypecontrol',
 					});
-					console.log(res, '素材分类数据');
 					if (res.status == 200) {
 						this.getTreeData(res.data);
 						this.searchTypecontrolList = res.data;
@@ -140,7 +138,6 @@
 						type: 'addLabel',
 						data,
 					});
-					console.log(res, '新增昵称');
 					if (res.status == 200) {
 						this.$message.success(res.msg);
 					} else {
@@ -161,11 +158,9 @@
 			async btnOK() {
 				try {
 					await this.$refs.ruleForm.validate();
-					console.log(this.ruleForm.label, '文本域数据');
 					let nickNameArr = [];
 					// 处理文本域数据
 					this.ruleForm.label.split('\n').forEach((item) => {
-						console.log(item.replace(/\s/gi, ''));
 						if (item.replace(/\s/gi, '')) {
 							nickNameArr.push(item.replace(/\s/gi, ''));
 						}
@@ -185,7 +180,7 @@
 					this.$emit('update:showDialog', false);
 					this.$parent.getLabelClassify(this.upParameter);
 				} catch (error) {
-					console.log(error);
+					// console.error(error);
 				}
 			},
 			// 处理树型children问题

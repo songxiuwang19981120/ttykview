@@ -83,9 +83,7 @@
           ></el-option>
         </el-select>
       </div>
-      <el-button @click="batchEditor" class="batchedit-btn" type="primary"
-        >批量编辑</el-button
-      >
+      <el-button @click="batchEditor" class="batchedit-btn" type="primary">批量编辑</el-button>
     </div>
 
 
