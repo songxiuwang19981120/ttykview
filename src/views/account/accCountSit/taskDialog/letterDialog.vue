@@ -13,7 +13,7 @@
         :rules="rules"
         class="lettertask-form"
         label-position="left"
-        label-width="216px"
+        label-width="220px"
         :model="letterTaskForm"
       >
         <el-form-item
@@ -55,7 +55,7 @@
         </el-form-item>
 
         <el-form-item
-          label="单号每日关注上限 :"
+          label="单号每日关注上限 ："
           prop="user_follow_upper_limit"
           v-model="letterTaskForm.user_follow_upper_limit"
         >
@@ -67,7 +67,7 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item label-width="150px" label="关注频率 :" prop="follow_rate">
+        <el-form-item label-width="150px" label="关注频率 ：" prop="follow_rate">
           <div class="between-input">
             <el-input
               style="width: 14%"
@@ -96,9 +96,9 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item label="连续失败执行下一个号（次） ：" prop="can_fail_num">
+        <el-form-item label="连续失败执行下一个号（次）：" prop="can_fail_num">
           <el-input
-            style="width: 38%"
+            style="width: 39%"
             type="text"
             v-model="letterTaskForm.can_fail_num"
             placeholder="输入连续失败次数"
@@ -202,6 +202,34 @@ export default {
           value: "俄国",
           label: "俄国",
         },
+        {
+          value: "新加坡",
+          label: "新加坡",
+        },
+        {
+          value: "泰国",
+          label: "泰国",
+        },
+        {
+          value: "菲律宾",
+          label: "菲律宾",
+        },
+        {
+          value: "印度尼西亚",
+          label: "印度尼西亚",
+        },
+        {
+          value: "越南",
+          label: "越南",
+        },
+        {
+          value: "马来西亚",
+          label: "马来西亚",
+        },
+        {
+          value: "巴西",
+          label: "巴西",
+        },
       ],
       //关注发布任务 提交表单
       letterTaskForm: {
@@ -209,8 +237,7 @@ export default {
         user_follow_upper_limit: "", //单号关注上限
         rate_min: "", //关注频率最小值
         rate_max: "", //关注频率最大值
-        rate_min: "",
-        rate_max: "",
+
         follower_status: "", //粉丝量小于
         tasklist_id_list: [], //数据来源
         following_count: "", //关注数量小于
@@ -297,6 +324,8 @@ export default {
     */
     resetForm() {
       this.$refs["letterForm"].resetFields();
+      this.letterTaskForm.rate_min = '',
+      this.letterTaskForm.rate_max = ''
     },
   },
 };

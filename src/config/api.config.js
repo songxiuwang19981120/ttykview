@@ -568,6 +568,11 @@ export default {
     method: 'POST'
   },
   //PrivateLetter API end
+
+  'getCountry':{    //获取国家数据
+    url:'/member/country',
+    method:'POST'
+  }
 }
 
 

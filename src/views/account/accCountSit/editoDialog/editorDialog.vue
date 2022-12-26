@@ -42,8 +42,21 @@
             type="text"
             v-model="accUpdateForm.nickname"
           ></el-input>
-          <el-button class="ml-8" @click="getRendomNickname" type="primary"
-            >随机获取</el-button
+          <el-button
+            class="ml-8"
+            @click="
+              getRandom({
+                loading: 'nickNameLoading',
+                type: '1',
+                accParams: 'nickname',
+                desParams: 'nickname_id',
+                resAccParams: 'nickname',
+                resDesParams: 'nickname_id',
+              })
+            "
+            :loading="nickNameLoading"
+            type="primary"
+            >{{ this.nickNameLoading ? "获取中..." : "随机获取" }}</el-button
           >
         </el-form-item>
 
@@ -53,10 +66,22 @@
             type="text"
             v-model="accUpdateForm.signature"
           ></el-input>
-          <el-button class="ml-8" @click="getRendomAutograph" type="primary"
-            >随机获取</el-button
+          <el-button
+            class="ml-8"
+            :loading="signatureLoading"
+            @click="
+              getRandom({
+                loading: 'signatureLoading',
+                type: '2',
+                accParams: 'signature',
+                desParams: 'autograph_id',
+                resAccParams: 'autograph',
+                resDesParams: 'autograph_id',
+              })
+            "
+            type="primary"
+            >{{ this.signatureLoading ? "获取中..." : "随机获取" }}</el-button
           >
- 
         </el-form-item>
 
         <el-form-item class="upload-wrap ml-8" label="上传头像 :">
@@ -80,10 +105,19 @@
             <el-button
               class="avatar-random--btn ml-52"
               type="primary"
-              @click="getRendomAvatar"
-              >随机获取</el-button
+              @click="
+                getRandom({
+                  loading: 'avatarLoading',
+                  type: '3',
+                  accParams: 'avatar_uri',
+                  desParams: 'headimage_id',
+                  resAccParams: 'image',
+                  resDesParams: 'headimage_id',
+                })
+              "
+              :loading="avatarLoading"
+              >{{ this.avatarLoading ? "获取中..." : "随机获取" }}</el-button
             >
-
           </div>
         </el-form-item>
       </el-form>
@@ -129,38 +163,41 @@ export default {
     },
   },
   components: { tableCustom, Pagination },
+
   data() {
     return {
       BASE_URL: BASE_URL, //图片BASE地址
       rules: editorDialog, //表单校验规则  详见formRules文件
       submitting: false,
-      type_id: "",
+      avatarLoading: false,
+      nickNameLoading: false,
+      signatureLoading: false,
+      grouping_id: "", //分组ID
+      typecontrol_id: "", //分类ID
       accUpdateForm: {
         //更新数据的表单
-        type: "",
         nickname: "",
         signature: "",
-        grouping_id: "",
-        typecontrol_id: "",
         avatar_uri: "",
-      },
-      randomInfo: {
-        //编辑时随机获取的信息
         typecontrol_id: "",
+      },
+      destroyInfo: {
+        //编辑时随机获取的信息
         nickname_id: "",
         autograph_id: "",
         headimage_id: "",
       },
+      userTypeMap: {
+        nickname: "1",
+        signature: "2",
+        avatar_uri: "3",
+      },
     };
   },
 
-  mounted() {
-    //this.accUpdateForm.user_id = this.user_id
-  },
+  mounted() {},
 
   methods: {
-
-  
     /* 
         function: handleAvatarError
         params: null
@@ -212,10 +249,73 @@ export default {
     handlerClose() {
       this.$emit("closeEditorDialog");
       this.resetForm();
+      this.grouping_id = ''
     },
 
+    /* 
+        function: updateInfo
+        params: data | 表单数据
+        desc: 更新用户数据 
+    */
+    async updateInfo(data = {}) {
+      try {
+        await Promise.all(
+          Object.entries(data).map((item) => {
+            let type = this.userTypeMap[item[0]];
+            let key = item[0];
+            let info = item[1];
+            let user_id = this.user_id;
+            let data = Object.fromEntries([
+              ["type", type],
+              [key, info],
+              ["user_id", user_id],
+            ]);
+            this.reqInfo(data);
+          })
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    },
 
-    
+    /* 
+        function: resetDestroyInfo
+        params: nu;;
+        desc: 重置需要摧毁素材数据
+    */
+    resetDestroyInfo(){
+      this.destroyInfo = {
+        nickname_id: "",
+        autograph_id: "",
+        headimage_id: "",
+      }
+    },
+
+    /* 
+        function: reqInfo
+        params: data | 请求API时的参数，默认为{}
+        desc: 更新用户信息的静态方法 
+    */
+    async reqInfo(data = {}) {
+      try {
+        await this.$api({ type: "updateUserInfo", data: data });
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    /* 
+        function: delInfo
+        params: data | 请求API时的参数，默认为destroyInfo
+        desc: 销毁素材库对应素材的静态方法 
+    */
+    async delInfo(data = this.destroyInfo) {
+      try {
+        await this.$api({ type: "destroyedUserInfo", data: data });
+      } catch (error) {
+        console.error(error);
+      }
+    },
 
     /* 
         function: handlerConfrim
@@ -223,141 +323,84 @@ export default {
         desc: 提交表单回调 
     */
     async handlerConfrim() {
-      this.submitting = true;
-      /*  let typeMap = {
-        nickname: 1,
-        signature: 2,
-        avatar_uri: 3,
-      };
-      let length = this.accUpdateForm.typecontrol_id.length;
-      if (length === 0) {
-        this.$message.error("请选择分类");
-        return false;
-      }
-      let updateArr = Object.entries(this.accUpdateForm).filter((item) => {
-        return (
-          item[0] === "nickname" ||
-          item[0] === "signature" ||
-          item[0] === "avatar_uri" ||
-          item[0] === "typecontrol_id"
-        );
-      });
-      await Promise.all(
-        updateArr.map(async (item) => {
-          if (item[1].length !== 0) {
-            let typeData = typeMap[item[0]];
-            let typeId = updateArr[2][1][updateArr[2][1].length - 1];
-            let key = item[0];
-            let grouping_id = this.accUpdateForm.grouping_id
-            console.log(grouping_id)
-            let keyData = this.accUpdateForm[key];
-            let data = Object.fromEntries([
-              ["user_id", this.user_id],
-              ["type", typeData],
-              [key, keyData],
-            ]);
-            await this.$api({ type: "updateUserInfo", data: data }).then(() => {
-              this.randomInfo.typecontrol_id = typeId;
-              this.$api({ type: "destroyedUserInfo", data: data }).then(() => {
-                this.$api({
-                  type: "setMemberId",
-                  data: { user_id: this.user_id, typecontrol_id: typeId,grouping_id: grouping_id},
-                }).then(() => {
-                  this.$parent.updateMemberList();
-                });
-              });
-            });
+      try {
+        let typecontrol_id =
+          this.accUpdateForm.typecontrol_id[
+            this.accUpdateForm.typecontrol_id.length - 1
+          ];
+        let destroyInfo = Object.entries(this.destroyInfo).filter((item) => {
+          return item[1] !== "";
+        });
+        let accUpdateForm = Object.entries(this.accUpdateForm).filter(
+          (item) => {
+            return item[1] !== "" && item[0] !== "typecontrol_id"  && item[0] !== "grouping_id";
           }
-        })
-      ); */
-      this.$message.success("操作成功");
-      this.submitting = true;
-      this.resetForm();
-      this.accUpdateForm.avatar_uri = "";
-      this.accUpdateForm.grouping_id = "";
-      this.handlerClose();
-      this.$parent.updateMemberList();
-      this.randomInfo = {
-        typecontrol_id: "",
-        nickname_id: "",
-        autograph_id: "",
-        headimage_id: "",
-      };
+        );
+        let memberInfo = {
+          user_id: this.user_id,
+          grouping_id: this.grouping_id,
+          typecontrol_id: typecontrol_id,
+        };
+          await this.updateInfo(Object.fromEntries(accUpdateForm)),
+          await this.delInfo(Object.fromEntries(destroyInfo)),
+          await this.$api({ type: "setMemberId", data: memberInfo })
+          this.$message.success('操作成功')
+          this.handlerClose()
+          this.resetDestroyInfo()
+          this.accUpdateForm.avatar_uri = ''
+          this.$nextTick(()=>{
+            this.$parent.updateMemberList()
+          })
+          
+      } catch (error) {
+        this.$message.error("未知错误");
+      }
     },
 
     /* 
-        function: getRendomInfo
-        params: type | 1是随机获取昵称，2是签名，3是头像
-        desc: 根据传入type随机获取所需字段
-        return: 返回拿到的字段
+        function: getRandom
+        params: {loading,type,accParams,desParams,resAccParams,resDesParams}
+                *loading | 相应button的loading                        默认为空
+                *type | random类型，1为昵称，2为签名，3为头像           默认为空
+                *accparams | accUpdateForm键名                        默认为空
+                *desParams | destroyInfo键名                          默认为空
+                *resAccParams | 返回值，对应accUpdateForm键名          默认为空
+                *resDesParams | 返回值，对应accUpdateForm键名          默认为空
+        desc: 随机获取素材 
     */
-    async getRendomInfo(type) {
+    async getRandom({
+      loading = "",
+      type = "",
+      accParams = "",
+      desParams = "",
+      resAccParams = "",
+      resDesParams = "",
+    }) {
       try {
-        let group = this.accUpdateForm.typecontrol_id;
-        if (group.length === 0) {
+        this[loading] = true;
+        let typeId = this.accUpdateForm.typecontrol_id;
+        if (typeId.length === 0) {
           this.$message.error("请先选择分类");
+          this[loading] = false;
           return false;
         }
         let data = {
-          typecontrol_id: group[group.length - 1],
+          typecontrol_id: typeId[typeId.length - 1],
           type: type,
         };
         let result = await this.$api({ type: "getUserRandomInfo", data: data });
-        return result;
+        if (result.data?.[0]?.[resAccParams]) {
+          this.accUpdateForm[accParams] = result.data[0][resAccParams];
+          this.destroyInfo[desParams] = result.data[0]?.[resDesParams];
+          this.$message.success("获取成功");
+          this[loading] = false;
+          return;
+        }
+        this.$message.error(result.msg ?? "获取失败");
+        this[loading] = false;
       } catch (error) {
         console.error(error);
       }
-    },
-
-    /* 
-        function: getRendomNickname
-        params: null
-        desc: 随机获取昵称
-    */
-    async getRendomNickname() {
-      let result = await this.getRendomInfo(1);
-      if (result?.data?.[0]?.nickname) {
-        this.disNickNameBtn = false;
-        this.accUpdateForm.nickname = result.data[0].nickname;
-        this.$message.success("获取成功");
-        this.randomInfo.nickname_id = result.data[0].nickname_id;
-        return true;
-      }
-      this.$message.error("素材库为空");
-    },
-
-    /* 
-        function: getRendomAutograph
-        params: null
-        desc: 随机获取签名
-    */
-    async getRendomAutograph() {
-      let result = await this.getRendomInfo(2);
-      if (result?.data?.[0]?.autograph) {
-        this.disAutographBtn = false
-        this.accUpdateForm.signature = result.data[0].autograph;
-        this.$message.success("获取成功");
-        this.randomInfo.autograph_id = result.data[0].autograph_id;
-        return true;
-      }
-      this.$message.error("素材库为空");
-    },
-
-    /* 
-        function: getRendomAvatar
-        params: null
-        desc: 随机获取头像
-    */
-    async getRendomAvatar() {
-      let result = await this.getRendomInfo(3);
-      if (result?.data?.[0]?.image) {
-        this.disAvatarBtn = false
-        this.accUpdateForm.avatar_uri = result.data?.[0]?.image;
-        this.$message.success("获取成功");
-        this.randomInfo.headimage_id = result.data?.[0]?.headimage_id;
-        return true;
-      }
-      this.$message.error("素材库为空");
     },
 
     /* 

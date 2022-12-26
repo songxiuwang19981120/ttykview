@@ -1,48 +1,24 @@
 <template>
   <div class="tt-acccountsit--vieotask">
-    <el-dialog
-      width="40%"
-      :visible="showVideoTask"
-      :before-close="handlerClose"
-    >
+    <el-dialog width="40%" :visible="showVideoTask" :before-close="handlerClose">
       <span slot="title">
         <h1 class="tt-acccountsit--title">视频发布任务配置</h1>
       </span>
 
-      <el-form
-        :rules="rules"
-        ref="videoForm"
-        label-position="left"
-        label-width="130px"
-        :model="vieoTaskForm"
-      >
+      <el-form :rules="rules" ref="videoForm" label-position="left" label-width="130px" :model="vieoTaskForm">
         <el-form-item label="视频发布数量 :" prop="video_num">
-          <el-input
-            type="text"
-            v-model="vieoTaskForm.video_num"
-          ></el-input>
+          <el-input type="number" v-model="vieoTaskForm.video_num"></el-input>
         </el-form-item>
         <el-form-item label="主题标签内容 :" prop="label_num">
-          <el-input
-            v-model="vieoTaskForm.label_num"
-            autocomplete="off"
-          ></el-input>
+          <el-input v-model="vieoTaskForm.label_num" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="@用户数量 :" prop="user_num">
-          <el-input v-model="vieoTaskForm.user_num"></el-input>
+          <el-input type="number" v-model="vieoTaskForm.user_num"></el-input>
         </el-form-item>
         <el-form-item label="主题内容 :" prop="text">
-          <el-input
-            :disabled="isTextAreaDisabled"
-            class="input-textarea"
-            type="textarea"
-            v-model="vieoTaskForm.text"
-          ></el-input>
-          <el-checkbox
-            :disabled="isRandomTextDisabled"
-            v-model="vieoTaskForm.text_round"
-            >随机主题内容</el-checkbox
-          >
+          <el-input :disabled="isTextAreaDisabled" class="input-textarea" type="textarea"
+            v-model="vieoTaskForm.text"></el-input>
+          <el-checkbox :disabled="isRandomTextDisabled" v-model="vieoTaskForm.text_round">随机主题内容</el-checkbox>
         </el-form-item>
       </el-form>
 
@@ -55,8 +31,6 @@
 </template>
 
 <script>
-import formRule from "@/config/accountConfig/formRules.config";
-const { video } = formRule;
 export default {
   name: "TtprojectVideoDialog",
   props: {
@@ -81,7 +55,16 @@ export default {
 
   data() {
     return {
-      rules: video,
+      rules: {
+        video_num:[
+        { required: true, message: '请输入视频发布数量', trigger: 'blur' },
+          { pattern: /^[0-9]*[1-9][0-9]*$/, message: '请输入正整数', trigger: 'blur' }
+        ],
+        user_num: [
+          { required: true, message: '请输入@用户数量', trigger: 'blur' },
+          { pattern: /^[0-9]*[1-9][0-9]*$/, message: '请输入正整数', trigger: 'blur' }
+        ]
+      },
 
       //TODO  需要跟后端对接字段  视频发布任务 提交表单
       vieoTaskForm: {
@@ -96,7 +79,7 @@ export default {
     };
   },
 
-  mounted() {},
+  mounted() { },
 
   methods: {
     /* 
@@ -132,9 +115,10 @@ export default {
                   this.$message.success(res.msg);
                   this.handlerClose();
                   this.resetForm();
+                  this.$message.success(res.msg ?? '操作成功')
                   return;
                 }
-                this.$message.error(res.msg ?? "未知错误");
+                this.$message.error(res.msg ?? "操作失败");
               })
               .cathch(() => {
                 this.$message.error("未知错误");

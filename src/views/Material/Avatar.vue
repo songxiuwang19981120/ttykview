@@ -11,9 +11,9 @@
                     </el-select>
                 </div>
                 <div>
-                    <span class="search-title">素材库:</span>
+                    <span class="search-title">账号分类:</span>
                     <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryList"
-                        v-model="searchTableData.library" placeholder="素材库选择"
+                        v-model="searchTableData.library" placeholder="账号分类选择"
                         style="width:180px;margin-right:20px"></el-cascader>
                 </div>
                 <div>
@@ -169,7 +169,7 @@ export default {
             current_limit: 10, //每页条数
             submitting: false,  //提交确定
             groupList: [],  //设备分组
-            libraryList: [],  //素材库
+            libraryList: [],  //账号分类
             searchTableData: {
                 equipment: '',
                 library: '',
@@ -187,6 +187,10 @@ export default {
                 },
             ],  //时间排序
             searchTypeList: [
+                {
+                    value: '',
+                    label: '全部素材'
+                },
                 {
                     value: '0',
                     label: '已用素材'
@@ -335,7 +339,6 @@ export default {
                 group: '',  //分组
                 library: '',  //库
             };
-            this.$refs.imgUnload.clearFiles()
             this.imgUploadVisible = true
         },
         /*

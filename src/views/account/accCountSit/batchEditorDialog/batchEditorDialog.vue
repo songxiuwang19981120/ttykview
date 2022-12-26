@@ -10,7 +10,7 @@
       </span>
         <h2>当前分组为：{{this.groupString}}</h2>
       <el-form :model="batchEiatorForm">
-<!--         <el-form-item label="设置分组">
+<!--         <el-form-item label="设备分组">
           <el-select
             clearable
             v-model="batchEiatorForm.group"
@@ -25,7 +25,7 @@
           </el-select>
         </el-form-item> -->
 
-        <el-form-item label="设置分类">
+        <el-form-item label="账号分类">
           <el-cascader
             clearable
             @change="setProjectNum"
@@ -56,9 +56,9 @@ export default {
     check_all: {
       type: Boolean,
     },
-    groupList: {
+/*     groupList: {
       type: Array,
-    },
+    }, */
     typeList: {
       type: Array,
     },
@@ -73,9 +73,6 @@ export default {
     },
     materialTotal: {
       type: Number,
-    },
-    group:{
-      type:String
     },
     groupString:{
       type:String

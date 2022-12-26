@@ -211,7 +211,6 @@
 						type: 'getTaskListDetail',
 						data,
 					});
-					console.log(res, '私信详情数据');
 					this.tableData = res.data.list;
 					this.total = res.data.count;
 				} catch (error) {

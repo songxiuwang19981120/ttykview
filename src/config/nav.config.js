@@ -40,7 +40,7 @@ export default {
             ]
         },
         {
-            title: '任务配置',
+            title: '任务管理',
             to: '',
             icon: 'el-icon-s-tools',
             children: [

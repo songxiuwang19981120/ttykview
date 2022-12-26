@@ -126,7 +126,6 @@
 						type: 'getAutograph',
 						data,
 					});
-					console.log(res, '签名数据列表');
 					if (res.status == 200) {
 						this.tableData = res.data.list;
 						this.total = res.data.count;
@@ -146,7 +145,6 @@
 						type: 'updateAutograph',
 						data,
 					});
-					console.log(res, '编辑签名');
 					if (res.status == 200) {
 						this.$message.success(res.msg);
 					} else {
@@ -165,7 +163,6 @@
 							autograph_ids: id,
 						},
 					});
-					console.log(res, '删除签名');
 					if (res.status == 200) {
 						this.$message.success(res.msg);
 					} else {
@@ -175,9 +172,17 @@
 					console.error(error);
 				}
 			},
+			// 更新页面
+			updatePageData() {
+				this.getAutograph({
+					page: this.nickNameData.page,
+					limit: this.nickNameData.limit,
+					typecontrol_id: this.upParameter.typecontrol_id,
+					grouping_id: this.upParameter.grouping_id,
+				});
+			},
 			// 点击编辑按钮
 			editBtn(obj) {
-				console.log(obj, '++++++++++++++');
 				this.innerVisible = true;
 				this.curNickName = obj.autograph;
 				// this.ruleForm = obj;
@@ -189,23 +194,13 @@
 				if(this.tableData.length == 1 && this.nickNameData.page > 1){
 					this.nickNameData.page = this.nickNameData.page - 1
 				}
-				await this.getAutograph({
-					page: this.nickNameData.page,
-					limit: this.nickNameData.limit,
-					typecontrol_id: this.upParameter.typecontrol_id,
-					grouping_id: this.upParameter.grouping_id,
-				});
+				this.updatePageData()
 			},
 			// 当前页数据条数/页码改变
 			pageChange(obj) {
 				this.nickNameData.page = obj.page;
 				this.nickNameData.limit = obj.limit;
-				this.getAutograph({
-					page: this.nickNameData.page,
-					limit: this.nickNameData.limit,
-					typecontrol_id: this.upParameter.typecontrol_id,
-					grouping_id: this.upParameter.grouping_id,
-				});
+				this.updatePageData()
 			},
 			// 点击取消按钮
 			btnCancel() {
@@ -223,14 +218,9 @@
 					await this.$refs.ruleForm.validate();
 					await this.editAutograph(this.ruleForm);
 					this.innerVisible = false;
-					this.getAutograph({
-						page: this.nickNameData.page,
-						limit: this.nickNameData.limit,
-						typecontrol_id: this.upParameter.typecontrol_id,
-						grouping_id: this.upParameter.grouping_id,
-					});
+					this.updatePageData()
 				} catch (error) {
-					console.log(error);
+					// console.error(error);
 				}
 			},
 		},

@@ -22,12 +22,12 @@
 					</el-select>
 				</div>
 				<div>
-					<span>素材库：</span>
+					<span>账号分类：</span>
 					<el-cascader
 						:props="{ checkStrictly: true }"
 						:options="searchTypecontrolList"
 						v-model="searchTableData.typecontrol"
-						placeholder="素材库选择"
+						placeholder="账号分类选择"
 						style="margin-right: 20px"
 						@focus="getTypecontrol"
 					></el-cascader>
@@ -44,9 +44,7 @@
 					>
 				</div>
 				<div>
-					<el-button type="primary" :loading="resetloading" @click="btnReset">{{
-						btnloading ? '加载中...' : '重置'
-					}}</el-button>
+					<el-button type="primary" @click="btnReset">重置</el-button>
 				</div>
 			</div>
 			<div class="tt-accsituation--operation">
@@ -55,10 +53,8 @@
 				</div>
 			</div>
 		</div>
-		<el-card>
-			<!-- 表格 -->
-			<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
-		</el-card>
+		<!-- 表格 -->
+		<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 		<!-- 详情弹层 -->
 		<LabelDetailDialog
 			:outerVisible.sync="showDetailDialog"
@@ -79,7 +75,7 @@
 	import LabelDetailDialog from './component/LabelDetailDialog.vue';
 	import LabelUploadDialog from './component/LabelUploadDialog';
 	export default {
-		name: 'NikName',
+		name: 'LaBel',
 		components: {
 			tableCustom,
 			LabelDetailDialog,
@@ -88,7 +84,7 @@
 		data() {
 			return {
 				searchEquipmentList: [], // 分组数据
-				searchTypecontrolList: [], // 素材库数据
+				searchTypecontrolList: [], // 账号分类数据
 				btnloading: false,
 				searchTableData: {
 					equipment: '',
@@ -154,7 +150,6 @@
 					const res = await this.$api({
 						type: 'getGrouping',
 					});
-					console.log(res, '设备分组名称');
 					if (res.status == 200) {
 						this.searchEquipmentList = res.data.list;
 					} else {
@@ -173,7 +168,6 @@
 					const res = await this.$api({
 						type: 'getTypecontrol',
 					});
-					console.log(res, '素材分类数据');
 					if (res.status == 200) {
 						this.getTreeData(res.data);
 						this.searchTypecontrolList = res.data;
@@ -194,7 +188,6 @@
 						type: 'getLabelClassify',
 						data,
 					});
-					console.log(res, '标签分类列表');
 					if (res.status == 200) {
 						this.tableData = res.data;
 						this.total = res.data.length;
@@ -231,12 +224,9 @@
 					equipment: '',
 					typecontrol: '',
 				};
-				const { equipment, typecontrol } = this.searchTableData;
-				const typecontrol_id = typecontrol.length ? typecontrol[typecontrol.length - 1] : '';
-				const grouping_id = equipment;
 				this.parameterData = {
-					typecontrol_id,
-					grouping_id,
+					typecontrol_id: '',
+					grouping_id: '',
 				};
 				this.getLabelClassify();
 			},
@@ -249,13 +239,13 @@
 				this.showDetailDialog = true;
 				this.nickData = {
 					typecontrol_id: obj.typecontrol_id,
-					grouping_id: this.searchTableData.equipment,
+					grouping_id: obj.grouping_id,
 				};
 				this.$refs.detailDialog.getLabel({
 					page: 1,
 					limit: 20,
 					typecontrol_id: obj.typecontrol_id,
-					grouping_id: this.searchTableData.equipment,
+					grouping_id: obj.grouping_id,
 				});
 			},
 			// 处理树型children问题
@@ -272,16 +262,16 @@
 	};
 </script>
 
-<style lang="stylus" scoped>
-	.tt-accsituation{
-		background-color #fff
-		margin-bottom  20px
-		border-radius 4px
-		padding 0 12px
-		.tt-accsituation--operation{
-			display flex
-			height 70px
-			line-height 70px
-		}
+<style scoped>
+	.tt-accsituation {
+		background-color: #fff;
+		margin-bottom: 20px;
+		border-radius: 4px;
+		padding: 0 12px;
+	}
+	.tt-accsituation--operation {
+		display: flex;
+		height: 70px;
+		line-height: 70px;
 	}
 </style>
