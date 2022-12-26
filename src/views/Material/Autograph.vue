@@ -43,9 +43,7 @@
 					>
 				</div>
 				<div>
-					<el-button type="primary" :loading="resetloading" @click="btnReset">{{
-						btnloading ? '加载中...' : '重置'
-					}}</el-button>
+					<el-button type="primary" @click="btnReset">重置</el-button>
 				</div>
 			</div>
 			<div class="tt-accsituation--operation">
@@ -54,10 +52,8 @@
 				</div>
 			</div>
 		</div>
-		<el-card>
-			<!-- 表格 -->
-			<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
-		</el-card>
+		<!-- 表格 -->
+		<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 		<!-- 详情弹层 -->
 		<AutographDetailDialog
 			:outerVisible.sync="showDetailDialog"
@@ -252,13 +248,13 @@
 				this.showDetailDialog = true;
 				this.nickData = {
 					typecontrol_id: obj.typecontrol_id,
-					grouping_id: obj.grouping_id
+					grouping_id: obj.grouping_id,
 				};
 				this.$refs.detailDialog.getAutograph({
 					page: 1,
 					limit: 20,
 					typecontrol_id: obj.typecontrol_id,
-					grouping_id: obj.grouping_id
+					grouping_id: obj.grouping_id,
 				});
 			},
 			// 处理树型children问题
@@ -275,16 +271,16 @@
 	};
 </script>
 
-<style lang="stylus" scoped>
-	.tt-accsituation{
-		background-color #fff
-		margin-bottom  20px
-		border-radius 4px
-		padding 0 12px
-		.tt-accsituation--operation{
-			display flex
-			height 70px
-			line-height 70px
-		}
+<style scoped>
+	.tt-accsituation {
+		background-color: #fff;
+		margin-bottom: 20px;
+		border-radius: 4px;
+		padding: 0 12px;
+	}
+	.tt-accsituation--operation {
+		display: flex;
+		height: 70px;
+		line-height: 70px;
 	}
 </style>

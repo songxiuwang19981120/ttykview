@@ -29,9 +29,7 @@
 					>
 				</div>
 				<div>
-					<el-button type="primary" :loading="resetloading" @click="btnReset" size="small">{{
-						btnloading ? '加载中...' : '重置'
-					}}</el-button>
+					<el-button type="primary" @click="btnReset">重置</el-button>
 				</div>
 			</div>
 		</div>
