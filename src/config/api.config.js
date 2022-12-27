@@ -310,7 +310,7 @@ export default {
     url: '/User/updatePassword',
     method: 'POST',
   },
-  'loginUserPassword': {
+  'login': {
     url: '/User/login',
     method: 'POST',
   },

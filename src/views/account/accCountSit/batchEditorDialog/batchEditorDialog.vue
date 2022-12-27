@@ -144,7 +144,7 @@ export default {
       console.log(updateData)
       this.batchEiatorForm.eidtorList = userList;
       let result = await this.$api({type:'updateUserDate',data:updateData})
-      if(result.status === 200){
+      if(result.status == 200){
         this.$message.success(result.msg ?? '操作成功')
         this.resetForm()
         this.handlerClose()
