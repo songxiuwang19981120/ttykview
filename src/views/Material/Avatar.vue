@@ -31,22 +31,20 @@
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
-                <el-button type="primary" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...' :
+                <el-button type="primary"  class="seachbut" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...' :
                         '搜索'
                 }}</el-button>
-                <el-button type="primary" @click="resetTable">重置</el-button>
+                <el-button type="primary"  class="seachbut" @click="resetTable">重置</el-button>
+                <el-button type="primary" class="seachbut" @click="imgUpLoad">上传图片</el-button>
+
             </div>
-            <div class="tt-accsituation--operation">
-                <el-button type="primary" @click="imgUpLoad">上传图片</el-button>
-                <!-- <el-button type="primary" @click="imgUpLoad">批量删除</el-button> -->
-            </div>
-            <el-table :data="statisticsData" border style="width:490px;margin: 10px; ">
+            <!-- <el-table :data="statisticsData" border style="width:490px;margin: 10px; ">
                 <el-table-column prop="name" label="分类名称" width="120" align="center"></el-table-column>
                 <el-table-column prop="unloadNumber" label="已上传图片数量" width="120" align="center"></el-table-column>
                 <el-table-column prop="use" label="已用图片数量" width="120" align="center"></el-table-column>
                 <el-table-column prop="used" label="当前可用素材" align="center"></el-table-column>
             </el-table>
-            <div style="height:10px"></div>
+            <div style="height:10px"></div> -->
         </div>
         <el-dialog title="图片上传" :visible.sync="imgUploadVisible" width="40%" :before-close="imgUploadClose">
             <el-form ref="imgForm" :rules="rulesUpload" :model="imgForm" label-width="140px">
@@ -62,7 +60,7 @@
                 </el-form-item>
                 <el-form-item label="图片:" prop="img">
                     <el-upload ref="imgUnload" class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple
-                        accept=".png,.jpg,.jpeg" :on-success="handleSucess" :on-remove="handleRemove">
+                        accept=".png,.jpg,.jpeg" :on-success="handleSucess" :on-remove="handleRemove" :before-upload="imgBefore">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
                     </el-upload>
@@ -221,6 +219,13 @@ export default {
     },
 
     methods: {
+        imgBefore(file) {
+            let { size } = file || {};
+            if (size >  200 * 1024) {
+                 this.$message.error('图片大小请不要超过200kb');
+                 return false
+            }
+        },
         // 图片删除
         handleRemove(file, fileList) {
             console.log('图片删除', file, fileList);
@@ -443,21 +448,6 @@ export default {
 <style scoped>
 ::v-deep .el-image-viewer__canvas {
     width: 40%;
-}
-
-.tt-accsituation {
-    background-color: #fff;
-    min-height: 70px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-
-.tt-accsituation--operation {
-    display: flex;
-    justify-content: flex-start;
-    flex-flow: wrap;
-    align-items: center;
-    padding: 10px;
 }
 
 .search-title {

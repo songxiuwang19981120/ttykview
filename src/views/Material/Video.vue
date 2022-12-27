@@ -3,66 +3,54 @@
         <div class="tt-accsituation">
             <div class="tt-accsituation--operation">
                 <div>
-                    <span class="search-title">设备分组:</span>
                     <el-select v-model="searchTableData.equipment" placeholder="请选择设备分组"
-                        style="width:150px;margin-right:20px">
+                        style="width:150px;margin-right:10px" @change="searchEquipmentChange">
                         <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
                             :key="item.grouping_id"></el-option>
                     </el-select>
                 </div>
                 <div>
-                    <span class="search-title">账号分类:</span>
                     <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryList"
                         v-model="searchTableData.library" placeholder="账号分类选择"
-                        style="width:180px;margin-right:20px"></el-cascader>
+                        style="width:180px;margin-right:10px"></el-cascader>
                 </div>
                 <div>
-                    <span class="search-title">素材类型:</span>
                     <el-select v-model="searchTableData.status" placeholder="素材类型"
-                        style="width:160px;margin-right:20px">
+                        style="width:160px;margin-right:10px">
                         <el-option v-for="item in searchTypeList" :key="item.value" :label="item.label"
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
                 <div>
-                    <span class="search-title">时间排序:</span>
                     <el-select v-model="searchTableData.sort" placeholder="时间排序" style="width:110px;margin-right:20px">
                         <el-option v-for="item in searchTimeSortList" :key="item.value" :label="item.label"
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
-                <el-button type="primary" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...' :
+                <el-button type="primary" class="seachbut" :loading="submitting" @click="searchTable">{{ submitting ?
+                        '搜索中 ...' :
                         '搜索'
                 }}</el-button>
-                <el-button type="primary" @click="resetTable">重置</el-button>
+                <el-button type="primary" class="seachbut" @click="resetTable">重置</el-button>
+                <el-button type="primary" class="seachbut" @click="videoUpLoad">上传视频</el-button>
             </div>
-            <div class="tt-accsituation--operation">
-                <el-button type="primary" @click="videoUpLoad">上传视频</el-button>
-                <!-- <el-button type="primary" @click="videoUpLoad">批量删除</el-button> -->
-            </div>
-            <el-table :data="statisticsData" border style="width:490px;margin: 10px; ">
-                <el-table-column prop="name" label="分类名称" width="120" align="center"></el-table-column>
-                <el-table-column prop="unloadNumber" label="已上传视频数量" width="120" align="center"></el-table-column>
-                <el-table-column prop="use" label="已用视频数量" width="120" align="center"></el-table-column>
-                <el-table-column prop="used" label="当前可用素材" align="center"></el-table-column>
-            </el-table>
-            <div style="height:10px"></div>
         </div>
         <el-dialog title="视频上传" :visible.sync="videoUploadVisible" width="40%" :before-close="videoUploadClose">
             <el-form ref="videoForm" :rules="rulesUpload" :model="videoForm" label-width="140px">
                 <el-form-item label="分组:" prop="group">
-                    <el-select v-model="videoForm.group" placeholder="请选择分组">
+                    <el-select v-model="videoForm.group" placeholder="请选择分组" @change="equipmentChange">
                         <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
                             :key="item.grouping_id"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="库:" prop="library">
-                    <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryList"
-                        v-model="videoForm.library" placeholder="库选择"></el-cascader>
+                <el-form-item label="分类:" prop="library">
+                    <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryAddList"
+                        v-model="videoForm.library" placeholder="分类选择"></el-cascader>
                 </el-form-item>
                 <el-form-item label="视频:" prop="video">
                     <el-upload class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple accept=".mp4"
-                        :on-success="handleSucess" :on-error="handleError" :on-remove="handleRemove">
+                        :on-success="handleSucess" :on-error="handleError" :on-remove="handleRemove"
+                        :before-upload="videoBefore"	>
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
                     </el-upload>
@@ -75,6 +63,13 @@
                 }}</el-button>
             </span>
         </el-dialog>
+        <!-- <div>
+            <div v-for="(item,index) in tableData" :key="index">
+                <video controls loop :src="item.video_url" class="videosize"></video>
+                <div>视频编号:{{item.video_num  }}</div>
+                <div>上传时间:{{item.add_time  }}</div>
+            </div>
+        </div> -->
         <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
             @handleSelectionChange="selectionChange"></table-custom>
         <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination">
@@ -194,7 +189,7 @@ export default {
             ],  //时间排序
             searchTypeList: [
                 {
-                    value: '',
+                    value: '2',
                     label: '全部素材'
                 },
                 {
@@ -217,16 +212,31 @@ export default {
                 library: [{ required: true, message: '请选择库', trigger: 'blur' }],
             },  //视频上传弹框校验
             fileList: [],  //已选择需要上传的视频
+            libraryAddList: [],
         };
     },
 
     mounted() {
         this.getGroupList();
-        this.getTypeControlList();
         this.getMaterialList();
     },
 
     methods: {
+        videoBefore(file) {
+            let { size } = file || {};
+            if (size > 3 * 1024 * 1024) {
+                 this.$message.error('视频大小请不要超过2M');
+                 return false
+            }
+        },
+        // 监听搜索分组变化
+        searchEquipmentChange() {
+            this.getTypeControlList()
+        },
+        // 监听分组变化
+        equipmentChange() {
+            this.getAddTypeControlList()
+        },
         // 视频删除
         handleRemove(file, fileList) {
             console.log('视频删除', file, fileList);
@@ -234,10 +244,6 @@ export default {
         },
         // 视频上传成功回调
         handleSucess(response, file, fileList) {
-            // if(response.status!='200'){
-            //     this.$message.warning(response.msg);
-            //     fileList.pop()
-            // }
             this.fileList = fileList
         },
         // 视频上传失败回调
@@ -263,8 +269,11 @@ export default {
             获取素材
         */
         async getTypeControlList() {
+            let data = {
+                grouping_id: this.searchTableData.equipment
+            }
             try {
-                let result = await this.$api({ type: "getTypecontrol" });
+                let result = await this.$api({ type: "getTypecontrol", data: data });
                 if (result.status == '200') {
                     this.libraryList = result.data;
                     this.getTreeData(result.data)
@@ -283,6 +292,23 @@ export default {
             } else {
                 this.$message.error({ message: result.msg })
             }
+        },
+        /* 
+            获取素材
+        */
+        async getAddTypeControlList() {
+            let data = {
+                grouping_id: this.videoForm.group
+            }
+            try {
+                let result = await this.$api({ type: "getTypecontrol", data: data });
+                if (result.status == '200') {
+                    this.libraryAddList = result.data;
+                    this.getTreeData(result.data)
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) { }
         },
         // 关闭视频播放
         videoPlayClose() {
@@ -412,8 +438,12 @@ export default {
         */
         async getMaterialList() {
             let order = ''
+            let status = ''
             if (this.searchTableData.sort != '') {
                 order = 'add_time'
+            }
+            if (this.searchTableData.status == '2') {
+                status = ''
             }
             let typecontrolId = this.searchTableData.library[this.searchTableData.library.length - 1] ?? ''
             let data = {
@@ -426,7 +456,7 @@ export default {
                 order: order,
                 sort: this.searchTableData.sort,
                 grouping_id: this.searchTableData.equipment,
-                status: this.searchTableData.status,
+                status: status,
             }
             try {
                 this.loading = true;
@@ -467,28 +497,13 @@ export default {
 </script>
 
 <style scoped>
-.tt-accsituation {
-    background-color: #fff;
-    min-height: 70px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-
-.tt-accsituation--operation {
-    display: flex;
-    justify-content: flex-start;
-    flex-flow: wrap;
-    align-items: center;
-    padding: 10px;
-}
-
-.search-title {
-    font-size: 13px;
-    padding-right: 10px;
-}
 
 .videosize {
     width: 100px;
     height: 30px;
 }
-</style>
+.videosize{
+    width: 134px;
+    height: 191px;
+}
+</style> 

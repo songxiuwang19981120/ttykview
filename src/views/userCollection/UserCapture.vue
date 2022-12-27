@@ -8,10 +8,38 @@
                         '采集参数中...' : '配置采集参数'
                 }}</el-button>
             </div>
+            <div class="tt-accsituation--operation">
+                <div>
+                    <span style="padding-right:10px;font-size:13px">昵称:</span>
+                    <el-input v-model="searchData.nickname" placeholder="请输入昵称"
+                        style="width:140px;margin-right: 20px;"></el-input>
+                </div>
+                <div>
+                    <span style="padding-right:10px;font-size:13px">uid:</span>
+                    <el-input v-model="searchData.uid" placeholder="请输入uid"
+                        style="width:140px;margin-right: 20px;"></el-input>
+                </div>
+                <div>
+                    <span style="padding-right:10px;font-size:13px">数据来源:</span>
+                    <el-select v-model="searchData.sources" placeholder="请选择数据来源"
+                        style="width:140px;margin-right: 20px;">
+                        <el-option v-for="item in collectionContentlist" :key="item.value" :label="item.label"
+                            :value="item.value"></el-option>
+                    </el-select>
+
+                </div>
+                <div>
+                    <span style="padding-right:10px;font-size:13px">数据标签:</span>
+                    <el-input v-model="searchData.label" placeholder="请输入数据标签"
+                        style="width:140px;margin-right: 20px;"></el-input>
+                </div>
+                <el-button type="primary" :loading="searching" @click="searchTable">{{ searching ? '查询中 ...' : '查 询'
+                }}</el-button>
+                <el-button type="primary" :loading="searching" @click="resetClick">重 置</el-button>
+            </div>
         </div>
         <el-dialog title="采集配置" :visible.sync="configureVisible" width="40%" :before-close="configureClose">
-            <el-form ref="form" :rules="rules" :model="configureForm" label-width="140px"
-                :hide-required-asterisk="true">
+            <el-form ref="form" :rules="rules" :model="configureForm" label-width="140px">
                 <el-form-item label="任务名:" prop="task_name">
                     <el-input v-model="configureForm.task_name" placeholder="请输入任务名" style="width:60%"></el-input>
                 </el-form-item>
@@ -45,37 +73,6 @@
                 }}</el-button>
             </span>
         </el-dialog>
-        <div class="tt-accsituation">
-            <div class="tt-accsituation--operation">
-                <div>
-                    <span style="padding-right:10px;font-size:13px">昵称:</span>
-                    <el-input v-model="searchData.nickname" placeholder="请输入昵称"
-                        style="width:140px;margin-right: 20px;"></el-input>
-                </div>
-                <div>
-                    <span style="padding-right:10px;font-size:13px">uid:</span>
-                    <el-input v-model="searchData.uid" placeholder="请输入uid"
-                        style="width:140px;margin-right: 20px;"></el-input>
-                </div>
-                <div>
-                    <span style="padding-right:10px;font-size:13px">数据来源:</span>
-                    <el-select v-model="searchData.sources" placeholder="请选择数据来源"
-                        style="width:140px;margin-right: 20px;">
-                        <el-option v-for="item in collectionContentlist" :key="item.value" :label="item.label"
-                            :value="item.value"></el-option>
-                    </el-select>
-
-                </div>
-                <div>
-                    <span style="padding-right:10px;font-size:13px">数据标签:</span>
-                    <el-input v-model="searchData.label" placeholder="请输入数据标签"
-                        style="width:140px;margin-right: 20px;"></el-input>
-                </div>
-                <el-button type="primary" :loading="searching" @click="searchTable">{{ searching ? '查询中 ...' : '查 询'
-                }}</el-button>
-                <el-button type="primary" :loading="searching" @click="resetClick">重 置</el-button>
-            </div>
-        </div>
         <div>
             <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
                 @handleSelectionChange="selectionChange"></table-custom>
@@ -205,7 +202,7 @@ export default {
                 //     },
                 // },
             ],  //表格
-            total: 100,  //数据总量
+            total: 0,  //数据总量
             current_page: 1, //当前页
             current_limit: 10, //每页条数
             bloggerLink: '', //博主主页链接
