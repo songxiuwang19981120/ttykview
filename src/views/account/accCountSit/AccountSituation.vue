@@ -177,6 +177,7 @@
       :showBatchEditor="showBatchEditor"
       :editorTota="editorTota"
     />
+    
   </div>
 </template>
 
@@ -329,6 +330,15 @@ export default {
           label: "昵称",
           width: "150",
           align: "center",
+          render:(h,{row})=>{
+            return (
+              <div>
+              <a target="three" href={'https://www.tiktok.com/@'+row.unique_id}>
+                <span>{row.nickname}</span>
+                </a>
+              </div>
+            )
+          }
         },
         {
           prop: "type_title",
