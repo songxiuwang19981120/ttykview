@@ -80,11 +80,11 @@
                 </div>
             </div>
         </el-dialog>
-        <el-dialog :visible.sync="videoPlayDialog" width="50%" :before-close="videoPlayClose">
+        <!-- <el-dialog :visible.sync="videoPlayDialog" width="50%" :before-close="videoPlayClose">
             <div style="text-align: center;width:100%">
                 <video autoplay controls loop :src='videoUrl' width="40%"></video>
             </div>
-        </el-dialog>
+        </el-dialog> -->
     </div>
 </template>
 
@@ -102,7 +102,7 @@ export default {
         return {
             searching: false, //获取TT视频ing
             videoUrl: '',  //播放视频路径
-            videoPlayDialog: false,  //播放视频弹框
+            // videoPlayDialog: false,  //播放视频弹框
 
             getCommentListstoo: {},
             activeNames: [],
@@ -154,8 +154,8 @@ export default {
                     align: 'center',
                     render(h, { row }) {
                         return (
-                            <div >
-                                <video controls loop src={row.video_url} class="videosize"></video>
+                            <div>
+                                <video controls loop src={row.video_url} style="width:134px;height:191px"></video>
                             </div>
                         )
                     }
@@ -232,21 +232,21 @@ export default {
                         );
                     },
                 },
-                {
-                    prop: 'ifvideo',
-                    label: '操作',
-                    width: 80,
-                    align: 'center',
-                    fiexd: true,
-                    fixed: 'right',
-                    render: (h, { row }) => {
-                        return (
-                            <div>
-                                <el-button style="margin-right:10px" size="mini" type="success" onClick={this.videoPlay.bind(this, row)}>播放</el-button>
-                            </div>
-                        );
-                    },
-                },
+                // {
+                //     prop: 'ifvideo',
+                //     label: '操作',
+                //     width: 80,
+                //     align: 'center',
+                //     fiexd: true,
+                //     fixed: 'right',
+                //     render: (h, { row }) => {
+                //         return (
+                //             <div>
+                //                 <el-button style="margin-right:10px" size="mini" type="success" onClick={this.videoPlay.bind(this, row)}>播放</el-button>
+                //             </div>
+                //         );
+                //     },
+                // },
 
             ],
         };
@@ -282,7 +282,6 @@ export default {
             } catch (error) {
             }
         },
-        //
         // 关闭视频播放
         videoPlayClose() {
             this.videoUrl = ''
@@ -293,7 +292,6 @@ export default {
             this.videoUrl = row.video_url
             this.videoPlayDialog = true
         },
-
         videocaptureIndexs() {
             this.searchTableData.equipment = "";
             this.videocaptureIndex()
@@ -499,5 +497,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

@@ -2,10 +2,10 @@
 	<el-dialog title="主题内容上传" :visible="showDialog" @close="btnCancel">
 		<!-- 新增条件选择 -->
 		<el-form :model="ruleForm" ref="ruleForm" :rules="rules" label-width="120px">
-			<el-form-item label="设备分组选择：" prop="grouping_id">
+			<el-form-item label="账号分组选择：" prop="grouping_id">
 				<el-select
 					v-model="ruleForm.grouping_id"
-					placeholder="设备分组选择"
+					placeholder="账号分组选择"
 					style="margin-right: 20px"
 					@focus="getaccGroup()"
 					:loading="equipmentLoading"
@@ -88,14 +88,14 @@
 			};
 		},
 		methods: {
-			// 获取设备分组数据
+			// 获取账号分组数据
 			async getaccGroup() {
 				try {
 					this.equipmentLoading = true;
 					const res = await this.$api({
 						type: 'getGrouping',
 					});
-					console.log(res, '设备分组名称');
+					console.log(res, '账号分组名称');
 					if (res.status == 200) {
 						this.searchEquipmentList = res.data.list;
 					} else {
@@ -136,7 +136,7 @@
 						type: 'subjectcontentAdd',
 						data:{
 							content:data.nickname,
-							typecontrol_id: data.typecontrol[data.typecontrol.length - 1] ?? "", //点击设备分组的grouping_id
+							typecontrol_id: data.typecontrol[data.typecontrol.length - 1] ?? "", //点击账号分组的grouping_id
 							grouping:data.grouping_id,//点击分类的typecontrol_id
 						}
 					});
@@ -163,13 +163,18 @@
 					await this.$refs.ruleForm.validate();
 					let nickNameArr = [];
 					// 处理文本域数据
+
 					this.ruleForm.nickname.split('\n').forEach((item) => {
-						console.log(item.replace(/\s/gi, ''));
-						if (item.replace(/\s/gi, '')) {
-							nickNameArr.push(item.replace(/\s/gi, ''));
+						console.log(item);
+						if (item!='') {
+							nickNameArr.push(item);
 						}
 					});
-					this.ruleForm.nickname = nickNameArr.join('\n');
+					if (nickNameArr.length && nickNameArr[0]){
+						this.ruleForm.nickname = nickNameArr.join('\n');
+					} else {
+						return this.$message.warning('昵称内容不能为空')
+					}
 					// 调用新增昵称接口
 					this.addNickName(this.ruleForm);
 				} catch (error) {

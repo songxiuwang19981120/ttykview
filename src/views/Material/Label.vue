@@ -3,10 +3,9 @@
 		<div class="tt-accsituation">
 			<div class="tt-accsituation--operation">
 				<div>
-					<span>设备分组：</span>
 					<el-select
 						v-model="searchTableData.equipment"
-						placeholder="设备分组选择"
+						placeholder="账号分组选择"
 						style="margin-right: 20px"
 						@focus="getaccGroup"
 						:loading="equipmentLoading"
@@ -22,7 +21,6 @@
 					</el-select>
 				</div>
 				<div>
-					<span>账号分类：</span>
 					<el-cascader
 						:props="{ checkStrictly: true }"
 						:options="searchTypecontrolList"
@@ -39,16 +37,9 @@
 						:loading="btnloading"
 						@click="searchNickName"
 						ref="search"
-						style="margin-right: 20px"
 						>{{ btnloading ? '加载中...' : '搜索' }}</el-button
 					>
-				</div>
-				<div>
 					<el-button type="primary" @click="btnReset">重置</el-button>
-				</div>
-			</div>
-			<div class="tt-accsituation--operation">
-				<div>
 					<el-button type="primary" @click="uploadNickName">上传</el-button>
 				</div>
 			</div>
@@ -143,7 +134,7 @@
 		mounted() {},
 
 		methods: {
-			// 获取设备分组数据
+			// 获取账号分组数据
 			async getaccGroup() {
 				try {
 					this.equipmentLoading = true;
@@ -263,15 +254,4 @@
 </script>
 
 <style scoped>
-	.tt-accsituation {
-		background-color: #fff;
-		margin-bottom: 20px;
-		border-radius: 4px;
-		padding: 0 12px;
-	}
-	.tt-accsituation--operation {
-		display: flex;
-		height: 70px;
-		line-height: 70px;
-	}
 </style>

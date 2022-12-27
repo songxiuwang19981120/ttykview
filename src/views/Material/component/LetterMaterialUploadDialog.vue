@@ -2,10 +2,10 @@
 	<el-dialog title="私信上传" :visible="showDialog" @close="btnCancel">
 		<!-- 新增条件选择 -->
 		<el-form :model="ruleForm" ref="ruleForm" :rules="rules" label-width="120px">
-			<el-form-item label="设备分组选择：" prop="grouping_id">
+			<el-form-item label="账号分组选择：" prop="grouping_id">
 				<el-select
 					v-model="ruleForm.grouping_id"
-					placeholder="设备分组选择"
+					placeholder="账号分组选择"
 					style="margin-right: 20px"
 					@focus="getaccGroup"
 					:loading="equipmentLoading"
@@ -77,13 +77,6 @@
 			},
 		},
 		data() {
-			const validateCont = (rule, value, callback) => {
-				if (value.replace(/\s/gi, '')) {
-					callback();
-				} else {
-					callback(new Error('私信不能为空'));
-				}
-			};
 			return {
 				searchEquipmentList: [], // 分组数据
 				searchTypecontrolList: [], // 账号分类数据
@@ -126,7 +119,7 @@
 			};
 		},
 		methods: {
-			// 获取设备分组数据
+			// 获取账号分组数据
 			async getaccGroup() {
 				try {
 					this.equipmentLoading = true;
@@ -190,11 +183,19 @@
 			async btnOK() {
 				try {
 					await this.$refs.ruleForm.validate();
-					if(this.ruleForm.content.replace(/\s/gi, '')){
-						this.ruleForm.content = this.ruleForm.content.replace(/\s/gi, '');
+					let nickNameArr = [];
+					this.ruleForm.content.split('\n').forEach((item) => {
+						if (item!='') {
+							nickNameArr.push(item);
+						}
+					});
+					if (nickNameArr.length && nickNameArr[0]){
+						this.ruleForm.content = nickNameArr.join('\n');
 					} else {
 						return this.$message.warning('私信内容不能为空')
 					}
+
+
 					const { typecontrol } = this.ruleForm;
 					this.ruleForm.typecontrol_id = typecontrol.length
 						? typecontrol[typecontrol.length - 1]

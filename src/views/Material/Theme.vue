@@ -3,8 +3,7 @@
 		<div class="tt-accsituation">
 			<div class="tt-accsituation--operation">
 				<div>
-					<span>设备分组：</span>
-					<el-select v-model="searchTableData.equipment" placeholder="设备分组选择" style="margin-right: 20px"
+					<el-select v-model="searchTableData.equipment" placeholder="账号分组选择" style="margin-right: 20px"
 						@focus="getaccGroup" :loading="equipmentLoading" loading-text="数据加载中...">
 						<el-option v-for="item in searchEquipmentList" :key="item.grouping_id"
 							:label="item.grouping_name" :value="item.grouping_id">
@@ -12,25 +11,16 @@
 					</el-select>
 				</div>
 				<div>
-					<span>账号分类：</span>
 					<el-cascader :props="{ checkStrictly: true }" :options="searchTypecontrolList"
 						v-model="searchTableData.typecontrol" placeholder="账号分类选择" style="margin-right: 20px"
 						@focus="getTypecontrol"></el-cascader>
 				</div>
 				<div>
 					<!-- 查询 -->
-					<el-button type="primary" :loading="btnloading" @click="searchNickName"
-						style="margin-right: 20px">{{
-								btnloading ? '加载中...' : '搜索'
-						}}</el-button>
-				</div>
-				<div>
+					<el-button type="primary" :loading="btnloading" @click="searchNickName">{{btnloading ? '加载中...' : '搜索'}}</el-button>
 					<el-button type="primary" @click="btnReset">重置</el-button>
-				</div>
-			</div>
-			<div class="tt-accsituation--operation">
-				<div>
 					<el-button type="primary" @click="uploadNickName">上传</el-button>
+
 				</div>
 			</div>
 		</div>
@@ -261,7 +251,7 @@ export default {
 				console.error(error);
 			} 
 		},
-		// 获取设备分组数据
+		// 获取账号分组数据
 		async getaccGroup() {
 			try {
 				this.equipmentLoading = true;
@@ -325,7 +315,7 @@ export default {
 		async getNickNameClassify() {
 			this.loadingList=true
 			let data = {
-				typecontrol_id:this.classifytypecontrol_id, //点击设备分组的grouping_id
+				typecontrol_id:this.classifytypecontrol_id, //点击账号分组的grouping_id
 				grouping: this.classifygrouping_id,//点击分类的typecontrol_id
 			}
 			try {
@@ -420,15 +410,4 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-	.tt-accsituation{
-		background-color #fff
-		margin-bottom  20px
-		border-radius 4px
-		padding 0 12px
-		.tt-accsituation--operation{
-			display flex
-			height 70px
-			line-height 70px
-		}
-	}
 </style>

@@ -10,7 +10,7 @@
       </span>
         <h2>当前分组为：{{this.groupString}}</h2>
       <el-form :model="batchEiatorForm" ref="batchEiatorForm">
-<!--         <el-form-item label="设备分组">
+<!--         <el-form-item label="账号分组">
           <el-select
             clearable
             v-model="batchEiatorForm.group"

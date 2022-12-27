@@ -2,10 +2,10 @@
 	<el-dialog title="标签上传" :visible="showDialog" @close="btnCancel">
 		<!-- 新增条件选择 -->
 		<el-form :model="ruleForm" ref="ruleForm" :rules="rules" label-width="120px">
-			<el-form-item label="设备分组选择：" prop="grouping_id">
+			<el-form-item label="账号分组选择：" prop="grouping_id">
 				<el-select
 					v-model="ruleForm.grouping_id"
-					placeholder="设备分组选择"
+					placeholder="账号分组选择"
 					style="margin-right: 20px"
 					@focus="getaccGroup"
 					:loading="equipmentLoading"
@@ -94,7 +94,7 @@
 			};
 		},
 		methods: {
-			// 获取设备分组数据
+			// 获取账号分组数据
 			async getaccGroup() {
 				try {
 					this.equipmentLoading = true;
@@ -161,8 +161,8 @@
 					let nickNameArr = [];
 					// 处理文本域数据
 					this.ruleForm.label.split('\n').forEach((item) => {
-						if (item.replace(/\s/gi, '')) {
-							nickNameArr.push(item.replace(/\s/gi, ''));
+						if (item!='') {
+							nickNameArr.push(item);
 						}
 					});
 					if (nickNameArr.length && nickNameArr[0]){
