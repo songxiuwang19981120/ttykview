@@ -27,12 +27,11 @@
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
-                <el-button type="primary" class="seachbut" :loading="submitting" @click="searchTable">{{ submitting ?
-                        '搜索中 ...' :
-                        '搜索'
-                }}</el-button>
-                <el-button type="primary" class="seachbut" @click="resetTable">重置</el-button>
-                <el-button type="primary" class="seachbut" @click="videoUpLoad">上传视频</el-button>
+                <el-button type="primary" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...' :'搜索'}}</el-button>
+                <el-button type="primary" @click="resetTable">重置</el-button>
+                <el-button type="primary" @click="videoUpLoad">上传视频</el-button>
+                <el-button type="primary" @click="batchDelete">批量删除</el-button>
+
             </div>
         </div>
         <el-dialog title="视频上传" :visible.sync="videoUploadVisible" width="40%" :before-close="videoUploadClose">
@@ -50,7 +49,7 @@
                 <el-form-item label="视频:" prop="video">
                     <el-upload class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple accept=".mp4"
                         :on-success="handleSucess" :on-error="handleError" :on-remove="handleRemove"
-                        :before-upload="videoBefore"	>
+                        :before-upload="videoBefore">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
                     </el-upload>
@@ -58,20 +57,22 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="videoUploadClose">取 消</el-button>
-                <el-button type="primary" :loading="videoSubmitting" @click="submitForVideo">{{ videoSubmitting ?
-                        '提交中...' : '提 交'
-                }}</el-button>
+                <el-button type="primary" :loading="videoSubmitting" @click="submitForVideo">{{ videoSubmitting ?'提交中...' : '提 交'}}</el-button>
             </span>
         </el-dialog>
-        <!-- <div>
-            <div v-for="(item,index) in tableData" :key="index">
-                <video controls loop :src="item.video_url" class="videosize"></video>
-                <div>视频编号:{{item.video_num  }}</div>
-                <div>上传时间:{{item.add_time  }}</div>
-            </div>
-        </div> -->
-        <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
-            @handleSelectionChange="selectionChange"></table-custom>
+        <div>
+            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll"
+                @change="handleCheckAllChange">全选 <span style="color:#FF411F;font-size: 12px;padding-left: 20px;"> 已选中 {{ checkedCities.length }} 个视频</span></el-checkbox>
+            <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange" class="video">
+                <div v-for="(item, index) in tableData" :key="index" class="videoData">
+                    <video controls loop :src="item.video_url" class="videosize"></video>
+                    <el-checkbox :label="item.material_id" :key="item.material_id" class="videoNum">视频编号:{{ item.video_num}}</el-checkbox>
+                    <div class="videoNum">上传时间:{{ item.add_time }}</div>
+                </div>
+            </el-checkbox-group>
+        </div>
+        <!-- <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
+            @handleSelectionChange="selectionChange"></table-custom> -->
         <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination">
         </pagination>
         <el-dialog :visible.sync="videoPlayDialog" width="50%" :before-close="videoPlayClose">
@@ -96,6 +97,9 @@ export default {
     },
     data() {
         return {
+            checkAll: false,  //全选
+            checkedCities: [], //已选数据
+            isIndeterminate: true,  //复选框全选属性
             baseUrl: BASE_URL,
             statisticsData: [
                 {
@@ -103,7 +107,6 @@ export default {
                     unloadNumber: '',
                     use: '1',
                     used: '1',
-
                 }
 
             ],
@@ -119,10 +122,9 @@ export default {
                     fixed: true,
                     align: 'center',
                     render: (h, { row }) => {
-                        // this.getVideoBase64(row.video_url)
                         return (
                             <div>
-                                <video class="videosize" width="100" height="50" src={row.video_url}></video>
+                                <video controls loop width="100" height="50" src={row.video_url}></video>
                             </div>
                         );
                     },
@@ -155,7 +157,7 @@ export default {
                                     confirm-button-text='删除'
                                     cancel-button-text='取消'
                                     title="确认删除此视频？"
-                                    onConfirm={this.removeHandler.bind(this, row)}
+                                    onConfirm={this.removeHandler.bind(this, row,'1')}
                                 >
                                     <el-button slot="reference" type="danger" size="mini">删除</el-button>
                                 </el-popconfirm>
@@ -167,7 +169,7 @@ export default {
             ],  //表格
             total: 0,  //数据总量
             current_page: 1, //当前页
-            current_limit: 10, //每页条数
+            current_limit: 20, //每页条数
             submitting: false,  //提交确定
             groupList: [],  //设备分组
             libraryList: [],  //账号分类
@@ -222,11 +224,39 @@ export default {
     },
 
     methods: {
+        // 批量删除
+        batchDelete(){
+            if(this.checkedCities.length==0){
+                this.$message.warning('请选择需要删除的视频');
+            }else{
+                this.removeHandler(this.checkedCities,'2')
+            }
+        },
+        // 监听全选
+        handleCheckAllChange(val) {
+            if (val) {
+                this.tableData.forEach((item) => {
+                    if(this.checkedCities.indexOf(item.material_id) === -1){
+                        this.checkedCities.push(item.material_id)
+                    }
+                })
+            }else{
+                this.checkedCities=[]
+            }
+            this.isIndeterminate = false;
+        },
+        // 单个选择
+        handleCheckedCitiesChange(value) {
+            let checkedCount = value.length;
+            this.checkAll = checkedCount === this.tableData.length;
+            this.isIndeterminate = checkedCount > 0 && checkedCount < this.tableData.length;
+        },
+        // 校验视频大小
         videoBefore(file) {
             let { size } = file || {};
             if (size > 3 * 1024 * 1024) {
-                 this.$message.error('视频大小请不要超过2M');
-                 return false
+                this.$message.error('视频大小请不要超过2M');
+                return false
             }
         },
         // 监听搜索分组变化
@@ -239,7 +269,6 @@ export default {
         },
         // 视频删除
         handleRemove(file, fileList) {
-            console.log('视频删除', file, fileList);
             this.fileList = fileList
         },
         // 视频上传成功回调
@@ -320,29 +349,6 @@ export default {
             this.videoUrl = url
             this.videoPlayDialog = true
         },
-        /**
-         * 获取视频第一帧并转化为图片
-         */
-        getVideoBase64() {
-            let url = 'http://192.168.4.30/uploads/api/202212/6389eb3cc4ca2.mp4'
-            const video = document.createElement("video"); // 获取视频对象
-            // const video = document.createElement("video") // 也可以自己创建video
-            video.src = url; // url地址 url跟 视频流是一样的
-            var canvas = document.createElement("canvas"); // 获取 canvas 对象
-            const ctx = canvas.getContext("2d"); // 绘制2d
-            // video.crossOrigin = "anonymous"; // 解决跨域问题，也就是提示污染资源无法转换视频
-            video.currentTime = 1; // 第一帧
-            video.oncanplay = () => {
-                canvas.width = video.clientWidth; // 获取视频宽度
-                canvas.height = video.clientHeight; //获取视频高度
-                // 利用canvas对象方法绘图
-                ctx.drawImage(video, 0, 0, video.clientWidth, video.clientHeight);
-                // 转换成base64形式
-                let img = canvas.toDataURL("image/png"); // 截取后的视频封面
-                let i = 1
-                console.log(i++, img);
-            };
-        },
         // 视频上传提交
         submitForVideo() {
             if (this.fileList.length == 0) {
@@ -398,13 +404,21 @@ export default {
         /*
            删除视频
         */
-        async removeHandler(val) {
+        async removeHandler(val,type) {
             let data = {
-                material_ids: val.material_id,
+                material_ids: '',
+            }
+            if(type==2){  //批量删除
+                data.material_ids=val.join(',')
+            }else{
+                data.material_ids=val.material_id
             }
             try {
                 let result = await this.$api({ type: "deleteMaterial", data: data });
                 if (result.status == '200') {
+                    if(type==2){
+                        this.checkedCities=[]
+                    }
                     this.$message.success({ message: '视频删除成功' });
                     this.getMaterialList()
                 } else {
@@ -497,13 +511,32 @@ export default {
 </script>
 
 <style scoped>
+.video {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.videoData {
+    width: 170px;
+    margin: 10px 15px;
+}
 
 .videosize {
-    width: 100px;
-    height: 30px;
+    width: 100%;
+    height: 266px;
 }
-.videosize{
-    width: 134px;
-    height: 191px;
+
+.videoNum {
+    color: rgba(16, 16, 16, 1);
+    font-size: 12px;
+    text-align: left;
+    padding-top: 5px;
+}
+
+.videoCheckbox {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
 }
 </style> 

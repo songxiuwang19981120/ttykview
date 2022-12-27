@@ -3,9 +3,12 @@
     <div>
         <div class="tt-accsituation">
             <div class="tt-accsituation--operation">
-                <el-input  v-model="numberValidateForm.age" placeholder="请输入完整素材链接https://www.tiktok.com/@..." style="width:40%" clearable>
-                    <el-button slot="append" @click="searchLink">获取TT视频</el-button>
-                </el-input>
+                <el-input v-model="numberValidateForm.age" placeholder="请输入完整素材链接https://www.tiktok.com/@..."
+                    style="width:30%;margin-right: 20px;" clearable></el-input>
+                <el-button type="primary" @click="searchLink" :loading="searching">{{ searching ? '获取中 ...' :
+        '获取TT视频'
+}}</el-button>
+
             </div>
         </div>
         <div class="tt-accsituation">
@@ -20,54 +23,62 @@
                 <el-button type="primary" @click="videocaptureIndexs">重 置</el-button>
             </div>
             <div class="tt-accsituation--operation">
-                <el-button  type="primary" :disabled="disableda"
-                @click="transition()">导出下载地址</el-button>
+                <el-button type="primary" :disabled="disableda" @click="transition()">导出下载地址</el-button>
             </div>
         </div>
-  
-        <table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns" @handleSelectionChange="selectionChange"></table-custom>
-        <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination"></pagination>
-        <el-dialog :visible.sync="dialogVisible" width="40%" >
-            
-            <div v-for="(item, index) of CommentLists.list" :key="index" >
+
+        <table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
+            @handleSelectionChange="selectionChange"></table-custom>
+        <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination">
+        </pagination>
+        <el-dialog :visible.sync="dialogVisible" width="40%">
+
+            <div v-for="(item, index) of CommentLists.list" :key="index">
                 <div style="margin:0 0 40px 0;height:100%;">
                     <img :src="item.avatar_medium" style="width:50px; border-radius:25px;float: left;" alt="">
-                    <div style="margin-left: 10px;float: left;width:80%" >
-                        <div style="font-size:24px;color: #999;height: 25px;line-height: 25px;">{{item.nickname}}:</div>
-                        <div style=" float: right;margin-top: 5px;"><i class="el-icon-success"></i>获赞数:{{item.digg_count}}</div>
-                        <div style="font-size:16px;margin-top: 5px;padding-right: 30%;">{{item.text}}</div>
-                        
-                        <div style="font-size:12px;color:#9999;margin-top: 5px;margin-bottom: 10px;">评论时间:{{item.create_time}}</div>
+                    <div style="margin-left: 10px;float: left;width:80%">
+                        <div style="font-size:24px;color: #999;height: 25px;line-height: 25px;">{{ item.nickname }}:</div>
+                        <div style=" float: right;margin-top: 5px;"><i
+                                class="el-icon-success"></i>获赞数:{{ item.digg_count }}</div>
+                        <div style="font-size:16px;margin-top: 5px;padding-right: 30%;">{{ item.text }}</div>
+
+                        <div style="font-size:12px;color:#9999;margin-top: 5px;margin-bottom: 10px;">
+                            评论时间:{{ item.create_time }}</div>
                         <el-collapse v-model="activeNames" @change="showCommentLists(item)" accordion>
-                            <el-collapse-item :title='"展开"+item.reply_comment_total+"条回复"' :name="item.uid">
-                            
-                                <div style=""
-                            v-for="(item1, index1) of  getCommentListstoo.list"
-                            :key="index1"
-                        > <el-collapse v-model="activeName2" accordion>
-                           
-                            <img :src="item1.avatar_medium" style="width:20px; margin-top: 20px; border-radius:10px;float: left;" alt="">
-                            <div style="margin:20px 0 10px 10px;float: left;width:80%">
-                                <div style="font-size:12px;color: #999;height: 10px;line-height: 10px;">{{item1.nickname}}:</div>
-                                <div style=" font-size: 8px; position: absolute;right: 15%;"><i class="el-icon-success"></i>获赞数:{{item1.digg_count}}</div>
-                                <div style="font-size:8px;margin-top: 5px;margin-left:5px;padding-right: 30%;">{{item1.text}}</div>
-                                <div style="font-size:8px;margin-left:5px;color:#9999;">回复时间:{{item1.create_time}}</div>
-                               <div style="clear:both"></div>
-                           
-                        </div>
-                        </el-collapse>
-                            <div style="clear:both"></div>
-                        </div>
+                            <el-collapse-item :title='"展开" + item.reply_comment_total + "条回复"' :name="item.uid">
+
+                                <div style="" v-for="(item1, index1) of  getCommentListstoo.list" :key="index1">
+                                    <el-collapse v-model="activeName2" accordion>
+
+                                        <img :src="item1.avatar_medium"
+                                            style="width:20px; margin-top: 20px; border-radius:10px;float: left;"
+                                            alt="">
+                                        <div style="margin:20px 0 10px 10px;float: left;width:80%">
+                                            <div style="font-size:12px;color: #999;height: 10px;line-height: 10px;">
+                                                {{ item1.nickname }}:</div>
+                                            <div style=" font-size: 8px; position: absolute;right: 15%;"><i
+                                                    class="el-icon-success"></i>获赞数:{{ item1.digg_count }}</div>
+                                            <div
+                                                style="font-size:8px;margin-top: 5px;margin-left:5px;padding-right: 30%;">
+                                                {{ item1.text }}</div>
+                                            <div style="font-size:8px;margin-left:5px;color:#9999;">
+                                                回复时间:{{ item1.create_time }}</div>
+                                            <div style="clear:both"></div>
+
+                                        </div>
+                                    </el-collapse>
+                                    <div style="clear:both"></div>
+                                </div>
                             </el-collapse-item>
                         </el-collapse>
-                      
+
                         <!-- 回复 -->
-                        
+
                     </div>
                 </div>
                 <div style="clear:both"></div>
                 <div>
-                    
+
                 </div>
             </div>
         </el-dialog>
@@ -91,20 +102,21 @@ export default {
 
     data() {
         return {
+            searching: false, //获取TT视频ing
             videoUrl: '',  //播放视频路径
             videoPlayDialog: false,  //播放视频弹框
 
-           getCommentListstoo:{},
-           activeNames: [],
-           activeName2:[],
-           
-            icon:true,
-            icon2:false,
-            aweme_id:"",
-            CommentLists:[],
-            addtime:"",
-            disableda:false,
-            video_capture_ids:"",
+            getCommentListstoo: {},
+            activeNames: [],
+            activeName2: [],
+
+            icon: true,
+            icon2: false,
+            aweme_id: "",
+            CommentLists: [],
+            addtime: "",
+            disableda: false,
+            video_capture_ids: "",
             searchTableData: {
                 equipment: "",//搜索框绑定数据
             },
@@ -145,7 +157,7 @@ export default {
                     render(h, { row }) {
                         return (
                             <div >
-                                <video width="100" height="50" src={row.video_url} class="videosize"></video>
+                                <video controls loop src={row.video_url} class="videosize"></video>
                             </div>
                         )
                     }
@@ -153,32 +165,32 @@ export default {
                 {
                     prop: 'video_desc',
                     label: '视频描述',
-                    minWidth:250,
+                    minWidth: 250,
                     align: 'center',
                 },
                 {
                     prop: 'uid',
                     label: '用户ID',
-                    minWidth:140,
+                    minWidth: 140,
                     align: 'center',
                 },
                 {
                     prop: 'aweme_id',
                     label: '视频ID',
-                    minWidth:140,
+                    minWidth: 140,
                     align: 'center',
 
                 },
                 {
                     prop: 'play_count',
                     label: '播放量',
-                    minWidth:80,
+                    minWidth: 80,
                     align: 'center',
                 },
                 {
                     prop: 'comment_count',
                     label: '评论量',
-                    minWidth:80,
+                    minWidth: 80,
                     align: 'center',
                     render: (h, { row }) => {
                         return (
@@ -192,17 +204,17 @@ export default {
                     prop: 'digg_count',
                     label: '点赞量',
                     align: 'center',
-                    minWidth:80,
+                    minWidth: 80,
                 },
                 {
                     prop: 'addtime',
                     label: '抓取时间',
-                    minWidth:120,
+                    minWidth: 120,
                     align: 'center',
                     render: (h, { row }) => {
                         return (
                             <div>
-                                    {row.addtime}
+                                {row.addtime}
                             </div>
                         );
                     },
@@ -210,15 +222,15 @@ export default {
                 {
                     prop: 'ifvideo',
                     label: '状态',
-                    minWidth:80,
+                    minWidth: 80,
                     align: 'center',
                     render: (h, { row }) => {
                         return (
                             <div>
-                            <span  v-show={row.ifvideo=='1'}>未下载</span>
-                            <span  v-show={row.ifvideo=='0'}>已下载</span>
+                                <span v-show={row.ifvideo == '1'}>未下载</span>
+                                <span v-show={row.ifvideo == '0'}>已下载</span>
                             </div>
-                            
+
                         );
                     },
                 },
@@ -243,36 +255,38 @@ export default {
     },
 
     mounted() {
-this.videocaptureIndex()
+        this.videocaptureIndex()
     },
 
     methods: {
-     //展开评论
-     showCommentLists(item){
-        console.log(item);//当前点击的对象
-            this.icon=!this.icon
-            this.icon2=!this.icon2
-            this.getCommentListstoo=item
+        //展开评论
+        showCommentLists(item) {
+            console.log(item);//当前点击的对象
+            this.icon = !this.icon
+            this.icon2 = !this.icon2
+            this.getCommentListstoo = item
             this.getCommentListstooFn()
-  },
-  //评论回复接口
-  async getCommentListstooFn() {
+        },
+        //评论回复接口
+        async getCommentListstooFn() {
             try {
-                let result = await this.$api({ type: "getCommentList", data:
-                {
-                    reply_id:this.getCommentListstoo.cid
-                }});
+                let result = await this.$api({
+                    type: "getCommentList", data:
+                    {
+                        reply_id: this.getCommentListstoo.cid
+                    }
+                });
                 if (result.status == '200') {
-                    this.getCommentListstoo=result.data
+                    this.getCommentListstoo = result.data
                 } else {
                     this.$message.error({ message: result.msg })
                 }
             } catch (error) {
             }
         },
-//
-  // 关闭视频播放
-  videoPlayClose() {
+        //
+        // 关闭视频播放
+        videoPlayClose() {
             this.videoUrl = ''
             this.videoPlayDialog = false
         },
@@ -282,21 +296,21 @@ this.videocaptureIndex()
             this.videoPlayDialog = true
         },
 
-        videocaptureIndexs(){
-            this.searchTableData.equipment="";
+        videocaptureIndexs() {
+            this.searchTableData.equipment = "";
             this.videocaptureIndex()
-        } ,
+        },
         async videocaptureIndex() {
-           let data={
-            limit:this.current_limit,
-            page:this.current_page,
-            ifvideo:this.searchTableData.equipment,
-           }
-           this.loading = true
+            let data = {
+                limit: this.current_limit,
+                page: this.current_page,
+                ifvideo: this.searchTableData.equipment,
+            }
+            this.loading = true
             let result = await this.$api({ type: "videocaptureIndex", data: data });
             this.loading = false
-            this.tableData=result.data.list
-            this.total=result.data.count;
+            this.tableData = result.data.list
+            this.total = result.data.count;
             //日期格式
             // this.tableData.forEach(item => {
             //     let time1= item.addtime;
@@ -312,7 +326,7 @@ this.videocaptureIndex()
             //     console.log(item.addtime)
             //     return year+"年"+month+"月"+date+"日   "+hour+":"+minute+":"+second
             // })
-            
+
         },
         // 搜索链接
         searchLink() {
@@ -328,29 +342,41 @@ this.videocaptureIndex()
                 keyword: this.numberValidateForm.age.replace('https://www.tiktok.com/@', ''),
             };
             try {
+                this.searching = true
                 let result = await this.$api({ type: "testGetRestByKeys", data: data });
+                this.searching = false
                 if (result.status == '200') {
                     let list = result.data[0]
-                    let list1 = []
-                    let list2 = {
+                    let data = []
+                    let dataAss = {
                         uid: list.uid,
                         sec_uid: list.sec_uid,
                         unique_id: list.unique_id
                     }
-                    list1.push(list2)
-                    this.pushs(list1)
+                    data.push(dataAss)
+                    this.collertionVideo(data)
                 } else {
                     this.$message.error({ message: result.msg })
                 }
             } catch (error) {
-               
             }
         },
-        async pushs(list1) {
+        async collertionVideo(data) {
             let list = {
-                data: list1
+                data: data
             }
-            let result = await this.$api({ type: "collertionVideo", data: list });
+            try {
+                let result = await this.$api({ type: "collertionVideo", data: list });
+                if (result.status == '200') {
+                    this.videocaptureIndex()
+                    this.$message.success({ message: result.msg })
+                }else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) {
+
+            }
+
         },
         //导出TXT
         transition() {
@@ -367,27 +393,28 @@ this.videocaptureIndex()
             save_link.href = window.URL.createObjectURL(export_blob);
             save_link.download = '下载地址' + '.txt';
             this.fakeClick(save_link);
-      
+
             //获取已下载视频地址的video_capture_ids
             this.gridData.forEach(item => {
-                this.video_capture_ids = this.video_capture_ids+item.video_capture_id+",";
+                this.video_capture_ids = this.video_capture_ids + item.video_capture_id + ",";
             })
             //这里不加定时器的话页面不刷新已下载
             this.videocaptureDownload()
-            this.disableda=true
+            this.disableda = true
             setTimeout(() => {
                 this.videocaptureIndexs();
-                this.disableda=false
+                this.disableda = false
             }, 1000);
-            
+
         },
         //是否下载
         async videocaptureDownload() {
-            let result = await this.$api({ 
-                type: "videocaptureDownload", 
+            let result = await this.$api({
+                type: "videocaptureDownload",
                 data: {
-                    video_capture_id:this.video_capture_ids
-                } });
+                    video_capture_id: this.video_capture_ids
+                }
+            });
         },
         //导出后格式
         fakeClick(obj) {
@@ -432,22 +459,24 @@ this.videocaptureIndex()
         messageBox(row) {
             let _self = this;
             _self.dialogVisible = true;
-            
-            _self.aweme_id=row.aweme_id
+
+            _self.aweme_id = row.aweme_id
             console.log(_self.aweme_id);
-            _self.CommentLists =[];
+            _self.CommentLists = [];
             _self.getCommentLists();
 
         },
-         //获取评论详情
-      async getCommentLists() {
+        //获取评论详情
+        async getCommentLists() {
             try {
-                let result = await this.$api({ type: "getCommentList", data:
-                {
-                    aweme_id:this.aweme_id
-                }});
+                let result = await this.$api({
+                    type: "getCommentList", data:
+                    {
+                        aweme_id: this.aweme_id
+                    }
+                });
                 if (result.status == '200') {
-                    this.CommentLists=result.data
+                    this.CommentLists = result.data
                 } else {
                     this.$message.error({ message: result.msg })
                 }
@@ -466,7 +495,7 @@ this.videocaptureIndex()
         handleSelectionChange(val) {
             this.multipleSelection = val;
         },
-       
+
     },
 };
 </script>
@@ -485,10 +514,10 @@ this.videocaptureIndex()
     align-items: center;
     padding: 10px;
 }
-.videosize {
-    width: 100px;
-    height: 30px;
-   
-}
 
+.videosize {
+    width: 134px;
+    height: 191px;
+
+}
 </style>

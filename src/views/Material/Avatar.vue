@@ -36,15 +36,10 @@
                 }}</el-button>
                 <el-button type="primary"  class="seachbut" @click="resetTable">重置</el-button>
                 <el-button type="primary" class="seachbut" @click="imgUpLoad">上传图片</el-button>
+                <el-button type="primary" class="seachbut" @click="batchDelete" :loading="deleteing">{{deleteing ? '删除中 ...' :
+        '批量删除'}}</el-button>
 
             </div>
-            <!-- <el-table :data="statisticsData" border style="width:490px;margin: 10px; ">
-                <el-table-column prop="name" label="分类名称" width="120" align="center"></el-table-column>
-                <el-table-column prop="unloadNumber" label="已上传图片数量" width="120" align="center"></el-table-column>
-                <el-table-column prop="use" label="已用图片数量" width="120" align="center"></el-table-column>
-                <el-table-column prop="used" label="当前可用素材" align="center"></el-table-column>
-            </el-table>
-            <div style="height:10px"></div> -->
         </div>
         <el-dialog title="图片上传" :visible.sync="imgUploadVisible" width="40%" :before-close="imgUploadClose">
             <el-form ref="imgForm" :rules="rulesUpload" :model="imgForm" label-width="140px">
@@ -73,8 +68,19 @@
                 }}</el-button>
             </span>
         </el-dialog>
-        <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
-            @handleSelectionChange="selectionChange"></table-custom>
+        <div>
+            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll"
+                @change="handleCheckAllChange">全选 <span style="color:#FF411F;font-size: 12px;padding-left: 20px;"> 已选中 {{ checkedCities.length }} 个图片</span></el-checkbox>
+            <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange" class="img">
+                <div v-for="(item, index) in tableData" :key="index" class="imgData">
+                    <el-image :src="item.image" class="imgsize"></el-image>
+                    <el-checkbox :label="item.headimage_id" :key="item.headimage_id" class="imgNum">头像编号:{{ item.headimage_id}}</el-checkbox>
+                    <div class="imgNum">上传时间:{{ item.usage_time }}</div>
+                </div>
+            </el-checkbox-group>
+        </div>
+        <!-- <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
+            @handleSelectionChange="selectionChange"></table-custom> -->
         <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination">
         </pagination>
     </div>
@@ -94,17 +100,11 @@ export default {
     },
     data() {
         return {
+            deleteing:false, //删除ing
+            checkAll: false,  //全选
+            checkedCities: [], //已选数据
+            isIndeterminate: true,  //复选框全选属性
             baseUrl: BASE_URL,
-            statisticsData: [
-                {
-                    name: '全部',
-                    unloadNumber: '',
-                    use: '1',
-                    used: '1',
-
-                }
-
-            ],
             imgUrl: '',  //播放图片路径
             loading: false, //表格加载loading
             tableData: [],  //表格数据
@@ -152,7 +152,7 @@ export default {
                                     confirm-button-text='删除'
                                     cancel-button-text='取消'
                                     title="确认删除此图片？"
-                                    onConfirm={this.removeHandler.bind(this, row)}
+                                    onConfirm={this.removeHandler.bind(this, row,'1')}
                                 >
                                     <el-button slot="reference" type="danger" size="mini">删除</el-button>
                                 </el-popconfirm>
@@ -164,7 +164,7 @@ export default {
             ],  //表格
             total: 0,  //数据总量
             current_page: 1, //当前页
-            current_limit: 10, //每页条数
+            current_limit: 30, //每页条数
             submitting: false,  //提交确定
             groupList: [],  //设备分组
             libraryList: [],  //账号分类
@@ -219,6 +219,34 @@ export default {
     },
 
     methods: {
+        // 批量删除
+        batchDelete(){
+            if(this.checkedCities.length==0){
+                this.$message.warning('请选择需要删除的头像');
+            }else{
+                this.removeHandler(this.checkedCities,'2')
+            }
+        },
+        // 监听全选
+        handleCheckAllChange(val) {
+            if (val) {
+                this.tableData.forEach((item) => {
+                    if(this.checkedCities.indexOf(item.headimage_id) === -1){
+                        this.checkedCities.push(item.headimage_id)
+                    }
+                })
+            }else{
+                this.checkedCities=[]
+            }
+            this.isIndeterminate = false;
+        },
+        // 单个选择
+        handleCheckedCitiesChange(value) {
+            let checkedCount = value.length;
+            this.checkAll = checkedCount === this.tableData.length;
+            this.isIndeterminate = checkedCount > 0 && checkedCount < this.tableData.length;
+        },
+        // 检验上传的图片大小
         imgBefore(file) {
             let { size } = file || {};
             if (size >  200 * 1024) {
@@ -228,12 +256,10 @@ export default {
         },
         // 图片删除
         handleRemove(file, fileList) {
-            console.log('图片删除', file, fileList);
             this.fileList = fileList
         },
         // 图片上传成功返回
         handleSucess(response, file, fileList) {
-            console.log('图片上传', response, file, fileList);
             // if(response.status!='200'){
             //     this.$message.warning(response.msg);
             //     fileList.pop()
@@ -349,13 +375,24 @@ export default {
         /*
            删除图片
         */
-        async removeHandler(val) {
+        async removeHandler(val,type) {
             let data = {
-                headimage_ids: val.headimage_id,
+                headimage_ids: '',
             }
+            if(type==2){  //批量删除
+                this.deleteing=true
+                data.headimage_ids=val.join(',')
+            }else{
+                data.headimage_ids=val.headimage_id
+            }
+
             try {
                 let result = await this.$api({ type: "deleteHeadimage", data: data });
+                this.deleteing=false
                 if (result.status == '200') {
+                    if(type==2){
+                        this.checkedCities=[]
+                    }
                     this.$message.success({ message: '图片删除成功' });
                     this.getHeadimageList()
                 } else {
@@ -412,10 +449,6 @@ export default {
                 if (result.status == '200') {
                     this.tableData = result.data.list;
                     this.total = result.data.count
-                    this.statisticsData[0].unloadNumber = result.data.count
-                    this.statisticsData[0].name = (result.data.type_title == '' ? '全部' : result.data.type_title)
-                    this.statisticsData[0].use = result.data.yy
-                    this.statisticsData[0].used = result.data.count - result.data.yy
                 } else {
                     this.$message.error({ message: result.msg })
                 }
@@ -456,7 +489,31 @@ export default {
 }
 
 .imgsize {
-    width: 100px;
-    height: 30px;
+    width: 125px;
+    height: 125px;
+    border-radius: 100px;
+}
+.img {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.imgData {
+    width: 170px;
+    margin: 10px 15px;
+}
+
+.imgNum {
+    color: rgba(16, 16, 16, 1);
+    font-size: 12px;
+    text-align: left;
+    padding-top: 5px;
+}
+
+.imgCheckbox {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
 }
 </style>
