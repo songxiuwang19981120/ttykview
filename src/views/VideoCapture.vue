@@ -21,8 +21,6 @@
                 </el-select>
                 <el-button type="primary" @click="videocaptureIndex">搜 索</el-button>
                 <el-button type="primary" @click="videocaptureIndexs">重 置</el-button>
-            </div>
-            <div class="tt-accsituation--operation">
                 <el-button type="primary" :disabled="disableda" @click="transition()">导出下载地址</el-button>
             </div>
         </div>
@@ -501,23 +499,5 @@ export default {
 </script>
 
 <style scoped>
-.tt-accsituation {
-    background-color: #fff;
-    min-height: 70px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
 
-.tt-accsituation--operation {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 10px;
-}
-
-.videosize {
-    width: 134px;
-    height: 191px;
-
-}
 </style>

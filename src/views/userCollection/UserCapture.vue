@@ -465,20 +465,6 @@ export default {
 </script>
 
 <style scoped>
-.tt-accsituation {
-    background-color: #fff;
-    min-height: 70px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-
-.tt-accsituation--operation {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    flex-wrap: wrap;
-    padding: 10px;
-}
 
 .blogger {
     width: 400px;

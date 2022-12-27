@@ -7,7 +7,7 @@
 					v-model="ruleForm.grouping_id"
 					placeholder="设备分组选择"
 					style="margin-right: 20px"
-					@focus="getEquipmentGroup"
+					@focus="getaccGroup"
 					:loading="equipmentLoading"
 					loading-text="数据加载中..."
 					clearable
@@ -127,7 +127,7 @@
 		},
 		methods: {
 			// 获取设备分组数据
-			async getEquipmentGroup() {
+			async getaccGroup() {
 				try {
 					this.equipmentLoading = true;
 					const res = await this.$api({

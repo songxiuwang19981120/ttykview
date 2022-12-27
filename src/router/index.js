@@ -38,7 +38,7 @@ const routes = [
       {
         path:'/equgroup',
         name:'equgroup',
-        component:() => import(/* webpackChunkName: "equgroup" */ '@/views/equipment/EquipmentGroup.vue')
+        component:() => import(/* webpackChunkName: "equgroup" */ '@/views/account/accGroup.vue')
       },
       //设备管理 end
 

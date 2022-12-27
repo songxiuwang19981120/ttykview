@@ -5,7 +5,7 @@
 				<div>
 					<span>设备分组：</span>
 					<el-select v-model="searchTableData.equipment" placeholder="设备分组选择" style="margin-right: 20px"
-						@focus="getEquipmentGroup" :loading="equipmentLoading" loading-text="数据加载中...">
+						@focus="getaccGroup" :loading="equipmentLoading" loading-text="数据加载中...">
 						<el-option v-for="item in searchEquipmentList" :key="item.grouping_id"
 							:label="item.grouping_name" :value="item.grouping_id">
 						</el-option>
@@ -262,7 +262,7 @@ export default {
 			} 
 		},
 		// 获取设备分组数据
-		async getEquipmentGroup() {
+		async getaccGroup() {
 			try {
 				this.equipmentLoading = true;
 				const res = await this.$api({

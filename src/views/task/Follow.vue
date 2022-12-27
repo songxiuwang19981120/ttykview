@@ -3,17 +3,13 @@
 		<div class="tt-accsituation">
 			<div class="tt-accsituation--operation">
 				<div  style="margin-right: 20px">
-					<span>任务状态：</span>
 					<el-select v-model="page.status" placeholder="请选择任务状态">
 						<el-option v-for="item in searchStateList" :key="item.value" :label="item.label"
 							:value="item.value">
 						</el-option>
 					</el-select>
 				</div>
-				<el-button type="primary" class="seachbut" :loading="btnloading" @click="searchTasks"
-					style="margin-right: 20px">{{
-							btnloading ? '加载中...' : '搜索'
-					}}</el-button>
+				<el-button type="primary" class="seachbut" :loading="btnloading" @click="searchTasks">{{btnloading ? '加载中...' : '搜索'}}</el-button>
 				<el-button type="primary" class="seachbut" @click="btnReset">重置</el-button>
 			</div>
 		</div>
@@ -186,24 +182,4 @@ export default {
 </script>
 
 <style  lang="scss" scoped>
-@import '@/assets/base/base.scss';
-
-.tt-accsituation {
-	background-color: #fff;
-	margin-bottom: 20px;
-	border-radius: 4px;
-	padding: 0 12px;
-}
-
-.tt-accsituation--operation {
-	display: flex;
-	// height: 70px;
-	// line-height: 70px;
-	padding: 10px;
-}
-
-.seachbut {
-	background-color: $button-back-color;
-	border-color: $button-bord-color;
-}
 </style>

@@ -53,7 +53,7 @@
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
               <el-form-item label="选择分组:" :disabled="false" prop="equipment" label-width="100px">
                 <el-select :disabled="disabled" v-model="ruleForm.equipment" placeholder="设备分组选择" style="margin-right: 10px"
-                  @focus="getEquipmentGroup" :loading="equipmentLoading" loading-text="数据加载中...">
+                  @focus="getaccGroup" :loading="equipmentLoading" loading-text="数据加载中...">
                   <el-option v-for="item in searchEquipmentList" :key="item.grouping_id"
                     :label="item.grouping_name" :value="item.grouping_id">
                   </el-option>
@@ -434,7 +434,7 @@ export default {
 
   methods: {
     // 获取设备分组数据
-		async getEquipmentGroup() {
+		async getaccGroup() {
 			try {
 				this.equipmentLoading = true;
 				const res = await this.$api({
