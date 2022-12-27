@@ -74,7 +74,7 @@
             <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange" class="img">
                 <div v-for="(item, index) in tableData" :key="index" class="imgData">
                     <el-image :src="item.image" class="imgsize"></el-image>
-                    <el-checkbox :label="item.headimage_id" :key="item.headimage_id" class="imgNum">头像编号:{{ item.headimage_id}}</el-checkbox>
+                    <el-checkbox :label="item.headimage_id" :key="item.headimage_id" class="imgNum">头像编号:100{{ item.headimage_id}}</el-checkbox>
                     <div class="imgNum">上传时间:{{ item.usage_time }}</div>
                 </div>
             </el-checkbox-group>

@@ -572,7 +572,12 @@ export default {
   'getCountry':{    //获取国家数据
     url:'/member/country',
     method:'POST'
-  }
+  },
+   'updateUserType':{ //更新用户分组分类
+      url:'member/BatchUpdateUserType',
+     method:'POST'
+     }
+  
 }
 
 
