@@ -607,7 +607,11 @@ showBatchEditorDialog(){
         page: this.page ?? 1,
         grouping_id: this.group,
       };
-      let result = await this.getMemberList(data);
+      console.log(111)
+      let result = await  this.$api({
+          type: "getMember",
+          data: data,
+        });;
       console.log(result);
       this.memberList = result?.data?.list ?? [];
       this.total = result?.data?.count ?? 0;
