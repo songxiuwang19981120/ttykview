@@ -13,17 +13,18 @@
             ></el-option>
           </el-select>
         </div>
-            <el-date-picker
-            class="date-picker"
-      v-model="date"
-      type="daterange"
-      align="right"
-      unlink-panels
-      range-separator="——"
-      start-placeholder="开始日期"
-      end-placeholder="结束日期"
-      :picker-options="pickerOptions">
-    </el-date-picker>
+        <el-date-picker
+          class="date-picker"
+          v-model="date"
+          type="daterange"
+          align="right"
+          unlink-panels
+          range-separator="——"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          :picker-options="pickerOptions"
+        >
+        </el-date-picker>
         <el-button
           type="primary"
           class="seachbut"
@@ -34,9 +35,11 @@
         <el-button type="primary" class="seachbut" @click="btnReset"
           >重置</el-button
         >
+		
         <el-button type="primary" class="seachbut" @click="showVideoTask"
           >发布视频</el-button
         >
+		<i class="el-icon-refresh-left"></i>
       </div>
     </div>
     <!-- 表格 -->
@@ -58,7 +61,13 @@
       :showDialog.sync="dialog"
       :curId="curId"
     ></VideoReleaseDialogComponent>
-
+    <TaskDetail
+      @closeTaskDetail="closeTaskDetail"
+      :showTaskDetail="showTaskDetail"
+      :taskDesc="title"
+      :tableData="tableData"
+      :title="title"
+    />
     <VideoTaskDialog
       :showVideoDialog="showVideoDialog"
       @closeVideoTask="closeVideoTask"
@@ -70,6 +79,7 @@ import tableCustom from "@/components/myComponent/table/tableCustom.vue";
 import VideoReleaseDialogComponent from "./component/VideoReleaseDialogComponent.vue";
 import pagination from "@/components/myComponent/table/pagination.vue";
 import VideoTaskDialog from "@/views/account/accCountSit/taskDialog/videoDialog.vue";
+import TaskDetail from "./component/TaskDetail.vue";
 export default {
   name: "TtVideoRelease",
   components: {
@@ -77,10 +87,13 @@ export default {
     VideoReleaseDialogComponent,
     pagination,
     VideoTaskDialog,
+    TaskDetail,
   },
   data() {
     return {
-      date:'',//时间开始与结束
+      title: "视频发布任务详情",
+      showTaskDetail: false,
+      date: "", //时间开始与结束
       showVideoDialog: false, //控制dialog显示
       // 下拉选择数据
       searchStateList: [
@@ -150,14 +163,14 @@ export default {
                 <el-button
                   type="primary"
                   size="mini"
-                  onClick={this.toDetail.bind(this, row.tasklist_id)}
+                  onClick={this.delete.bind(this, row.tasklist_id)}
                 >
                   删除
                 </el-button>
                 <el-button
                   type="primary"
                   size="mini"
-                  onClick={this.toDetail.bind(this, row.tasklist_id)}
+                  onClick={this.suspend.bind(this, row.tasklist_id)}
                 >
                   暂停
                 </el-button>
@@ -175,33 +188,37 @@ export default {
       },
       total: 0,
       curId: null,
-              pickerOptions: {
-          shortcuts: [{
-            text: '最近一周',
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "最近一周",
             onClick(picker) {
               const end = new Date();
               const start = new Date();
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: '最近一个月',
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近一个月",
             onClick(picker) {
               const end = new Date();
               const start = new Date();
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: '最近三个月',
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近三个月",
             onClick(picker) {
               const end = new Date();
               const start = new Date();
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit('pick', [start, end]);
-            }
-          }]
-        },
+              picker.$emit("pick", [start, end]);
+            },
+          },
+        ],
+      },
     };
   },
 
@@ -213,6 +230,16 @@ export default {
   mounted() {},
 
   methods: {
+    closeTaskDetail() {
+      this.showTaskDetail = false;
+    },
+    delete() {
+      console.log("删除");
+    },
+
+    suspend() {
+      console.log("暂停");
+    },
     /* 
         function: closeVideoTask
         params: null
@@ -254,7 +281,7 @@ export default {
     },
     // 查看详情
     toDetail(id) {
-      this.dialog = true;
+      this.showTaskDetail = true;
       this.curId = id;
       this.$refs.dialog.getTaskListDetail({
         page: 1,
@@ -310,5 +337,11 @@ export default {
 .date-picker {
   margin-right: 12px;
 }
-  
+
+.el-icon-refresh-left {
+	margin: 5px 0 0 50px;
+	font-size: 30px;
+	color: $button-back-color;
+	cursor: pointer;
+}
 </style>

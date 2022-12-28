@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-dialog
+    width="60%"
     :visible="showTaskDetail"
     :before-close="handlerClose"
     >
@@ -42,127 +43,121 @@ export default {
   data() {
     return {
       loading: false,
-      columns: [
-        {
-          prop: "avatar_thumb",
-          label: "头像",
-          width: "100",
-          align: "center",
-          render: (h, { row }) => {
-            return (
-              <div>
-                <el-image
-                  src={row.avatar_thumb}
-                  style="width: 60px; height: 60px"
-                ></el-image>
+				columns: [
+          {
+						label: '头像',
+						prop: 'task_type',
+						align: 'center',
+            fixed: true,
+            width:'200',
+						render() {
+							return (<div style="display:flex">
+                <el-image></el-image>
                 <div>
-                  <h1></h1>
-                  <span>ID:</span>
+                  <p>赵铁柱</p>
+                  <p>ID:233333333</p>
                 </div>
-              </div>
-            );
-          },
-        },
-        ,
-        {
-          prop: "typecontrol_id",
-          label: "账号分类",
-          width: "100",
-          align: "center",
-          render: (h, { row }) => {
-            return (
-              <div>
-                <span>巴西/盲盒/美女/丝袜</span>
-              </div>
-            );
-          },
-        },
-        {
-          prop: "task_num",
-          label: "任务批次",
-          width: "100",
-          align: "center",
-          render: (h, { row }) => {
-            return (
-              <div>
-                <span>23</span>
-              </div>
-            );
-          },
-        },
-        {
-          prop: "curr_num",
-          label: { taskDesc },
-          width: "100",
-          align: "center",
-          render: (h, { row }) => {
-            return (
-              <div>
-                <span>999</span>
-              </div>
-            );
-          },
-        },
-        {
-          prop: "lose_num",
-          label: "失败次数",
-          width: "100",
-          align: "center",
-          render: (h, { row }) => {
-            return (
-              <div>
-                <span>1</span>
-              </div>
-            );
-          },
-        },
-        {
-          prop: "update_time",
-          label: "更新时间",
-          width: "100",
-          align: "center",
-          render: (h, { row }) => {
-            return (
-              <div>
-                <span>2022-12-13 21:25:27</span>
-              </div>
-            );
-          },
-        },
-        {
-          prop: "status",
-          label: "状态",
-          width: "100",
-          align: "center",
-          render: (h, { row }) => {
-            return (
-              <div>
-                <span>完成</span>
-              </div>
-            );
-          },
-        },
-        {
-          prop: "status",
-          label: "状态",
-          width: "100",
-          align: "center",
-          render: (h, { row }) => {
-            return (
-              <div>
-                <el-button>日志</el-button>
-                <el-button>删除</el-button>
-              </div>
-            );
-          },
-        },
-      ],
+              </div>);
+						},
+					},
+          {
+						label: '账号分类',
+						prop: 'task_type',
+						align: 'center',
+						render() {
+							return (<div>
+                巴西/盲盒
+              </div>);
+						},
+					},
+          {
+						label: '任务批次',
+						prop: 'task_type',
+						align: 'center',
+						render() {
+							return (<div>
+                22
+              </div>);
+						},
+					},
+          {
+						label: '目标数量',
+						prop: 'task_type',
+						align: 'center',
+						render() {
+							return (<div>
+                2
+              </div>);
+						},
+					},
+          {
+						label: '已执行数量',
+						prop: 'task_type',
+						align: 'center',
+						render() {
+							return (<div>
+                2
+              </div>);
+						},
+					},
+
+					{
+						label: '失败次数',
+						prop: 'task_type',
+						align: 'center',
+						render() {
+							return <div>1</div>;
+						},
+					},
+					{
+						label: '更新时间',
+						prop: 'create_time',
+						align: 'center',
+					},
+					{
+						label: '状态',
+						prop: 'status',
+						align: 'center',
+						render(h, { row }) {
+							const { status } = row;
+							let state;
+							if (status == 0) {
+								state = '成功';
+							} else if (status == 1) {
+								state = '未开始';
+							} else if (status == 2) {
+								state = '失败';
+							}
+							return <div>{state}</div>;
+						},
+					},
+					{
+						label: '操作',
+						prop: 'status',
+						align: 'center',
+            width:'200',
+						render(h, { row }) {
+              return (
+                <div>
+                  <el-button size="mini">日志</el-button>
+                  <el-button size="mini">删除</el-button>
+                </div>
+              )
+						},
+					},
+				],
     };
   },
 
   mounted() {},
 
   methods: {
+    showLogDialog(){
+
+    },
+    handleDel(){
+      console.log('删除')
+    },
     handlerClose(){
         this.$emit('closeTaskDetail')
     }
