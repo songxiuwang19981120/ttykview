@@ -568,6 +568,21 @@ export default {
     method: 'POST'
   },
   //PrivateLetter API end
+
+  // Role API start
+  'getRole': { // 获取角色列表
+    url: '/Role/index',
+    method: 'POST'
+  },
+  'addRole': { // 新增角色
+    url: '/Role/add',
+    method: 'POST'
+  },
+  'updateRole': { // 编辑角色
+    url: '/Role/update',
+    method: 'POST'
+  },
+  // Role API end
 }
 
 

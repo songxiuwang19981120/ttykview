@@ -115,6 +115,24 @@ export default {
         },
 
         {
+            title: '账户管理',
+            to: '',
+            icon: 'el-icon-s-tools',
+            children: [
+                {
+                    title: '用户管理',
+                    to: '/users',
+                    icon: '',
+                },
+                {
+                    title: '角色管理',
+                    to: '/roles',
+                    icon: '',
+                },
+            ]
+        },
+
+        {
             title: '视频采集',
             to: '/videocapture',
             icon: 'el-icon-s-platform'

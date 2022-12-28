@@ -132,8 +132,21 @@ const routes = [
         path:'/usercapture',
         name:'usercapture',
         component:() => import(/* webpackChunkName: "usercapture" */ '@/views/userCollection/UserCapture.vue')
-      }
+      },
       //素材管理 end
+
+      // 账户管理 start
+      {
+        path:'/users',
+        name:'users',
+        component:() => import(/* webpackChunkName: "users" */ '@/views/users/Users.vue')
+      },
+      {
+        path:'/roles',
+        name:'roles',
+        component:() => import(/* webpackChunkName: "users" */ '@/views/users/Roles.vue')
+      },
+      // 账户管理 end
     ]
   },
 ]
