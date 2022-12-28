@@ -3,7 +3,7 @@
 		<div class="tt-accsituation">
 			<div class="tt-accsituation--operation">
 				<div>
-					<el-button type="primary" @click="addRole" class="btn">新增</el-button>
+					<el-button type="primary" @click="addRole">新增</el-button>
 				</div>
 			</div>
 		</div>
@@ -147,28 +147,5 @@
 </script>
 
 <style lang="scss" scoped>
-	@import '@/assets/base/_color_variables.scss';
-	.tt-accsituation {
-		background-color: #fff;
-		margin-bottom: 20px;
-		border-radius: 4px;
-		padding: 0 12px;
-		.tt-accsituation--operation {
-			display: flex;
-			flex-wrap: wrap;
-			min-height: 70px;
-			line-height: 70px;
-			.contain {
-				margin-right: 20px;
-			}
-			.btn {
-				background-color: $button-back-color;
-				border: $button-bord-color;
-			}
-		}
-	}
-	::v-deep .el-button--primary {
-		background-color: $button-back-color;
-		border: $button-bord-color;
-	}
+
 </style>

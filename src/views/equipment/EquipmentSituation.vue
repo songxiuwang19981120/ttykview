@@ -2,88 +2,80 @@
   <div>
     <div class="tt-accsituation">
       <div class="tt-accsituation--operation">
-        <div style="float:left">
-          <span>显示分组：</span>
+        <div style="margin-right: 10px;">
           <el-select v-model="equipment" placeholder="请选择分组" style="width:150px;">
-            <el-option v-for="item in searchEquipentList" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
+            <el-option v-for="item in searchEquipentList" :key="item.value" :label="item.label"
+              :value="item.value"></el-option>
           </el-select>
         </div>
-        <div style="float:left;margin-left: 80px;">
-          <span style="width:100px">显示状态：</span>
+        <div style="margin-right: 10px;">
           <el-select v-model="equipmentState" placeholder="请选择状态" style="width:150px;">
             <el-option v-for="item in searchEquipentListState" :key="item.value" :label="item.label"
               :value="item.value">
             </el-option>
           </el-select>
         </div>
-        <div style="float:left;margin-left: 80px;">
-          <el-button type="primary" @click="dialog = true">修改分组</el-button>
-          <el-drawer title="修改分组" :before-close="handleClose" :visible.sync="dialog" direction="rtl"
-            custom-class="demo-drawer" ref="drawer">
-            <div class="">
-              <el-form :model="form">
-                <el-form-item label="修改分组" :label-width="formLabelWidth">
-                  <el-select v-model="form.region" placeholder="请选择分组">
-                    <el-option v-for="item in searchEquipentList" :key="item.value" :label="item.label"
-                      :value="item.value"></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-form>
-              <!-- 更改显示状态的列表 -->
-              <table-custom :loading="loading" :tableData="tableData2" :columns="columns_T"></table-custom>
-              <div style="float: right;margin-right: 20px;margin-top: 20px;">
-                <el-button @click="cancelForm">关 闭</el-button>
-                <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading
-                    ?
-                    '提交中 ...' : '确 定'
-                }}</el-button>
-              </div>
-            </div>
-          </el-drawer>
-
-        </div>
-        <div style="float:left;">
-          <el-button style="margin-left: 20px;" type="primary" @click="dialogFormVisible = true">创建账号</el-button>
-          <el-dialog title="创建账号" style="width:50%; margin:0 auto" :visible.sync="dialogFormVisible"
-            :before-close="handleCloseDialog">
-            <!-- 四级联动 -->
-          
-            
-            <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
-              <el-form-item label="选择分组:" :disabled="false" prop="equipment" label-width="100px">
-                <el-select :disabled="disabled" v-model="ruleForm.equipment" placeholder="账号分组选择" style="margin-right: 10px"
-                  @focus="getaccGroup" :loading="equipmentLoading" loading-text="数据加载中...">
-                  <el-option v-for="item in searchEquipmentList" :key="item.grouping_id"
-                    :label="item.grouping_name" :value="item.grouping_id">
-                  </el-option>
-                </el-select>
-                <span @click="addlis()">
-            <el-checkbox  v-model="checked">选择全部分组</el-checkbox>
-          </span>
-              </el-form-item>
-
-              <el-form-item label="选择分类:" prop="classify" label-width="100px">
-                <el-cascader v-model="ruleForm.classify" :options="options" @change="handleChange">
-                </el-cascader>
-              </el-form-item>
-
-            
-              <el-form-item label="最大容量:" label-width="100px">
-                <!-- 计数器 -->
-                <el-input-number v-model="ruleForm.num" @change="handleChangeNum" :min="1" :max="10"
-                  label="请输入单设备最大容量"></el-input-number>
-              </el-form-item>
-            </el-form>
-            <div slot="footer" style="margin-top: 100px;">
-              <el-button @click="dialogFormVisible = false">取 消</el-button>
-              <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
-            </div>
-          </el-dialog>
-        </div>
-        <div style="clear: both;"></div>
+        <el-button type="primary" @click="dialog = true">修改分组</el-button>
+        <el-button style="margin-right: 20px;" type="primary" @click="dialogFormVisible = true">创建账号</el-button>
       </div>
     </div>
+    <el-drawer title="修改分组" :before-close="handleClose" :visible.sync="dialog" direction="rtl"
+      custom-class="demo-drawer" ref="drawer">
+      <div class="">
+        <el-form :model="form">
+          <el-form-item label="修改分组" :label-width="formLabelWidth">
+            <el-select v-model="form.region" placeholder="请选择分组">
+              <el-option v-for="item in searchEquipentList" :key="item.value" :label="item.label"
+                :value="item.value"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <!-- 更改显示状态的列表 -->
+        <table-custom :loading="loading" :tableData="tableData2" :columns="columns_T"></table-custom>
+        <div style="float: right;margin-right: 20px;margin-top: 20px;">
+          <el-button @click="cancelForm">关 闭</el-button>
+          <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading
+    ?
+    '提交中 ...' : '确 定'
+}}</el-button>
+        </div>
+      </div>
+    </el-drawer>
+    <el-dialog title="创建账号" style="width:50%; margin:0 auto" :visible.sync="dialogFormVisible"
+      :before-close="handleCloseDialog">
+      <!-- 四级联动 -->
+
+
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
+        <el-form-item label="选择分组:" :disabled="false" prop="equipment" label-width="100px">
+          <el-select :disabled="disabled" v-model="ruleForm.equipment" placeholder="账号分组选择" style="margin-right: 10px"
+            @focus="getaccGroup" :loading="equipmentLoading" loading-text="数据加载中...">
+            <el-option v-for="item in searchEquipmentList" :key="item.grouping_id" :label="item.grouping_name"
+              :value="item.grouping_id">
+            </el-option>
+          </el-select>
+          <span @click="addlis()">
+            <el-checkbox v-model="checked">选择全部分组</el-checkbox>
+          </span>
+        </el-form-item>
+
+        <el-form-item label="选择分类:" prop="classify" label-width="100px">
+          <el-cascader v-model="ruleForm.classify" :options="options" @change="handleChange">
+          </el-cascader>
+        </el-form-item>
+
+
+        <el-form-item label="最大容量:" label-width="100px">
+          <!-- 计数器 -->
+          <el-input-number v-model="ruleForm.num" @change="handleChangeNum" :min="1" :max="10"
+            label="请输入单设备最大容量"></el-input-number>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" style="margin-top: 100px;">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+      </div>
+    </el-dialog>
     <table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
       @handleSelectionChange="selectionChange"></table-custom>
     <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination">
@@ -104,7 +96,7 @@ export default {
   data() {
     return {
       checked: false,//是否添加根目录分组
-      disabled:false,
+      disabled: false,
       //联级选择器
       options: [{
         value: 'zhinan',
@@ -301,8 +293,8 @@ export default {
           label: '组件交互文档'
         }]
       }],
-      searchEquipmentList:[],
-      equipmentLoading:false,
+      searchEquipmentList: [],
+      equipmentLoading: false,
       //计数器
       visibleDelete: false,
       dialog: false,//抽屉1显隐
@@ -314,7 +306,7 @@ export default {
       ruleForm: {
         classify: [],
         num: '',
-        equipment:[]
+        equipment: []
       },
       rules: {
         classify: [
@@ -434,35 +426,35 @@ export default {
 
   methods: {
     // 获取账号分组数据
-		async getaccGroup() {
-			try {
-				this.equipmentLoading = true;
-				const res = await this.$api({
-					type: 'getGrouping',
-				});
-				if (res.status == 200) {
-					this.searchEquipmentList = res.data.list;
-				} else {
-					this.$message.error(res.msg);
-				}
-			} catch (error) {
-				console.error(error);
-			} finally {
-				this.equipmentLoading = false;
-			}
-		},
-        //是否根目录
-        addlis() {
+    async getaccGroup() {
+      try {
+        this.equipmentLoading = true;
+        const res = await this.$api({
+          type: 'getGrouping',
+        });
+        if (res.status == 200) {
+          this.searchEquipmentList = res.data.list;
+        } else {
+          this.$message.error(res.msg);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.equipmentLoading = false;
+      }
+    },
+    //是否根目录
+    addlis() {
       this.ruleForm.equipment = [];
       if (this.checked == true) {
         this.disabled = false;
-          this.rules. equipment=[
+        this.rules.equipment = [
           { required: true, message: '请选择分组', trigger: 'blur' },
         ]
       } else {
         this.disabled = true;
-        this.rules.equipment=[]
-      
+        this.rules.equipment = []
+
       }
     },
     //表单验证
@@ -550,17 +542,5 @@ export default {
 };
 </script>
 <style scoped>
-.tt-accsituation {
-  background-color: #fff;
-  min-height: 70px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
 
-.tt-accsituation--operation {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 10px;
-}
 </style>
