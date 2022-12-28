@@ -38,7 +38,7 @@ const routes = [
       {
         path:'/equgroup',
         name:'equgroup',
-        component:() => import(/* webpackChunkName: "equgroup" */ '@/views/equipment/EquipmentGroup.vue')
+        component:() => import(/* webpackChunkName: "equgroup" */ '@/views/account/accGroup.vue')
       },
       //设备管理 end
 
@@ -79,6 +79,17 @@ const routes = [
         name:'private',
         component:() => import(/* webpackChunkName: "private" */ '@/views/task/PrivateLetter.vue')
       },
+      {
+        path:'/accountcreation',
+        name:'AccountCreation',
+        component:() => import(/* webpackChunkName: "private" */ '@/views/task/AccountCreation.vue')
+      },
+      {
+        path:'/cultivatetask',
+        name:'cultivatetask',
+        component:() => import(/* webpackChunkName: "private" */ '@/views/task/CultivateTask.vue')
+      },
+
       //任务管理 end
 
       //素材管理 start
@@ -152,6 +163,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
+  mode:'history',
   routes
 })
 

@@ -15,6 +15,7 @@
         label-position="left"
         label-width="130px"
       >
+      
         <el-form-item
           label="选择国家 ："
           prop="account_region"
@@ -146,7 +147,7 @@ export default {
   data() {
     return {
       rules: follow,
-      letterOptions: ["1", "2", "3", "4", "5"],
+      letterOptions: [],
       letterGroup: ["文本话术", "短连接", "好友名片", "作品转发"],
       letterOptionsValue: {
         文本话术: "ChatText",
@@ -170,6 +171,34 @@ export default {
         {
           value: "俄国",
           label: "俄国",
+        },
+        {
+          value: "新加坡",
+          label: "新加坡",
+        },
+        {
+          value: "泰国",
+          label: "泰国",
+        },
+        {
+          value: "菲律宾",
+          label: "菲律宾",
+        },
+        {
+          value: "印度尼西亚",
+          label: "印度尼西亚",
+        },
+        {
+          value: "越南",
+          label: "越南",
+        },
+        {
+          value: "马来西亚",
+          label: "马来西亚",
+        },
+        {
+          value: "巴西",
+          label: "巴西",
         },
       ],
       //关注发布任务 提交表单

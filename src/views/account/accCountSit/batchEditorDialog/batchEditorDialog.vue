@@ -9,8 +9,8 @@
         <h1 class="tt-acccountsit--title">批量编辑</h1>
       </span>
         <h2>当前分组为：{{this.groupString}}</h2>
-      <el-form :model="batchEiatorForm">
-<!--         <el-form-item label="设备分组">
+      <el-form :model="batchEiatorForm" ref="batchEiatorForm">
+<!--         <el-form-item label="账号分组">
           <el-select
             clearable
             v-model="batchEiatorForm.group"
@@ -56,9 +56,9 @@ export default {
     check_all: {
       type: Boolean,
     },
-    groupList: {
+/*     groupList: {
       type: Array,
-    },
+    }, */
     typeList: {
       type: Array,
     },
@@ -73,9 +73,6 @@ export default {
     },
     materialTotal: {
       type: Number,
-    },
-    group:{
-      type:String
     },
     groupString:{
       type:String
@@ -105,7 +102,7 @@ export default {
         group: "",
         typecontrol_id: [],
         eidtorList: "",
-        member_id:this.memberIdList
+        member_id:''
       },
     };
   },
@@ -116,6 +113,11 @@ export default {
     handlerClose() {
       this.$emit("closeBatchEidialog");
     },
+
+    resetForm() {
+      this.$refs["batchEiatorForm"].resetFields();
+    },
+
     async setProjectNum(){
       let data = {
         typecontrol_id: this.batchEiatorForm.typecontrol_id[this.batchEiatorForm.typecontrol_id.length - 1] ?? ''
@@ -124,8 +126,11 @@ export default {
       this.$emit('updateProjectNum',this.batchEiatorForm.typecontrol_id[this.batchEiatorForm.typecontrol_id.length - 1])
       console.log(result)
     },
+
+
     async handlerConfrim() {
-      if (this.editorTotal > this.materialTotal) {
+      try {
+        if (this.editorTotal > this.materialTotal) {
         this.$message.error("素材不够用啦");
         return false;
       }
@@ -135,12 +140,23 @@ export default {
       let updateData = {
         member_id: this.memberIdList.toString(),
         typecontrol_id: this.batchEiatorForm.typecontrol_id[this.batchEiatorForm.typecontrol_id.length - 1] ?? this.typecontrol_id,
-        
       }
       console.log(updateData)
       this.batchEiatorForm.eidtorList = userList;
       let result = await this.$api({type:'updateUserDate',data:updateData})
-      console.log(result);
+      if(result.status == 200){
+        this.$message.success(result.msg ?? '操作成功')
+        this.resetForm()
+        this.handlerClose()
+        return
+      }
+        this.$message.error(result.msg ?? '操作失败')
+        this.resetForm()
+        this.handlerClose()
+      } catch (error) {
+        console.error(error)
+      }
+
     },
   },
 };

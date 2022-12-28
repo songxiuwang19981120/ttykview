@@ -3,66 +3,55 @@
         <div class="tt-accsituation">
             <div class="tt-accsituation--operation">
                 <div>
-                    <span class="search-title">设备分组:</span>
-                    <el-select v-model="searchTableData.equipment" placeholder="请选择设备分组"
-                        style="width:150px;margin-right:20px">
+                    <el-select v-model="searchTableData.equipment" placeholder="请选择账号分组"
+                        style="width:150px;margin-right:10px" @change="searchEquipmentChange" clearable>
                         <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
                             :key="item.grouping_id"></el-option>
                     </el-select>
                 </div>
                 <div>
-                    <span class="search-title">账号分类:</span>
                     <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryList"
                         v-model="searchTableData.library" placeholder="账号分类选择"
-                        style="width:180px;margin-right:20px"></el-cascader>
+                        style="width:180px;margin-right:10px"></el-cascader>
                 </div>
                 <div>
-                    <span class="search-title">素材类型:</span>
                     <el-select v-model="searchTableData.status" placeholder="素材类型"
-                        style="width:160px;margin-right:20px">
+                        style="width:160px;margin-right:10px">
                         <el-option v-for="item in searchTypeList" :key="item.value" :label="item.label"
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
                 <div>
-                    <span class="search-title">时间排序:</span>
                     <el-select v-model="searchTableData.sort" placeholder="时间排序" style="width:110px;margin-right:20px">
                         <el-option v-for="item in searchTimeSortList" :key="item.value" :label="item.label"
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
                 <el-button type="primary" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...' :
-                        '搜索'
-                }}</el-button>
+        '搜索'
+}}</el-button>
                 <el-button type="primary" @click="resetTable">重置</el-button>
-            </div>
-            <div class="tt-accsituation--operation">
                 <el-button type="primary" @click="videoUpLoad">上传视频</el-button>
-                <!-- <el-button type="primary" @click="videoUpLoad">批量删除</el-button> -->
+                <el-button type="primary" @click="batchDelete">批量删除</el-button>
+
             </div>
-            <el-table :data="statisticsData" border style="width:490px;margin: 10px; ">
-                <el-table-column prop="name" label="分类名称" width="120" align="center"></el-table-column>
-                <el-table-column prop="unloadNumber" label="已上传视频数量" width="120" align="center"></el-table-column>
-                <el-table-column prop="use" label="已用视频数量" width="120" align="center"></el-table-column>
-                <el-table-column prop="used" label="当前可用素材" align="center"></el-table-column>
-            </el-table>
-            <div style="height:10px"></div>
         </div>
         <el-dialog title="视频上传" :visible.sync="videoUploadVisible" width="40%" :before-close="videoUploadClose">
             <el-form ref="videoForm" :rules="rulesUpload" :model="videoForm" label-width="140px">
                 <el-form-item label="分组:" prop="group">
-                    <el-select v-model="videoForm.group" placeholder="请选择分组">
+                    <el-select v-model="videoForm.group" placeholder="请选择分组" @change="equipmentChange">
                         <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
                             :key="item.grouping_id"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="库:" prop="library">
-                    <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryList"
-                        v-model="videoForm.library" placeholder="库选择"></el-cascader>
+                <el-form-item label="分类:" prop="library">
+                    <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryAddList"
+                        v-model="videoForm.library" placeholder="分类选择"></el-cascader>
                 </el-form-item>
                 <el-form-item label="视频:" prop="video">
-                    <el-upload class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple accept=".mp4"
-                        :on-success="handleSucess" :on-error="handleError" :on-remove="handleRemove">
+                    <el-upload ref="videoUnload" class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple
+                        accept=".mp4" :on-success="handleSucess" :on-error="handleError" :on-remove="handleRemove"
+                        :before-upload="videoBefore">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
                     </el-upload>
@@ -71,12 +60,26 @@
             <span slot="footer" class="dialog-footer">
                 <el-button @click="videoUploadClose">取 消</el-button>
                 <el-button type="primary" :loading="videoSubmitting" @click="submitForVideo">{{ videoSubmitting ?
-                        '提交中...' : '提 交'
-                }}</el-button>
+        '提交中...' : '提 交'
+}}</el-button>
             </span>
         </el-dialog>
-        <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
-            @handleSelectionChange="selectionChange"></table-custom>
+        <div>
+            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选 <span
+                    style="color:#FF411F;font-size: 12px;padding-left: 20px;"> 已选中 {{ checkedCities.length }}
+                    个视频</span></el-checkbox>
+            <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange" class="video">
+                <div v-for="(item, index) in tableData" :key="index" class="videoData">
+                    <video controls loop :src="item.video_url" class="videosize"></video>
+                    <el-checkbox :label="item.material_id" :key="item.material_id" class="videoNum">视频编号:{{
+        item.video_num
+}}</el-checkbox>
+                    <div class="videoNum">上传时间:{{ item.add_time }}</div>
+                </div>
+            </el-checkbox-group>
+        </div>
+        <!-- <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
+            @handleSelectionChange="selectionChange"></table-custom> -->
         <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination">
         </pagination>
         <el-dialog :visible.sync="videoPlayDialog" width="50%" :before-close="videoPlayClose">
@@ -101,6 +104,9 @@ export default {
     },
     data() {
         return {
+            checkAll: false,  //全选
+            checkedCities: [], //已选数据
+            isIndeterminate: true,  //复选框全选属性
             baseUrl: BASE_URL,
             statisticsData: [
                 {
@@ -108,7 +114,6 @@ export default {
                     unloadNumber: '',
                     use: '1',
                     used: '1',
-
                 }
 
             ],
@@ -124,10 +129,9 @@ export default {
                     fixed: true,
                     align: 'center',
                     render: (h, { row }) => {
-                        // this.getVideoBase64(row.video_url)
                         return (
                             <div>
-                                <video class="videosize" width="100" height="50" src={row.video_url}></video>
+                                <video controls loop width="100" height="50" src={row.video_url}></video>
                             </div>
                         );
                     },
@@ -160,7 +164,7 @@ export default {
                                     confirm-button-text='删除'
                                     cancel-button-text='取消'
                                     title="确认删除此视频？"
-                                    onConfirm={this.removeHandler.bind(this, row)}
+                                    onConfirm={this.removeHandler.bind(this, row, '1')}
                                 >
                                     <el-button slot="reference" type="danger" size="mini">删除</el-button>
                                 </el-popconfirm>
@@ -172,9 +176,9 @@ export default {
             ],  //表格
             total: 0,  //数据总量
             current_page: 1, //当前页
-            current_limit: 10, //每页条数
+            current_limit: 50, //每页条数
             submitting: false,  //提交确定
-            groupList: [],  //设备分组
+            groupList: [],  //账号分组
             libraryList: [],  //账号分类
             searchTableData: {
                 equipment: '',
@@ -217,27 +221,65 @@ export default {
                 library: [{ required: true, message: '请选择库', trigger: 'blur' }],
             },  //视频上传弹框校验
             fileList: [],  //已选择需要上传的视频
+            libraryAddList: [],
         };
     },
 
     mounted() {
         this.getGroupList();
-        this.getTypeControlList();
         this.getMaterialList();
     },
 
     methods: {
+        // 批量删除
+        batchDelete() {
+            if (this.checkedCities.length == 0) {
+                this.$message.warning('请选择需要删除的视频');
+            } else {
+                this.removeHandler(this.checkedCities, '2')
+            }
+        },
+        // 监听全选
+        handleCheckAllChange(val) {
+            if (val) {
+                this.tableData.forEach((item) => {
+                    if (this.checkedCities.indexOf(item.material_id) === -1) {
+                        this.checkedCities.push(item.material_id)
+                    }
+                })
+            } else {
+                this.checkedCities = []
+            }
+            this.isIndeterminate = false;
+        },
+        // 单个选择
+        handleCheckedCitiesChange(value) {
+            let checkedCount = value.length;
+            this.checkAll = checkedCount === this.tableData.length;
+            this.isIndeterminate = checkedCount > 0 && checkedCount < this.tableData.length;
+        },
+        // 校验视频大小
+        videoBefore(file) {
+            let { size } = file || {};
+            if (size > 3 * 1024 * 1024) {
+                this.$message.error('视频大小请不要超过2M');
+                return false
+            }
+        },
+        // 监听搜索分组变化
+        searchEquipmentChange() {
+            this.getTypeControlList()
+        },
+        // 监听分组变化
+        equipmentChange() {
+            this.getAddTypeControlList()
+        },
         // 视频删除
         handleRemove(file, fileList) {
-            console.log('视频删除', file, fileList);
             this.fileList = fileList
         },
         // 视频上传成功回调
         handleSucess(response, file, fileList) {
-            // if(response.status!='200'){
-            //     this.$message.warning(response.msg);
-            //     fileList.pop()
-            // }
             this.fileList = fileList
         },
         // 视频上传失败回调
@@ -263,11 +305,14 @@ export default {
             获取素材
         */
         async getTypeControlList() {
+            let data = {
+                grouping_id: this.searchTableData.equipment
+            }
             try {
-                let result = await this.$api({ type: "getTypecontrol" });
+                let result = await this.$api({ type: "getTypecontrol", data: data });
                 if (result.status == '200') {
+                    this.getTreeData(result.data);
                     this.libraryList = result.data;
-                    this.getTreeData(result.data)
                 } else {
                     this.$message.error({ message: result.msg })
                 }
@@ -284,6 +329,23 @@ export default {
                 this.$message.error({ message: result.msg })
             }
         },
+        /* 
+            获取素材
+        */
+        async getAddTypeControlList() {
+            let data = {
+                grouping_id: this.videoForm.group
+            }
+            try {
+                let result = await this.$api({ type: "getTypecontrol", data: data });
+                if (result.status == '200') {
+                    this.getTreeData(result.data);
+                    this.libraryAddList = result.data;
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) { }
+        },
         // 关闭视频播放
         videoPlayClose() {
             this.videoUrl = ''
@@ -293,29 +355,6 @@ export default {
         videoPlay(url) {
             this.videoUrl = url
             this.videoPlayDialog = true
-        },
-        /**
-         * 获取视频第一帧并转化为图片
-         */
-        getVideoBase64() {
-            let url = 'http://192.168.4.30/uploads/api/202212/6389eb3cc4ca2.mp4'
-            const video = document.createElement("video"); // 获取视频对象
-            // const video = document.createElement("video") // 也可以自己创建video
-            video.src = url; // url地址 url跟 视频流是一样的
-            var canvas = document.createElement("canvas"); // 获取 canvas 对象
-            const ctx = canvas.getContext("2d"); // 绘制2d
-            // video.crossOrigin = "anonymous"; // 解决跨域问题，也就是提示污染资源无法转换视频
-            video.currentTime = 1; // 第一帧
-            video.oncanplay = () => {
-                canvas.width = video.clientWidth; // 获取视频宽度
-                canvas.height = video.clientHeight; //获取视频高度
-                // 利用canvas对象方法绘图
-                ctx.drawImage(video, 0, 0, video.clientWidth, video.clientHeight);
-                // 转换成base64形式
-                let img = canvas.toDataURL("image/png"); // 截取后的视频封面
-                let i = 1
-                console.log(i++, img);
-            };
         },
         // 视频上传提交
         submitForVideo() {
@@ -328,7 +367,6 @@ export default {
                 let fileList = this.fileList.map((item) => {
                     return item.response.data;
                 }).join(",");
-                console.log(fileList);
                 let typecontrolId = this.videoForm.library[this.videoForm.library.length - 1] ?? ''
                 let data = {
                     typecontrol_id: typecontrolId,
@@ -350,6 +388,7 @@ export default {
                         group: '',  //分组
                         library: '',  //库
                     };
+                    this.$refs.videoUnload.clearFiles()
                     this.getMaterialList()
                     this.$message.success({ message: result.msg })
                 } else {
@@ -361,6 +400,12 @@ export default {
         },
         // 取消视频上传弹框
         videoUploadClose() {
+            this.$refs.videoUnload.clearFiles()
+            this.fileList = [];
+            this.videoForm = {
+                group: '',  //分组
+                library: '',  //库
+            };
             this.videoUploadVisible = false
         },
         /*
@@ -372,13 +417,21 @@ export default {
         /*
            删除视频
         */
-        async removeHandler(val) {
+        async removeHandler(val, type) {
             let data = {
-                material_ids: val.material_id,
+                material_ids: '',
+            }
+            if (type == 2) {  //批量删除
+                data.material_ids = val.join(',')
+            } else {
+                data.material_ids = val.material_id
             }
             try {
                 let result = await this.$api({ type: "deleteMaterial", data: data });
                 if (result.status == '200') {
+                    if (type == 2) {
+                        this.checkedCities = []
+                    }
                     this.$message.success({ message: '视频删除成功' });
                     this.getMaterialList()
                 } else {
@@ -412,8 +465,12 @@ export default {
         */
         async getMaterialList() {
             let order = ''
+            let status = ''
             if (this.searchTableData.sort != '') {
                 order = 'add_time'
+            }
+            if (this.searchTableData.status == '2') {
+                status = ''
             }
             let typecontrolId = this.searchTableData.library[this.searchTableData.library.length - 1] ?? ''
             let data = {
@@ -426,7 +483,7 @@ export default {
                 order: order,
                 sort: this.searchTableData.sort,
                 grouping_id: this.searchTableData.equipment,
-                status: this.searchTableData.status,
+                status: status,
             }
             try {
                 this.loading = true;
@@ -459,6 +516,7 @@ export default {
                 status: '',
                 sort: '',
             }
+            this.libraryList = []
             this.getMaterialList()
         },
 
@@ -467,28 +525,32 @@ export default {
 </script>
 
 <style scoped>
-.tt-accsituation {
-    background-color: #fff;
-    min-height: 70px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-
-.tt-accsituation--operation {
+.video {
     display: flex;
     justify-content: flex-start;
-    flex-flow: wrap;
-    align-items: center;
-    padding: 10px;
+    flex-wrap: wrap;
 }
 
-.search-title {
-    font-size: 13px;
-    padding-right: 10px;
+.videoData {
+    width: 170px;
+    margin: 10px 15px;
 }
 
 .videosize {
-    width: 100px;
-    height: 30px;
+    width: 100%;
+    height: 266px;
 }
-</style>
+
+.videoNum {
+    color: rgba(16, 16, 16, 1);
+    font-size: 12px;
+    text-align: left;
+    padding-top: 5px;
+}
+
+.videoCheckbox {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+}
+</style> 

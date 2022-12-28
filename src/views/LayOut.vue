@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="ttproject-wrap">
     <el-row>
       <el-col :span="3">
         <el-aside class="tt-aside--wrap">
@@ -14,12 +14,8 @@
           </el-header>
 
           <el-main class="tt-main">
-            <transition
-              appear
-              mode="out-in"
-            >
               <router-view></router-view>
-            </transition>
+           
           </el-main>
         </el-container>
       </el-col>
@@ -44,6 +40,8 @@ export default {
 </script>
 
 <style lang="stylus">
+
+
 .tt-aside--wrap {
   width: 100% !important;
 }

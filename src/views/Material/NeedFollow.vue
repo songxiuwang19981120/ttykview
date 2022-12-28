@@ -3,7 +3,6 @@
     <div class="tt-accsituation">
       <div class="tt-accsituation--operation">
         <div>
-          <span class="search-title">ID库名称:</span>
           <el-select v-model="searchTableData.id" placeholder="请选择ID库名称" style="width: 150px; margin-right: 20px"
             clearable filterable>
             <el-option v-for="item in searchIDList" :key="item.libraryid_id" :label="item.name"
@@ -14,8 +13,6 @@
             submitting ? "搜索中 ..." : "搜索"
         }}</el-button>
         <el-button type="primary" @click="resetTable">重置</el-button>
-      </div>
-      <div class="tt-accsituation--operation">
         <el-button type="primary" @click="libraryVisible = true">新增ID库</el-button>
         <el-button type="primary" @click="uploadMaterialVisible = true">上传素材</el-button>
       </div>
@@ -326,23 +323,4 @@ export default {
 </script>
 
 <style scoped>
-.tt-accsituation {
-  background-color: #fff;
-  min-height: 70px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
-.tt-accsituation--operation {
-  display: flex;
-  justify-content: flex-start;
-  flex-flow: wrap;
-  align-items: center;
-  padding: 10px;
-}
-
-.search-title {
-  font-size: 13px;
-  padding-right: 10px;
-}
 </style>

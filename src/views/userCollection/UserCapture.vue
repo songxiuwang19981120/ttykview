@@ -5,13 +5,41 @@
                 <el-input class="blogger" type="textarea" :rows="3" v-model="bloggerLink"
                     placeholder="请输入博主主页链接（一行一个）,每条链接请求时间大概为20秒，请耐心等待"></el-input>
                 <el-button type="primary" :loading="collectioning" @click="configureParameter">{{ collectioning ?
-                        '采集参数中...' : '配置采集参数'
-                }}</el-button>
+        '采集参数中...' : '配置采集参数'
+}}</el-button>
+            </div>
+            <div class="tt-accsituation--operation">
+                <div>
+                    <!-- <span style="padding-right:10px;font-size:13px">昵称:</span> -->
+                    <el-input v-model="searchData.nickname" placeholder="请输入昵称"
+                        style="width:140px;margin-right: 20px;"></el-input>
+                </div>
+                <div>
+                    <!-- <span style="padding-right:10px;font-size:13px">uid:</span> -->
+                    <el-input v-model="searchData.uid" placeholder="请输入uid"
+                        style="width:140px;margin-right: 20px;"></el-input>
+                </div>
+                <div>
+                    <!-- <span style="padding-right:10px;font-size:13px">数据来源:</span> -->
+                    <el-select v-model="searchData.sources" placeholder="请选择数据来源"
+                        style="width:140px;margin-right: 20px;">
+                        <el-option v-for="item in collectionContentlist" :key="item.value" :label="item.label"
+                            :value="item.value"></el-option>
+                    </el-select>
+
+                </div>
+                <div>
+                    <!-- <span style="padding-right:10px;font-size:13px">数据标签:</span> -->
+                    <el-input v-model="searchData.label" placeholder="请输入数据标签"
+                        style="width:140px;margin-right: 20px;"></el-input>
+                </div>
+                <el-button type="primary" :loading="searching" @click="searchTable">{{ searching ? '查询中 ...' : '查 询'
+}}</el-button>
+                <el-button type="primary" :loading="searching" @click="resetClick">重 置</el-button>
             </div>
         </div>
         <el-dialog title="采集配置" :visible.sync="configureVisible" width="40%" :before-close="configureClose">
-            <el-form ref="form" :rules="rules" :model="configureForm" label-width="140px"
-                :hide-required-asterisk="true">
+            <el-form ref="form" :rules="rules" :model="configureForm" label-width="140px">
                 <el-form-item label="任务名:" prop="task_name">
                     <el-input v-model="configureForm.task_name" placeholder="请输入任务名" style="width:60%"></el-input>
                 </el-form-item>
@@ -21,8 +49,8 @@
                 <el-form-item label="采集内容:" prop="type_list">
                     <el-checkbox-group v-model="configureForm.type_list">
                         <el-checkbox v-for="(item, index) in collectionContentlist" :label="item.value" :key="index">{{
-                                item.label
-                        }}</el-checkbox>
+        item.label
+}}</el-checkbox>
                     </el-checkbox-group>
                 </el-form-item>
                 <el-form-item label="单博主采集上限:" prop="upper_limit">
@@ -34,48 +62,17 @@
                     <el-checkbox-group v-model="configureForm.black_list">
                         <el-checkbox v-for="(item, index) in collectionBlacklistlist" :label="item.value"
                             :key="index">{{
-                                    item.label
-                            }}</el-checkbox>
+        item.label
+}}</el-checkbox>
                     </el-checkbox-group>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="configureClose">取 消</el-button>
                 <el-button type="primary" :loading="submitting" @click="submitForm">{{ submitting ? '提交中 ...' : '确 定'
-                }}</el-button>
+}}</el-button>
             </span>
         </el-dialog>
-        <div class="tt-accsituation">
-            <div class="tt-accsituation--operation">
-                <div>
-                    <span style="padding-right:10px;font-size:13px">昵称:</span>
-                    <el-input v-model="searchData.nickname" placeholder="请输入昵称"
-                        style="width:140px;margin-right: 20px;"></el-input>
-                </div>
-                <div>
-                    <span style="padding-right:10px;font-size:13px">uid:</span>
-                    <el-input v-model="searchData.uid" placeholder="请输入uid"
-                        style="width:140px;margin-right: 20px;"></el-input>
-                </div>
-                <div>
-                    <span style="padding-right:10px;font-size:13px">数据来源:</span>
-                    <el-select v-model="searchData.sources" placeholder="请选择数据来源"
-                        style="width:140px;margin-right: 20px;">
-                        <el-option v-for="item in collectionContentlist" :key="item.value" :label="item.label"
-                            :value="item.value"></el-option>
-                    </el-select>
-
-                </div>
-                <div>
-                    <span style="padding-right:10px;font-size:13px">数据标签:</span>
-                    <el-input v-model="searchData.label" placeholder="请输入数据标签"
-                        style="width:140px;margin-right: 20px;"></el-input>
-                </div>
-                <el-button type="primary" :loading="searching" @click="searchTable">{{ searching ? '查询中 ...' : '查 询'
-                }}</el-button>
-                <el-button type="primary" :loading="searching" @click="resetClick">重 置</el-button>
-            </div>
-        </div>
         <div>
             <table-custom :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
                 @handleSelectionChange="selectionChange"></table-custom>
@@ -205,7 +202,7 @@ export default {
                 //     },
                 // },
             ],  //表格
-            total: 100,  //数据总量
+            total: 0,  //数据总量
             current_page: 1, //当前页
             current_limit: 10, //每页条数
             bloggerLink: '', //博主主页链接
@@ -223,7 +220,7 @@ export default {
                 type_list: [{ required: true, message: '请选择采集内容', trigger: 'blur' }],
                 upper_limit: [
                     { required: true, message: '请输入单博主采集上限', trigger: 'blur' },
-                    { pattern: /^[0-9]*[1-9][0-9]*$/,message:'请输入正整数', trigger: 'blur' }
+                    { pattern: /^[0-9]*[1-9][0-9]*$/, message: '请输入正整数', trigger: 'blur' }
                 ],
 
             },  //必填校验
@@ -234,7 +231,7 @@ export default {
                 },
                 {
                     label: '关注列表',
-                    value: 'CollectionFollow ',
+                    value: 'CollectionFollow',
                 },
             ],//采集内容
             collectionBlacklistlist: [
@@ -340,6 +337,7 @@ export default {
             data.uid_list = this.userList
             try {
                 let result = await this.$api({ type: "collectionUser", data: data });
+                this.submitting = false
                 if (result.status == '200') {
                     this.$message.success({ message: '数据采集中,请稍后刷新页面查看' })
                     this.configureVisible = false
@@ -368,8 +366,8 @@ export default {
             } else {
                 let listLink = []
                 this.bloggerLink.split('\n').forEach((item) => {
-                    if (item.replace(/\s/gi, '')) {
-                        listLink.push(item.replace(/\s/gi, ''));
+                    if(item!=''){
+                        listLink.push(item)
                     }
                 });
                 this.$nextTick(() => {
@@ -413,13 +411,15 @@ export default {
             try {
                 let result = await this.$api({ type: "testGetRestByKeys", data: data });
                 if (result.status == '200') {
-                    let list = result.data[0]
-                    let listType = {
-                        uid: list.uid,
-                        sec_uid: list.sec_uid,
-                        unique_id: list.unique_id,
+                    if (result.data.length >= 0) {
+                        let list = result.data[0]
+                        let listType = {
+                            uid: list.uid,
+                            sec_uid: list.sec_uid,
+                            unique_id: list.unique_id,
+                        }
+                        return listType
                     }
-                    return listType
                 } else {
                     this.$message.error({ message: result.msg })
                 }
@@ -468,21 +468,6 @@ export default {
 </script>
 
 <style scoped>
-.tt-accsituation {
-    background-color: #fff;
-    min-height: 70px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-
-.tt-accsituation--operation {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    flex-wrap: wrap;
-    padding: 10px;
-}
-
 .blogger {
     width: 400px;
     margin-right: 20px;

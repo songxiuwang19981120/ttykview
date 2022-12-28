@@ -15,11 +15,11 @@ export default {
                     to: '/equsituation',
                     icon: '',
                 },
-                {
-                    title: '设备分组',
-                    to: '/equgroup',
-                    icon: '',
-                },
+                // {
+                //     title: '账号分组',
+                //     to: '/equgroup',
+                //     icon: '',
+                // },
             ]
         },
         {
@@ -30,6 +30,11 @@ export default {
                 {
                     title: '账号情况',
                     to: '/accsituation',
+                    icon: '',
+                },
+                {
+                    title: '账号分组',
+                    to: '/equgroup',
                     icon: '',
                 },
                 {
@@ -64,6 +69,17 @@ export default {
                     to: '/private',
                     icon: '',
                 },
+                {
+                    title: '账号创建',
+                    to: '/accountcreation',
+                    icon: '',
+                },
+                {
+                    title: '养号任务',
+                    to: '/cultivatetask',
+                    icon: '',
+                },
+                
             ]
         },
         {

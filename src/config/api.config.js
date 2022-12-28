@@ -310,7 +310,7 @@ export default {
     url: '/User/updatePassword',
     method: 'POST',
   },
-  'loginUserPassword': {
+  'login': {
     url: '/User/login',
     method: 'POST',
   },
@@ -583,6 +583,15 @@ export default {
     method: 'POST'
   },
   // Role API end
+  'getCountry':{    //获取国家数据
+    url:'/member/country',
+    method:'POST'
+  },
+   'updateUserType':{ //更新用户分组分类
+      url:'member/BatchUpdateUserType',
+     method:'POST'
+     }
+  
 }
 
 
