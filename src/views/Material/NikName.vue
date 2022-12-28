@@ -3,7 +3,8 @@
 		<div class="tt-accsituation">
 			<div class="tt-accsituation--operation">
 				<div>
-					<el-select v-model="searchTableData.equipment" placeholder="账号分组选择" style="margin-right: 20px"  @change="searchEquipmentChange">
+					<el-select v-model="searchTableData.equipment" placeholder="账号分组选择" style="margin-right: 20px"
+						@change="searchEquipmentChange" clearable>
 						<el-option v-for="item in searchEquipmentList" :key="item.grouping_id"
 							:label="item.grouping_name" :value="item.grouping_id">
 						</el-option>
@@ -12,11 +13,13 @@
 				<div>
 					<el-cascader :props="{ checkStrictly: true }" :options="searchTypecontrolList"
 						v-model="searchTableData.typecontrol" placeholder="账号分类选择"
-						style="margin-right: 20px"></el-cascader>
+						style="margin-right: 20px" clearable></el-cascader>
 				</div>
 				<div>
 					<!-- 查询 -->
-					<el-button type="primary" :loading="btnloading" @click="searchNickName">{{ btnloading ? '加载中...' :'搜索'}}</el-button>
+					<el-button type="primary" :loading="btnloading" @click="searchNickName">{{ btnloading ? '加载中...'
+		: '搜索'
+}}</el-button>
 					<el-button type="primary" @click="btnReset">重置</el-button>
 					<el-button type="primary" @click="uploadNickName">上传</el-button>
 				</div>
@@ -117,9 +120,9 @@ export default {
 
 	methods: {
 		// 监听搜索分组变化
-        searchEquipmentChange() {
-            this.getTypecontrol()
-        },
+		searchEquipmentChange() {
+			this.getTypecontrol()
+		},
 		// 获取账号分组数据
 		async getaccGroup() {
 			try {
@@ -139,10 +142,10 @@ export default {
 		// 获取素材分类数据
 		async getTypecontrol() {
 			let data = {
-                grouping_id: this.searchTableData.equipment
-            }
+				grouping_id: this.searchTableData.equipment
+			}
 			try {
-				const res = await this.$api({type: 'getTypecontrol',data: data});
+				const res = await this.$api({ type: 'getTypecontrol', data: data });
 				if (res.status == 200) {
 					this.getTreeData(res.data);
 					this.searchTypecontrolList = res.data;
@@ -202,7 +205,7 @@ export default {
 				typecontrol_id: '',
 				grouping_id: '',
 			};
-			this.searchTypecontrolList=[]
+			this.searchTypecontrolList = []
 			this.getNickNameClassify();
 		},
 		// 点击上传按钮

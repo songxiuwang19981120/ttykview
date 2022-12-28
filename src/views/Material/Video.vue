@@ -4,7 +4,7 @@
             <div class="tt-accsituation--operation">
                 <div>
                     <el-select v-model="searchTableData.equipment" placeholder="请选择账号分组"
-                        style="width:150px;margin-right:10px" @change="searchEquipmentChange">
+                        style="width:150px;margin-right:10px" @change="searchEquipmentChange" clearable>
                         <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
                             :key="item.grouping_id"></el-option>
                     </el-select>
@@ -27,7 +27,9 @@
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
-                <el-button type="primary" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...': '搜索'}}</el-button>
+                <el-button type="primary" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...' :
+        '搜索'
+}}</el-button>
                 <el-button type="primary" @click="resetTable">重置</el-button>
                 <el-button type="primary" @click="videoUpLoad">上传视频</el-button>
                 <el-button type="primary" @click="batchDelete">批量删除</el-button>
@@ -57,7 +59,9 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="videoUploadClose">取 消</el-button>
-                <el-button type="primary" :loading="videoSubmitting" @click="submitForVideo">{{ videoSubmitting? '提交中...' : '提 交'}}</el-button>
+                <el-button type="primary" :loading="videoSubmitting" @click="submitForVideo">{{ videoSubmitting ?
+        '提交中...' : '提 交'
+}}</el-button>
             </span>
         </el-dialog>
         <div>
@@ -307,8 +311,8 @@ export default {
             try {
                 let result = await this.$api({ type: "getTypecontrol", data: data });
                 if (result.status == '200') {
+                    this.getTreeData(result.data);
                     this.libraryList = result.data;
-                    this.getTreeData(result.data)
                 } else {
                     this.$message.error({ message: result.msg })
                 }
@@ -335,8 +339,8 @@ export default {
             try {
                 let result = await this.$api({ type: "getTypecontrol", data: data });
                 if (result.status == '200') {
+                    this.getTreeData(result.data);
                     this.libraryAddList = result.data;
-                    this.getTreeData(result.data)
                 } else {
                     this.$message.error({ message: result.msg })
                 }
@@ -512,7 +516,7 @@ export default {
                 status: '',
                 sort: '',
             }
-            this.libraryList=[]
+            this.libraryList = []
             this.getMaterialList()
         },
 

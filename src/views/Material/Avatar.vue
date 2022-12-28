@@ -4,7 +4,7 @@
             <div class="tt-accsituation--operation">
                 <div>
                     <el-select v-model="searchTableData.equipment" placeholder="请选择账号分组"
-                        style="width:150px;margin-right:20px" @change="searchEquipmentChange">
+                        style="width:150px;margin-right:20px" @change="searchEquipmentChange" clearable>
                         <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
                             :key="item.grouping_id"></el-option>
                     </el-select>
@@ -15,8 +15,10 @@
                         style="width:180px;margin-right:20px"></el-cascader>
                 </div>
                 <div>
-                    <el-select v-model="searchTableData.status" placeholder="素材类型" style="width:160px;margin-right:20px">
-                        <el-option v-for="item in searchTypeList" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    <el-select v-model="searchTableData.status" placeholder="素材类型"
+                        style="width:160px;margin-right:20px">
+                        <el-option v-for="item in searchTypeList" :key="item.value" :label="item.label"
+                            :value="item.value"></el-option>
                     </el-select>
                 </div>
                 <div>
@@ -25,19 +27,21 @@
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
-                <el-button type="primary"  class="seachbut" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...' :
-                        '搜索'
-                }}</el-button>
-                <el-button type="primary"  class="seachbut" @click="resetTable">重置</el-button>
+                <el-button type="primary" class="seachbut" :loading="submitting" @click="searchTable">{{ submitting ?
+        '搜索中 ...' :
+        '搜索'
+}}</el-button>
+                <el-button type="primary" class="seachbut" @click="resetTable">重置</el-button>
                 <el-button type="primary" class="seachbut" @click="imgUpLoad">上传图片</el-button>
-                <el-button type="primary" class="seachbut" @click="batchDelete" :loading="deleteing">{{deleteing ? '删除中 ...' :'批量删除'}}</el-button>
+                <el-button type="primary" class="seachbut" @click="batchDelete" :loading="deleteing">{{ deleteing ? '删除中 ...' :'批量删除'}}</el-button>
             </div>
         </div>
         <el-dialog title="图片上传" :visible.sync="imgUploadVisible" width="40%" :before-close="imgUploadClose">
             <el-form ref="imgForm" :rules="rulesUpload" :model="imgForm" label-width="140px">
                 <el-form-item label="账号分组:" prop="group">
-                    <el-select v-model="imgForm.group" placeholder="请选择账号分组"  @change="equipmentChange">
-                        <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name" :key="item.grouping_id"></el-option>
+                    <el-select v-model="imgForm.group" placeholder="请选择账号分组" @change="equipmentChange">
+                        <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
+                            :key="item.grouping_id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="账号分类:" prop="library">
@@ -46,7 +50,8 @@
                 </el-form-item>
                 <el-form-item label="图片:" prop="img">
                     <el-upload ref="imgUnload" class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple
-                        accept=".png,.jpg,.jpeg" :on-success="handleSucess" :on-remove="handleRemove" :before-upload="imgBefore">
+                        accept=".png,.jpg,.jpeg" :on-success="handleSucess" :on-remove="handleRemove"
+                        :before-upload="imgBefore">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
                     </el-upload>
@@ -54,16 +59,19 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="imgUploadClose">取 消</el-button>
-                <el-button type="primary" :loading="imgSubmitting" @click="submitForimg">{{ imgSubmitting ?'提交中...' : '提 交'}}</el-button>
+                <el-button type="primary" :loading="imgSubmitting" @click="submitForimg">{{ imgSubmitting ? '提交中...' : '提 交'}}</el-button>
             </span>
         </el-dialog>
         <div>
-            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll"
-                @change="handleCheckAllChange">全选 <span style="color:#FF411F;font-size: 12px;padding-left: 20px;"> 已选中 {{ checkedCities.length }} 个图片</span></el-checkbox>
+            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选 <span
+                    style="color:#FF411F;font-size: 12px;padding-left: 20px;"> 已选中 {{ checkedCities.length }}
+                    个图片</span></el-checkbox>
             <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange" class="img">
                 <div v-for="(item, index) in tableData" :key="index" class="imgData">
                     <el-image :src="item.image" class="imgsize"></el-image>
-                    <el-checkbox :label="item.headimage_id" :key="item.headimage_id" class="imgNum">头像编号:100{{ item.headimage_id}}</el-checkbox>
+                    <el-checkbox :label="item.headimage_id" :key="item.headimage_id" class="imgNum">头像编号:100{{
+        item.headimage_id
+}}</el-checkbox>
                     <div class="imgNum">上传时间:{{ item.usage_time }}</div>
                 </div>
             </el-checkbox-group>
@@ -89,7 +97,7 @@ export default {
     },
     data() {
         return {
-            deleteing:false, //删除ing
+            deleteing: false, //删除ing
             checkAll: false,  //全选
             checkedCities: [], //已选数据
             isIndeterminate: true,  //复选框全选属性
@@ -127,7 +135,7 @@ export default {
                                     confirm-button-text='删除'
                                     cancel-button-text='取消'
                                     title="确认删除此图片？"
-                                    onConfirm={this.removeHandler.bind(this, row,'1')}
+                                    onConfirm={this.removeHandler.bind(this, row, '1')}
                                 >
                                     <el-button slot="reference" type="danger" size="mini">删除</el-button>
                                 </el-popconfirm>
@@ -183,7 +191,7 @@ export default {
                 library: [{ required: true, message: '请选择账号分类', trigger: 'blur' }],
             },  //图片上传弹框校验
             fileList: [],  //已选择需要上传的图片
-            libraryAddList:[],
+            libraryAddList: [],
         };
     },
 
@@ -211,31 +219,31 @@ export default {
             try {
                 let result = await this.$api({ type: "getTypecontrol", data: data });
                 if (result.status == '200') {
+                    this.getTreeData(result.data);
                     this.libraryAddList = result.data;
-                    this.getTreeData(result.data)
                 } else {
                     this.$message.error({ message: result.msg })
                 }
             } catch (error) { }
         },
         // 批量删除
-        batchDelete(){
-            if(this.checkedCities.length==0){
+        batchDelete() {
+            if (this.checkedCities.length == 0) {
                 this.$message.warning('请选择需要删除的头像');
-            }else{
-                this.removeHandler(this.checkedCities,'2')
+            } else {
+                this.removeHandler(this.checkedCities, '2')
             }
         },
         // 监听全选
         handleCheckAllChange(val) {
             if (val) {
                 this.tableData.forEach((item) => {
-                    if(this.checkedCities.indexOf(item.headimage_id) === -1){
+                    if (this.checkedCities.indexOf(item.headimage_id) === -1) {
                         this.checkedCities.push(item.headimage_id)
                     }
                 })
-            }else{
-                this.checkedCities=[]
+            } else {
+                this.checkedCities = []
             }
             this.isIndeterminate = false;
         },
@@ -248,9 +256,9 @@ export default {
         // 检验上传的图片大小
         imgBefore(file) {
             let { size } = file || {};
-            if (size >  200 * 1024) {
-                 this.$message.error('图片大小请不要超过200kb');
-                 return false
+            if (size > 200 * 1024) {
+                this.$message.error('图片大小请不要超过200kb');
+                return false
             }
         },
         // 图片删除
@@ -259,9 +267,9 @@ export default {
         },
         // 图片上传成功返回
         handleSucess(response, file, fileList) {
-            if(response.status=='200'){
+            if (response.status == '200') {
                 this.fileList.push(file)
-            }else{
+            } else {
                 this.$message.warning(response.msg);
                 fileList.splice(fileList.indexOf(file), 1)
             }
@@ -289,10 +297,10 @@ export default {
                 grouping_id: this.searchTableData.equipment
             }
             try {
-                let result = await this.$api({ type: "getTypecontrol" });
+                let result = await this.$api({ type: "getTypecontrol",data:data });
                 if (result.status == '200') {
+                    this.getTreeData(result.data);
                     this.libraryList = result.data;
-                    this.getTreeData(result.data)
                 } else {
                     this.$message.error({ message: result.msg })
                 }
@@ -322,7 +330,7 @@ export default {
 
 
                 let fileList = this.fileList.map((item) => {
-                        return item.response.data;
+                    return item.response.data;
                 }).join(",");
                 let typecontrolId = this.imgForm.library[this.imgForm.library.length - 1] ?? ''
                 let data = {
@@ -379,23 +387,23 @@ export default {
         /*
            删除图片
         */
-        async removeHandler(val,type) {
+        async removeHandler(val, type) {
             let data = {
                 headimage_ids: '',
             }
-            if(type==2){  //批量删除
-                this.deleteing=true
-                data.headimage_ids=val.join(',')
-            }else{
-                data.headimage_ids=val.headimage_id
+            if (type == 2) {  //批量删除
+                this.deleteing = true
+                data.headimage_ids = val.join(',')
+            } else {
+                data.headimage_ids = val.headimage_id
             }
 
             try {
                 let result = await this.$api({ type: "deleteHeadimage", data: data });
-                this.deleteing=false
+                this.deleteing = false
                 if (result.status == '200') {
-                    if(type==2){
-                        this.checkedCities=[]
+                    if (type == 2) {
+                        this.checkedCities = []
                     }
                     this.$message.success({ message: '图片删除成功' });
                     this.getHeadimageList()
@@ -473,7 +481,7 @@ export default {
                 status: '',
                 sort: '',
             }
-            this.libraryList=[]
+            this.libraryList = []
             this.getHeadimageList()
         },
 
@@ -496,6 +504,7 @@ export default {
     height: 125px;
     border-radius: 100px;
 }
+
 .img {
     display: flex;
     justify-content: flex-start;
