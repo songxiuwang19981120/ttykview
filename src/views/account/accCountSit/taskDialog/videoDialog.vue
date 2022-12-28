@@ -110,7 +110,6 @@
         <el-button @click="handleReset">重 置</el-button>
         <el-button @click="handlerClose">取 消</el-button>
         <el-button type="primary" @click="handlerConfrim">确认并执行</el-button>
-        
       </span>
     </el-dialog>
   </div>
