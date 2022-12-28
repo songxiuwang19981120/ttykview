@@ -84,6 +84,11 @@ const routes = [
         name:'AccountCreation',
         component:() => import(/* webpackChunkName: "private" */ '@/views/task/AccountCreation.vue')
       },
+      {
+        path:'/cultivatetask',
+        name:'cultivatetask',
+        component:() => import(/* webpackChunkName: "private" */ '@/views/task/CultivateTask.vue')
+      },
 
       //任务管理 end
 

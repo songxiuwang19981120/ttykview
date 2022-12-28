@@ -62,8 +62,10 @@
 
       </el-dialog>
     </div>
+    
     <!-- 表格 -->
-    <el-table :data="tableData_tw_t" style="width: 100%;border-radius: 8px" row-key="value" lazy :load="load"
+    <tableCustom style="width: 100%;border-radius: 8px"  :tableData="tableData_tw_t" :columns="columns" :load="load"></tableCustom>
+    <!-- <el-table :data="tableData_tw_t" style="width: 100%;border-radius: 8px"  :load="load"
       :tree-props="{ children: 'children' }">
       <el-table-column prop="label" label="名称" align="center" width="300">
       </el-table-column>
@@ -73,13 +75,13 @@
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 
-          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button> -->
           <!-- 修改 -->
 
-        </template>
+        <!-- </template>
       </el-table-column>
 
-    </el-table>
+    </el-table> -->
     <el-dialog title="编辑" :visible.sync="dialogFormVisible">
       <el-form :model="form">
         <el-form-item label="修改名称:" label-width="100px">
@@ -99,15 +101,42 @@
 </template>
 
 <script>
+import tableCustom from '@/components/myComponent/table/tableCustom.vue';
 import pagination from '@/components/myComponent/table/pagination.vue';
 import { Footer } from 'element-ui';
 
 export default {
 
   name: 'AccountClass',
-  components: { pagination },
+  components: { pagination,tableCustom },
   data() {
-    return {
+    return {  columns: [
+				{
+					prop: 'label',
+					label: '名称',
+					align: 'center',
+          width: 300
+				},
+				{
+					prop: 'typecontrol_id',
+					label: '编号',
+					align: 'center',
+				},
+				{
+          prop:"status",
+					label: '操作',
+					align: 'center',
+          width:180,
+					render: (h, { row }) => {
+						return (
+							<div>
+								<el-button  size="mini" type="primary"  onClick={this.handleEdit.bind(this, row)}>编辑</el-button>
+								<el-button  size="mini" type="danger"  onClick={this.handleDelete.bind(this, row)}>删除</el-button>
+							</div>
+						);
+					},
+				},
+			],
       searchEquipmentList:[],
       equipmentLoading:false,
       searchTableData:{
@@ -147,6 +176,7 @@ export default {
         name: '',
       },//新增分组名称
       options_tw:[],
+    
 
     }
   },
@@ -167,9 +197,10 @@ export default {
             grouping_id:this.searchTableData.equipment
           }
         });
-  
+        if(result.status == 200){
         this.options = result.data;
-        this.filterTreeDate(result.data)//联动后方无内容
+        this.filterTreeDate(result.data)
+        }//联动后方无内容
       } catch (error) {
         console.error(error)
       }
@@ -347,20 +378,21 @@ export default {
     },
 
     //操作
-    handleEdit(index, row) {
+    handleEdit(row) {
 
       this.dialogFormVisible = true;
       this.form.name = row.label;//名称
       this.typecontrol_id = row.typecontrol_id//主键ID
       this.pid = row.pid//pid
     },
-    handleDelete(index, row) {
+    handleDelete(row) {
+      this.typecontrol_id=row.typecontrol_id
       this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.leDelete(index, row)
+        this.leDelete()
         this.$message({
           type: 'success',
           message: '删除成功!'
@@ -373,12 +405,12 @@ export default {
       });
     },
     //删除接口
-    async leDelete(index, row) {
+    async leDelete() {
       try {
         let result = await this.$api({
           type: "deleteTypecontrol",
           data: {
-            typecontrol_ids: row.typecontrol_id
+            typecontrol_ids:this.typecontrol_id
           },
         });
         this.Typecontrol()

@@ -69,6 +69,11 @@ export default {
                     to: '/accountcreation',
                     icon: '',
                 },
+                {
+                    title: '养号任务',
+                    to: '/cultivatetask',
+                    icon: '',
+                },
                 
             ]
         },
