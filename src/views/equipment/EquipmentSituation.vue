@@ -52,8 +52,8 @@
             
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
               <el-form-item label="选择分组:" :disabled="false" prop="equipment" label-width="100px">
-                <el-select :disabled="disabled" v-model="ruleForm.equipment" placeholder="设备分组选择" style="margin-right: 10px"
-                  @focus="getEquipmentGroup" :loading="equipmentLoading" loading-text="数据加载中...">
+                <el-select :disabled="disabled" v-model="ruleForm.equipment" placeholder="账号分组选择" style="margin-right: 10px"
+                  @focus="getaccGroup" :loading="equipmentLoading" loading-text="数据加载中...">
                   <el-option v-for="item in searchEquipmentList" :key="item.grouping_id"
                     :label="item.grouping_name" :value="item.grouping_id">
                   </el-option>
@@ -354,7 +354,7 @@ export default {
         },
         {
           prop: 'ch',
-          label: '设备分组',
+          label: '账号分组',
           fiexd: true,
           align: 'center',
         },
@@ -412,7 +412,7 @@ export default {
       },
       {
         prop: 'ch',
-        label: '设备分组',
+        label: '账号分组',
         fiexd: true,
         align: 'center',
       },
@@ -433,8 +433,8 @@ export default {
   },
 
   methods: {
-    // 获取设备分组数据
-		async getEquipmentGroup() {
+    // 获取账号分组数据
+		async getaccGroup() {
 			try {
 				this.equipmentLoading = true;
 				const res = await this.$api({

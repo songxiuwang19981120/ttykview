@@ -180,6 +180,7 @@ export default {
         signature: "",
         avatar_uri: "",
         typecontrol_id: "",
+        grouping_id:''
       },
       destroyInfo: {
         //编辑时随机获取的信息
@@ -259,6 +260,7 @@ export default {
     */
     async updateInfo(data = {}) {
       try {
+        
         await Promise.all(
           Object.entries(data).map((item) => {
             let type = this.userTypeMap[item[0]];
@@ -338,7 +340,7 @@ export default {
         );
         let memberInfo = {
           user_id: this.user_id,
-          grouping_id: this.grouping_id,
+          grouping_id: this.accUpdateForm.grouping_id,
           typecontrol_id: typecontrol_id,
         };
           await this.updateInfo(Object.fromEntries(accUpdateForm)),
@@ -410,6 +412,7 @@ export default {
     */
     resetForm() {
       this.$refs["editorForm"].resetFields();
+      this.accUpdateForm.grouping_id = ''
     },
   },
 };

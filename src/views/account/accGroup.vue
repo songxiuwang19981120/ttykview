@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div style="background-color:white; margin-bottom:10px; padding:10px">
+        <div style="margin:10px 0 20px 0">
             <el-button type="primary" @click="dialogVisible = true"><i class="el-icon-plus"></i>添加分组</el-button>
         </div>
 
@@ -45,7 +45,7 @@
 import tableCustom from '@/components/myComponent/table/tableCustom.vue';
 import pagination from '@/components/myComponent/table/pagination.vue';
 export default {
-    name: 'EquipmentGroup',
+    name: 'accGroup',
     components: {
         tableCustom,
         pagination,

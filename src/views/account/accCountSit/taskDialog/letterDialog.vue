@@ -178,10 +178,10 @@ export default {
       rules: letter,
       blackList: ["无昵称", "无作品", "无头像", "历史已操作用户"],
       blackListMap: {
-        无头像: "no_avatar",
-        无作品: "no_aweme",
-        历史已操作用户: "historical_users",
-        无昵称: "no_nickname",
+        '无头像': "no_avatar",
+        '无作品': "no_aweme",
+        '历史已操作用户': "historical_users",
+        '无昵称': "no_nickname",
       },
       sourceData: [],
       // TODO 国家options
@@ -292,8 +292,11 @@ export default {
               return this.blackListMap[item];
             }
           );
+         
           let data = this.letterTaskForm;
+          
           this.aaa(data)
+          
         }
       });
     },
@@ -306,7 +309,7 @@ export default {
           }else{
             console.log('11111111111111111',result);
           this.$message.warning(result.msg);
-
+          this.resetForm();
           }
 
     },
@@ -325,7 +328,8 @@ export default {
     resetForm() {
       this.$refs["letterForm"].resetFields();
       this.letterTaskForm.rate_min = '',
-      this.letterTaskForm.rate_max = ''
+      this.letterTaskForm.rate_max = '',
+      this.letterTaskForm.black_list = []
     },
   },
 };

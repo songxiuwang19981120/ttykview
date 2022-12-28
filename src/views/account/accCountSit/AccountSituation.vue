@@ -30,11 +30,16 @@
             :props="{ checkStrictly: true, value: 'value' }"
             :options="typeList"
             v-model="classiFication"
-            placeholder="选择分类"
+            :placeholder="typeSelectPlaceholder"
+            :disabled="isTypeSelectDis"
           ></el-cascader>
         </div>
       </el-col>
-      <el-col :span="10"></el-col>
+      
+      <el-col class="editor-btn" :span="10">
+        <el-button style="width: 150px"  @click="showBatchEditorDialog" type="primary">批量编辑分类</el-button>
+      </el-col>
+      
     </el-row>
 
     <el-row class="tt-accsituation-searchbar">
@@ -86,7 +91,6 @@
       <el-button @click="batchEditor" class="batchedit-btn" type="primary">批量编辑</el-button>
     </div>
 
-
       <table-custom
         class="tt-accsituation--tabel"
         :mutiSelect="true"
@@ -96,15 +100,13 @@
         :columns="columns"
       ></table-custom>
    
-
-    
-
     <Pagination
       :total="total"
       :page="page"
       :size="limit"
       @pagination="handlePagination"
     />
+    
     <VideoDialog
       @closeVideoTask="closeVideoTask"
       :showVideoTask="showVideoTask"
@@ -170,6 +172,12 @@
       :visterTotal="visterTotal"
       :user_id="user_id"
     />
+    <BatchEditor
+      :member_ids="member_ids"
+      :showBatchEditor="showBatchEditor"
+      :editorTota="editorTota"
+    />
+    
   </div>
 </template>
 
@@ -185,7 +193,7 @@ import taskStatus from "@/config/accountConfig/taskStatus.config";
 import BatchEditorDialog from "./batchEditorDialog/batchEditorDialog";
 import VideoTabel from "./videoTabel/videoTabel";
 import ViewerTabel from "./ViewerLabel/viewerTabel";
-
+import BatchEditor from './taskDialog/batchEditor.vue'
 const { STATUS_MAP } = taskStatus;
 export default {
   name: "AccountSituation",
@@ -200,6 +208,7 @@ export default {
     BatchEditorDialog,
     VideoTabel,
     ViewerTabel,
+    BatchEditor
   },
   computed: {
     batchEditorLength() {
@@ -213,6 +222,12 @@ export default {
         this.classiFication.length === 0 || this.batchEditorList.length === 0
       );
     },
+    typeSelectPlaceholder(){
+      return this.group === '' ? '请先选择分组' : '选择分类'
+    },
+    isTypeSelectDis(){
+      return this.group === ''
+    }
   },
   watch: {
     classiFication(newVal){
@@ -225,7 +240,7 @@ export default {
       }
       this.getMemberList(data)
     }, 
-    group(newVal) {
+    async group(newVal) {
       let arr = Object.entries(this.groupList).find((item) => {
         return item?.[1]?.grouping_id === newVal;
       });
@@ -237,7 +252,13 @@ export default {
         limit: this.limit ?? 10,
         page: this.page ?? 1
       }
+      let searchTypeData = {
+        grouping_id:this.group
+      }
       this.getMemberList(data)
+      let result = await this.$api({type:'getTypecontrol',data:searchTypeData})
+      this.typeList = this.getTreeData(result.data)
+      console.log(this.classiFication)
     },
   },
   data() {
@@ -247,6 +268,7 @@ export default {
       showLikeCommentTask: false, //控制评论点赞任务dialog显示
       showLetterTask: false, //控制评论任务dialog显示
       showFollowDialog: false, //控制关注任务dialog显示
+      showBatchEditor:false,
       searchForm: {
         grouping_id: "",
         typecontrol_id: "",
@@ -287,7 +309,6 @@ export default {
             );
           },
         },
-
         {
           prop: "avatar_thumb",
           label: "头像",
@@ -309,6 +330,15 @@ export default {
           label: "昵称",
           width: "150",
           align: "center",
+          render:(h,{row})=>{
+            return (
+              <div>
+              <a target="three" href={'https://www.tiktok.com/@'+row.unique_id}>
+                <span>{row.nickname}</span>
+                </a>
+              </div>
+            )
+          }
         },
         {
           prop: "type_title",
@@ -323,7 +353,7 @@ export default {
           align: "center",
           render: (h, { row }) => {
             return (
-              <div class={this.accStatusMap[row.status]}></div>
+              <div>{this.accStatusMap[row.status]}</div>
             );
           },
         },
@@ -396,7 +426,6 @@ export default {
                   size="mini"
                  type="primary"
                   onClick={this.handleEdit.bind(this, row)}
-
                 >
                   编辑
                 </el-button>
@@ -450,6 +479,8 @@ export default {
       materialTotal: 0, //素材数量  给批量编辑窗口用的
       videoCount: 0,
       userIdList: [], //选中用户的UID  组件通信之间会用到
+      member_ids:'',
+      editorTota:0
     };
   },
 
@@ -461,6 +492,13 @@ export default {
 
   //typecontrol_id 分类ID
   methods: {
+showBatchEditorDialog(){
+  this.showBatchEditor = true
+},
+    closeBatchEditor(){
+      this.showBatchEditor = false
+      this.member_ids = ''
+    },
     /* 
         function: updateMemberList
         params: null
@@ -487,7 +525,7 @@ export default {
 
     /* 
         function: updateVisitorList
-        params: params | 子组件传的参数，是arguments
+        params: params | 子组件传的参数，arguments
         desc: 用来更新访问人数dialog的数据更新
     */
     async updateVisitorList(params) {
@@ -579,7 +617,11 @@ export default {
         page: this.page ?? 1,
         grouping_id: this.group,
       };
-      let result = await this.getMemberList(data);
+      console.log(111)
+      let result = await  this.$api({
+          type: "getMember",
+          data: data,
+        });;
       console.log(result);
       this.memberList = result?.data?.list ?? [];
       this.total = result?.data?.count ?? 0;
@@ -716,11 +758,20 @@ export default {
         desc: 表格多选框改变时的回调
     */
     handleSelectChange(val) {
+      this.member_ids = ''
       this.batchEditorList = val;
       val.length === 100 ? (this.check_all = true) : (this.check_all = false);
       this.userIdList = this.batchEditorList.map((item) => {
         return item.uid;
       });
+      let member_id = this.batchEditorList.map((item) => {
+        return item.member_id;
+      });
+      member_id.forEach((item)=>{
+        this.member_ids += `${item},`
+        console.log(this.member_ids)
+      })
+      this.editorTota = this.batchEditorList.length
     },
 
     /*
@@ -937,4 +988,8 @@ export default {
 .topsearch-right {
   margin-left: 10px;
 }
+
+.editor-btn
+  display: flex
+  justify-content: flex-end
 </style>
