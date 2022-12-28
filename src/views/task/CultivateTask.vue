@@ -93,6 +93,7 @@
                 size="40%"
                 :visible.sync="drawer_task"
                 direction="rtl"
+                style="font-size:x-small"
                 >
                 <!-- :before-close="handleClose" -->
                 <!-- 基础养号配置 -->
@@ -102,11 +103,11 @@
                         <el-col :span="1"></el-col>
                     <el-col  :span="12">
                         <div ><i class="el-icon-star-off"></i>单号每日最长养号时间：<el-input v-model="day_time" style="width:60px;margin-right: 10px;" size="mini"></el-input>分钟</div>
-                        <div style="margin-top:10px"><i class="el-icon-star-off"></i>其他ID单视频播放时间：<el-input v-model="start_time" style="width:60px;margin-right: 5px;" size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input>秒</div></el-col>
+                        <div class="all_margin_top"><i class="el-icon-star-off"></i>其他ID单视频播放时间：<el-input v-model="start_time" style="width:60px;margin-right: 5px;" size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input>秒</div></el-col>
                     <el-col :span="1"></el-col>
                     <el-col :span="10">
                         <div><i class="el-icon-star-off"></i>其他ID随机关注后取关：<el-input v-model="id_att" style="width:60px;margin-right: 10px;" size="mini"></el-input>%</div>
-                        <div style="margin-top:10px"><i class="el-icon-star-off"></i>其他ID随机关注：<el-input  v-model="random_att" style="width:60px;margin-right: 10px;" size="mini"></el-input>%</div></el-col>
+                        <div class="all_margin_top"><i class="el-icon-star-off"></i>其他ID随机关注：<el-input  v-model="random_att" style="width:60px;margin-right: 10px;" size="mini"></el-input>%</div></el-col>
                     </el-row>
                     <el-divider></el-divider>
                 </div>
@@ -126,12 +127,14 @@
                             </el-select>
                         </div>
 
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.comment_pro">进入评论区比例<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 10px;" size="mini"></el-input>%</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.comment_like_pro">评论区点赞比例<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 10px;" size="mini"></el-input>%</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.comment_word_pro">评论区留言比例<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 10px;" size="mini"></el-input>%</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.home_check_pro">进入主页查看比例<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 10px;" size="mini"></el-input>%</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.video_collect_pro">视频收藏比例<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 10px;" size="mini"></el-input>%</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.search_label_pro">选择要搜索的标签
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.comment_pro"></el-checkbox>进入评论区比例<el-input v-model="sp_content.comment_pro" class="all_class_margin" size="mini"></el-input>%</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.comment_like_pro"></el-checkbox>评论区点赞比例<el-input v-model="sp_content.comment_like_pro" class="all_class_margin" size="mini"></el-input>%</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.comment_word_pro"></el-checkbox>评论区留言比例<el-input v-model="sp_content.comment_word_pro" class="all_class_margin" size="mini"></el-input>%</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.home_check_pro"></el-checkbox>进入主页查看比例<el-input v-model="sp_content.home_check_pro" class="all_class_margin" size="mini"></el-input>%</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.video_collect_pro"></el-checkbox>视频收藏比例<el-input v-model="sp_content.video_collect_pro" class="all_class_margin" size="mini"></el-input>%</div>
+                        <div class="all_margin_top">
+                            <el-checkbox  v-model="sp.search_label_pro"></el-checkbox>
+                            选择要搜索的标签
                             <el-select v-model="search_label" placeholder="被搜索标签" size="mini">
                                 <el-option
                                 v-for="item in options_search_label"
@@ -139,20 +142,22 @@
                                 :label="item.label"
                                 :value="item.value">
                                 </el-option>
-                            </el-select></el-checkbox></div>
+                            </el-select></div>
 
                     </el-col>
                     <el-col :span="1"></el-col>
                     <el-col :span="11">
-                        <div> <el-checkbox  v-model="sp.video_live_pro">视频点赞比例<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 10px;" size="mini"></el-input>%</el-checkbox>
-                            <el-checkbox  v-model="sp.video_end">视频完播</el-checkbox>
+                        <div>
+                            <span><el-checkbox  v-model="sp.video_live_pro"></el-checkbox>视频点赞比例<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 20px;" size="mini"></el-input>%</span>
+                            <span style="margin-left:20px"><el-checkbox  v-model="sp.video_end"></el-checkbox>视频完播</span>
                         </div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.comment_stay_time">评论区停留时间<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input>秒</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.comment_like_num">评论区点赞数量<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input>个</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.brush_num">被刷到次数<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input>次关注该账号</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.home_look_time">进入主页查看时间<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input></el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.open_label_search"><el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>天未刷到垂直号开启标签搜索</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.message_board">选择留言内容
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.comment_stay_time"></el-checkbox>评论区停留时间<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input>秒</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.comment_like_num"></el-checkbox>评论区点赞数量<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input>个</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.brush_num"></el-checkbox>被刷到次数<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input>次关注该账号</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.home_look_time"></el-checkbox>进入主页查看时间<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input></div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.open_label_search"></el-checkbox><el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>天未刷到垂直号开启标签搜索</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.message_board"></el-checkbox>
+                            选择留言内容
                             <el-select v-model="search_label" placeholder="留言内容" size="mini">
                                 <el-option
                                 v-for="item in options_search_label"
@@ -160,7 +165,7 @@
                                 :label="item.label"
                                 :value="item.value">
                                 </el-option>
-                            </el-select></el-checkbox></div>
+                            </el-select></div>
                     </el-col>
                     </el-row>
                     <el-divider></el-divider>
@@ -182,12 +187,12 @@
                             </el-select>
                         </div>
 
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.comment_pro_t">进入评论区比例<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 10px;" size="mini"></el-input>%</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.comment_like_pro_t">评论区点赞比例<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 10px;" size="mini"></el-input>%</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.comment_word_pro_t">评论区留言比例<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 10px;" size="mini"></el-input>%</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.home_check_pro_t">进入主页查看比例<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 10px;" size="mini"></el-input>%</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.video_collect_pro_t">视频收藏比例<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 10px;" size="mini"></el-input>%</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.search_label_pro_t">选择要搜索的标签
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.comment_pro_t"></el-checkbox>进入评论区比例<el-input v-model="id_att" class="all_class_margin" size="mini"></el-input>%</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.comment_like_pro_t"></el-checkbox>评论区点赞比例<el-input v-model="id_att" class="all_class_margin" size="mini"></el-input>%</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.comment_word_pro_t"></el-checkbox>评论区留言比例<el-input v-model="id_att" class="all_class_margin" size="mini"></el-input>%</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.home_check_pro_t"></el-checkbox>进入主页查看比例<el-input v-model="id_att" class="all_class_margin" size="mini"></el-input>%</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.video_collect_pro_t"></el-checkbox>视频收藏比例<el-input v-model="id_att" class="all_class_margin" size="mini"></el-input>%</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.search_label_pro_t"></el-checkbox>选择要搜索的标签
                             <el-select v-model="search_label" placeholder="被搜索标签" size="mini">
                                 <el-option
                                 v-for="item in options_search_label"
@@ -195,21 +200,22 @@
                                 :label="item.label"
                                 :value="item.value">
                                 </el-option>
-                            </el-select></el-checkbox></div>
-                            <div style="margin-top:10px"><el-checkbox  v-model="sp.video__transmit_pro_t">视频转发比例<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 10px;" size="mini"></el-input>%</el-checkbox></div>
+                            </el-select></div>
+                            <div class="all_margin_top"><el-checkbox  v-model="sp.video__transmit_pro_t"></el-checkbox>视频转发比例<el-input v-model="id_att" class="all_class_margin" size="mini"></el-input>%</div>
 
                     </el-col>
                     <el-col :span="1"></el-col>
                     <el-col :span="11">
-                        <div> <el-checkbox  v-model="sp.video_live_pro_t">视频点赞比例<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 10px;" size="mini"></el-input>%</el-checkbox>
-                            <el-checkbox  v-model="sp.video_end_t">视频完播</el-checkbox>
+                        <div> 
+                            <span><el-checkbox  v-model="sp.video_live_pro_t"></el-checkbox>视频点赞比例<el-input v-model="id_att" class="all_class_margin" size="mini"></el-input>%</span>
+                            <span style="margin-left:20px"><el-checkbox  v-model="sp.video_end_t"></el-checkbox>视频完播</span>
                         </div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.comment_stay_time_t">评论区停留时间<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input>秒</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.comment_like_num_t">评论区点赞数量<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input>个</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.brush_num_t">被刷到次数<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input>次关注该账号</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.home_look_time_t">进入主页查看时间<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input></el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.open_label_search_t"><el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>天未刷到垂直号开启标签搜索</el-checkbox></div>
-                        <div style="margin-top:10px"><el-checkbox  v-model="sp.message_board_t">选择留言内容
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.comment_stay_time_t"></el-checkbox>评论区停留时间<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input>秒</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.comment_like_num_t"></el-checkbox>评论区点赞数量<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input>个</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.brush_num_t"></el-checkbox>被刷到次数<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input>次关注该账号</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.home_look_time_t"></el-checkbox>进入主页查看时间<el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"  size="mini"></el-input></div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.open_label_search_t"></el-checkbox><el-input v-model="start_time" class="all_class_margin"  size="mini"></el-input>天未刷到垂直号开启标签搜索</div>
+                        <div class="all_margin_top"><el-checkbox  v-model="sp.message_board_t"></el-checkbox>选择留言内容
                             <el-select v-model="search_label" placeholder="留言内容" size="mini">
                                 <el-option
                                 v-for="item in options_search_label"
@@ -217,14 +223,15 @@
                                 :label="item.label"
                                 :value="item.value">
                                 </el-option>
-                            </el-select></el-checkbox></div>
-                            <div style="margin-top:10px"><el-checkbox  v-model="sp.random_transmit_num">随机转发人数<el-input v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 10px;" size="mini"></el-input></el-checkbox></div>
+                            </el-select></div>
+                            <div class="all_margin_top"><el-checkbox  v-model="sp.random_transmit_num"></el-checkbox>随机转发人数<el-input v-model="id_att" class="all_class_margin" size="mini"></el-input></div>
 
                     </el-col>
                     </el-row>
                 </div>
                 <div style="margin-left:45%;margin-top:20px"><el-button type="primary" size="mini">重置</el-button></div>
-                <div style="margin-left:38%;margin-top:20px; margin-bottom: 20px;"><el-button plain style="margin-right: 20px;">取消</el-button><el-button type="primary"  class="seachbut" >确定</el-button></div>
+                <div style="margin-left:38%;margin-top:20px; margin-bottom: 20px;"><el-button plain style="margin-right: 20px;">取消</el-button>
+                <el-button type="primary"  class="seachbut" @click="submit_drawer" >确定</el-button></div>
                 </el-drawer>
 
     </div>
@@ -274,15 +281,22 @@ export default {
                 open_label_search_t:true,
                 message_board_t:true,
                 random_transmit_num:true,
-
             },
             day_time:5,//每日养号时间
             id_att:0.1,//关注取关
-            Task_num:123,//已选择账号数量
+            Task_num:0,//已选择账号数量
             start_time:0.5,//其他ID视频播放时间
             end_time:15,
             random_att:1,//其他id随机关注
-       
+
+            sp_content:{
+                comment_pro:"15",
+                comment_like_pro:"1",
+                comment_word_pro:"1",
+                home_check_pro:"1",
+                video_collect_pro:"1",
+                search_label_pro:"1",
+            },
 
             //搜索标签
             options_search_label:[
@@ -309,7 +323,6 @@ export default {
                 label: '水平'},],
                 vertical_direction_big:"",
             stripe:true,//斑马线
-            select_task:[],//多选框选中的数据
             //任务状态
             optionsCreationState: [
                 {
@@ -469,8 +482,11 @@ export default {
         //选择框
         selectionChange(val) {
         //val选中数据
-        this.select_task=val;
-        console.log(this.select_task);
+        this.Task_num=0;
+        val.forEach(item => {
+            this.Task_num=this.Task_num+item.d//当前已选择账号
+        });
+        console.log(this.Task_num)
         },
         //暂停养号
         pauseCreation(row){
@@ -513,6 +529,10 @@ export default {
             this.drawer_task=true
 
         },
+        //提交表单数据
+        submit_drawer(){
+
+        }
         
         
     },
@@ -567,9 +587,11 @@ export default {
 }
 .all_class_margin{
    width:60px;
-   margin-right: 5px;
-   margin-left: 5px;
+   margin-right: 10px;
+   margin-left: 10px;
 }
-
+.all_margin_top{
+    margin-top:10px
+}
 
 </style>
