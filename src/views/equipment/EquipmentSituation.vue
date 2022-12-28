@@ -1,5 +1,6 @@
 <template>
   <div>
+    <div class="EquipmentSituation">
     <div class="tt-accsituation">
       <div class="tt-accsituation--operation">
         <div style="margin-right: 10px;">
@@ -33,7 +34,7 @@
         <!-- 更改显示状态的列表 -->
         <table-custom :loading="loading" :tableData="tableData2" :columns="columns_T"></table-custom>
         <div style="float: right;margin-right: 20px;margin-top: 20px;">
-          <el-button @click="cancelForm">关 闭</el-button>
+          <el-button @click="handleClose">关 闭</el-button>
           <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading
     ?
     '提交中 ...' : '确 定'
@@ -41,13 +42,11 @@
         </div>
       </div>
     </el-drawer>
-    <el-dialog title="创建账号" style="width:50%; margin:0 auto" :visible.sync="dialogFormVisible"
+    <el-dialog title="创建账号" style="width:60%; margin:0 auto" :visible.sync="dialogFormVisible"
       :before-close="handleCloseDialog">
       <!-- 四级联动 -->
-
-
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
-        <el-form-item label="选择分组:" :disabled="false" prop="equipment" label-width="100px">
+        <el-form-item label="选择账号分组:" :disabled="false" prop="equipment" label-width="120px">
           <el-select :disabled="disabled" v-model="ruleForm.equipment" placeholder="账号分组选择" style="margin-right: 10px"
             @focus="getaccGroup" :loading="equipmentLoading" loading-text="数据加载中...">
             <el-option v-for="item in searchEquipmentList" :key="item.grouping_id" :label="item.grouping_name"
@@ -59,13 +58,13 @@
           </span>
         </el-form-item>
 
-        <el-form-item label="选择分类:" prop="classify" label-width="100px">
+        <el-form-item label="选择账号分类:" prop="classify" label-width="120px">
           <el-cascader v-model="ruleForm.classify" :options="options" @change="handleChange">
           </el-cascader>
         </el-form-item>
 
 
-        <el-form-item label="最大容量:" label-width="100px">
+        <el-form-item label="单设备账号容量:" label-width="120px">
           <!-- 计数器 -->
           <el-input-number v-model="ruleForm.num" @change="handleChangeNum" :min="1" :max="10"
             label="请输入单设备最大容量"></el-input-number>
@@ -76,11 +75,12 @@
         <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
       </div>
     </el-dialog>
-    <table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
-      @handleSelectionChange="selectionChange"></table-custom>
+    <table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns" @handleSelectionChange="selectionChange"></table-custom>
+    <span class="position_select_num">已选中{{total}}个设备</span>
+    <span class="position_num">共{{total}}个设备</span>
     <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination">
     </pagination>
-
+  </div>
   </div>
 </template>
 
@@ -499,37 +499,14 @@ export default {
         }
       )
     },
-    //dialog弹出框
-    handleCloseDialog(done) {
-      this.$confirm('确认关闭？')
-        .then(_ => {
-          done();
-        })
-        .catch(_ => { });
+    //dialog弹出框关闭时
+    handleCloseDialog() {
+      this.dialogFormVisible=false
     },
-    //抽屉事件
-    handleClose(done) {
-      if (this.loading) {
-        return;
-      }
-      this.$confirm('确定要修改分组吗？')
-        .then(_ => {
-          console.log(this.form.region)//确认提交修改分组后的操作
-          this.loading = true;
-          this.timer = setTimeout(() => {
-            done();
-            // 动画关闭需要一定的时间
-            setTimeout(() => {
-              this.loading = false;
-            }, 400);
-          }, 2000);
-        })
-        .catch(_ => { });
-    },
-    cancelForm() {
+    //抽屉关闭时
+    handleClose() {
+      this.dialog=false
       this.loading = false;
-      this.dialog = false;
-      clearTimeout(this.timer);
     },
     /**
                * 翻页回调
@@ -542,5 +519,22 @@ export default {
 };
 </script>
 <style scoped>
-
+.position_num{
+  color: red;
+  position: absolute;
+  margin-top: 10px;
+  margin-left: 50px;
+}
+.position_select_num{
+  position: absolute;
+  margin-top: 10px;
+  margin-left: 200px;
+}
+</style>
+<style>
+/* 视觉欺骗去除组件的总条数 给该页面加个外层class防止穿透*/
+.EquipmentSituation .el-pagination__total{
+  position: relative;
+    left: 90px;
+}
 </style>
