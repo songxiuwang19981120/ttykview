@@ -9,11 +9,23 @@
 							:value="item.value">
 						</el-option>
 					</el-select>
+					            <el-date-picker
+            class="date-picker"
+      v-model="date"
+      type="daterange"
+      align="right"
+      unlink-panels
+      range-separator="——"
+      start-placeholder="开始日期"
+      end-placeholder="结束日期"
+      :picker-options="pickerOptions">
+    </el-date-picker>
 				</div>
 					<el-button type="primary"  class="seachbut" :loading="btnloading" @click="searchTasks" style="margin-right: 20px">{{
 							btnloading ? '加载中...' : '搜索'
 					}}</el-button>
 					<el-button type="primary" class="seachbut" @click="btnReset">重置</el-button>
+					<el-button type="primary" class="seachbut" @click="showLikeCommentDialog">点赞任务</el-button>
 			</div>
 		</div>
 		<!-- 表格 -->
@@ -22,21 +34,28 @@
 		<pagination :total="total" :page="page.page" :limit="page.limit" @pagination="pageChange"></pagination>
 		<!-- 弹层 -->
 		<CommentLikeDialogComponent ref="dialog" :showDialog.sync="dialog" :curId="curId"></CommentLikeDialogComponent>
+		<LikeCommentDialog 
+		@closeLikeCommentTask="closeLikeCommentTask"
+      	:showLikeCommentTask="showLikeCommentTask"
+		/>
 	</div>
 </template>
 <script>
 import tableCustom from '@/components/myComponent/table/tableCustom.vue';
 import CommentLikeDialogComponent from './component/CommentLikeDialogComponent.vue';
 import pagination from '@/components/myComponent/table/pagination.vue';
+import LikeCommentDialog from '@/views/account/accCountSit/taskDialog/likeCommentDialog.vue'
 export default {
 	name: 'TtCommentLike',
 	components: {
 		tableCustom,
 		CommentLikeDialogComponent,
 		pagination,
+		LikeCommentDialog
 	},
 	data() {
 		return {
+			showLikeCommentTask:false,
 			// 下拉选择数据
 			searchStateList: [
 				{
@@ -115,6 +134,33 @@ export default {
 			},
 			total: 0,
 			curId: null,
+			              pickerOptions: {
+          shortcuts: [{
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit('pick', [start, end]);
+            }
+          }]
+        }, 
 		};
 	},
 
@@ -179,6 +225,23 @@ export default {
 			};
 			this.getVideoTasks(this.page)
 		},
+    /* 
+        function: closeLikeCommentTask
+        params: null
+        desc: 关闭评论点赞配置窗口
+    */
+		closeLikeCommentTask(){
+			this.showLikeCommentTask = false
+		},
+
+    /* 
+        function: showLikeCommentDialog
+        params: null
+        desc: 展示评论点赞配置窗口
+    */
+		showLikeCommentDialog(){
+			this.showLikeCommentTask = true
+		}
 	},
 };
 </script>

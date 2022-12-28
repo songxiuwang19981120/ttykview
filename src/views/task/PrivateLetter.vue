@@ -9,10 +9,23 @@
 							:value="item.value">
 						</el-option>
 					</el-select>
+
+					            <el-date-picker
+            class="date-picker"
+      v-model="date"
+      type="daterange"
+      align="right"
+      unlink-panels
+      range-separator="——"
+      start-placeholder="开始日期"
+      end-placeholder="结束日期"
+      :picker-options="pickerOptions">
+    </el-date-picker>
 				</div>
 				<!-- 查询 -->
 				<el-button type="primary"  class="seachbut" :loading="btnloading" @click="searchTasks">{{ btnloading ? '加载中...' : '搜索'}}</el-button>
 				<el-button type="primary"  class="seachbut" @click="btnReset">重置</el-button>
+				<el-button type="primary"  class="seachbut" @click="showFollowTaskDialog">私信任务</el-button>
 			</div>
 		</div>
 		<!-- 表格 -->
@@ -22,21 +35,28 @@
 		<!-- 弹层 -->
 		<PrivateLetterDialogComponent ref="dialog" :showDialog.sync="dialog" :curId="curId">
 		</PrivateLetterDialogComponent>
+		<LetterTaskDialog 
+		@closeFollowTask="closeFollowTask"
+      	:showFollowDialog="showFollowDialog"
+		/>
 	</div>
 </template>
 <script>
 import tableCustom from '@/components/myComponent/table/tableCustom.vue';
 import PrivateLetterDialogComponent from './component/PrivateLetterDialogComponent.vue';
 import pagination from '@/components/myComponent/table/pagination.vue';
+import LetterTaskDialog from '@/views/account/accCountSit/taskDialog/followDialog.vue'
 export default {
 	name: 'TtPrivateLetter',
 	components: {
 		tableCustom,
 		PrivateLetterDialogComponent,
 		pagination,
+		LetterTaskDialog
 	},
 	data() {
 		return {
+			showFollowDialog:false,
 			// 下拉选择数据
 			searchStateList: [
 				{
@@ -115,6 +135,33 @@ export default {
 			},
 			total: 0,
 			curId: null,
+			              pickerOptions: {
+          shortcuts: [{
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit('pick', [start, end]);
+            }
+          }]
+        },
 		};
 	},
 
@@ -126,6 +173,13 @@ export default {
 	mounted() { },
 
 	methods: {
+		closeFollowTask(){
+			this.showFollowDialog = false
+		},
+
+		showFollowTaskDialog(){
+			this.showFollowDialog = true
+		},
 		// 获取私信任务列表
 		async getVideoTasks(data) {
 			try {

@@ -7,6 +7,7 @@
     >
       <span slot="title">
         <h1 class="tt-acccountsit--title">关注任务配置</h1>
+        <p>当前已选中0个账号</p>
       </span>
       <el-form
         ref="letterForm"
@@ -16,6 +17,34 @@
         label-width="220px"
         :model="letterTaskForm"
       >
+
+              <el-form-item prop="group" label="选择分组 ：">
+          <el-select
+            style="width: 45%"
+            ref="gropuSelect"
+            clearable
+            v-model="letterTaskForm.group"
+            placeholder="选择分组"
+          >
+            <el-option
+              v-for="item in groupList"
+              :value="item.grouping_id"
+              :label="item.grouping_name"
+              :key="item.grouping_id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item prop="typecontrol_id" label="选择分类 ：">
+          <el-cascader
+            style="width: 45%"
+            clearable
+            :props="{ checkStrictly: true, value: 'value' }"
+            :options="typeList"
+            v-model="letterTaskForm.typecontrol_id"
+          ></el-cascader>
+        </el-form-item>
+
         <el-form-item
           label="选择国家 ："
           v-model="letterTaskForm.account_region"
@@ -67,23 +96,32 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item label-width="150px" label="关注频率 ：" prop="follow_rate">
+        <el-form-item 
+        label-width="150px" 
+        label="关注频率 ：" 
+        required>
           <div class="between-input">
+            <el-form-item class="rate-min" prop="rate_min">
             <el-input
-              style="width: 14%"
+              
               class="lettertask-input--between"
               v-model="letterTaskForm.rate_min"
               autocomplete="off"
               placeholder="最小"
             ></el-input
-            >&nbsp;&nbsp;
+            
+            >
+            </el-form-item>
+           
+            <el-form-item class="rate-max" prop="rate_max">
             <el-input
-              style="width: 14%"
+              
               class="lettertask-input--between"
               v-model="letterTaskForm.rate_max"
               autocomplete="off"
               placeholder="最大"
             ></el-input>
+            </el-form-item>
           </div>
         </el-form-item>
 
@@ -127,6 +165,15 @@
           ></el-input>
         </el-form-item>
 
+        <el-form-item label="备注任务名称 ：" prop="remarks">
+          <el-input
+            style="width: 38%"
+            type="text"
+            v-model="letterTaskForm.remarks"
+            placeholder="请备注任务名称"
+          ></el-input>
+        </el-form-item>
+
         <el-form-item label="黑名单" prop="black_list">
           <el-checkbox-group v-model="letterTaskForm.black_list">
             <el-checkbox
@@ -137,16 +184,10 @@
           </el-checkbox-group>
         </el-form-item>
 
-        <div class="lettertask-checkport">
-          <span class="check">执行端选择：</span>
-          <el-checkbox-group v-model="letterTaskForm.port">
-            <el-checkbox label="协议"></el-checkbox>
-            <el-checkbox disabled label="真机"></el-checkbox>
-          </el-checkbox-group>
-        </div>
       </el-form>
 
       <span slot="footer" class="dialog-footer">
+        <el-button @click="handleReset">重 置</el-button>
         <el-button @click="handlerClose">取 消</el-button>
         <el-button type="primary" @click="handlerConfrim">确认并执行</el-button>
       </span>
@@ -178,11 +219,13 @@ export default {
       rules: letter,
       blackList: ["无昵称", "无作品", "无头像", "历史已操作用户"],
       blackListMap: {
-        无头像: "no_avatar",
-        无作品: "no_aweme",
-        历史已操作用户: "historical_users",
-        无昵称: "no_nickname",
+        '无头像': "no_avatar",
+        '无作品': "no_aweme",
+        '历史已操作用户': "historical_users",
+        '无昵称': "no_nickname",
       },
+      typeList:[],
+      groupList:[],
       sourceData: [],
       // TODO 国家options
       countryOptions: [
@@ -237,7 +280,7 @@ export default {
         user_follow_upper_limit: "", //单号关注上限
         rate_min: "", //关注频率最小值
         rate_max: "", //关注频率最大值
-
+        typecontrol_id:'',
         follower_status: "", //粉丝量小于
         tasklist_id_list: [], //数据来源
         following_count: "", //关注数量小于
@@ -245,9 +288,10 @@ export default {
         typecontrol_id: "",
         can_fail_num: "", //连续失败次数
         following_count: "", //关注数量小于
-        port: [], //执行端选择
         black_list: [],
         uid_list: "",
+        remarks:'',//备注任务名称
+        group:''
       },
     };
   },
@@ -255,11 +299,57 @@ export default {
   mounted() {
     this.getTasklist();
     this.letterTaskForm.typecontrol_id = this.typecontrol_id;
+    this.getGroupList()
   },
 
   methods: {
     async getTasklist() {
       let result = await this.$api();
+    },
+
+handleReset(){
+  this.resetForm()
+},
+    /*
+        function: getTreeData
+        params: data | 需要进行递归处理的数组
+        desc: 递归函数，对数组进行处理，设置dhilren长度为0的字段为undefined
+        return: 处理后的数据
+    */
+    getTreeData(data) {
+      data.forEach((item) => {
+        if (!item.children.length) {
+          item.children = undefined;
+        } else {
+          this.getTreeData(item.children);
+        }
+      });
+      return data;
+    },
+
+      /*
+        function: getTypeControlList
+        params: null
+        desc: 异步获取TypeControlList，页面渲染时调用
+    */
+    async getTypeControlList() {
+      try {
+        let result = await this.$api({ type: "getTypecontrol" });
+        this.typeList = this.getTreeData(result.data);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+      /* 
+        function: getGroupList
+        params: null
+        desc: 获取分组  异步
+    */
+    async getGroupList() {
+      let result = await this.$api({ type: "getGrouping" });
+      console.log(result);
+      this.groupList = result.data.list;
     },
 
     handlerClose() {
@@ -358,4 +448,18 @@ export default {
   margin-bottom: 20px;
   font-size: 20px;
 }
+
+.between-input
+  display: flex
+  justify-content: space-between
+
+.rate-max
+  margin-right: 267px
+  position: absolute
+  right: 10px
+  .el-form-item__error
+    left: 70px !important
+
+.rate-min .el-form-item__error
+  left: 70px !important
 </style>
