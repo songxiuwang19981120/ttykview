@@ -16,7 +16,7 @@ export default {
                     icon: '',
                 },
                 // {
-                //     title: '设备分组',
+                //     title: '账号分组',
                 //     to: '/equgroup',
                 //     icon: '',
                 // },

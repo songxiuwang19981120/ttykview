@@ -3,8 +3,8 @@
         <div class="tt-accsituation">
             <div class="tt-accsituation--operation">
                 <div>
-                    <el-select v-model="searchTableData.equipment" placeholder="请选择设备分组"
-                        style="width:150px;margin-right:10px" @change="searchEquipmentChange">
+                    <el-select v-model="searchTableData.equipment" placeholder="请选择账号分组"
+                        style="width:150px;margin-right:10px" @change="searchEquipmentChange" clearable>
                         <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
                             :key="item.grouping_id"></el-option>
                     </el-select>
@@ -27,7 +27,9 @@
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
-                <el-button type="primary" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...' :'搜索'}}</el-button>
+                <el-button type="primary" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...' :
+        '搜索'
+}}</el-button>
                 <el-button type="primary" @click="resetTable">重置</el-button>
                 <el-button type="primary" @click="videoUpLoad">上传视频</el-button>
                 <el-button type="primary" @click="batchDelete">批量删除</el-button>
@@ -47,8 +49,8 @@
                         v-model="videoForm.library" placeholder="分类选择"></el-cascader>
                 </el-form-item>
                 <el-form-item label="视频:" prop="video">
-                    <el-upload class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple accept=".mp4"
-                        :on-success="handleSucess" :on-error="handleError" :on-remove="handleRemove"
+                    <el-upload ref="videoUnload" class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple
+                        accept=".mp4" :on-success="handleSucess" :on-error="handleError" :on-remove="handleRemove"
                         :before-upload="videoBefore">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -57,16 +59,21 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="videoUploadClose">取 消</el-button>
-                <el-button type="primary" :loading="videoSubmitting" @click="submitForVideo">{{ videoSubmitting ?'提交中...' : '提 交'}}</el-button>
+                <el-button type="primary" :loading="videoSubmitting" @click="submitForVideo">{{ videoSubmitting ?
+        '提交中...' : '提 交'
+}}</el-button>
             </span>
         </el-dialog>
         <div>
-            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll"
-                @change="handleCheckAllChange">全选 <span style="color:#FF411F;font-size: 12px;padding-left: 20px;"> 已选中 {{ checkedCities.length }} 个视频</span></el-checkbox>
+            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选 <span
+                    style="color:#FF411F;font-size: 12px;padding-left: 20px;"> 已选中 {{ checkedCities.length }}
+                    个视频</span></el-checkbox>
             <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange" class="video">
                 <div v-for="(item, index) in tableData" :key="index" class="videoData">
                     <video controls loop :src="item.video_url" class="videosize"></video>
-                    <el-checkbox :label="item.material_id" :key="item.material_id" class="videoNum">视频编号:{{ item.video_num}}</el-checkbox>
+                    <el-checkbox :label="item.material_id" :key="item.material_id" class="videoNum">视频编号:{{
+        item.video_num
+}}</el-checkbox>
                     <div class="videoNum">上传时间:{{ item.add_time }}</div>
                 </div>
             </el-checkbox-group>
@@ -157,7 +164,7 @@ export default {
                                     confirm-button-text='删除'
                                     cancel-button-text='取消'
                                     title="确认删除此视频？"
-                                    onConfirm={this.removeHandler.bind(this, row,'1')}
+                                    onConfirm={this.removeHandler.bind(this, row, '1')}
                                 >
                                     <el-button slot="reference" type="danger" size="mini">删除</el-button>
                                 </el-popconfirm>
@@ -169,9 +176,9 @@ export default {
             ],  //表格
             total: 0,  //数据总量
             current_page: 1, //当前页
-            current_limit: 20, //每页条数
+            current_limit: 50, //每页条数
             submitting: false,  //提交确定
-            groupList: [],  //设备分组
+            groupList: [],  //账号分组
             libraryList: [],  //账号分类
             searchTableData: {
                 equipment: '',
@@ -191,7 +198,7 @@ export default {
             ],  //时间排序
             searchTypeList: [
                 {
-                    value: '2',
+                    value: '',
                     label: '全部素材'
                 },
                 {
@@ -225,23 +232,23 @@ export default {
 
     methods: {
         // 批量删除
-        batchDelete(){
-            if(this.checkedCities.length==0){
+        batchDelete() {
+            if (this.checkedCities.length == 0) {
                 this.$message.warning('请选择需要删除的视频');
-            }else{
-                this.removeHandler(this.checkedCities,'2')
+            } else {
+                this.removeHandler(this.checkedCities, '2')
             }
         },
         // 监听全选
         handleCheckAllChange(val) {
             if (val) {
                 this.tableData.forEach((item) => {
-                    if(this.checkedCities.indexOf(item.material_id) === -1){
+                    if (this.checkedCities.indexOf(item.material_id) === -1) {
                         this.checkedCities.push(item.material_id)
                     }
                 })
-            }else{
-                this.checkedCities=[]
+            } else {
+                this.checkedCities = []
             }
             this.isIndeterminate = false;
         },
@@ -304,8 +311,8 @@ export default {
             try {
                 let result = await this.$api({ type: "getTypecontrol", data: data });
                 if (result.status == '200') {
+                    this.getTreeData(result.data);
                     this.libraryList = result.data;
-                    this.getTreeData(result.data)
                 } else {
                     this.$message.error({ message: result.msg })
                 }
@@ -332,8 +339,8 @@ export default {
             try {
                 let result = await this.$api({ type: "getTypecontrol", data: data });
                 if (result.status == '200') {
+                    this.getTreeData(result.data);
                     this.libraryAddList = result.data;
-                    this.getTreeData(result.data)
                 } else {
                     this.$message.error({ message: result.msg })
                 }
@@ -360,7 +367,6 @@ export default {
                 let fileList = this.fileList.map((item) => {
                     return item.response.data;
                 }).join(",");
-                console.log(fileList);
                 let typecontrolId = this.videoForm.library[this.videoForm.library.length - 1] ?? ''
                 let data = {
                     typecontrol_id: typecontrolId,
@@ -382,6 +388,7 @@ export default {
                         group: '',  //分组
                         library: '',  //库
                     };
+                    this.$refs.videoUnload.clearFiles()
                     this.getMaterialList()
                     this.$message.success({ message: result.msg })
                 } else {
@@ -393,6 +400,12 @@ export default {
         },
         // 取消视频上传弹框
         videoUploadClose() {
+            this.$refs.videoUnload.clearFiles()
+            this.fileList = [];
+            this.videoForm = {
+                group: '',  //分组
+                library: '',  //库
+            };
             this.videoUploadVisible = false
         },
         /*
@@ -404,20 +417,20 @@ export default {
         /*
            删除视频
         */
-        async removeHandler(val,type) {
+        async removeHandler(val, type) {
             let data = {
                 material_ids: '',
             }
-            if(type==2){  //批量删除
-                data.material_ids=val.join(',')
-            }else{
-                data.material_ids=val.material_id
+            if (type == 2) {  //批量删除
+                data.material_ids = val.join(',')
+            } else {
+                data.material_ids = val.material_id
             }
             try {
                 let result = await this.$api({ type: "deleteMaterial", data: data });
                 if (result.status == '200') {
-                    if(type==2){
-                        this.checkedCities=[]
+                    if (type == 2) {
+                        this.checkedCities = []
                     }
                     this.$message.success({ message: '视频删除成功' });
                     this.getMaterialList()
@@ -503,6 +516,7 @@ export default {
                 status: '',
                 sort: '',
             }
+            this.libraryList = []
             this.getMaterialList()
         },
 

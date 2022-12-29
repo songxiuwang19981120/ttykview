@@ -1,7 +1,8 @@
 <template>
   <!-- <div> -->
   <el-dialog :visible.sync="editShowDialog" title="编辑素材" width="70%" :before-close="cancelMaterial">
-    <table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+    <el-button @click="batchDelete" type="primary" :loading="deleteing">{{ deleteing ? '删除中 ...': '批量删除'}}</el-button>
+    <table-custom  :mutiSelect="true" @handleSelectionChange="selectionChange" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
     <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination"></pagination>
     <span slot="footer" class="dialog-footer">
       <el-button @click="cancelMaterial">取 消</el-button>
@@ -77,16 +78,34 @@ export default {
           render: (h, { row }) => {
             return (
               <div>
-                <el-button style="margin-right:10px" size="mini" type="danger" onClick={this.removeMaterial.bind(this, row)}>删除</el-button>
+                <el-button style="margin-right:10px" size="mini" type="danger" onClick={this.removeMaterial.bind(this, row.uidlibrary_id)}>删除</el-button>
               </div>
             );
           },
         },
       ],
       libraryidId:'',  //id库id
+      tableSelsectList:[],
+      deleteing:false
     }
   },
   methods: {
+    // 批量删除
+		batchDelete() {
+			if (this.tableSelsectList.length > 0) {
+				let id = this.tableSelsectList.map((item) => {
+					return item.uidlibrary_id;
+				}).join(",");
+				this.deleteing = true
+				this.removeMaterial(id)
+			} else {
+				this.$message.warning('请选择需要删除的数据');
+			}
+		},
+		//选择框
+		selectionChange(val) {
+			this.tableSelsectList = val
+		},
     getData(row) {
       this.libraryidId = row.libraryid_id
       this.getUidlibraryIndex()
@@ -132,12 +151,13 @@ export default {
       this.getUidlibraryIndex();
     },
     // 删除素材
-    async removeMaterial(row) {
+    async removeMaterial(id) {
       let data = {
-        uidlibrary_ids: row.uidlibrary_id
+        uidlibrary_ids: id
       };
       try {
         let result = await this.$api({ type: "uidlibraryDelete", data: data });
+        this.deleteing = false
         if (result.status == '200') {
           this.$message.success({ message: '删除成功' })
           if (this.current_page != 1) {
@@ -150,6 +170,7 @@ export default {
           this.$message.error({ message: result.msg })
         }
       } catch (error) {
+        this.deleteing = false
         console.error(error);
       }
     },
