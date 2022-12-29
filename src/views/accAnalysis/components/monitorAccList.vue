@@ -32,13 +32,13 @@
         <el-button>确定</el-button>
       </div>
 
-      <Scroll>
+      <happy-scroll class="scroll">
         <table-custom
           :loading="loading"
           :tableData="tableData"
           :columns="columns"
         ></table-custom>
-      </Scroll>
+      </happy-scroll>
     </el-card>
   </div>
 </template>
@@ -247,6 +247,9 @@ export default {
   height: 500px;
   border-radius: 33px;
 }
+
+.scroll
+  height: 400px
 
 .monitor-screen {
   display: flex;

@@ -87,4 +87,13 @@ export default {
 .accAnalysis-left {
   width: 100%;
 }
+
+.accAnalysis-tab {
+  display: flex
+  justify-content: space-around
+  align-items: center
+  padding: 0 180px
+  width: 100%
+
+}
 </style>

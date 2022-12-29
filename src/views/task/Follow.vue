@@ -301,6 +301,7 @@ export default {
 </script>
 
 <style  lang="scss" scoped>
+	@import '@/assets/base/_color_variables.scss';
 
 .date-picker {
 	margin-left: 16px;
