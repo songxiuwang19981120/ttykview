@@ -161,7 +161,6 @@
 	import * as echarts from 'echarts';
 	import chooseduration from '@/components/index/chooseduration.vue';
 	import choosetype from '@/components/index/choosetype.vue';
-	import '@/assets/font/iconfont.css'
 	export default {
 		name: 'TtIndex',
 
@@ -352,8 +351,6 @@
 					text-align: center;
 					font-size: 12px;
 					color: #6c6c6c;
-<<<<<<< HEAD
-=======
 					.icon-shangsheng{
 						font-size: 12px;
 						color: red;
@@ -362,7 +359,6 @@
 						font-size: 12px;
 						color: green;
 					}
->>>>>>> 2e4f148f7bd351a6c33c5e6fbc8ea51d972517b4
 					.up, .down{
 						width: 12px;
 						height: 12px;
