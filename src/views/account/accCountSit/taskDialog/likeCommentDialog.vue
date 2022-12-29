@@ -7,14 +7,44 @@
     >
       <span slot="title">
         <h1 class="tt-acccountsit--title">评论区点赞任务配置</h1>
+        <p>当前已选中0个账号</p>
       </span>
+      
       <el-form
         :rules="rules"
         ref="likeCommentForm"
         label-position="left"
-        label-width="216px"
+        label-width="210px"
         :model="likeCommentTaskForm"
       >
+
+        <el-form-item prop="group" label="选择分组 ：">
+          <el-select
+            style="width: 45%"
+            ref="gropuSelect"
+            clearable
+            v-model="likeCommentTaskForm.group"
+            placeholder="选择分组"
+          >
+            <el-option
+              v-for="item in groupList"
+              :value="item.grouping_id"
+              :label="item.grouping_name"
+              :key="item.grouping_id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item prop="typecontrol_id" label="选择分类 ：">
+          <el-cascader
+            style="width: 45%"
+            clearable
+            :props="{ checkStrictly: true, value: 'value' }"
+            :options="typeList"
+            v-model="likeCommentTaskForm.typecontrol_id"
+          ></el-cascader>
+        </el-form-item>
+
         <el-form-item
           label="选择国家 ："
           prop="account_region"
@@ -81,6 +111,10 @@
           ></el-input>
         </el-form-item>
 
+        <el-form-item prop="remarks" label="备注任务名称">
+          <el-input type="textarea" v-model="likeCommentTaskForm.remarks" placeholder="输入任务名称"></el-input>
+        </el-form-item>
+
         <el-form-item label="黑名单 :" prop="black_list">
           <el-checkbox-group
             style="width: 101%"
@@ -93,19 +127,10 @@
             ></el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-        <el-form-item class="port" label="执行端协议">
-          <el-checkbox-group v-model="likeCommentTaskForm.port">
-            <el-checkbox label="协议"></el-checkbox>
-            <el-checkbox disabled label="真机"></el-checkbox>
-            <!-- TODO  目前没有真机业务 -->
-          </el-checkbox-group>
-        </el-form-item>
-        <!--        <div>
-          <span>执行端选择：</span>
-          
-        </div> -->
+
       </el-form>
       <span slot="footer" class="dialog-footer">
+        <el-button @click="handleReset">重 置</el-button>
         <el-button @click="handlerClose">取 消</el-button>
         <el-button type="primary" @click="handlerConfrim">确认并执行</el-button>
       </span>
@@ -132,6 +157,14 @@ export default {
       type: Array,
     },
   },
+  computed:{
+        typeSelectPlaceholder() {
+      return this.group === "" ? "请先选择分组" : "选择分类";
+    },
+        isTypeSelectDis() {
+      return this.group === "";
+    },
+  },
   data() {
     return {
       rules: likeComment,
@@ -142,6 +175,8 @@ export default {
         历史已操作用户: "historical_users",
         无昵称: "no_nickname",
       },
+      groupList:[],
+      typeList:[],
       //TODO 需关注分组下拉框选择  需要跟后端对接
       groupData: [
         {
@@ -218,15 +253,66 @@ export default {
         port: [], //执行端协议
         typecontrol_id: "",
         uid_list: "",
+        group:'',
+        remarks:'' //备注任务名称
       },
     };
   },
 
   mounted() {
     this.getTasklist();
+    this.getGroupList()
+    this.getTypeControlList()
   },
 
   methods: {
+
+    handleReset(){
+      this.resetForm()
+    },
+
+    /*
+        function: getTreeData
+        params: data | 需要进行递归处理的数组
+        desc: 递归函数，对数组进行处理，设置dhilren长度为0的字段为undefined
+        return: 处理后的数据
+    */
+    getTreeData(data) {
+      data.forEach((item) => {
+        if (!item.children.length) {
+          item.children = undefined;
+        } else {
+          this.getTreeData(item.children);
+        }
+      });
+      return data;
+    },
+    /*
+        function: getTypeControlList
+        params: null
+        desc: 异步获取TypeControlList，页面渲染时调用
+    */
+    async getTypeControlList() {
+      try {
+        let result = await this.$api({ type: "getTypecontrol" });
+        this.typeList = this.getTreeData(result.data);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    /* 
+        function: getGroupList
+        params: null
+        desc: 获取分组  异步
+    */
+    async getGroupList() {
+      let result = await this.$api({ type: "getGrouping" });
+      console.log(result);
+      this.groupList = result.data.list;
+    },
+
+
     async getTasklist() {
       let data = { task_type: "CollectionVideo" };
       let result = await this.$api({ type: "getTasklist", data });

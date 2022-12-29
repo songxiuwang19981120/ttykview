@@ -12,6 +12,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 import '@/assets/css/global.styl'
 import '@/assets/css/page.css';
 
+import '@/assets/css/iconfont.css'
 // Vue.use(animated)
 Vue.prototype.$EventBus = new Vue()
 Vue.config.productionTip = false
