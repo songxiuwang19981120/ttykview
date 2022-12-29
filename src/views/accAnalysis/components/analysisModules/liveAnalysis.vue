@@ -10,6 +10,9 @@
             <button @click="initWords4">修改b</button>
             <axis ref="axis" chartId="axis" height="392px" width="858px"></axis>
 
+            <button @click="initWords5">修改a1</button>
+            <button @click="initWords6">修改b2</button>
+            <pie ref="pie" chartId="pie" height="392px" width="858px"></pie>
         </div>
     </div>
 </template>
@@ -17,11 +20,14 @@
 <script>
 import wordcloud from "@/components/myComponent/echarts/wordcloud.vue";
 import axis from "@/components/myComponent/echarts/axis.vue";
+import pie from "@/components/myComponent/echarts/pie.vue";
+
 export default {
     name: 'TtprojectVideoAnalysis',
     components: {
         wordcloud,
-        axis
+        axis,
+        pie,
     },
     data() {
         return {
@@ -31,6 +37,7 @@ export default {
     mounted() {
         this.initWords();
         this.initWords3()
+        this.initWords5()
     },
 
     methods: {
@@ -178,6 +185,40 @@ export default {
             let xAxis = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
             let legend=['Email']
             this.$refs.axis.getIint(chartData, xAxis,legend)
+        },
+        initWords5(){
+            let chartData = [
+                {
+                    name: "女性",
+                    value: 30
+                },
+                {
+                    name: "男性",
+                    value: 15
+                },
+                {
+                    name: "未知",
+                    value: 10
+                },
+            ];
+            this.$refs.pie.getIint(chartData)
+        },
+        initWords6(){
+            let chartData = [
+                {
+                    name: "女性",
+                    value: 100
+                },
+                {
+                    name: "男性",
+                    value: 150
+                },
+                {
+                    name: "未知",
+                    value: 20
+                },
+            ];
+            this.$refs.pie.getIint(chartData)
         },
     },
 };
