@@ -1,0 +1,23 @@
+{
+  "id": "3844116",
+  "name": "xm",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "21924181",
+      "name": "上升",
+      "font_class": "shangsheng",
+      "unicode": "e64e",
+      "unicode_decimal": 58958
+    },
+    {
+      "icon_id": "21924182",
+      "name": "下降",
+      "font_class": "xiajiang",
+      "unicode": "e64f",
+      "unicode_decimal": 58959
+    }
+  ]
+}
