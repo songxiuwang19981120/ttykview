@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div>
+  <div class="mar-bot-10">
+    <div class="border-bot">
       <div class="data-desc mar-bot-10">
         <div>
           <i :class="[icon]" class="color-rad"></i>
@@ -111,7 +111,6 @@ export default {
 
 .date-picker {
   height: 40px
-  border: 1px solid #3475E1
 }
 
 .pad-20 {
@@ -119,12 +118,15 @@ export default {
 }
 
 .mar-bot-10 {
-  margin-bottom: 10px;
+  margin-bottom: 30px;
 }
 
 .color-rad {
   color: red
 }
+
+.border-bot
+  border-bottom: 1px solid #ccc
 
 .data-desc
   display: flex

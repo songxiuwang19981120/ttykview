@@ -21,7 +21,10 @@
         :data="videoSummaryData"
         :title="videoSummary"
         />
-
+        <GraphicalData 
+        :title="VideoTrendTitle"
+        :icon="icon"
+        />
   
 
 
@@ -30,12 +33,13 @@
 </template>
 
 <script>
-import BaseData from './baseAnalysisCom/baseData.vue'
-import TabData from './baseAnalysisCom/tabData.vue'
-
+import BaseData from './baseAnalysisCom/baseDataCom'
+import TabData from './baseAnalysisCom/tabDataCom'
+import Wordcloud from "@/components/myComponent/echarts/wordcloud";
+import GraphicalData from './baseAnalysisCom/graphicalDataCom'
 export default {
   name: "TtprojectBaseAnalysis",
-    components:{BaseData,TabData},
+    components:{BaseData,TabData,Wordcloud,GraphicalData},
   data() {
     return {
 
@@ -44,6 +48,7 @@ export default {
         commerceVideoTitle:'带货视频数据',
         videoSummary:'视频概述',
         icon:'el-icon-s-flag',
+        VideoTrendTitle:'视频趋势数据',
       summaryData: [
         {
           lable: "总粉丝数量",
