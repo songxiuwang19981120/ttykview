@@ -330,7 +330,6 @@ export default {
         {
           prop: "following_status,following_count,play_num",
           label: "关注/粉丝/获赞",
-        
           align: "center",
           render: (h, { row }) => {
             return (
@@ -369,6 +368,7 @@ export default {
                 >
                   监控
                 </el-button>
+               
                 <el-button
                   size="mini"
                   type="danger"
@@ -376,6 +376,7 @@ export default {
                 >
                   分析
                 </el-button>
+               
                 <el-button
                   size="mini"
                   type="danger"
@@ -448,8 +449,8 @@ export default {
 handleAnalysis(row){
   
   let unique_id = row.unique_id
-  this.userInfo = row
-  this.$router.push({name:'analysis',query:{id:unique_id,userInfo:row}})
+  let userInfo = row
+  this.$router.push({name:'analysis',query:{id:unique_id,userInfo:JSON.stringify(userInfo)}})
 },
     closeReleaseVideoDialog(){
       this.showReleaseVideoDialog = false
