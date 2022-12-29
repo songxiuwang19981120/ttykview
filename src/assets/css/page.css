@@ -1,0 +1,36 @@
+
+.tt-accsituation {
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.tt-accsituation--operation {
+    display: flex;
+    justify-content: flex-start;
+    flex-flow: wrap;
+    align-items: center;
+    padding: 10px;
+}
+
+
+.el-button--primary { 
+  background: #FF3E1E !important;
+  border-color: #FF3E1E !important;
+}
+.el-button--primary:hover {
+  background: #ff654b !important;
+  border-color: #ff654b !important;
+  color: #FFF !important;
+  opacity: 0.8;
+}
+.el-button--default { 
+  background: #fff !important;
+  border-color: #FF3E1E !important;
+  color: #FF3E1E !important;
+}
+.el-button--default:hover {
+  background: #fff !important;
+  border-color: #FF3E1E !important;
+  color: #FF3E1E !important;
+  opacity: 0.8;
+}

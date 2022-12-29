@@ -3,7 +3,6 @@
     <div class="tt-accsituation">
       <div class="tt-accsituation--operation">
         <div style="margin-right: 20px">
-          <span>任务状态：</span>
           <el-select v-model="page.status" placeholder="请选择任务状态">
             <el-option
               v-for="item in searchStateList"
@@ -305,24 +304,6 @@ export default {
 };
 </script>
 <style  lang="scss" scoped>
-@import "@/assets/base/base.scss";
-.tt-accsituation {
-  background-color: #fff;
-  margin-bottom: 20px;
-  border-radius: 4px;
-  padding: 0 12px;
-}
-
-.tt-accsituation--operation {
-  display: flex;
-  // height: 70px;
-  // line-height: 70px;
-  padding: 10px;
-}
-.seachbut {
-  background-color: $button-back-color;
-  border-color: $button-bord-color;
-}
 
 .date-picker {
 	margin-left: 16px;

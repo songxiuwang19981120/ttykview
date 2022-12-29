@@ -569,15 +569,29 @@ export default {
   },
   //PrivateLetter API end
 
+  // Role API start
+  'getRole': { // 获取角色列表
+    url: '/Role/index',
+    method: 'POST'
+  },
+  'addRole': { // 新增角色
+    url: '/Role/add',
+    method: 'POST'
+  },
+  'updateRole': { // 编辑角色
+    url: '/Role/update',
+    method: 'POST'
+  },
+  // Role API end
   'getCountry':{    //获取国家数据
     url:'/member/country',
     method:'POST'
   },
-
-  'updateUserType':{ //更新用户分组分类
-    url:'member/BatchUpdateUserType',
-    method:'POST'
-  }
+   'updateUserType':{ //更新用户分组分类
+      url:'member/BatchUpdateUserType',
+     method:'POST'
+     }
+  
 }
 
 

@@ -109,7 +109,7 @@ export default {
 
 <style scoped>
 .pagination-container {
-  background: #fff;
+  /* background: #fff; */
   margin: 0 auto;
   padding: 10px;
   text-align: right;

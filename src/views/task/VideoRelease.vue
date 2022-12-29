@@ -3,75 +3,30 @@
     <div class="tt-accsituation">
       <div class="tt-accsituation--operation">
         <div style="margin-right: 20px">
-          <span>任务状态：</span>
           <el-select v-model="page.status" placeholder="请选择任务状态">
-            <el-option
-              v-for="item in searchStateList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
+            <el-option v-for="item in searchStateList" :key="item.value" :label="item.label"
+              :value="item.value"></el-option>
           </el-select>
         </div>
-        <el-date-picker
-          class="date-picker"
-          v-model="date"
-          type="daterange"
-          align="right"
-          unlink-panels
-          range-separator="——"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          :picker-options="pickerOptions"
-        >
+        <el-date-picker class="date-picker" v-model="date" type="daterange" align="right" unlink-panels
+          range-separator="——" start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="pickerOptions">
         </el-date-picker>
-        <el-button
-          type="primary"
-          class="seachbut"
-          :loading="btnloading"
-          @click="searchTasks"
-          >{{ btnloading ? "搜索中 ..." : "搜索" }}</el-button
-        >
-        <el-button type="primary" class="seachbut" @click="btnReset"
-          >重置</el-button
-        >
-		
-        <el-button type="primary" class="seachbut" @click="showVideoTask"
-          >发布视频</el-button
-        >
-		<i class="el-icon-refresh-left"></i>
+        <el-button type="primary" class="seachbut" :loading="btnloading" @click="searchTasks">{{ btnloading ? "搜索中 ...": "搜索"}}</el-button>
+        <el-button type="primary" class="seachbut" @click="btnReset">重置</el-button>
+
+        <el-button type="primary" class="seachbut" @click="showVideoTask">发布视频</el-button>
+        <i class="el-icon-refresh-left"></i>
       </div>
     </div>
     <!-- 表格 -->
-    <table-custom
-      :loading="loading"
-      :tableData="tableData"
-      :columns="columns"
-    ></table-custom>
+    <table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
     <!-- 分页 -->
-    <pagination
-      :total="total"
-      :page="page.page"
-      :limit="page.limit"
-      @pagination="pageChange"
-    ></pagination>
+    <pagination :total="total" :page="page.page" :limit="page.limit" @pagination="pageChange"></pagination>
     <!-- 弹层 -->
-    <VideoReleaseDialogComponent
-      ref="dialog"
-      :showDialog.sync="dialog"
-      :curId="curId"
-    ></VideoReleaseDialogComponent>
-    <TaskDetail
-      @closeTaskDetail="closeTaskDetail"
-      :showTaskDetail="showTaskDetail"
-      :taskDesc="title"
-      :tableData="tableData"
-      :title="title"
-    />
-    <VideoTaskDialog
-      :showVideoDialog="showVideoDialog"
-      @closeVideoTask="closeVideoTask"
-    />
+    <VideoReleaseDialogComponent ref="dialog" :showDialog.sync="dialog" :curId="curId"></VideoReleaseDialogComponent>
+    <TaskDetail @closeTaskDetail="closeTaskDetail" :showTaskDetail="showTaskDetail" :taskDesc="title"
+      :tableData="tableData" :title="title" />
+    <VideoTaskDialog :showVideoDialog="showVideoDialog" @closeVideoTask="closeVideoTask" />
   </div>
 </template>
 <script>
@@ -227,7 +182,7 @@ export default {
     this.getVideoTasks(this.page);
   },
 
-  mounted() {},
+  mounted() { },
 
   methods: {
     closeTaskDetail() {
@@ -314,34 +269,15 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-@import "@/assets/base/base.scss";
-.tt-accsituation {
-  background-color: #fff;
-  margin-bottom: 20px;
-  border-radius: 4px;
-  padding: 0 12px;
-}
-
-.tt-accsituation--operation {
-  display: flex;
-  // height: 70px;
-  // line-height: 70px;
-  padding: 10px;
-}
-.seachbut {
-  background-color: $button-back-color;
-  border-color: $button-bord-color;
-}
-
+<style  lang="scss" scoped>
 .date-picker {
   margin-right: 12px;
 }
 
 .el-icon-refresh-left {
-	margin: 5px 0 0 50px;
-	font-size: 30px;
-	color: $button-back-color;
-	cursor: pointer;
+  margin: 5px 0 0 50px;
+  font-size: 30px;
+  color: $button-back-color;
+  cursor: pointer;
 }
 </style>

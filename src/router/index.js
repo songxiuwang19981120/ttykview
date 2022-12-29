@@ -48,7 +48,7 @@ const routes = [
       {
         path:'/equgroup',
         name:'equgroup',
-        component:() => import(/* webpackChunkName: "equgroup" */ '@/views/equipment/EquipmentGroup.vue')
+        component:() => import(/* webpackChunkName: "equgroup" */ '@/views/account/accGroup.vue')
       },
       //设备管理 end
 
@@ -89,6 +89,17 @@ const routes = [
         name:'private',
         component:() => import(/* webpackChunkName: "private" */ '@/views/task/PrivateLetter.vue')
       },
+      {
+        path:'/accountcreation',
+        name:'AccountCreation',
+        component:() => import(/* webpackChunkName: "private" */ '@/views/task/AccountCreation.vue')
+      },
+      {
+        path:'/cultivatetask',
+        name:'cultivatetask',
+        component:() => import(/* webpackChunkName: "private" */ '@/views/task/CultivateTask.vue')
+      },
+
       //任务管理 end
 
       //素材管理 start
@@ -142,8 +153,21 @@ const routes = [
         path:'/usercapture',
         name:'usercapture',
         component:() => import(/* webpackChunkName: "usercapture" */ '@/views/userCollection/UserCapture.vue')
-      }
+      },
       //素材管理 end
+
+      // 账户管理 start
+      {
+        path:'/users',
+        name:'users',
+        component:() => import(/* webpackChunkName: "users" */ '@/views/users/Users.vue')
+      },
+      {
+        path:'/roles',
+        name:'roles',
+        component:() => import(/* webpackChunkName: "users" */ '@/views/users/Roles.vue')
+      },
+      // 账户管理 end
     ]
   },
 ]

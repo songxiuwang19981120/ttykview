@@ -382,8 +382,11 @@ handleReset(){
               return this.blackListMap[item];
             }
           );
+         
           let data = this.letterTaskForm;
+          
           this.aaa(data)
+          
         }
       });
     },
@@ -396,7 +399,7 @@ handleReset(){
           }else{
             console.log('11111111111111111',result);
           this.$message.warning(result.msg);
-
+          this.resetForm();
           }
 
     },
@@ -415,7 +418,8 @@ handleReset(){
     resetForm() {
       this.$refs["letterForm"].resetFields();
       this.letterTaskForm.rate_min = '',
-      this.letterTaskForm.rate_max = ''
+      this.letterTaskForm.rate_max = '',
+      this.letterTaskForm.black_list = []
     },
   },
 };
