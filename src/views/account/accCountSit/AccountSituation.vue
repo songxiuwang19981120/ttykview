@@ -103,7 +103,7 @@
     <Pagination
       :total="total"
       :page="page"
-      :size="limit"
+      :limit="limit"
       @pagination="handlePagination"
     />
     
@@ -635,7 +635,14 @@ showBatchEditorDialog(){
     handlePagination(val) {
       console.log(val)
       this.page = val.page;
-      this.getMemberList();
+      this.limit = val.limit
+      let data = {
+        typecontrol_id : this.classiFication[this.classiFication.length - 1] ?? "",
+        grouping_id: this.group ?? '', 
+        limit: this.limit ?? 10,
+        page: this.page ?? 1
+      }
+      this.getMemberList(data);
     },
 
     /* 
