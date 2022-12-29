@@ -25,7 +25,7 @@
 					<span class="name">播放量</span>
 					<div class="count">42396</div>
 					<div class="compare">
-						较昨天 <span class="compCount">2421</span> <span class="iconfont icon-shangsheng"></span>
+						较昨天 <span class="compCount">2421</span> <img class="up" src="../assets/up.png" alt="">
 					</div>
 				</div>
 				<div class="content">
@@ -36,35 +36,35 @@
 					<span class="name">粉丝量</span>
 					<div class="count">2796030</div>
 					<div class="compare">
-						较昨天 <span class="compCount">21651</span> <span class="iconfont icon-xiajiang"></span>
+						较昨天 <span class="compCount">21651</span> <img class="down" src="../assets/down.png" alt="">
 					</div>
 				</div>
 				<div class="content">
 					<span class="name">评论量</span>
 					<div class="count">342210</div>
 					<div class="compare">
-						较昨天 <span class="compCount">24221</span> <span class="iconfont icon-shangsheng"></span>
+						较昨天 <span class="compCount">24221</span> <img class="down" src="../assets/up.png" alt="">
 					</div>
 				</div>
 				<div class="content">
 					<span class="name">收藏量</span>
 					<div class="count">23432</div>
 					<div class="compare">
-						较昨天 <span class="compCount">3421</span> <span class="iconfont icon-shangsheng"></span>
+						较昨天 <span class="compCount">3421</span> <img class="down" src="../assets/up.png" alt="">
 					</div>
 				</div>
 				<div class="content">
 					<span class="name">分享量</span>
 					<div class="count">54278</div>
 					<div class="compare">
-						较昨天 <span class="compCount">342</span> <span class="iconfont icon-shangsheng"></span>
+						较昨天 <span class="compCount">342</span> <img class="down" src="../assets/up.png" alt="">
 					</div>
 				</div>
 				<div class="content">
 					<span class="name">主页访问量</span>
 					<div class="count">16534</div>
 					<div class="compare">
-						较昨天 <span class="compCount">2411</span> <span class="iconfont icon-shangsheng"></span>
+						较昨天 <span class="compCount">2411</span> <img class="down" src="../assets/up.png" alt="">
 					</div>
 				</div>
 			</div>
@@ -161,7 +161,6 @@
 	import * as echarts from 'echarts';
 	import chooseduration from '@/components/index/chooseduration.vue';
 	import choosetype from '@/components/index/choosetype.vue';
-	import '@/assets/font/iconfont.css'
 	export default {
 		name: 'TtIndex',
 
@@ -359,6 +358,10 @@
 					.icon-xiajiang{
 						font-size: 12px;
 						color: green;
+					}
+					.up, .down{
+						width: 12px;
+						height: 12px;
 					}
 				}
 			}
