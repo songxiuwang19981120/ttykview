@@ -17,7 +17,7 @@
 			</el-form-item>
 			<el-row type="flex" justify="end">
 				<el-form-item>
-					<el-button type="primary" :loading="btnloading" class="btn" @click="btnOK">{{
+					<el-button type="primary" :loading="btnloading" @click="btnOK">{{
 						btnloading ? '上传中...' : '确定'
 					}}</el-button>
 					<el-button @click="btnCancel">取消</el-button>
@@ -126,10 +126,4 @@
 	};
 </script>
 
-<style lang="scss" scoped>
-  @import '@/assets/base/_color_variables.scss';
-	.btn {
-		background-color: $button-back-color;
-		border: $button-bord-color;
-	}
-</style>
+<style lang="scss" scoped></style>

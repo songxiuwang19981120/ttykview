@@ -1,5 +1,5 @@
 <template>
-	<el-dialog :visible="showdialog" title="修改账户" width="40%" @close="btnCancel">
+	<el-dialog :visible="showdialog" title="账户信息修改" width="40%" @close="btnCancel">
 		<el-form label-width="120px" :model="ruleForm" :rules="rules" ref="ruleForm">
 			<el-form-item label="用户名：" prop="user">
 				<el-input v-model="ruleForm.user" placeholder="请输入用户名" style="width: 90%"></el-input>
@@ -22,7 +22,6 @@
 				<el-select
 					v-model="ruleForm.role_id"
 					placeholder="请选择角色"
-					@focus="getRole"
 					:loading="roleLoading"
 					loading-text="数据加载中..."
 				>
@@ -37,7 +36,7 @@
 			</el-form-item>
 		</el-form>
 		<el-row type="flex" justify="end">
-			<el-button type="primary" class="btn" @click="btnOK">确定</el-button>
+			<el-button type="primary" @click="btnOK">确定</el-button>
 			<el-button @click="btnCancel">取消</el-button>
 		</el-row>
 	</el-dialog>
@@ -113,10 +112,4 @@
 	};
 </script>
 
-<style lang="scss" scoped>
-	@import '@/assets/base/_color_variables.scss';
-	.btn {
-		background-color: $button-back-color;
-		border: $button-bord-color;
-	}
-</style>
+<style lang="scss" scoped></style>
