@@ -161,6 +161,7 @@
 	import * as echarts from 'echarts';
 	import chooseduration from '@/components/index/chooseduration.vue';
 	import choosetype from '@/components/index/choosetype.vue';
+	import '@/assets/font/iconfont.css'
 	export default {
 		name: 'TtIndex',
 
