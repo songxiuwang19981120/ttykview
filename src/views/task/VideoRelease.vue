@@ -314,7 +314,7 @@ export default {
 </script>
 
 <style  lang="scss" scoped>
-@import "@/assets/base/_color_variables.scss";
+	@import '@/assets/base/_color_variables.scss';
 
 .date-picker {
   margin-right: 12px;
