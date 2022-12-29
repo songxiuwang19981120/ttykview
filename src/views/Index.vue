@@ -352,6 +352,17 @@
 					text-align: center;
 					font-size: 12px;
 					color: #6c6c6c;
+<<<<<<< HEAD
+=======
+					.icon-shangsheng{
+						font-size: 12px;
+						color: red;
+					}
+					.icon-xiajiang{
+						font-size: 12px;
+						color: green;
+					}
+>>>>>>> 2e4f148f7bd351a6c33c5e6fbc8ea51d972517b4
 					.up, .down{
 						width: 12px;
 						height: 12px;
