@@ -10,9 +10,9 @@
           <el-container>
             <el-header>
               <div class="accAnalysis-tab">
-                <p @click="getText($event)">基础分析</p>
-                <p @click="getText($event)">视频分析</p>
-                <p @click="getText($event)">直播分析</p>
+                <p class="tab-btn" @click="getText($event)">基础分析</p>
+                <p class="tab-btn" @click="getText($event)">视频分析</p>
+                <p class="tab-btn" @click="getText($event)">直播分析</p>
               </div>
             </el-header>
             <el-main>
@@ -88,12 +88,29 @@ export default {
   width: 100%;
 }
 
+.tab-btn 
+  width: 120px
+  height: 40px
+  font-size 18px
+  background-color: #EFEFEF
+  text-align: center
+  line-height 40px
+  border-radius: 18px
+  font-weight: 700
+  cursor pointer
+  &:hover
+    box-shadow: 0 2px 8px 0 #ccc;
+    transition: .4s
+
 .accAnalysis-tab {
   display: flex
   justify-content: space-around
   align-items: center
   padding: 0 180px
   width: 100%
-
+  height: 70px
+  background-color #fff
+  box-shadow: 0 2px 8px 0 #ccc;
+  border-radius: 18px
 }
 </style>

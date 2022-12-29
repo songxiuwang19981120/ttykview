@@ -248,6 +248,8 @@ export default {
   border-radius: 33px;
 }
 
+
+
 .scroll
   height: 400px
 
