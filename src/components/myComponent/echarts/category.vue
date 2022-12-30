@@ -11,9 +11,12 @@ export default {
         chartId: {
             type: String,
             default: () => {
-                return '';
+                return 'wordClound';
             },
         },
+        // chartData: {
+        //     type: Array,
+        // },
         height: {
             type: String,
             default: () => {
@@ -34,50 +37,36 @@ export default {
     created() {
     },
     mounted() {
-        this.getIint();
+        // this.getIint();
     },
     methods: {
         /**
      * 词云初始化
      */
-        getIint(chartData, xAxis,legend) {
-            // if (chartData.length==0) return;
+        getIint(chartData,xAxis) {
+            // if (chartData.length == 0) return;
             // 获取到ref绑定为loginTimes的DOM节点，以canvas的形式展现在视图层
             let myEcharts = undefined
             myEcharts = echarts.init(document.getElementById(this.chartId)).dispose();
             myEcharts = echarts.init(document.getElementById(this.chartId));
+            // echarts参数设置
             myEcharts.setOption({
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'shadow',
-                        shadowStyle: {
-                            color: '#ABD1FD',
-                            opacity: 0.1,
-                        },
-                    },
-                },
-                legend: {
-                    data: legend
-                },
-                // xAxis:xAxis,
+                // tooltip: {
+                //     trigger: 'item'
+                // },
                 xAxis: {
                     type: 'category',
-                    data: xAxis,
+                    data: xAxis
                 },
                 yAxis: {
-                    type: 'value',
+                    type: 'value'
                 },
-                grid: {
-                    containLabel: true,
-                    left: '0%',
-                    right: '0%',
-                },
-                color: ['#5a72e0'],
-                series: chartData,
-            });
-            window.addEventListener('resize', function () {
-                myEcharts.resize();
+                series: [
+                    {
+                        data: chartData,
+                        type: 'bar'
+                    }
+                ]
             });
         },
     },
