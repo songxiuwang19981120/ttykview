@@ -52,7 +52,7 @@
 			</el-form-item>
 			<el-row type="flex" justify="end">
 				<el-form-item>
-					<el-button type="primary" :loading="btnloading" class="btn" @click="btnOK">{{
+					<el-button type="primary" :loading="btnloading" @click="btnOK">{{
 						btnloading ? '上传中...' : '确定'
 					}}</el-button>
 					<el-button @click="btnCancel">取消</el-button>
@@ -116,24 +116,18 @@
 			async btnOK() {
 				try {
 					await this.$refs.ruleForm.validate();
-					console.log(this.ruleForm)
+					console.log(this.ruleForm);
 					this.$emit('update:showdialog', false);
 				} catch (error) {}
 			},
 
 			// 点击取消按钮
 			btnCancel() {
-				this.$refs.ruleForm.resetFields()
+				this.$refs.ruleForm.resetFields();
 				this.$emit('update:showdialog', false);
 			},
 		},
 	};
 </script>
 
-<style scoped lang="scss">
-	@import '@/assets/base/_color_variables.scss';
-	.btn {
-		background-color: $button-back-color;
-		border: $button-bord-color;
-	}
-</style>
+<style scoped lang="scss"></style>

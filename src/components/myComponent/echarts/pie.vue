@@ -57,31 +57,41 @@ export default {
             });
             // echarts参数设置
             this.wordChart.setOption({
-                backgroundColor: '#fff', // canvas背景颜色
+                color: ['#FF411F', '#65FCA8 ', '#FCE97E'],
                 tooltip: {
                     trigger: 'item'
                 },
+                legend: {
+                    top: '5%',
+                    left: 'center'
+                },
+                // backgroundColor: '#fff', // canvas背景颜色
                 series: [
                     {
-                        type: 'wordCloud',
-                        // left: '-5%', // X轴偏移量
-                        // top: '20%', // Y轴偏移量
-                        width: '100%', // canvas宽度大小
-                        height: '95%', // canvas高度大小
-                        sizeRange: [12, 50], //  词典字体大小范围配置
-                        rotationRange: [-90, 90], // 词典字体旋转角度配置，默认不旋转
-                        rotationStep: 45,
-                        gridSize: 10, // 词典字体间距配置
-                        layoutAnimation: true, // 为false词典过度会阻塞
-                        textStyle: {
-                            // 词典样式配置
-                            color: function () {
-                                // 颜色随机
-                                let colors = ['#5E75FB', '#0CB5FF', '#7551EA', '#3BC171', '#8E9FFF', '#FFB800', '#7B61FF'];
-                                return colors[Math.floor(Math.random() * 7)];
-                            },
+                        // name: '性别',
+                        type: 'pie',
+                        radius: ['30%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2
                         },
-                        // 渲染词典数据
+                        label: {
+                            show: false,
+                            position: 'center',
+                            formatter: '{d}%'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: 20,
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
                         data,
                     },
                 ],

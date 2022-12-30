@@ -2,9 +2,7 @@
 	<div>
 		<div class="tt-accsituation">
 			<div class="tt-accsituation--operation">
-				<div>
-					<el-button type="primary" @click="addRole">新增</el-button>
-				</div>
+				<el-button type="primary" @click="addRole">新增</el-button>
 			</div>
 		</div>
 		<!-- 表格 -->
@@ -18,8 +16,8 @@
 		></pagination>
 		<!-- 新增角色弹层 -->
 		<addRole :showdialog.sync="showAddDialog" :ruleForm.sync="editData"></addRole>
-    <!-- 权限配置弹层 -->
-    <setRole :showdialog.sync="showSetDialog"></setRole>
+		<!-- 权限配置弹层 -->
+		<setRole :showdialog.sync="showSetDialog"></setRole>
 	</div>
 </template>
 
@@ -27,7 +25,7 @@
 	import tableCustom from '@/components/myComponent/table/tableCustom.vue';
 	import pagination from '@/components/myComponent/table/pagination.vue';
 	import addRole from './components/addRoleDialog.vue';
-  import setRole from './components/setRoleDialog.vue';
+	import setRole from './components/setRoleDialog.vue';
 
 	export default {
 		name: 'Roles',
@@ -36,7 +34,7 @@
 			tableCustom,
 			pagination,
 			addRole,
-      setRole
+			setRole,
 		},
 
 		data() {
@@ -63,7 +61,12 @@
 									<el-button type="primary" size="mini" onClick={this.toEditRole.bind(this, row)}>
 										修改名称
 									</el-button>
-									<el-button type="primary" size="mini" style="margin-right: 10px;" onClick={this.toSetRole.bind(this, row)}>
+									<el-button
+										type="primary"
+										size="mini"
+										style="margin-right: 10px;"
+										onClick={this.toSetRole.bind(this, row)}
+									>
 										权限配置
 									</el-button>
 									<el-popconfirm
@@ -88,7 +91,7 @@
 				total: 0,
 				showAddDialog: false, // 新增弹层
 				editData: {},
-        showSetDialog: false, // 配置弹层
+				showSetDialog: false, // 配置弹层
 			};
 		},
 
@@ -137,8 +140,8 @@
 
 			// 点击权限配置按钮
 			toSetRole() {
-        this.showSetDialog = true
-      },
+				this.showSetDialog = true;
+			},
 
 			// 点击删除按钮
 			toDelRole() {},
@@ -146,6 +149,4 @@
 	};
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>
