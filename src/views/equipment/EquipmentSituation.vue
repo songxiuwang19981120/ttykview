@@ -16,6 +16,8 @@
             </el-option>
           </el-select>
         </div>
+        <el-button type="primary" @click="examine_index">查看</el-button>
+        <el-button type="primary" @click="reset">重置</el-button>
         <el-button type="primary" @click="dialog = true">修改分组</el-button>
         <el-button style="margin-right: 20px;" type="primary" @click="dialogFormVisible = true">创建账号</el-button>
       </div>
@@ -459,6 +461,17 @@ export default {
         this.equipmentLoading = false;
       }
     },
+    //点击查看
+    examine_index(){
+      console.log("查看")
+    },
+    //点击重置
+    reset(){
+      console.log("重置")
+      this.equipment="";
+      this.equipmentState=""
+    },
+
     //是否根目录
     All_lis() {
       this.ruleForm.equipment = [];
