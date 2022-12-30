@@ -147,12 +147,12 @@ const routes = [
       {
         path:'/videocapture',
         name:'videocapture',
-        component:() => import(/* webpackChunkName: "videocapture" */ '@/views/VideoCapture.vue')
+        component:() => import(/* webpackChunkName: "videocapture" */ '@/views/task/VideoCapture.vue')
       },
       {
         path:'/usercapture',
         name:'usercapture',
-        component:() => import(/* webpackChunkName: "usercapture" */ '@/views/userCollection/UserCapture.vue')
+        component:() => import(/* webpackChunkName: "usercapture" */ '@/views/task/UserCapture.vue')
       },
       //素材管理 end
 
