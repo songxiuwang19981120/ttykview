@@ -9,6 +9,7 @@
         <el-date-picker
           class="date-picker"
           v-model="date"
+          value-format="yyyy-MM-dd"
           type="daterange"
           align="right"
           unlink-panels
@@ -95,6 +96,11 @@ export default {
   mounted() {},
 
   methods: {
+    /* 
+        function: handleChange
+        params: val | 时间
+        desc: 选择时间变化时的回调
+    */
     handleChange(val) {
       console.log(val);
       this.$emit("updateData");

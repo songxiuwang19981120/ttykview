@@ -93,12 +93,13 @@ export default {
     text-align: center
 
 .usercard-signature
+    display: flex
+    align-items: center
     margin: 10px auto
     width: 286px
     height: 74px
     background-color: #EFEFEF
     text-align: center
-    line-height 74px
     border-radius: 10px
 
 .text-center

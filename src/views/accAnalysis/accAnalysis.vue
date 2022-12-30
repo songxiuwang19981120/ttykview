@@ -76,7 +76,6 @@ export default {
 .accAnalysis-wrap {
   padding: 20px 20px 0 30px;
   width: 100vw;
-  background-color: #EFEFEF;
 }
 
 .accAnalysis-content {
