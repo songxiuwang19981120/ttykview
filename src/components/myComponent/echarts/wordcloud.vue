@@ -58,6 +58,9 @@ export default {
             // echarts参数设置
             this.wordChart.setOption({
                 backgroundColor: '#fff', // canvas背景颜色
+                tooltip: {
+                    trigger: 'item'
+                },
                 series: [
                     {
                         type: 'wordCloud',
