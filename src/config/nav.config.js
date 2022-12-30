@@ -79,6 +79,16 @@ export default {
                     to: '/cultivatetask',
                     icon: '',
                 },
+                {
+                    title: '视频采集',
+                    to: '/videocapture',
+                    icon: 'el-icon-s-platform'
+                },
+                {
+                    title: '用户采集',
+                    to: '/usercapture',
+                    icon: 'el-icon-s-platform'
+                }
                 
             ]
         },
@@ -147,17 +157,6 @@ export default {
                 },
             ]
         },
-
-        {
-            title: '视频采集',
-            to: '/videocapture',
-            icon: 'el-icon-s-platform'
-        },
-        {
-            title: '用户采集',
-            to: '/usercapture',
-            icon: 'el-icon-s-platform'
-        }
 
     ]
 

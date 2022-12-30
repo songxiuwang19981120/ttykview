@@ -10,6 +10,16 @@ const routes = [
     component:() => import(/* webpackChunkName: "login" */ '@/views/Login.vue')
   },
   {
+    path:'/register',
+    name:'register',
+    component:() => import(/* webpackChunkName: "login" */ '@/views/Register.vue')
+  },
+  {
+    path:'/analysis/:id?',
+    name:'analysis',
+    component:() => import(/* webpackChunkName: "login" */ '@/views/accAnalysis/accAnalysis.vue')
+  },
+  {
     path:'/',
     name:'layout',
     component:() => import(/* webpackChunkName: "layout" */ '@/views/LayOut.vue'),
@@ -137,12 +147,12 @@ const routes = [
       {
         path:'/videocapture',
         name:'videocapture',
-        component:() => import(/* webpackChunkName: "videocapture" */ '@/views/VideoCapture.vue')
+        component:() => import(/* webpackChunkName: "videocapture" */ '@/views/task/VideoCapture.vue')
       },
       {
         path:'/usercapture',
         name:'usercapture',
-        component:() => import(/* webpackChunkName: "usercapture" */ '@/views/userCollection/UserCapture.vue')
+        component:() => import(/* webpackChunkName: "usercapture" */ '@/views/task/UserCapture.vue')
       },
       //素材管理 end
 

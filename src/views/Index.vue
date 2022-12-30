@@ -1,34 +1,5 @@
 <template>
 	<div>
-		<div class="tt-accsituation">
-			<div class="tt-accsituation--operation">
-				<div>
-					<span>设备分组：</span>
-					<el-select
-						v-model="searchTableData.equipment"
-						placeholder="分组选择"
-						style="margin-right: 20px"
-						@focus="getEquipmentGroup"
-						:loading="equipmentLoading"
-						loading-text="数据加载中..."
-					>
-						<el-option
-							v-for="item in searchEquipmentList"
-							:key="item.grouping_id"
-							:label="item.grouping_name"
-							:value="item.grouping_id"
-						>
-						</el-option>
-					</el-select>
-				</div>
-				<div>
-					<!-- 查询 -->
-					<el-button type="primary" :loading="btnloading" @click="searchData" class="search">{{
-						btnloading ? '加载中...' : '查看'
-					}}</el-button>
-				</div>
-			</div>
-		</div>
 		<!-- 数据概览 -->
 		<div class="showdata">
 			<el-row type="flex" justify="space-between" style="margin-bottom: 18px">
@@ -54,7 +25,7 @@
 					<span class="name">播放量</span>
 					<div class="count">42396</div>
 					<div class="compare">
-						较昨天 <span class="compCount">2421</span> <i class="el-icon-top"></i>
+						较昨天 <span class="compCount">2421</span> <img class="up" src="../assets/up.png" alt="">
 					</div>
 				</div>
 				<div class="content">
@@ -65,35 +36,35 @@
 					<span class="name">粉丝量</span>
 					<div class="count">2796030</div>
 					<div class="compare">
-						较昨天 <span class="compCount">21651</span> <i class="el-icon-bottom"></i>
+						较昨天 <span class="compCount">21651</span> <img class="down" src="../assets/down.png" alt="">
 					</div>
 				</div>
 				<div class="content">
 					<span class="name">评论量</span>
 					<div class="count">342210</div>
 					<div class="compare">
-						较昨天 <span class="compCount">24221</span> <i class="el-icon-top"></i>
+						较昨天 <span class="compCount">24221</span> <img class="down" src="../assets/up.png" alt="">
 					</div>
 				</div>
 				<div class="content">
 					<span class="name">收藏量</span>
 					<div class="count">23432</div>
 					<div class="compare">
-						较昨天 <span class="compCount">3421</span> <i class="el-icon-top"></i>
+						较昨天 <span class="compCount">3421</span> <img class="down" src="../assets/up.png" alt="">
 					</div>
 				</div>
 				<div class="content">
 					<span class="name">分享量</span>
 					<div class="count">54278</div>
 					<div class="compare">
-						较昨天 <span class="compCount">342</span> <i class="el-icon-top"></i>
+						较昨天 <span class="compCount">342</span> <img class="down" src="../assets/up.png" alt="">
 					</div>
 				</div>
 				<div class="content">
 					<span class="name">主页访问量</span>
 					<div class="count">16534</div>
 					<div class="compare">
-						较昨天 <span class="compCount">2411</span> <i class="el-icon-top"></i>
+						较昨天 <span class="compCount">2411</span> <img class="down" src="../assets/up.png" alt="">
 					</div>
 				</div>
 			</div>
@@ -115,6 +86,7 @@
 							start-placeholder="开始日期"
 							end-placeholder="结束日期"
 							size="small"
+							@change="videoTimeChange"
 						>
 						</el-date-picker>
 					</el-row>
@@ -158,6 +130,7 @@
 							start-placeholder="开始日期"
 							end-placeholder="结束日期"
 							size="small"
+							@change="fansTimeChange"
 						>
 						</el-date-picker>
 					</el-row>
@@ -193,11 +166,6 @@
 
 		data() {
 			return {
-				searchEquipmentList: [], // 分组数据
-				searchTableData: {
-					equipment: '',
-				},
-				equipmentLoading: false,
 				btnloading: false,
 				videoDate: '', // 视频趋势日期选择
 				fansDate: '', // 粉丝变化趋势
@@ -207,6 +175,10 @@
 				fanstype: ['总量', '增量'],
 				videotypewid: 300,
 				fanstypewid: 175,
+				curVideoType: '', // 当前类型
+				curFansType: '', // 当前类型
+				curVideoDur: '', // 当前日期间隔
+				curFansDur: '' // 当前日期间隔
 			};
 		},
 
@@ -221,26 +193,6 @@
 		},
 
 		methods: {
-			// 获取设备分组数据
-			async getEquipmentGroup() {
-				try {
-					this.equipmentLoading = true;
-					const res = await this.$api({
-						type: 'getGrouping',
-					});
-					if (res.status == 200) {
-						this.searchEquipmentList = res.data.list;
-					} else {
-						this.$message.error(res.msg);
-					}
-				} catch (error) {
-					console.error(error);
-				} finally {
-					this.equipmentLoading = false;
-				}
-			},
-			// 点击查看按钮
-			searchData() {},
 			// 视频趋势图
 			showVideoLine() {
 				const myEcharts = echarts.init(document.querySelector('.videoLine'));
@@ -343,27 +295,19 @@
 			chooseFansDur(index) {
 				console.log(index);
 			},
+			// 日历 - 视频
+			videoTimeChange() {
+				console.log(this.videoDate)
+			},
+			// 日历 - 粉丝
+			fansTimeChange() {
+				console.log(this.fansDate)
+			}
 		},
 	};
 </script>
 
 <style lang="scss" scoped>
-	@import '@/assets/base/_color_variables.scss';
-	.tt-accsituation {
-		background-color: #fff;
-		margin-bottom: 20px;
-		border-radius: 4px;
-		padding: 0 12px;
-		.tt-accsituation--operation {
-			display: flex;
-			height: 70px;
-			line-height: 70px;
-			.search {
-				background-color: $button-back-color;
-				border: $button-bord-color;
-			}
-		}
-	}
 	.showdata {
 		background-color: #fff;
 		margin-bottom: 20px;
@@ -407,11 +351,17 @@
 					text-align: center;
 					font-size: 12px;
 					color: #6c6c6c;
-					.el-icon-top {
+					.icon-shangsheng{
+						font-size: 12px;
 						color: red;
 					}
-					.el-icon-bottom {
-						color: forestgreen;
+					.icon-xiajiang{
+						font-size: 12px;
+						color: green;
+					}
+					.up, .down{
+						width: 12px;
+						height: 12px;
 					}
 				}
 			}

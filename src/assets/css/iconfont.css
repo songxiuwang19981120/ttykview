@@ -1,0 +1,25 @@
+@font-face {
+  font-family: "iconfont"; /* Project id  */
+  src: url('iconfont.ttf?t=1672228959049') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 24px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-icon_pk:before {
+  content: "\e632";
+}
+
+.icon-jiankong:before {
+  content: "\e531";
+}
+
+.icon-tiktok:before {
+  content: "\ecdc";
+}
+

@@ -7,6 +7,7 @@
     >
       <span slot="title">
         <h1 class="tt-acccountsit--title">私信任务配置</h1>
+        <p>当前已选中0个账号</p>
       </span>
       <el-form
         :rules="rules"
@@ -16,6 +17,33 @@
         label-width="130px"
       >
       
+        <el-form-item prop="group" label="选择分组 ：">
+          <el-select
+            style="width: 45%"
+            ref="gropuSelect"
+            clearable
+            v-model="followTaskForm.group"
+            placeholder="选择分组"
+          >
+            <el-option
+              v-for="item in groupList"
+              :value="item.grouping_id"
+              :label="item.grouping_name"
+              :key="item.grouping_id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item prop="typecontrol_id" label="选择分类 ：">
+          <el-cascader
+            style="width: 45%"
+            clearable
+            :props="{ checkStrictly: true, value: 'value' }"
+            :options="typeList"
+            v-model="followTaskForm.typecontrol_id"
+          ></el-cascader>
+        </el-form-item>
+
         <el-form-item
           label="选择国家 ："
           prop="account_region"
@@ -118,6 +146,7 @@
       </el-form>
 
       <span slot="footer" class="dialog-footer">
+        <el-button @click="handleReset">重 置</el-button>
         <el-button @click="handlerClose">取 消</el-button>
         <el-button type="primary" @click="handlerConfrim">确认并执行</el-button>
       </span>
@@ -155,6 +184,8 @@ export default {
         好友名片: "ChatProfile",
         作品转发: "ChatAweme",
       },
+      typeList:[],
+      groupList:[],
       countryOptions: [
         {
           value: "法国",
@@ -219,9 +250,59 @@ export default {
   mounted() {
     this.followTaskForm.typecontrol_id = this.typecontrol_id;
     this.getPrivateLetter();
+    this.getGroupList()
+    this.getTypeControlList()
   },
 
   methods: {
+
+    handleReset(){
+      this.resetForm()
+    },
+
+        /*
+        function: getTreeData
+        params: data | 需要进行递归处理的数组
+        desc: 递归函数，对数组进行处理，设置dhilren长度为0的字段为undefined
+        return: 处理后的数据
+    */
+    getTreeData(data) {
+      data.forEach((item) => {
+        if (!item.children.length) {
+          item.children = undefined;
+        } else {
+          this.getTreeData(item.children);
+        }
+      });
+      return data;
+    },
+
+      /*
+        function: getTypeControlList
+        params: null
+        desc: 异步获取TypeControlList，页面渲染时调用
+    */
+    async getTypeControlList() {
+      try {
+        let result = await this.$api({ type: "getTypecontrol" });
+        this.typeList = this.getTreeData(result.data);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+      /* 
+        function: getGroupList
+        params: null
+        desc: 获取分组  异步
+    */
+    async getGroupList() {
+      let result = await this.$api({ type: "getGrouping" });
+      console.log(result);
+      this.groupList = result.data.list;
+    },
+
+
     async getPrivateLetter() {
       let result = await this.$api({ type: "getPrivateLetter" });
       this.letterOptions = result.data.list.map((item) => {
