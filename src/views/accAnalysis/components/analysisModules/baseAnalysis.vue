@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-card class="border-ra-20">
+    <el-card class="border-ra-20 pad-30">
       <BaseData :icon="icon" :data="summaryData" :title="summaryTitle" />
       <BaseData :icon="icon" :data="liveRoomData" :title="liveRoomTitle" />
       <BaseData
@@ -34,14 +34,35 @@
       <div>
         <div class="mar-bot-10">
           <i :class="[icon]" class="color-rad"></i>
-          <span class="title">常用话题</span>
+          <span class="fz-20">常用话题</span>
         </div>
         <Wordcloud
-          ref="wordcloud"
+          ref="wordClound"
           chartId="wordClound"
           height="392px"
-          width="858px"
+          width="100%"
         />
+      </div>
+      <div>
+        <div class="mar-bot-10">
+          <i :class="[icon]" class="color-rad"></i>
+          <span class="fz-20">粉丝画像</span>
+        </div>
+        <div class="fans-detail">
+          <div>
+            <p class="p-title">性别</p>
+            <PieEcharts ref="pie" chartId="pie" height="392px" width="390px" />
+          </div>
+          <div>
+            <p class="p-title">粉丝国家</p>
+            <Wordcloud
+              ref="fansCountry"
+              chartId="fansCountry"
+              height="392px"
+              width="600px"
+            />
+          </div>
+        </div>
       </div>
     </el-card>
   </div>
@@ -52,9 +73,10 @@ import BaseData from "./baseAnalysisCom/baseDataCom";
 import TabData from "./baseAnalysisCom/tabDataCom";
 import Wordcloud from "@/components/myComponent/echarts/wordcloud";
 import GraphicalData from "./baseAnalysisCom/graphicalDataCom";
+import PieEcharts from "@/components/myComponent/echarts/pie";
 export default {
   name: "TtprojectBaseAnalysis",
-  components: { BaseData, TabData, Wordcloud, GraphicalData },
+  components: { BaseData, TabData, Wordcloud, GraphicalData, PieEcharts },
   data() {
     return {
       videoEchart: "videoEchart",
@@ -225,24 +247,80 @@ export default {
           value: 67,
         },
       ],
+      pieEchartData: [
+        {
+          name: "女性",
+          value: 30,
+        },
+        {
+          name: "男性",
+          value: 15,
+        },
+        {
+          name: "未知",
+          value: 10,
+        },
+      ],
+      fansCountryData: [
+        {
+          name: "aaaaaaa",
+          value: 122,
+        },
+        {
+          name: "bbbbbb",
+          value: 123,
+        },
+        {
+          name: "cccccc",
+          value: 124,
+        },
+        {
+          name: "ddddddd",
+          value: 45,
+        },
+        {
+          name: "eeeeee",
+          value: 97,
+        },
+        {
+          name: "ffffff",
+          value: 98,
+        },
+        {
+          name: "gggggg",
+          value: 67,
+        },
+      ],
     };
   },
 
   mounted() {
     this.initWords();
+    this.initPieEchart();
+    this.initFansCountry();
   },
 
   methods: {
     initWords() {
       let chartData = this.wordCloudData;
-      this.$refs.wordcloud.getIint(chartData);
+      this.$refs.wordClound.getIint(chartData);
+    },
+    initFansCountry() {
+      let chartData = this.fansCountryData;
+      this.$refs.fansCountry.getIint(chartData);
+    },
+    initPieEchart() {
+      let chartData = this.pieEchartData;
+      this.$refs.pie.getIint(chartData);
     },
 
     setVideoQuery(index) {
       this.VideoQuery = this.VideoTrendData[index];
+      this.VideoTrendChartData[0].name = this.VideoTrendData[index];
     },
     setFansQuery(index) {
       this.fansQuery = this.fansTrendData[index];
+      this.fansTrendChartData[0].name = this.fansTrendData[index];
     },
   },
 };
@@ -253,7 +331,32 @@ export default {
   display: flex;
 }
 
+.mar-bot-10 {
+  margin-bottom: 20px;
+}
+
 .border-ra-20 {
   border-radius: 20px;
+}
+
+.pad-30
+  padding: 0 30px;
+
+.fz-20
+  font-size 20px
+
+.p-title {
+  font-size 16px
+  font-weight: 700
+}
+
+.color-rad {
+  color: red;
+  margin-right: 10px;
+}
+
+.fans-detail {
+  display: flex;
+  justify-content: space-between;
 }
 </style>

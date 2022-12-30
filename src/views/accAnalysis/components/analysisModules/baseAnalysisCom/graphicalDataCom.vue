@@ -1,10 +1,10 @@
 <template>
   <div>
     <div>
-      <div class="data-desc dis-flex mar-bot-10">
+      <div class="data-desc dis-flex mar-bot-20">
         <div>
           <i :class="[icon]" class="color-rad"></i>
-          <span class="title">{{ title }}</span>
+          <span class="fz-20">{{ title }}</span>
         </div>
         <el-date-picker
           class="date-picker"
@@ -22,7 +22,7 @@
         </el-date-picker>
       </div>
       <TabQuery :curWidth="tabQueryWid" :typeData="tabData" @changeType="setQuery" />
-      <InfoBar  class="mar-bot-10" :time="date" :data="infoBarData" />
+      <InfoBar  class="mar-bot-20" :time="date" :data="infoBarData" />
       <Echarts class="echarts" ref="axis" :chartId="chartId" height="392px" width="100%" />
     </div>
   </div>
@@ -62,6 +62,9 @@ export default {
     }
   },
   watch:{
+    query(){
+      this.initEcharts()
+    }
   },
   data() {
     return {
@@ -156,11 +159,10 @@ export default {
   margin-right: 10px;
 }
 
-.pad-20 {
-  padding: 0 70px;
-}
+.fz-20
+  font-size 20px
 
-.mar-bot-10 {
+.mar-bot-20 {
   margin-bottom: 20px;
 }
 
@@ -173,7 +175,7 @@ export default {
   height: 50px;
   text-align: center;
 
-  p {
+  p:nth-of-type(1) {
     font-weight: 700;
   }
 }

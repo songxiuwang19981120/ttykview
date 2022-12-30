@@ -1,10 +1,10 @@
 <template>
-  <div class="mar-bot-10">
+  <div class="mar-bot-30">
     <div class="border-bot">
-      <div class="data-desc mar-bot-10">
+      <div class="data-desc mar-bot-30">
         <div>
           <i :class="[icon]" class="color-rad"></i>
-          <span class="title">{{ title }}</span>
+          <span class="title fz-20">{{ title }}</span>
         </div>
         <el-date-picker
           class="date-picker"
@@ -22,11 +22,12 @@
         </el-date-picker>
       </div>
 
-      <div class="dis-flex pad-20 mar-bot-10">
-        <div class="data-item" v-for="item in data" :key="item.lable">
-          <p>{{ item.data }}</p>
-          <p>{{ item.lable }}</p>
-          <p class="data-tag">{{ item.tag_lable }}{{ item.tag_data }}</p>
+      <div class="dis-flex pad-20 mar-bot-50">
+        <div class="data-item " v-for="item in data" :key="item.lable">
+          <p class="fz-20">{{ item.data }}</p>
+          <p class="fz-14 mar-bot-10">{{ item.lable }}</p>
+
+          <p class="data-tag mar-bot-10">{{ item.tag_lable }}{{ item.tag_data }}</p>
         </div>
       </div>
     </div>
@@ -115,6 +116,15 @@ export default {
   justify-content: space-between;
 }
 
+
+.fz-14 {
+  font-size 14px
+}
+
+.fz-20 {
+  font-size 20px
+}
+
 .date-picker {
   height: 40px
 }
@@ -124,11 +134,20 @@ export default {
 }
 
 .mar-bot-10 {
+  margin-bottom: 10px
+}
+
+.mar-bot-30 {
   margin-bottom: 30px;
 }
 
+.mar-bot-50 {
+  margin-bottom: 50px;
+}
+
 .color-rad {
-  color: red
+  color: red;
+  margin-right: 10px;
 }
 
 .border-bot
@@ -152,7 +171,7 @@ export default {
   height: 50px;
   text-align: center;
 
-  p {
+  p:nth-of-type(1) {
     font-weight: 700;
   }
 }

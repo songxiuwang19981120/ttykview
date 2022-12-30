@@ -3,13 +3,13 @@
     <div class="border-bot mar-bot-10">
       <div class="mar-bot-10">
         <i :class="[icon]" class="color-rad"></i>
-        <span class="title">{{ title }}</span>
+        <span class="fz-20">{{ title }}</span>
       </div>
 
       <div class="dis-flex pad-20 mar-bot-10">
         <div class="data-item" v-for="item in data" :key="item.lable">
-          <p>{{ item.data }}</p>
-          <p>{{ item.lable }}</p>
+          <p class="fz-20">{{ item.data }}</p>
+          <p class="fz-14">{{ item.lable }}</p>
         </div>
       </div>
     </div>
@@ -51,6 +51,17 @@ export default {
   margin-right: 10px
 }
 
+.fz-14 {
+  font-size 14px
+}
+
+.fz-20 {
+  font-size 20px
+}
+
+.color-10
+  color: #101010
+
 .pad-20
   padding: 0 70px
 
@@ -64,7 +75,6 @@ export default {
   width: 150px
   height: 50px
   text-align: center
-
-  p
+  p:nth-of-type(1)
     font-weight 700
 </style>

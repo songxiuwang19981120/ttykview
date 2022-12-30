@@ -53,7 +53,7 @@
       >
       <el-button class="base-btn search-btn" @click="RestQuery">重置</el-button>
       <el-button class="base-btn">账号分配</el-button>
-
+      <el-button class="base-btn">开启一键回关</el-button>
       <el-button
         class="base-btn"
         style="width: 150px"
@@ -64,7 +64,6 @@
     </div>
 
     <table-custom
-     
       class="tt-accsituation--tabel"
       :mutiSelect="true"
       @handleSelectionChange="handleSelectChange"
@@ -112,8 +111,8 @@
       :editorTota="editorTota"
     />
     <ReleaseVideoDialog
-    :showReleaseVideoDialog="showReleaseVideoDialog" 
-    @closeReleaseVideoDialog="closeReleaseVideoDialog"
+      :showReleaseVideoDialog="showReleaseVideoDialog"
+      @closeReleaseVideoDialog="closeReleaseVideoDialog"
     />
   </div>
 </template>
@@ -122,7 +121,7 @@
 import tableCustom from "@/components/myComponent/table/tableCustom";
 import Pagination from "@/components/myComponent/table/pagination";
 import EditorDialog from "./editoDialog/editorDialog";
-import ReleaseVideoDialog from './taskDialog/releaseVideoDialog'
+import ReleaseVideoDialog from "./taskDialog/releaseVideoDialog";
 import BatchEditorDialog from "./batchEditorDialog/batchEditorDialog";
 import VideoTabel from "./videoTabel/videoTabel";
 import ViewerTabel from "./ViewerLabel/viewerTabel";
@@ -138,7 +137,7 @@ export default {
     VideoTabel,
     ViewerTabel,
     BatchEditor,
-    ReleaseVideoDialog
+    ReleaseVideoDialog,
   },
   computed: {
     batchEditorLength() {
@@ -175,7 +174,6 @@ export default {
       let arr = Object.entries(this.groupList).find((item) => {
         return item?.[1]?.grouping_id === newVal;
       });
-      console.log(arr);
       this.groupString = arr?.[1]?.grouping_name;
       let data = {
         typecontrol_id:
@@ -193,12 +191,11 @@ export default {
         data: searchTypeData,
       });
       this.typeList = this.getTreeData(result.data);
-      console.log(this.classiFication);
     },
   },
   data() {
     return {
-      showReleaseVideoDialog:false, //控制发布视频dialog展示
+      showReleaseVideoDialog: false, //控制发布视频dialog展示
       showBatchEditor: false,
       searchForm: {
         grouping_id: "",
@@ -224,7 +221,7 @@ export default {
           prop: "avatar_thumb",
           label: "基础信息",
           align: "left",
-          width:'300',
+          width: "300",
           render: (h, { row }) => {
             return (
               <div style="display: flex;min-width: 300px">
@@ -301,7 +298,7 @@ export default {
         {
           prop: "unread_viewer_count" ?? "",
           label: "主页访问人数",
-      
+
           align: "center",
           render: (h, { row }) => {
             return (
@@ -317,15 +314,11 @@ export default {
         {
           prop: "follower_status",
           label: "播放/收藏/转发",
-         
+
           align: "center",
-          render:(h,{row})=>{
-            return (
-              <span>
-                {row.play_num} / 0 / 0
-              </span>
-            )
-          }
+          render: (h, { row }) => {
+            return <span>{row.play_num} / 0 / 0</span>;
+          },
         },
         {
           prop: "following_status,following_count,play_num",
@@ -334,7 +327,8 @@ export default {
           render: (h, { row }) => {
             return (
               <div>
-                {row.following_count} / {row.follower_status} / {row.total_favorited} 
+                {row.following_count} / {row.follower_status} /{" "}
+                {row.total_favorited}
               </div>
             );
           },
@@ -342,7 +336,7 @@ export default {
         {
           prop: "operation",
           label: "操作",
-          width:'400',
+          width: "400",
           align: "center",
           render: (h, { row }) => {
             return (
@@ -356,30 +350,30 @@ export default {
                 </el-button>
                 <el-button
                   size="mini"
-                  type="danger"
+                  type="primary"
                   onClick={this.handleDelete.bind(this, row)}
                 >
                   删除
                 </el-button>
                 <el-button
                   size="mini"
-                  type="danger"
+                  type="primary"
                   onClick={this.handleMonitor.bind(this, row)}
                 >
                   监控
                 </el-button>
-               
+
                 <el-button
                   size="mini"
-                  type="danger"
+                  type="primary"
                   onClick={this.handleAnalysis.bind(this, row)}
                 >
                   分析
                 </el-button>
-               
+
                 <el-button
                   size="mini"
-                  type="danger"
+                  type="primary"
                   onClick={this.handleRelease.bind(this, row)}
                 >
                   发布视频
@@ -435,7 +429,7 @@ export default {
       userIdList: [], //选中用户的UID  组件通信之间会用到
       member_ids: "",
       editorTota: 0,
-      userInfo:''
+      userInfo: "",
     };
   },
 
@@ -446,31 +440,33 @@ export default {
   },
 
   methods: {
-handleAnalysis(row){
-  
-  let unique_id = row.unique_id
-  let userInfo = row
-  this.$router.push({name:'analysis',query:{id:unique_id,userInfo:JSON.stringify(userInfo)}})
-},
-    closeReleaseVideoDialog(){
-      this.showReleaseVideoDialog = false
+    handleAnalysis(row) {
+      let unique_id = row.unique_id;
+      let userInfo = row;
+      this.$router.push({
+        name: "analysis",
+        query: { id: unique_id, userInfo: JSON.stringify(userInfo) },
+      });
+    },
+    closeReleaseVideoDialog() {
+      this.showReleaseVideoDialog = false;
     },
     /* 
         function: handleRelease
         params: null
         desc: 发布视频回调
     */
-    handleRelease(){
-      this.showReleaseVideoDialog = true
-      console.log('发布视频')
+    handleRelease() {
+      this.showReleaseVideoDialog = true;
+      console.log("发布视频");
     },
     /* 
         function: handleMonitor
         params: null
         desc: 单账号监控回调
     */
-    handleMonitor(){
-      console.log('监控')
+    handleMonitor() {
+      console.log("监控");
     },
 
     showBatchEditorDialog() {
@@ -596,7 +592,7 @@ handleAnalysis(row){
         max: this.fans[1] ?? "",
         limit: this.limit ?? 10,
         page: this.page ?? 1,
-        grouping_id: this.group,
+        grouping_id: this.group ?? '',
       };
       console.log(111);
       let result = await this.$api({
@@ -614,9 +610,16 @@ handleAnalysis(row){
         desc: 打开访问人数表格
     */
     handlePagination(val) {
-      console.log(val);
+      this.limit = val.limit;
       this.page = val.page;
-      this.getMemberList();
+      let data = {
+        typecontrol_id:
+          this.classiFication[this.classiFication.length - 1] ?? "",
+        grouping_id: this.group ?? "",
+        limit: this.limit ?? 10,
+        page: this.page ?? 1,
+      };
+      this.getMemberList(data);
     },
 
     /* 
@@ -756,16 +759,6 @@ handleAnalysis(row){
     },
 
     /*
-        function: setAccConfig
-        params: val | 
-        desc: 设置账号任务配置
-    */
-    /*     openTaskDialog(val) {
-      let formType = STATUS_MAP[val];
-      this[formType] = true;
-    }, */
-
-    /*
         function: getTreeData
         params: data | 需要进行递归处理的数组
         desc: 递归函数，对数组进行处理，设置dhilren长度为0的字段为undefined
@@ -888,8 +881,7 @@ handleAnalysis(row){
   margin-bottom: 10px;
   width: 100%;
   height: 60px;
-  background-color: #fff;
-  border-radius: 8px;
+
 }
 
 .tt-accsituation-searchbar {
@@ -985,6 +977,5 @@ handleAnalysis(row){
   background-color: #ffdda5;
 }
 .table-avatar {
-  
 }
 </style>
