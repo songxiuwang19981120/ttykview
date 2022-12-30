@@ -14,21 +14,22 @@
                 </el-date-picker>
 
                 <el-button type="primary" class="seachbut" :loading="btnloading" @click="searchTasks"
-                    style="margin-left: 30px">{{
-        btnloading ? '加载中...' : '查看'
-}}</el-button>
+                    style="margin-left: 30px">{{btnloading ? '加载中...' : '查看'}}</el-button>
                 <el-button type="primary" class="seachbut" @click="btnReset"><i
                         class="el-icon-refresh-right"></i>重置</el-button>
                 <el-button type="primary" class="seachbut" @click="dialogConfig">配置养号</el-button>
             </div>
+
+
+
+            <!-- <Calendar></Calendar> -->
 
         </div>
         <table-custom :stripe="stripe" :mutiSelect="true" @handleSelectionChange="selectionChange" :loading="loading"
             :tableData="tableData" :columns="columns"></table-custom>
 
 
-        <el-dialog title="配置养号" center width="30%" :visible.sync="dialogCultivate"
-            @close="dialogCultivate_unbtn_close">
+        <el-dialog title="配置养号" center width="30%" :visible.sync="dialogCultivate" @close="dialogCultivate_unbtn_close">
 
             <el-form :model="rule_act" :rules="rules_act" ref="ruleForm" label-width="120px" style="margin-top:30px">
                 <el-form-item label="设备分组:" prop="cult_equipment">
@@ -45,8 +46,9 @@
                             :value="item.value">
                         </el-option>
                     </el-select>
-                    <span style="position:absolute;left:-60px" class="size_color">当前已选择账号<span
-                            class="num_color">{{ Task_num }}</span>个</span>
+                    <span style="position:absolute;left:-60px" class="size_color">当前已选择账号<span class="num_color">{{
+        Task_num
+}}</span>个</span>
                 </el-form-item>
 
 
@@ -259,7 +261,8 @@
                     </el-col>
                 </el-row>
             </div>
-            <div style="margin-left:45%;margin-top:20px"><el-button type="primary" size="mini" @click="drawer_reset">重置</el-button></div>
+            <div style="margin-left:45%;margin-top:20px"><el-button type="primary" size="mini"
+                    @click="drawer_reset">重置</el-button></div>
             <div style="margin-left:38%;margin-top:20px; margin-bottom: 20px;"><el-button plain
                     style="margin-right: 20px;" @click="drawer_close">取消</el-button>
                 <el-button type="primary" class="seachbut" @click="submit_drawer">确定</el-button>
@@ -271,11 +274,13 @@
 
 <script>
 import tableCustom from '@/components/myComponent/table/tableCustom.vue';
+import Calendar from '../task/component/calendar.vue'
 
 export default {
     name: 'CultivateTask',
     components: {
         tableCustom,
+        Calendar
     },
     data() {
         return {
@@ -591,8 +596,8 @@ export default {
             this.drawer_task = true
         },
         //抽屉重置(给默认值)
-        drawer_reset(){
-            this.sp={
+        drawer_reset() {
+            this.sp = {
                 comment_pro: true,
                 comment_like_pro: true,
                 comment_word_pro: true,
@@ -626,7 +631,7 @@ export default {
                 message_board_t: true,
                 random_transmit_num: true,
             };
-            this.sp_content={
+            this.sp_content = {
                 comment_pro: "15",
                 comment_like_pro: "1",
                 comment_word_pro: "1",
@@ -634,20 +639,20 @@ export default {
                 video_collect_pro: "1",
                 search_label_pro: "1",
             };
-            this.day_time= 5;//每日养号时间
-            this.id_att= 0.1;//关注取关
-            this.Task_num= 0;//已选择账号数量
-            this.start_time= 0.5;//其他ID视频播放时间
-            this.end_time= 15;
-            this.random_att= 1;//其他id随机关注
+            this.day_time = 5;//每日养号时间
+            this.id_att = 0.1;//关注取关
+            this.Task_num = 0;//已选择账号数量
+            this.start_time = 0.5;//其他ID视频播放时间
+            this.end_time = 15;
+            this.random_att = 1;//其他id随机关注
         },
         //抽屉取消(关闭)
-        drawer_close(){
-            this.drawer_task=false
+        drawer_close() {
+            this.drawer_task = false
         },
         //抽屉数据
         submit_drawer() {
-            this.drawer_task=false
+            this.drawer_task = false
         }
 
 

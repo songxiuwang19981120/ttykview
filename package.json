@@ -18,6 +18,7 @@
     "less": "^3.9.0",
     "moment": "^2.29.4",
     "nprogress": "^0.2.0",
+    "pubsub-js": "^1.9.4",
     "register-service-worker": "^1.7.2",
     "sass": "^1.56.1",
     "vue": "^2.7.14",
