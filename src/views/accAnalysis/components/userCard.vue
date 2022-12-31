@@ -51,16 +51,16 @@ export default {
       return `https://www.tiktok.com/@${this.unique_id}`;
     },
     avatar() {
-      return this.userInfo?.avatar_thumb ?? "";
+      return this.userInfo?.avatar_thumb || "";
     },
     nikname() {
-      return this.userInfo?.nickname ?? "暂无昵称";
+      return this.userInfo?.nickname || "暂无昵称";
     },
     unique_id() {
-      return this.userInfo?.unique_id ?? "暂无ID";
+      return this.userInfo?.unique_id || "暂无ID";
     },
     signature() {
-      return this.userInfo?.signature ?? "暂无简介";
+      return this.userInfo?.signature || "暂无简介";
     },
   },
   data() {
