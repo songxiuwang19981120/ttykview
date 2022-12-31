@@ -16,6 +16,18 @@ import '@/assets/css/page.css';
 Vue.prototype.$EventBus = new Vue()
 Vue.config.productionTip = false
 
+Vue.directive('loadMore', {
+  bind(el, binding) {
+    let select_dom = el.querySelector('.el-select-dropdown .el-select-dropdown__wrap');
+    select_dom.addEventListener('scroll', function () {
+      let height = this.scrollHeight - this.scrollTop <= this.clientHeight;
+      if (height) {
+        binding.value()
+      }
+    })
+  }
+});
+
 new Vue({
   router,
   store,
