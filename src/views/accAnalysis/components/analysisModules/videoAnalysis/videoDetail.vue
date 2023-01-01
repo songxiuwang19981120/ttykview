@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import GraphicalData from "./baseAnalysisCom/graphicalDataCom";
+import GraphicalData from "@/views/accAnalysis/components/analysisModules/baseAnalysisCom/graphicalDataCom";
 export default {
   name: "TtprojectVideoDetail",
   components: { GraphicalData },

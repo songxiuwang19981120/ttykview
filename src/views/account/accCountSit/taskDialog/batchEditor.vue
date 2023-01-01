@@ -5,33 +5,49 @@
       :visible="showBatchEditor"
       :before-close="handlerClose"
     >
-      <span>此次共编辑{{ editorTota }}个账号</span>
-      <el-form ref="editorForm" :model="eidtorForm">
-        <el-form-item label="选择分组">
-          <el-select
-            style="width: 45%"
-            ref="gropuSelect"
-            clearable
-            v-model="eidtorForm.grouping_id"
-            placeholder="选择分组"
-          >
-            <el-option
-              v-for="item in groupList"
-              :value="item.grouping_id"
-              :label="item.grouping_name"
-              :key="item.grouping_id"
-            ></el-option>
-          </el-select>
+      <span slot="title">
+        <h1 class="tt-acccountsit--title">批量编辑账号</h1>
+        <p>此次共编辑{{ editorTota }}个账号</p>
+      </span>
+
+      <el-form
+        label-position="left"
+        label-width="170px"
+        ref="editorForm"
+        :model="eidtorForm"
+      >
+        <el-form-item label="修改分组 ：">
+          <GroupSelect
+            class="mr-15"
+            :disabled="isGroupDis"
+            @handleChange="handleChange($event)"
+          />
+          <el-checkbox v-model="modifyGroup"></el-checkbox>
         </el-form-item>
 
-        <el-form-item label="选择分类">
-          <el-cascader
-            style="width: 45%"
-            clearable
-            :props="{ checkStrictly: true, value: 'value' }"
-            :options="typeList"
-            v-model="eidtorForm.typecontrol_id"
-          ></el-cascader>
+        <el-form-item label="修改分类 ：">
+          <TypeSelect
+            :disabled="isTypeDis"
+            class="mr-15"
+            @handleTypeChange="handleTypeChange($event)"
+            :typeList="typeList"
+          />
+          <el-checkbox v-model="modifyType"></el-checkbox>
+        </el-form-item>
+        <el-form-item label="修改昵称 ：">
+          <p style="width: 60%">当前可用12222个</p>
+          <el-checkbox v-model="eidtorForm.modify_nickname"></el-checkbox>
+        </el-form-item>
+        <el-form-item label="修改个人简介 ：">
+          <p style="width: 60%">当前可用12222个</p>
+          <el-checkbox v-model="eidtorForm.modify_userdesc"></el-checkbox>
+        </el-form-item>
+        <el-form-item label="修改头像 ：">
+          <p style="width: 60%">当前可用1222个</p>
+          <el-checkbox v-model="eidtorForm.modify_avatar"></el-checkbox>
+        </el-form-item>
+        <el-form-item label="选择当前分类所有账号 ：">
+          <el-checkbox v-model="eidtorForm.check_all"></el-checkbox>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -43,8 +59,13 @@
 </template>
 
 <script>
+import MINXIN from "@/core/minxin";
+import GroupSelect from "@/components/base/baseSelect/GroupSelect";
+import TypeSelect from "@/components/base/baseSelect/TypeSelect";
 export default {
   name: "TtprojectBatchEditor",
+  mixins: [MINXIN],
+  components: { GroupSelect, TypeSelect },
   props: {
     showBatchEditor: {
       type: Boolean,
@@ -56,40 +77,57 @@ export default {
       type: Number,
     },
   },
+  computed: {
+    isGroupDis() {
+      return !(this.modifyGroup === true);
+    },
+    isTypeDis(){
+      return !(this.modifyType === true)
+    }
+  },
   data() {
     return {
+      modifyType:'',
+      modifyGroup: "",
       typeList: [],
       groupList: [],
+      grouping_id: "",
       eidtorForm: {
         grouping_id: "",
         typecontrol_id: "",
         member_id: "",
+        modify_nickname: "",
+        modify_userdesc: "",
+        modify_avatar: "",
+        check_all: "",
       },
     };
   },
-
+  watch: {},
   mounted() {
-    this.getGroupList();
-    this.getTypeControlList();
+    /*  this.getGroupList(); */
+    /* this.getTypeControlList(); */
   },
 
   methods: {
-    /*
-        function: getTreeData
-        params: data | 需要进行递归处理的数组
-        desc: 递归函数，对数组进行处理，设置dhilren长度为0的字段为undefined
-        return: 处理后的数据
-    */
-    getTreeData(data) {
-      data.forEach((item) => {
-        if (!item.children.length) {
-          item.children = undefined;
-        } else {
-          this.getTreeData(item.children);
-        }
+    async handleChange(e) {
+      this.eidtorForm.grouping_id = e;
+      let searchTypeData = {
+        grouping_id: this.eidtorForm.grouping_id,
+      };
+      let result = await this.$api({
+        type: "getTypecontrol",
+        data: searchTypeData,
       });
-      return data;
+      this.typeList = this.getTreeData(result.data);
     },
+
+    handleTypeChange(e) {
+      console.log(e);
+      this.eidtorForm.typecontrol_id = e;
+      console.log(this.eidtorForm.typecontrol_id);
+    },
+
     /*
         function: getTypeControlList
         params: null
@@ -108,12 +146,9 @@ export default {
     },
     async handlerConfrim() {
       try {
-        this.eidtorForm.typecontrol_id =
-          this.eidtorForm.typecontrol_id[
-            this.eidtorForm.typecontrol_id.length - 1
-          ];
+        let typeId = this.eidtorForm.typecontrol_id;
+        this.eidtorForm.typecontrol_id = this.formatTypeId(typeId);
         this.eidtorForm.member_id = this.member_ids;
-        console.log(this.eidtorForm);
         let result = await this.$api({
           type: "updateUserType",
           data: this.eidtorForm,
@@ -158,4 +193,18 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped></style>
+<style lang="stylus" scoped>
+.mr-15 {
+  margin-right: 15px;
+}
+
+.tt-acccountsit--title {
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+/* hark */
+::v-deep .el-form-item__content {
+  display: flex;
+}
+</style>

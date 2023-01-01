@@ -53,7 +53,9 @@
       >
       <el-button class="base-btn search-btn" @click="RestQuery">重置</el-button>
       <el-button class="base-btn">账号分配</el-button>
-      <el-button class="base-btn">开启一键回关</el-button>
+      <el-button @click="handleFollow" class="base-btn">{{
+        followBtnText
+      }}</el-button>
       <el-button
         class="base-btn"
         style="width: 150px"
@@ -109,6 +111,8 @@
       :member_ids="member_ids"
       :showBatchEditor="showBatchEditor"
       :editorTota="editorTota"
+      :groupName="groupString"
+      :typeName="classiFication"
     />
     <ReleaseVideoDialog
       :showReleaseVideoDialog="showReleaseVideoDialog"
@@ -140,6 +144,9 @@ export default {
     ReleaseVideoDialog,
   },
   computed: {
+    followBtnText() {
+      return this.isFollow === true ? "一键回关已开启" : "开启一键回关";
+    },
     batchEditorLength() {
       return this.batchEditorList.length;
     },
@@ -159,25 +166,27 @@ export default {
     },
   },
   watch: {
-    classiFication(newVal) {
-      console.log(newVal);
+    classiFication() {
       let data = {
-        typecontrol_id:
-          this.classiFication[this.classiFication.length - 1] ?? "",
+        typecontrol_id: this.formatTypeId(),
         limit: this.limit,
         page: this.page,
         grouping_id: this.group ?? "",
       };
+      let arr = Object.entries(this.typeList)/* .find((item) => {
+        return item?.[1]?.grouping_id === newVal;
+      }); */
+      console.log(arr)
       this.getMemberList(data);
     },
+
     async group(newVal) {
       let arr = Object.entries(this.groupList).find((item) => {
         return item?.[1]?.grouping_id === newVal;
       });
       this.groupString = arr?.[1]?.grouping_name;
       let data = {
-        typecontrol_id:
-          this.classiFication[this.classiFication.length - 1] ?? "",
+        typecontrol_id: this.formatTypeId(),
         grouping_id: this.group ?? "",
         limit: this.limit ?? 10,
         page: this.page ?? 1,
@@ -197,6 +206,11 @@ export default {
     return {
       showReleaseVideoDialog: false, //控制发布视频dialog展示
       showBatchEditor: false,
+      showEditorDialog: false, //是否展示编辑按钮界面
+      showBatchEiDialog: false, //是否展示批量编辑按钮界面
+      shwoVideoTabel: false, //是否展示视频播放弹窗
+      showViewerTabel: false, //是否展示访问列表表格
+      isFollow: false, //是否开启一键回关
       searchForm: {
         grouping_id: "",
         typecontrol_id: "",
@@ -296,9 +310,8 @@ export default {
           },
         },
         {
-          prop: "unread_viewer_count" ?? "",
+          prop: "unread_viewer_count",
           label: "主页访问人数",
-
           align: "center",
           render: (h, { row }) => {
             return (
@@ -413,10 +426,6 @@ export default {
       groupString: "",
       group: "", //设置分组
       limit: 10, //每页请求数据条数
-      showEditorDialog: false, //是否展示编辑按钮界面
-      showBatchEiDialog: false, //是否展示批量编辑按钮界面
-      shwoVideoTabel: false, //是否展示视频播放弹窗
-      showViewerTabel: false, //是否展示访问列表表格
       user_video_num: 0, //视频数量
       videoList: [], //用户视频列表数据
       vistList: [], //访问列表数据
@@ -434,12 +443,54 @@ export default {
   },
 
   mounted() {
+    const scrollView = document.getElementsByClassName('tt-main')
     this.getMemberList();
-    this.getTypeControlList();
+    /*     this.getTypeControlList(); */
     this.getGroupList();
-  },
+    console.log(scrollView)
+    scrollView[0].addEventListener('scroll',this.scrollHandle,true)
 
+  },
+    beforeDestroy () {
+    // 获取指定元素
+    const scrollview = document.getElementsByClassName('tt-main')
+    // 移除监听
+    scrollview[0].removeEventListener('scroll', this.scrollHandle, true)
+  },
   methods: {
+
+    
+             
+                scrollHandle(e){
+         
+      console.log(e,1111);
+        },
+   
+
+    /* 
+        function: formatTypeId
+        params: null
+        desc: 格式化分类ID
+        return: 格式化之后的分类ID，数组最后一位
+    */
+    formatTypeId() {
+      return this.classiFication[this.classiFication.length - 1] ?? "";
+    },
+    /* 
+        function: handleFollow
+        params: null
+        desc: 一键回关回调
+    */
+    handleFollow() {
+      this.isFollow = !this.isFollow;
+      console.log("一键回关");
+    },
+
+    /* 
+        function: handleAnalysis
+        params: row | 默认值，获取表格行内数据
+        desc: 跳转到账号分析界面
+    */
     handleAnalysis(row) {
       let unique_id = row.unique_id;
       let userInfo = row;
@@ -448,6 +499,11 @@ export default {
         query: { id: unique_id, userInfo: JSON.stringify(userInfo) },
       });
     },
+    /* 
+        function: closeReleaseVideoDialog
+        params: null
+        desc: 关闭发布视频弹窗
+    */
     closeReleaseVideoDialog() {
       this.showReleaseVideoDialog = false;
     },
@@ -469,9 +525,28 @@ export default {
       console.log("监控");
     },
 
+    /* 
+        function: showBatchEditorDialog
+        params: null
+        desc: 打开批量编辑弹窗
+    */
     showBatchEditorDialog() {
+      if (
+        this.group === "" ||
+        this.classiFication.length === 0 ||
+        this.batchEditorList.length === 0
+      ) {
+        this.$message.error("请先选择分组、分类、账号");
+        return false;
+      }
       this.showBatchEditor = true;
     },
+
+    /* 
+        function: closeBatchEditor
+        params: null
+        desc: 关闭批量编辑弹窗
+    */
     closeBatchEditor() {
       this.showBatchEditor = false;
       this.member_ids = "";
@@ -585,16 +660,14 @@ export default {
     */
     async handlerSearch() {
       let data = {
-        typecontrol_id:
-          this.classiFication[this.classiFication.length - 1] ?? "",
+        typecontrol_id: this.formatTypeId(),
         uid: this.acc_id ?? "",
         min: this.fans[0] ?? "",
         max: this.fans[1] ?? "",
         limit: this.limit ?? 10,
         page: this.page ?? 1,
-        grouping_id: this.group ?? '',
+        grouping_id: this.group ?? "",
       };
-      console.log(111);
       let result = await this.$api({
         type: "getMember",
         data: data,
@@ -613,8 +686,7 @@ export default {
       this.limit = val.limit;
       this.page = val.page;
       let data = {
-        typecontrol_id:
-          this.classiFication[this.classiFication.length - 1] ?? "",
+        typecontrol_id: this.formatTypeId(),
         grouping_id: this.group ?? "",
         limit: this.limit ?? 10,
         page: this.page ?? 1,
@@ -642,8 +714,7 @@ export default {
           return false;
         }
         let data = {
-          typecontrol_id:
-            this.classiFication[this.classiFication.length - 1] ?? "",
+          typecontrol_id: this.formatTypeId(),
         };
         let result = await this.$api({ type: "getProjectNum", data: data });
         this.materialTotal = result.data.num ?? 0;
@@ -753,7 +824,6 @@ export default {
       });
       member_id.forEach((item) => {
         this.member_ids += `${item},`;
-        console.log(this.member_ids);
       });
       this.editorTota = this.batchEditorList.length;
     },
@@ -881,7 +951,6 @@ export default {
   margin-bottom: 10px;
   width: 100%;
   height: 60px;
-
 }
 
 .tt-accsituation-searchbar {
