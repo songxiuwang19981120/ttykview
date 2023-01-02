@@ -83,20 +83,44 @@
                 <el-row type="flex">
                     <el-col :span="1"></el-col>
                     <el-col :span="12">
-                        <div><i class="el-icon-star-off"></i>单号每日最长养号时间：<el-input v-model="day_time"
-                                style="width:60px;margin-right: 10px;" size="mini"></el-input>分钟</div>
-                        <div class="all_margin_top"><i class="el-icon-star-off"></i>其他ID单视频播放时间：<el-input
-                                v-model="start_time" style="width:60px;margin-right: 5px;"
-                                size="mini"></el-input>——<el-input v-model="end_time" class="all_class_margin"
-                                size="mini"></el-input>秒</div>
+                        
+            <!-- <el-form :model="rule_act" :rules="rules_act" ref="ruleForm" label-width="120px" style="margin-top:30px">
+                <el-form-item label="设备分组:" prop="cult_equipment">
+                    <el-select v-model="rule_act.cult_equipment" placeholder="请选择设备分组" size="mini"> -->
+                        <el-form :model="rule_drawer" :rules="rules_drawer" ref="rules_drawers">
+                            <el-form-item label="单号每日最长养号时间：" prop="day_time">
+                                <div><el-input v-model="rule_drawer.day_time" style="width:60px;margin-right: 10px;" size="mini"></el-input>分钟</div>
+                            </el-form-item>
+                            <el-form-item label="其他ID单视频播放时间："  required>
+                                <el-row type="flex">
+                                    <el-col :span="12">
+                                        <el-form-item prop="start_time">
+                                            <el-input v-model="rule_drawer.start_time" style="width:60px;margin-right: 10px;" size="mini"></el-input>
+                                            <span>—</span>
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="12">
+                                        <el-form-item prop="end_time">
+                                            <el-input v-model="rule_drawer.end_time" style="width:60px;" size="mini"></el-input>
+                                            <span>秒</span>
+                                        </el-form-item>
+                                    </el-col>
+                                </el-row>
+                            </el-form-item>
+                        </el-form>
                     </el-col>
+
+
                     <el-col :span="1"></el-col>
                     <el-col :span="10">
-                        <div><i class="el-icon-star-off"></i>其他ID随机关注后取关：<el-input v-model="id_att"
-                                style="width:60px;margin-right: 10px;" size="mini"></el-input>%</div>
-                        <div class="all_margin_top"><i class="el-icon-star-off"></i>其他ID随机关注：<el-input
-                                v-model="random_att" style="width:60px;margin-right: 10px;" size="mini"></el-input>%
-                        </div>
+                        <el-form :model="rule_drawer" :rules="rules_drawer" ref="rules_drawer">
+                            <el-form-item label="其他ID随机关注后取关："  prop="id_att">
+                                <el-input v-model="rule_drawer.id_att" style="width:60px;margin-right: 10px;" size="mini"></el-input>%
+                            </el-form-item>
+                            <el-form-item label="其他ID随机关注："  prop="random_att">
+                                <el-input v-model="rule_drawer.random_att" style="width:60px;margin-right: 10px;" size="mini"></el-input>%
+                            </el-form-item>
+                        </el-form>
                     </el-col>
                 </el-row>
                 <el-divider></el-divider>
@@ -318,6 +342,21 @@ export default {
                 open_label_search_t: true,
                 message_board_t: true,
                 random_transmit_num: true,
+            },
+            rule_drawer:{
+                day_time:"5",
+                start_time:"0.5",
+                end_time:"15",
+                id_att:"0.1",
+                random_att:"1"
+            },
+            rules_drawer:{
+                day_time: [{ required: true, message: '请输入最长养号时间', trigger: 'blur' }],
+                start_time: [{ required: true, message: '请输入最小时间段', trigger: 'blur' }],
+                end_time: [{ required: true, message: '请输入最大时间段', trigger: 'blur' }],
+                id_att: [{ required: true, message: '请输入随机取关率', trigger: 'blur' }],
+                random_att: [{ required: true, message: '请输入随机关注率', trigger: 'blur' }],
+                
             },
             day_time: 5,//每日养号时间
             id_att: 0.1,//关注取关
@@ -597,6 +636,18 @@ export default {
         },
         //抽屉重置(给默认值)
         drawer_reset() {
+            let _self = this
+            _self.$refs.rules_drawer.resetFields();//重置验证
+            _self.$refs.rules_drawers.resetFields();
+            this.$refs.rules_drawer.validate((valid) => {
+                if (valid) {
+                    
+                  console.log(123)
+                } else {
+                    console.log('error submit!!');
+                    return false;
+                }
+            });
             this.sp = {
                 comment_pro: true,
                 comment_like_pro: true,
@@ -639,12 +690,16 @@ export default {
                 video_collect_pro: "1",
                 search_label_pro: "1",
             };
-            this.day_time = 5;//每日养号时间
-            this.id_att = 0.1;//关注取关
-            this.Task_num = 0;//已选择账号数量
-            this.start_time = 0.5;//其他ID视频播放时间
-            this.end_time = 15;
-            this.random_att = 1;//其他id随机关注
+
+
+            this.rule_drawer={
+                day_time:"5",
+                start_time:"0.5",
+                end_time:"15",
+                id_att:"0.1",
+                random_att:"1"
+            }
+
         },
         //抽屉取消(关闭)
         drawer_close() {
