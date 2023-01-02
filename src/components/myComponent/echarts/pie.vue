@@ -32,7 +32,6 @@ export default {
     },
     data() {
         return {
-            wordChart: undefined,
         };
     },
     created() {
@@ -47,8 +46,9 @@ export default {
         getIint(chartData) {
             // if (chartData.length == 0) return;
             // 获取到ref绑定为loginTimes的DOM节点，以canvas的形式展现在视图层
-            this.wordChart = echarts.init(document.getElementById(this.chartId)).dispose();
-            this.wordChart = echarts.init(document.getElementById(this.chartId));
+            let myEcharts = undefined
+            myEcharts = echarts.init(document.getElementById(this.chartId)).dispose();
+            myEcharts = echarts.init(document.getElementById(this.chartId));
             const data = chartData.map((item) => {
                 return {
                     name: item.name,
@@ -56,7 +56,7 @@ export default {
                 };
             });
             // echarts参数设置
-            this.wordChart.setOption({
+            myEcharts.setOption({
                 color: ['#FF411F', '#65FCA8 ', '#FCE97E'],
                 tooltip: {
                     trigger: 'item'

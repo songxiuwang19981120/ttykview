@@ -2,7 +2,7 @@
   <div>
     <el-container class="accAnalysis-wrap">
       <el-row class="accAnalysis-content">
-        <el-col :span="7">
+        <el-col class="accAnalysis-left" :span="7">
           <UserCard :userInfo="userInfo" />
           <MonitorAccList />
         </el-col>
@@ -59,14 +59,11 @@ export default {
   },
   mounted() {
     this.userInfo = JSON.parse(this.$route.query.userInfo);
-    console.log(this.userInfo);
   },
 
   methods: {
     getText(e) {
-      console.log(111, e);
       this.text = e.path[0].innerText;
-      console.log(this.text);
     },
   },
 };
@@ -76,7 +73,6 @@ export default {
 .accAnalysis-wrap {
   padding: 20px 20px 0 30px;
   width: 100vw;
-  background-color: #EFEFEF;
 }
 
 .accAnalysis-content {
@@ -84,9 +80,7 @@ export default {
   height: 100%;
 }
 
-.accAnalysis-left {
-  width: 100%;
-}
+
 
 .tab-btn 
   width: 120px

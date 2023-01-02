@@ -1,14 +1,15 @@
 <template>
   <div>
     <div>
-      <div class="data-desc mar-bot-10">
+      <div class="data-desc dis-flex mar-bot-20">
         <div>
           <i :class="[icon]" class="color-rad"></i>
-          <span class="title">{{ title }}</span>
+          <span class="fz-20">{{ title }}</span>
         </div>
         <el-date-picker
           class="date-picker"
           v-model="date"
+          value-format="yyyy-MM-dd"
           type="daterange"
           align="right"
           unlink-panels
@@ -20,35 +21,54 @@
         >
         </el-date-picker>
       </div>
-
-      <div class="dis-flex pad-20 mar-bot-10">
-        <div class="data-item" v-for="item in data" :key="item.lable">
-          <p>{{ item.data }}</p>
-          <p>{{ item.lable }}</p>
-          <p class="data-tag">{{ item.tag_lable }}{{ item.tag_data }}</p>
-        </div>
-      </div>
+      <TabQuery :curWidth="tabQueryWid" :typeData="tabData" @changeType="setQuery" />
+      <InfoBar  class="mar-bot-20" :time="date" :data="infoBarData" />
+      <Echarts class="echarts" ref="axis" :chartId="chartId" height="392px" width="100%" />
     </div>
   </div>
 </template>
 
 <script>
+import TabQuery from "@/components/index/choosetype";
+import Echarts from "@/components/myComponent/echarts/axis";
+import InfoBar from "./infoBar";
 export default {
-  name: "TtprojectTabData",
+  name: "TtprojectGraphicalDataCom",
+  components: { TabQuery, InfoBar, Echarts },
   props: {
-    data: {
-      type: Array,
-    },
     icon: {
       type: String,
     },
     title: {
       type: String,
     },
+    tabData:{
+      type:Array
+    },
+    chartData:{
+      type:Array
+    },
+    xAxis:{
+      type:Array
+    },
+    query:{
+      type:String
+    },
+    tabQueryWid:{
+      type:Number
+    },
+    chartId:{
+      type:String
+    }
+  },
+  watch:{
+    query(){
+      this.initEcharts()
+    }
   },
   data() {
     return {
-      date: "",
+      date:'',
       pickerOptions: {
         shortcuts: [
           {
@@ -89,15 +109,36 @@ export default {
           },
         ],
       },
+      infoBarData: {
+        max_num: "2223",
+        min_num: "324",
+        average_num: "423",
+        update_time: "2022-12-12 22:23:43",
+      },
     };
   },
 
-  mounted() {},
+  mounted() {
+    this.initEcharts();
+  },
 
   methods: {
-    handleChange(val) {
-      console.log(val);
-      this.$emit("updateData");
+      initEcharts() {
+        let data = this.chartData
+        let xAxis = this.xAxis
+        let legend = [`${this.query}`];
+        this.$refs.axis.getIint(data, xAxis, legend);
+      },
+    handleChange(val){
+      console.log(val)
+    },
+     /* 
+        function: setQuery
+        params: index | 下标
+        desc: 设置字段，用于图标更新
+    */
+    setQuery(index) {
+      this.$emit('setQuery',index)
     },
   },
 };
@@ -109,43 +150,36 @@ export default {
   justify-content: space-between;
 }
 
-.date-picker {
-  height: 40px
-  border: 1px solid #3475E1
-}
-
-.pad-20 {
-  padding: 0 70px;
-}
-
-.mar-bot-10 {
-  margin-bottom: 10px;
+.border-bot {
+  border-bottom: 1px solid #ccc;
 }
 
 .color-rad {
-  color: red
+  color: red;
+  margin-right: 10px;
 }
 
-.data-desc
-  display: flex
-  align-items: center
-  justify-content: space-between
-  width: 100%
-  height: 50px
+.fz-20
+  font-size 20px
 
-.data-tag
-  height: 30px
-  background-color: #ccc
-  line-height 30px
-  border-radius: 20px
+.mar-bot-20 {
+  margin-bottom: 20px;
+}
+
+.border-bot {
+  border-bottom: 1px solid #ccc;
+}
 
 .data-item {
   width: 150px;
   height: 50px;
   text-align: center;
 
-  p {
+  p:nth-of-type(1) {
     font-weight: 700;
   }
 }
+
+.echarts
+  margin: 0 auto
 </style>

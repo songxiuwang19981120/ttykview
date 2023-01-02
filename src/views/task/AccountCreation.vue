@@ -3,7 +3,7 @@
         <div class="tt-accsituation">
             <div class="tt-accsituation--operation ">
                 <span>任务状态：</span>
-                <el-select v-model="CreationState" placeholder="请选择" >
+                <el-select @change="CreationState_select($event)" v-model="CreationState" placeholder="请选择" >
                     <el-option
                     v-for="item in optionsCreationState"
                     :key="item.value"
@@ -77,6 +77,8 @@ export default {
                     label: '全部'
                 },],
             CreationState:"",
+            CreationState_select_obj:{},//选中的任务状态数据
+
             //上传话题
             optionsTopic:[
                 {
@@ -94,9 +96,9 @@ export default {
             btnloading:false, //按钮loading
             loading:false,
             tableData:[
-                {a:1,b:2,c:3,d:4,e:5,f:6,g:7,h:8,i:9},
-                {a:1,b:2,c:3,d:4,e:5,f:6,g:7,h:8,i:9},
-                {a:1,b:2,c:3,d:4,e:5,f:6,g:7,h:8,i:9},
+                {a:1,b:2,c:3,d:4,e:5,f:6,g:7,h:8,i:9,suspend:0,},
+                {a:1,b:2,c:3,d:4,e:5,f:6,g:7,h:8,i:9,suspend:0,},
+                {a:1,b:2,c:3,d:4,e:5,f:6,g:7,h:8,i:9,suspend:1,},
             ],
             columns:[
             {
@@ -157,9 +159,16 @@ export default {
                     render: (h, { row }) => {
                         return (
                             <div>
-                                <el-button style="margin-right:10px" size="mini"  type="primary" plain onClick={this.dialogCreationbtn.bind(this, row)} >查看详情</el-button>
-                                <el-button style="margin-right:10px" size="mini" type="danger" onClick={this.deleteCreation.bind(this, row)}  >删除</el-button>
-                                <el-button style="margin-right:10px" size="mini" type="warning" plain onClick={this.pauseCreation.bind(this, row)}>暂停</el-button>
+                                <el-button style="margin-right:10px" size="mini" onClick={this.dialogCreationbtn.bind(this, row)} >查看详情</el-button>
+                                <el-popconfirm
+                                    confirm-button-text='删除'
+                                    cancel-button-text='取消'
+                                    title="确认清除此设备中异常账号？"
+                                    onConfirm={this.deleteCreation.bind(this, row)}
+                                    >
+                                    <el-button slot="reference" style="margin-right:10px" size="mini" type="danger">删除异常账号</el-button>
+                                    </el-popconfirm>
+                                <el-button style="margin-right:10px" size="mini" type="warning" plain onClick={this.pauseCreation.bind(this, row)}>{row.suspend ? '暂停' : '继续'}</el-button>
                             </div>
                         );
                     },
@@ -213,8 +222,16 @@ export default {
                     render: (h, { row }) => {
                         return (
                             <div>
-                                <el-button style="margin-right:10px" size="mini"  type="primary" plain onClick={this.New_dialogCreationbtn.bind(this, row)} >重新创建</el-button>
-                                <el-button style="margin-right:10px" size="mini" type="danger" onClick={this.delete_CreationDialog.bind(this, row)}  >删除</el-button>
+                                <el-button style="margin-right:10px" size="mini" onClick={this.New_dialogCreationbtn.bind(this, row)} >重新创建</el-button>
+                                <el-popconfirm
+                                    confirm-button-text='删除'
+                                    cancel-button-text='取消'
+                                    title="确认清除此设备中异常账号？"
+                                    onConfirm={this.delete_CreationDialog.bind(this, row)}
+                                    >
+                                    <el-button slot="reference" style="margin-right:10px" size="mini" type="danger">删除异常账号</el-button>
+                                    </el-popconfirm>
+                               
                             </div>
                         );
                     },
@@ -229,6 +246,16 @@ export default {
     },
 
     methods: {
+        //任务状态
+        CreationState_select(value){
+            //选中的数据
+            let  CreationState_select_obj= {};
+            //使用find()方法在下拉数据中根据value绑定的数据查找对象。
+            CreationState_select_obj = this.optionsCreationState.find(function(item){
+		    return item.value === value;
+		    })
+		console.log(CreationState_select_obj);
+    },
         //时间选择
         consleDate(){
             console.log(this.CreationDate,"返回开始和结束时间戳")
@@ -251,7 +278,13 @@ export default {
         },
         //暂停
         pauseCreation(row){
-            console.log(row,"暂停");
+            console.log(row,"暂停/继续");
+         
+            if(row.suspend===0){
+                row.suspend=1
+            }else{
+                row.suspend=0
+            }
         },
         //查看详情
         dialogCreationbtn(row){
@@ -272,27 +305,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/base/base.scss';
-.tt-accsituation {
 
-    min-height: 70px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-
-.tt-accsituation--operation {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 10px;
-}
-.videosize {
-    width: 100px;
-    height: 30px;
-   
-}
-.seachbut {
-	background-color: $button-back-color;
-    border-color: $button-bord-color;
-}
 </style>

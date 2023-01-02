@@ -1,5 +1,6 @@
 <template>
   <div>
+    <div class="EquipmentSituation">
     <div class="tt-accsituation">
       <div class="tt-accsituation--operation">
         <div style="margin-right: 10px;">
@@ -15,10 +16,18 @@
             </el-option>
           </el-select>
         </div>
+        <el-button type="primary" @click="examine_index">查看</el-button>
+        <el-button type="primary" @click="reset">重置</el-button>
         <el-button type="primary" @click="dialog = true">修改分组</el-button>
         <el-button style="margin-right: 20px;" type="primary" @click="dialogFormVisible = true">创建账号</el-button>
       </div>
+      <div style="background-color:white;height: 28px;">
+        <span class="position_select_num">已选中{{totalChange}}个设备</span>
+        <span class="position_num">共{{total}}个设备</span>
+      </div>
+      
     </div>
+
     <el-drawer title="修改分组" :before-close="handleClose" :visible.sync="dialog" direction="rtl"
       custom-class="demo-drawer" ref="drawer">
       <div class="">
@@ -31,9 +40,9 @@
           </el-form-item>
         </el-form>
         <!-- 更改显示状态的列表 -->
-        <table-custom :loading="loading" :tableData="tableData2" :columns="columns_T"></table-custom>
+        <table-custom :loading="loading" :tableData="drawer_tableData" :columns="columns_T"></table-custom>
         <div style="float: right;margin-right: 20px;margin-top: 20px;">
-          <el-button @click="cancelForm">关 闭</el-button>
+          <el-button @click="handleClose">关 闭</el-button>
           <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading
     ?
     '提交中 ...' : '确 定'
@@ -41,33 +50,38 @@
         </div>
       </div>
     </el-drawer>
-    <el-dialog title="创建账号" style="width:50%; margin:0 auto" :visible.sync="dialogFormVisible"
+    <el-dialog title="创建账号" style="width:60%; margin:0 auto" :visible.sync="dialogFormVisible"
       :before-close="handleCloseDialog">
       <!-- 四级联动 -->
-
-
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
-        <el-form-item label="选择分组:" :disabled="false" prop="equipment" label-width="100px">
+        <el-form-item label="选择账号分组:" :disabled="false" prop="equipment" label-width="120px">
           <el-select :disabled="disabled" v-model="ruleForm.equipment" placeholder="账号分组选择" style="margin-right: 10px"
             @focus="getaccGroup" :loading="equipmentLoading" loading-text="数据加载中...">
             <el-option v-for="item in searchEquipmentList" :key="item.grouping_id" :label="item.grouping_name"
               :value="item.grouping_id">
             </el-option>
           </el-select>
-          <span @click="addlis()">
-            <el-checkbox v-model="checked">选择全部分组</el-checkbox>
+          <span @click="All_lis">
+            <el-checkbox v-model="checked">选择未分组</el-checkbox>
           </span>
         </el-form-item>
 
-        <el-form-item label="选择分类:" prop="classify" label-width="100px">
-          <el-cascader v-model="ruleForm.classify" :options="options" @change="handleChange">
+        <el-form-item label="选择账号分类:" prop="classify" label-width="120px">
+
+          <el-cascader :options="classify_options" :props="defaultPropsa" v-model="ruleForm.classify"
+            @change="handleChange"><template slot-scope="{ node, data }">
+              <span>
+                <span>{{ data.label }}</span>
+                <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
+              </span>
+            </template>
           </el-cascader>
         </el-form-item>
 
 
-        <el-form-item label="最大容量:" label-width="100px">
+        <el-form-item label="单设备账号容量:" label-width="120px">
           <!-- 计数器 -->
-          <el-input-number v-model="ruleForm.num" @change="handleChangeNum" :min="1" :max="10"
+          <el-input-number v-model="ruleForm.num" @change="handleChangeNum" :min="1" :max="10" 
             label="请输入单设备最大容量"></el-input-number>
         </el-form-item>
       </el-form>
@@ -76,11 +90,10 @@
         <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
       </div>
     </el-dialog>
-    <table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
-      @handleSelectionChange="selectionChange"></table-custom>
+    <table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns" @handleSelectionChange="selectionChange"></table-custom>
     <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination">
     </pagination>
-
+  </div>
   </div>
 </template>
 
@@ -95,10 +108,15 @@ export default {
   },
   data() {
     return {
+      selection_number:[],//选中的数据
+      defaultPropsa: {
+        checkStrictly: true
+      },//选择的点是否开启
+      totalChange:0,//已选中设备
       checked: false,//是否添加根目录分组
       disabled: false,
       //联级选择器
-      options: [{
+      classify_options: [{
         value: 'zhinan',
         label: '指南',
         children: [{
@@ -304,9 +322,9 @@ export default {
       },//抽屉
       dialogFormVisible: false,
       ruleForm: {
-        classify: [],
+        classify: "",
         num: '',
-        equipment: []
+        equipment: ""
       },
       rules: {
         classify: [
@@ -333,9 +351,9 @@ export default {
       //表格的
       loading: false, //表格加载loading
       tableData: [
-        { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: "200", abnor: "123", tateKey: "123" },
-        { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: "200", abnor: "123", tateKey: "123" },
-        { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: "200", abnor: "123", tateKey: "123" },],  //表格数据
+        { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: 2, abnor: "123", tateKey: "123" },
+        { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: 2, abnor: "123", tateKey: "123" },
+        { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: 200000, abnor: "123", tateKey: "123" },],  //表格数据
       columns: [
         {
 
@@ -381,7 +399,7 @@ export default {
                   confirm-button-text='删除'
                   cancel-button-text='取消'
                   title="确认清除此设备中异常账号？"
-                  onConfirm={this.messageBox.bind(this, row)}
+                  onConfirm={this.delete_abnormal.bind(this, row)}
                 >
                   <el-button slot="reference" type="danger" size="mini">删除异常账号</el-button>
                 </el-popconfirm>
@@ -393,7 +411,7 @@ export default {
         },
 
       ],  //表格
-      tableData2: [
+      drawer_tableData: [
       ],//抽屉中的数据
       columns_T: [{
 
@@ -443,17 +461,29 @@ export default {
         this.equipmentLoading = false;
       }
     },
+    //点击查看
+    examine_index(){
+      console.log("查看")
+    },
+    //点击重置
+    reset(){
+      console.log("重置")
+      this.equipment="";
+      this.equipmentState=""
+    },
+
     //是否根目录
-    addlis() {
+    All_lis() {
       this.ruleForm.equipment = [];
       if (this.checked == true) {
         this.disabled = false;
+        this.ruleForm.equipment=""
         this.rules.equipment = [
           { required: true, message: '请选择分组', trigger: 'blur' },
         ]
       } else {
         this.disabled = true;
-        this.rules.equipment = []
+        this.rules.equipment = ""
 
       }
     },
@@ -463,7 +493,6 @@ export default {
         if (valid) {
           this.dialogFormVisible = false
           alert('创建成功');
-          this.ruleForm.classify = ""
         } else {
           console.log('error submit!!');
           return false;
@@ -474,17 +503,32 @@ export default {
     handleChangeNum(value) {
       console.log(value);
     },
+     //四级联动点完后的事件
+     getCascaderObj2(classify, opt) {
+      return classify.map(function (value, index, array) {
+        for (var itm of opt) {
+          if (itm.value == value) {
+            opt = itm.children;
+            return itm;
+          }
+        }
+        return null;
+      });
+    },
     //联级选择器
-    handleChange(value) {
-      console.log(value);
+    handleChange() {
+      this.selection_number=this.getCascaderObj2(this.ruleForm.classify, this.classify_options)
+      console.log(this.selection_number)
     },
     //选择框选中
     selectionChange(val) {
-      this.tableData2 = val
+      this.drawer_tableData = val;
+      this.totalChange=val.length
+      
     },
     //确认删除
-    messageBox() {
-      console.log(123)
+    delete_abnormal(row) {
+      console.log(row)
     },
     //查看详情
     examine() {
@@ -499,37 +543,14 @@ export default {
         }
       )
     },
-    //dialog弹出框
-    handleCloseDialog(done) {
-      this.$confirm('确认关闭？')
-        .then(_ => {
-          done();
-        })
-        .catch(_ => { });
+    //dialog弹出框关闭时
+    handleCloseDialog() {
+      this.dialogFormVisible=false
     },
-    //抽屉事件
-    handleClose(done) {
-      if (this.loading) {
-        return;
-      }
-      this.$confirm('确定要修改分组吗？')
-        .then(_ => {
-          console.log(this.form.region)//确认提交修改分组后的操作
-          this.loading = true;
-          this.timer = setTimeout(() => {
-            done();
-            // 动画关闭需要一定的时间
-            setTimeout(() => {
-              this.loading = false;
-            }, 400);
-          }, 2000);
-        })
-        .catch(_ => { });
-    },
-    cancelForm() {
+    //抽屉关闭时
+    handleClose() {
+      this.dialog=false
       this.loading = false;
-      this.dialog = false;
-      clearTimeout(this.timer);
     },
     /**
                * 翻页回调
@@ -542,5 +563,27 @@ export default {
 };
 </script>
 <style scoped>
+.position_num{
+  color:#6C6C6C;
+  margin-left: 20px;
+  font-size: 14px;
+  line-height: 28px;
 
+}
+.position_select_num{
+  color: #FF411F;
+  margin-left: 20px;
+  font-size: 14px;
+}
 </style>
+<!-- <style>
+/* 视觉欺骗去除组件的总条数 给该页面加个外层class防止穿透*/
+.EquipmentSituation .el-pagination__total{
+  position: relative;
+    left: 90px;
+}
+.EquipmentSituation .el-pagination{
+  background-color: #F3F3F3;
+
+}
+</style> -->

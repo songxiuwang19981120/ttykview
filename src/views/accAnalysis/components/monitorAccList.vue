@@ -29,7 +29,7 @@
           </el-option>
         </el-select>
 
-        <el-button>确定</el-button>
+        <el-button size="mini">确定</el-button>
       </div>
 
       <happy-scroll class="scroll">
@@ -184,6 +184,7 @@ export default {
           prop: "avatar",
           label: "头像",
           align: "center",
+          fiex:true,
           render: (h, { row }) => {
             return (
               <el-image
@@ -243,7 +244,7 @@ export default {
 
 <style lang="stylus" scoped>
 .monitor-wrap {
-  width: 530px;
+  width: 100%;
   height: 500px;
   border-radius: 33px;
 }
@@ -255,10 +256,10 @@ export default {
 
 .monitor-screen {
   display: flex;
+  justify-content: space-around
   align-items: center;
-  padding-left: 60px;
-  margin: 0 auto;
-  width: 500px;
+  margin: 0 auto 12px;
+  width: 100%;
   height: 50px;
   background-color: #EFEFEF;
   border-radius: 26px;

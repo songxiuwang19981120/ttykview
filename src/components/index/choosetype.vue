@@ -1,7 +1,7 @@
 <template>
 	<div class="typechange" :style="{width: curWidth + 'px'}">
     <div v-for="(item,index) in typeData" :key="index" @click="changeType(index)" :class="isDivAct == index ? 'videodivact' : ''">
-			播放量
+			{{item}}
 		</div>
 	</div>
 </template>
