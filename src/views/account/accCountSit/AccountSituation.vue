@@ -81,6 +81,12 @@
       @pagination="handlePagination"
     />
 
+    <ConfrimDelDialog
+      :showConfrimDel="showConfrimDel"
+      @handleClose="closeConfrimDel"
+      @handleConfrim="confrimDel"
+    />
+
     <EditorDialog
       @closeEditorDialog="closeEditorDialog"
       @updateMemberList="updateMemberList"
@@ -130,7 +136,8 @@ import BatchEditorDialog from "./batchEditorDialog/batchEditorDialog";
 import VideoTabel from "./videoTabel/videoTabel";
 import ViewerTabel from "./ViewerLabel/viewerTabel";
 import BatchEditor from "./taskDialog/batchEditor";
-
+import TableOperation from "./tableOperation/operationSelect";
+import ConfrimDelDialog from "./confrimDelDialog/confrimDelDialog";
 export default {
   name: "AccountSituation",
   components: {
@@ -142,6 +149,8 @@ export default {
     ViewerTabel,
     BatchEditor,
     ReleaseVideoDialog,
+    TableOperation,
+    ConfrimDelDialog,
   },
   computed: {
     followBtnText() {
@@ -173,10 +182,10 @@ export default {
         page: this.page,
         grouping_id: this.group ?? "",
       };
-      let arr = Object.entries(this.typeList)/* .find((item) => {
+      let arr = Object.entries(this.typeList); /* .find((item) => {
         return item?.[1]?.grouping_id === newVal;
       }); */
-      console.log(arr)
+      console.log(arr);
       this.getMemberList(data);
     },
 
@@ -204,6 +213,7 @@ export default {
   },
   data() {
     return {
+      showConfrimDel: false,
       showReleaseVideoDialog: false, //控制发布视频dialog展示
       showBatchEditor: false,
       showEditorDialog: false, //是否展示编辑按钮界面
@@ -218,6 +228,24 @@ export default {
         fans: "",
         acc_id: "",
       },
+      operationOption: [
+        {
+          value: "编辑",
+          label: "编辑",
+        },
+        {
+          value: "删除",
+          label: "删除",
+        },
+        {
+          value: "分析",
+          label: "分析",
+        },
+        {
+          value: "发布视频",
+          label: "发布视频",
+        },
+      ],
       accStatusMap: {
         1: "正常",
         0: "封禁",
@@ -313,6 +341,7 @@ export default {
           prop: "unread_viewer_count",
           label: "主页访问人数",
           align: "center",
+          width: "120",
           render: (h, { row }) => {
             return (
               <span
@@ -325,15 +354,39 @@ export default {
           },
         },
         {
-          prop: "follower_status",
-          label: "播放/收藏/转发",
-
+          prop: "following_status",
+          label: "关注",
           align: "center",
           render: (h, { row }) => {
-            return <span>{row.play_num} / 0 / 0</span>;
+            return <span style="font-size: 12px">{row.following_count}</span>;
           },
         },
         {
+          prop: "follower_status",
+          label: "粉丝",
+          align: "center",
+          render: (h, { row }) => {
+            return <span style="font-size: 12px">{row.follower_status}</span>;
+          },
+        },
+        {
+          prop: "total_favorited",
+          label: "获赞",
+          align: "center",
+          render: (h, { row }) => {
+            return <span style="font-size: 12px">{row.total_favorited}</span>;
+          },
+        },
+        {
+          prop: "follower_status",
+          label: "播放/收藏/转发",
+          width: "150",
+          align: "center",
+          render: (h, { row }) => {
+            return <span style="font-size: 12px">{row.play_num} / 0 / 0</span>;
+          },
+        },
+        /*         {
           prop: "following_status,following_count,play_num",
           label: "关注/粉丝/获赞",
           align: "center",
@@ -345,15 +398,29 @@ export default {
               </div>
             );
           },
-        },
+        }, */
         {
           prop: "operation",
           label: "操作",
-          width: "400",
+          width: "200",
           align: "center",
           render: (h, { row }) => {
             return (
-              <div>
+              <div style="display:flex">
+                <TableOperation
+                  style="margin-right:10px"
+                  onsetOperation={this.setOperation.bind(this, row)}
+                />
+                <el-button
+                  size="mini"
+                  type="primary"
+                  onClick={this.handleMonitor.bind(this, row)}
+                >
+                  监控
+                </el-button>
+              </div>
+
+              /* <div>
                 <el-button
                   size="mini"
                   type="primary"
@@ -391,7 +458,7 @@ export default {
                 >
                   发布视频
                 </el-button>
-              </div>
+              </div>  */
             );
           },
         },
@@ -438,34 +505,74 @@ export default {
       userIdList: [], //选中用户的UID  组件通信之间会用到
       member_ids: "",
       editorTota: 0,
-      userInfo: "",
+      userInfo: "", //账号信息
+      delId: "", //需要删除账号的ID
+      operationMap: {
+        编辑: "handleEdit",
+        删除: "handleDelete",
+        发布视频: "handleRelease",
+        分析: "handleAnalysis",
+      },
     };
   },
 
   mounted() {
-    const scrollView = document.getElementsByClassName('tt-main')
+    const scrollView = document.getElementsByClassName("tt-main");
     this.getMemberList();
     /*     this.getTypeControlList(); */
     this.getGroupList();
-    console.log(scrollView)
-    scrollView[0].addEventListener('scroll',this.scrollHandle,true)
-
+    console.log(scrollView);
+    scrollView[0].addEventListener("scroll", this.scrollHandle, true);
   },
-    beforeDestroy () {
+  beforeDestroy() {
     // 获取指定元素
-    const scrollview = document.getElementsByClassName('tt-main')
+    const scrollview = document.getElementsByClassName("tt-main");
     // 移除监听
-    scrollview[0].removeEventListener('scroll', this.scrollHandle, true)
+    scrollview[0].removeEventListener("scroll", this.scrollHandle, true);
   },
   methods: {
+    async confrimDel() {
+      try {
+        this.$message.success("操作成功");
+        this.closeConfrimDel();
+        /*         let result = await this.$api({
+          type: "deleteMember",
+          data: { member_ids: this.delId },
+        });
+        if (result.status == 200) {
+          this.$message.success(result.msg ?? "操作成功");
+          this.closeConfrimDel();
+          return;
+        }
+        this.$message.error(result.msg ?? "操作失败"); */
+      } catch (error) {
+        console.error(error);
+        this.$message.error("操作失败");
+      }
+    },
+    /* 
+        function: setOperation
+        params: null
+        desc: 关闭确认删除弹窗
+    */
+    closeConfrimDel() {
+      this.showConfrimDel = false;
+    },
+    /* 
+        function: setOperation
+        params: row | 表格对应行的数据
+                e   | operationMap对应键值
+        desc: 打开相应操作界面
+    */
+    setOperation(row, e) {
+      console.log(5555, e);
+      console.log(this.operationMap[e]);
+      this[this.operationMap[e]](row) && this[this.operationMap[e]](row);
+    },
 
-    
-             
-                scrollHandle(e){
-         
-      console.log(e,1111);
-        },
-   
+    scrollHandle(e) {
+      console.log(e, 1111);
+    },
 
     /* 
         function: formatTypeId
@@ -894,21 +1001,19 @@ export default {
         params: index,row | default
         desc: 删除操作时的回调
     */
-    async handleDelete(row) {
-      try {
-        this.$message.success("删除成功");
-        let result = await this.$api({
+    handleDelete(row) {
+      this.showConfrimDel = true;
+      this.delId = row.member_id;
+      //this.$message.success("删除成功");
+      /*         let result = await this.$api({
           type: "deleteMember",
           data: { member_ids: row.member_id },
         });
         if (result.status == 200) {
           this.$message.success(result.msg ?? "操作成功");
           return;
-        }
-        this.$message.error(result.msg ?? "操作失败");
-      } catch (error) {
-        console.error(error);
-      }
+        } */
+      //this.$message.error(result.msg ?? "操作失败");
     },
 
     /*

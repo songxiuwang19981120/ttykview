@@ -26,7 +26,6 @@
           <el-form-item prop="confirmPassword" label="确认密码 ：">
             <el-input
               style="width: 70%"
-              @blur="confirmPassword"
               v-model="registerForm.isSamePwd"
               placeholder="确认密码"
             ></el-input>
@@ -34,7 +33,7 @@
         </el-form>
         <el-checkbox>勾选并同意<span>《用户服务协议》</span></el-checkbox>
         <div class="register-bottom">
-          <el-button class="register-btn">注册</el-button>
+          <el-button @click="register" class="register-btn">注册</el-button>
           <p>
             已有账号？
             <router-link to="/login" class="color-18A1FF">马上登录</router-link>
@@ -64,8 +63,21 @@ export default {
   mounted() {},
 
   methods: {
-    confirmPassword() {},
+        async regi() {
+      try {
+        this.$refs["loginForm"].validate((valid) => {
+          if (valid) {
+            console.log("登录", this.loginForm);
+          }
+        });
+      } catch (error) {
+        console.error(error)
+        this.$message.error('登陆失败')
+      }
+    },
   },
+   
+  
 };
 </script>
 
