@@ -53,7 +53,9 @@
       >
       <el-button class="base-btn search-btn" @click="RestQuery">重置</el-button>
       <el-button class="base-btn">账号分配</el-button>
-      <el-button class="base-btn">开启一键回关</el-button>
+      <el-button @click="handleFollow" class="base-btn">{{
+        followBtnText
+      }}</el-button>
       <el-button
         class="base-btn"
         style="width: 150px"
@@ -77,6 +79,12 @@
       :page="page"
       :size="limit"
       @pagination="handlePagination"
+    />
+
+    <ConfrimDelDialog
+      :showConfrimDel="showConfrimDel"
+      @handleClose="closeConfrimDel"
+      @handleConfrim="confrimDel"
     />
 
     <EditorDialog
@@ -109,6 +117,8 @@
       :member_ids="member_ids"
       :showBatchEditor="showBatchEditor"
       :editorTota="editorTota"
+      :groupName="groupString"
+      :typeName="classiFication"
     />
     <ReleaseVideoDialog
       :showReleaseVideoDialog="showReleaseVideoDialog"
@@ -126,7 +136,8 @@ import BatchEditorDialog from "./batchEditorDialog/batchEditorDialog";
 import VideoTabel from "./videoTabel/videoTabel";
 import ViewerTabel from "./ViewerLabel/viewerTabel";
 import BatchEditor from "./taskDialog/batchEditor";
-
+import TableOperation from "./tableOperation/operationSelect";
+import ConfrimDelDialog from "./confrimDelDialog/confrimDelDialog";
 export default {
   name: "AccountSituation",
   components: {
@@ -138,8 +149,13 @@ export default {
     ViewerTabel,
     BatchEditor,
     ReleaseVideoDialog,
+    TableOperation,
+    ConfrimDelDialog,
   },
   computed: {
+    followBtnText() {
+      return this.isFollow === true ? "一键回关已开启" : "开启一键回关";
+    },
     batchEditorLength() {
       return this.batchEditorList.length;
     },
@@ -159,25 +175,27 @@ export default {
     },
   },
   watch: {
-    classiFication(newVal) {
-      console.log(newVal);
+    classiFication() {
       let data = {
-        typecontrol_id:
-          this.classiFication[this.classiFication.length - 1] ?? "",
+        typecontrol_id: this.formatTypeId(),
         limit: this.limit,
         page: this.page,
         grouping_id: this.group ?? "",
       };
+      let arr = Object.entries(this.typeList); /* .find((item) => {
+        return item?.[1]?.grouping_id === newVal;
+      }); */
+      console.log(arr);
       this.getMemberList(data);
     },
+
     async group(newVal) {
       let arr = Object.entries(this.groupList).find((item) => {
         return item?.[1]?.grouping_id === newVal;
       });
       this.groupString = arr?.[1]?.grouping_name;
       let data = {
-        typecontrol_id:
-          this.classiFication[this.classiFication.length - 1] ?? "",
+        typecontrol_id: this.formatTypeId(),
         grouping_id: this.group ?? "",
         limit: this.limit ?? 10,
         page: this.page ?? 1,
@@ -195,8 +213,14 @@ export default {
   },
   data() {
     return {
+      showConfrimDel: false,
       showReleaseVideoDialog: false, //控制发布视频dialog展示
       showBatchEditor: false,
+      showEditorDialog: false, //是否展示编辑按钮界面
+      showBatchEiDialog: false, //是否展示批量编辑按钮界面
+      shwoVideoTabel: false, //是否展示视频播放弹窗
+      showViewerTabel: false, //是否展示访问列表表格
+      isFollow: false, //是否开启一键回关
       searchForm: {
         grouping_id: "",
         typecontrol_id: "",
@@ -204,6 +228,24 @@ export default {
         fans: "",
         acc_id: "",
       },
+      operationOption: [
+        {
+          value: "编辑",
+          label: "编辑",
+        },
+        {
+          value: "删除",
+          label: "删除",
+        },
+        {
+          value: "分析",
+          label: "分析",
+        },
+        {
+          value: "发布视频",
+          label: "发布视频",
+        },
+      ],
       accStatusMap: {
         1: "正常",
         0: "封禁",
@@ -296,10 +338,10 @@ export default {
           },
         },
         {
-          prop: "unread_viewer_count" ?? "",
+          prop: "unread_viewer_count",
           label: "主页访问人数",
-
           align: "center",
+          width: "120",
           render: (h, { row }) => {
             return (
               <span
@@ -312,15 +354,39 @@ export default {
           },
         },
         {
-          prop: "follower_status",
-          label: "播放/收藏/转发",
-
+          prop: "following_status",
+          label: "关注",
           align: "center",
           render: (h, { row }) => {
-            return <span>{row.play_num} / 0 / 0</span>;
+            return <span style="font-size: 12px">{row.following_count}</span>;
           },
         },
         {
+          prop: "follower_status",
+          label: "粉丝",
+          align: "center",
+          render: (h, { row }) => {
+            return <span style="font-size: 12px">{row.follower_status}</span>;
+          },
+        },
+        {
+          prop: "total_favorited",
+          label: "获赞",
+          align: "center",
+          render: (h, { row }) => {
+            return <span style="font-size: 12px">{row.total_favorited}</span>;
+          },
+        },
+        {
+          prop: "follower_status",
+          label: "播放/收藏/转发",
+          width: "150",
+          align: "center",
+          render: (h, { row }) => {
+            return <span style="font-size: 12px">{row.play_num} / 0 / 0</span>;
+          },
+        },
+        /*         {
           prop: "following_status,following_count,play_num",
           label: "关注/粉丝/获赞",
           align: "center",
@@ -332,15 +398,29 @@ export default {
               </div>
             );
           },
-        },
+        }, */
         {
           prop: "operation",
           label: "操作",
-          width: "400",
+          width: "200",
           align: "center",
           render: (h, { row }) => {
             return (
-              <div>
+              <div style="display:flex">
+                <TableOperation
+                  style="margin-right:10px"
+                  onsetOperation={this.setOperation.bind(this, row)}
+                />
+                <el-button
+                  size="mini"
+                  type="primary"
+                  onClick={this.handleMonitor.bind(this, row)}
+                >
+                  监控
+                </el-button>
+              </div>
+
+              /* <div>
                 <el-button
                   size="mini"
                   type="primary"
@@ -378,7 +458,7 @@ export default {
                 >
                   发布视频
                 </el-button>
-              </div>
+              </div>  */
             );
           },
         },
@@ -413,10 +493,6 @@ export default {
       groupString: "",
       group: "", //设置分组
       limit: 10, //每页请求数据条数
-      showEditorDialog: false, //是否展示编辑按钮界面
-      showBatchEiDialog: false, //是否展示批量编辑按钮界面
-      shwoVideoTabel: false, //是否展示视频播放弹窗
-      showViewerTabel: false, //是否展示访问列表表格
       user_video_num: 0, //视频数量
       videoList: [], //用户视频列表数据
       vistList: [], //访问列表数据
@@ -429,17 +505,99 @@ export default {
       userIdList: [], //选中用户的UID  组件通信之间会用到
       member_ids: "",
       editorTota: 0,
-      userInfo: "",
+      userInfo: "", //账号信息
+      delId: "", //需要删除账号的ID
+      operationMap: {
+        编辑: "handleEdit",
+        删除: "handleDelete",
+        发布视频: "handleRelease",
+        分析: "handleAnalysis",
+      },
     };
   },
 
   mounted() {
+    const scrollView = document.getElementsByClassName("tt-main");
     this.getMemberList();
-    this.getTypeControlList();
+    /*     this.getTypeControlList(); */
     this.getGroupList();
+    console.log(scrollView);
+    scrollView[0].addEventListener("scroll", this.scrollHandle, true);
   },
-
+  beforeDestroy() {
+    // 获取指定元素
+    const scrollview = document.getElementsByClassName("tt-main");
+    // 移除监听
+    scrollview[0].removeEventListener("scroll", this.scrollHandle, true);
+  },
   methods: {
+    async confrimDel() {
+      try {
+        this.$message.success("操作成功");
+        this.closeConfrimDel();
+        /*         let result = await this.$api({
+          type: "deleteMember",
+          data: { member_ids: this.delId },
+        });
+        if (result.status == 200) {
+          this.$message.success(result.msg ?? "操作成功");
+          this.closeConfrimDel();
+          return;
+        }
+        this.$message.error(result.msg ?? "操作失败"); */
+      } catch (error) {
+        console.error(error);
+        this.$message.error("操作失败");
+      }
+    },
+    /* 
+        function: setOperation
+        params: null
+        desc: 关闭确认删除弹窗
+    */
+    closeConfrimDel() {
+      this.showConfrimDel = false;
+    },
+    /* 
+        function: setOperation
+        params: row | 表格对应行的数据
+                e   | operationMap对应键值
+        desc: 打开相应操作界面
+    */
+    setOperation(row, e) {
+      console.log(5555, e);
+      console.log(this.operationMap[e]);
+      this[this.operationMap[e]](row) && this[this.operationMap[e]](row);
+    },
+
+    scrollHandle(e) {
+      console.log(e, 1111);
+    },
+
+    /* 
+        function: formatTypeId
+        params: null
+        desc: 格式化分类ID
+        return: 格式化之后的分类ID，数组最后一位
+    */
+    formatTypeId() {
+      return this.classiFication[this.classiFication.length - 1] ?? "";
+    },
+    /* 
+        function: handleFollow
+        params: null
+        desc: 一键回关回调
+    */
+    handleFollow() {
+      this.isFollow = !this.isFollow;
+      console.log("一键回关");
+    },
+
+    /* 
+        function: handleAnalysis
+        params: row | 默认值，获取表格行内数据
+        desc: 跳转到账号分析界面
+    */
     handleAnalysis(row) {
       let unique_id = row.unique_id;
       let userInfo = row;
@@ -448,6 +606,11 @@ export default {
         query: { id: unique_id, userInfo: JSON.stringify(userInfo) },
       });
     },
+    /* 
+        function: closeReleaseVideoDialog
+        params: null
+        desc: 关闭发布视频弹窗
+    */
     closeReleaseVideoDialog() {
       this.showReleaseVideoDialog = false;
     },
@@ -469,9 +632,28 @@ export default {
       console.log("监控");
     },
 
+    /* 
+        function: showBatchEditorDialog
+        params: null
+        desc: 打开批量编辑弹窗
+    */
     showBatchEditorDialog() {
+      if (
+        this.group === "" ||
+        this.classiFication.length === 0 ||
+        this.batchEditorList.length === 0
+      ) {
+        this.$message.error("请先选择分组、分类、账号");
+        return false;
+      }
       this.showBatchEditor = true;
     },
+
+    /* 
+        function: closeBatchEditor
+        params: null
+        desc: 关闭批量编辑弹窗
+    */
     closeBatchEditor() {
       this.showBatchEditor = false;
       this.member_ids = "";
@@ -585,16 +767,14 @@ export default {
     */
     async handlerSearch() {
       let data = {
-        typecontrol_id:
-          this.classiFication[this.classiFication.length - 1] ?? "",
+        typecontrol_id: this.formatTypeId(),
         uid: this.acc_id ?? "",
         min: this.fans[0] ?? "",
         max: this.fans[1] ?? "",
         limit: this.limit ?? 10,
         page: this.page ?? 1,
-        grouping_id: this.group ?? '',
+        grouping_id: this.group ?? "",
       };
-      console.log(111);
       let result = await this.$api({
         type: "getMember",
         data: data,
@@ -613,8 +793,7 @@ export default {
       this.limit = val.limit;
       this.page = val.page;
       let data = {
-        typecontrol_id:
-          this.classiFication[this.classiFication.length - 1] ?? "",
+        typecontrol_id: this.formatTypeId(),
         grouping_id: this.group ?? "",
         limit: this.limit ?? 10,
         page: this.page ?? 1,
@@ -642,8 +821,7 @@ export default {
           return false;
         }
         let data = {
-          typecontrol_id:
-            this.classiFication[this.classiFication.length - 1] ?? "",
+          typecontrol_id: this.formatTypeId(),
         };
         let result = await this.$api({ type: "getProjectNum", data: data });
         this.materialTotal = result.data.num ?? 0;
@@ -753,7 +931,6 @@ export default {
       });
       member_id.forEach((item) => {
         this.member_ids += `${item},`;
-        console.log(this.member_ids);
       });
       this.editorTota = this.batchEditorList.length;
     },
@@ -824,21 +1001,19 @@ export default {
         params: index,row | default
         desc: 删除操作时的回调
     */
-    async handleDelete(row) {
-      try {
-        this.$message.success("删除成功");
-        let result = await this.$api({
+    handleDelete(row) {
+      this.showConfrimDel = true;
+      this.delId = row.member_id;
+      //this.$message.success("删除成功");
+      /*         let result = await this.$api({
           type: "deleteMember",
           data: { member_ids: row.member_id },
         });
         if (result.status == 200) {
           this.$message.success(result.msg ?? "操作成功");
           return;
-        }
-        this.$message.error(result.msg ?? "操作失败");
-      } catch (error) {
-        console.error(error);
-      }
+        } */
+      //this.$message.error(result.msg ?? "操作失败");
     },
 
     /*
@@ -881,7 +1056,6 @@ export default {
   margin-bottom: 10px;
   width: 100%;
   height: 60px;
-
 }
 
 .tt-accsituation-searchbar {
