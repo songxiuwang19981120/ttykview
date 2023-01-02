@@ -78,26 +78,6 @@
               notice: "这是紧急事项",
               type: "important",
             },
-            {
-              notice: "这是次要的事项",
-              type: "secondarySty",
-            },
-            {
-              notice: "记得点个赞",
-              type: "important",
-            },
-            {
-              notice: "记得点个赞",
-              type: "important",
-            },
-            {
-              notice: "记得点个赞",
-              type: "important",
-            },
-            {
-              notice: "记得点个赞",
-              type: "important",
-            },
           ],
         },
         {
