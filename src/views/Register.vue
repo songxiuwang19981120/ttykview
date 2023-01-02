@@ -4,6 +4,7 @@
       <el-card class="register-card">
         <h1 class="register-title">TT云控系统</h1>
         <el-form
+          ref="registerForm"
           :rules="rules"
           :model="registerForm"
           label-position="left"
@@ -23,7 +24,7 @@
               placeholder="设置密码"
             ></el-input>
           </el-form-item>
-          <el-form-item prop="confirmPassword" label="确认密码 ：">
+          <el-form-item prop="isSamePwd" label="确认密码 ：">
             <el-input
               style="width: 70%"
               v-model="registerForm.isSamePwd"
@@ -31,13 +32,17 @@
             ></el-input>
           </el-form-item>
         </el-form>
-        <el-checkbox>勾选并同意<span>《用户服务协议》</span></el-checkbox>
-        <div class="register-bottom">
-          <el-button @click="register" class="register-btn">注册</el-button>
-          <p>
+
+        <div class="flex-jus-space-bet">
+          <el-checkbox>勾选并同意<span>《用户服务协议》</span></el-checkbox>
+          <p class="fz-14">
             已有账号？
             <router-link to="/login" class="color-18A1FF">马上登录</router-link>
           </p>
+        </div>
+
+        <div class="register-bottom">
+          <el-button @click="register" class="register-btn">注册</el-button>
         </div>
       </el-card>
     </div>
@@ -63,21 +68,23 @@ export default {
   mounted() {},
 
   methods: {
-        async regi() {
+    async register() {
       try {
-        this.$refs["loginForm"].validate((valid) => {
+        if (this.registerForm.password !== this.registerForm.isSamePwd) {
+          this.$message.error("两次密码输入不一致，请重新输入");
+          return false;
+        }
+        this.$refs["registerForm"].validate((valid) => {
           if (valid) {
-            console.log("登录", this.loginForm);
+            console.log("注册", this.registerForm);
           }
         });
       } catch (error) {
-        console.error(error)
-        this.$message.error('登陆失败')
+        console.error(error);
+        this.$message.error("登陆失败");
       }
     },
   },
-   
-  
 };
 </script>
 
@@ -88,6 +95,15 @@ export default {
   width: 100vw;
   height: 100vh;
   background-color: #2d2f33;
+}
+
+.fz-14 {
+  font-size: 14px;
+}
+
+.flex-jus-space-bet {
+  display: flex;
+  justify-content: space-between;
 }
 
 .register-card {

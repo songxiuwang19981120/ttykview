@@ -38,7 +38,7 @@
         </el-select>
       </div>
 
-      <div class="mr-15">
+      <!--       <div class="mr-15">
         <el-select clearable v-model="ascription" placeholder="账号归属">
           <el-option
             v-for="item in ascription_option"
@@ -47,32 +47,66 @@
             :key="item.label"
           ></el-option>
         </el-select>
-      </div>
+      </div> -->
       <el-button class="base-btn search-btn" @click="handlerSearch"
         >搜索</el-button
       >
       <el-button class="base-btn search-btn" @click="RestQuery">重置</el-button>
-      <el-button class="base-btn">账号分配</el-button>
-      <el-button @click="handleFollow" class="base-btn">{{
+      <!-- <el-button class="base-btn">账号分配</el-button> -->
+      <!--       <el-button @click="handleFollow" class="base-btn">{{
         followBtnText
-      }}</el-button>
+      }}</el-button> -->
       <el-button
         class="base-btn"
         style="width: 150px"
         @click="showBatchEditorDialog"
         >编辑选中账号信息</el-button
       >
-      <el-button class="base-btn">一键监控选中账号</el-button>
+      <!-- <el-button class="base-btn">一键监控选中账号</el-button> -->
     </div>
 
-    <table-custom
-      class="tt-accsituation--tabel"
-      :mutiSelect="true"
-      @handleSelectionChange="handleSelectChange"
-      :loading="loading"
-      :tableData="memberList"
-      :columns="columns"
-    ></table-custom>
+    <div class="tt-accsituation-main">
+      <div class="flex-jus-spacebet pad-0-20">
+        <div class="flex-jus-spacebet">
+          <p class="mr-30">共{{ tota }}个账号</p>
+          <p class="mr-30">已选择{{}}个账号</p>
+          <el-checkbox>选择所有账号</el-checkbox>          
+        </div>
+
+        <div>
+          <el-select style="width:100px"  v-model="sortQuery">
+            <el-option
+              v-for="item in sortQueryOption"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>
+
+          <el-select style="width:100px" class="ml-15" v-model="sortWay">
+            <el-option
+              v-for="item in sortOption"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>
+
+          <el-button class="ml-15">查 看</el-button>
+        </div>
+      </div>
+
+      <table-custom
+        class="tt-accsituation--tabel"
+        :mutiSelect="true"
+        @handleSelectionChange="handleSelectChange"
+        :loading="loading"
+        :tableData="memberList"
+        :columns="columns"
+      ></table-custom>
+    </div>
 
     <Pagination
       :total="total"
@@ -221,6 +255,8 @@ export default {
       shwoVideoTabel: false, //是否展示视频播放弹窗
       showViewerTabel: false, //是否展示访问列表表格
       isFollow: false, //是否开启一键回关
+      sortQuery: "粉丝", //排序字段
+      sortWay:"升序",//排序方式
       searchForm: {
         grouping_id: "",
         typecontrol_id: "",
@@ -228,6 +264,34 @@ export default {
         fans: "",
         acc_id: "",
       },
+      sortOption: [
+        {
+          value: "升序",
+          label: "升序",
+        },
+        {
+          value: "降序",
+          label: "降序",
+        },
+      ],
+      sortQueryOption: [
+        {
+          value: "粉丝",
+          label: "粉丝",
+        },
+        {
+          value: "访问人数",
+          label: "访问人数",
+        },
+        {
+          value: "关注",
+          label: "关注",
+        },
+        {
+          value: "获赞",
+          label: "获赞",
+        },
+      ],
       operationOption: [
         {
           value: "编辑",
@@ -278,8 +342,8 @@ export default {
                   ></el-image>
                 </a>
                 <div>
-                  <p>{row.nickname}</p>
-                  <p>ID ：{row.unique_id}</p>
+                  <p style="font-size: 14px">{row.nickname}</p>
+                  <p style="font-size: 12px">ID ：{row.unique_id}</p>
                   <el-tooltip content="Top center" placement="right-start">
                     <div slot="content">
                       账号归属：
@@ -306,7 +370,9 @@ export default {
           width: "100",
           align: "center",
           render: (h, { row }) => {
-            return <div>{this.accStatusMap[row.status]}</div>;
+            return (
+              <div style="font-size: 12px">{this.accStatusMap[row.status]}</div>
+            );
           },
         },
         {
@@ -316,7 +382,9 @@ export default {
           render: (h, { row }) => {
             return (
               <el-tooltip content={row.signature} placement="top">
-                <p>{row.signature.substring(0, 10) + "..."}</p>
+                <p style="font-size: 12px">
+                  {row.signature.substring(0, 10) + "..."}
+                </p>
               </el-tooltip>
             );
           },
@@ -329,7 +397,7 @@ export default {
           render: (h, { row }) => {
             return (
               <span
-                style="cursor: pointer"
+                style="cursor: pointer;font-size: 12px"
                 onClick={this.showVideoTabel.bind(this, row)}
               >
                 {row.aweme_count}
@@ -345,7 +413,7 @@ export default {
           render: (h, { row }) => {
             return (
               <span
-                style="cursor: pointer"
+                style="cursor: pointer; font-size:12px"
                 onClick={this.toogleViewerTabel.bind(this, row)}
               >
                 {row.unread_viewer_count}
@@ -1099,6 +1167,15 @@ export default {
   width: 150px;
 }
 
+.flex-jus-spacebet {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pad-0-20 {
+  padding: 0 20px;
+}
+
 .ml-15 {
   margin-left: 15px;
 }
@@ -1113,6 +1190,14 @@ export default {
 
 .ml-50 {
   margin-left: 50px;
+}
+
+.fz-12 {
+  font-size: 12px;
+}
+
+.fz-14 {
+  font-size: 14px;
 }
 
 .searchbtn-group {
@@ -1136,6 +1221,11 @@ export default {
   border-radius: 8px;
 }
 
+.tt-accsituation-main{
+  padding-top: 30px;
+  background-color: #fff;
+}
+
 .topsearch-right {
   margin-left: 10px;
 }
@@ -1150,6 +1240,5 @@ export default {
   height: 80px;
   background-color: #ffdda5;
 }
-.table-avatar {
-}
+
 </style>

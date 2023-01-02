@@ -9,7 +9,7 @@ export default {
         { required: true, message: '密码必填', trigger: 'blur' },
         { pattern: /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/, message: '密码格式 6-21位数字字母组合', trigger: 'blur' }
     ],
-    confirmPassword: [
+    isSamePwd: [
         { required: true, message: '请确认密码', trigger: 'blur' },
     ],
     authCode: [
