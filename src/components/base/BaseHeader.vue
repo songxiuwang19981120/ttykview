@@ -6,6 +6,7 @@
       <el-image class="ml-12 tt-avatar-img" :src="src" fit="cover"></el-image>
       <p class="fz-14 tt-header-name">东燊网络</p>
       <svg
+        @click="logout"
         t="1672657190113"
         class="tt-header--logout"
         viewBox="0 0 1024 1024"
@@ -39,6 +40,7 @@ export default {
 
   methods: {
     logout() {
+      this.$message.success('退出登录')
       console.log("退出登录");
     },
   },

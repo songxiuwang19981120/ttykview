@@ -44,5 +44,5 @@ export default {
 
 <style lang="stylus" scoped>
 .deldialog-desc
-    font-size 20px
+    font-size 16px
 </style>

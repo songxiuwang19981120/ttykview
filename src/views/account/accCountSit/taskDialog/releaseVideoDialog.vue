@@ -3,7 +3,7 @@
     <el-dialog
       :visible="showReleaseVideoDialog"
       :before-close="handlerClose"
-      width="30%"
+      width="40%"
     >
       <span slot="title">
         <h1>上传视频</h1>
@@ -131,6 +131,9 @@ export default {
       this.resetForm();
     },
     handlerConfrim() {
+      this.$message.success('上传成功')
+      this.resetForm()
+      this.handlerClose()
       console.log("提交", this.releaseVideoForm);
     },
     resetForm() {
@@ -141,7 +144,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.upload-demo {
-  width: 70%;
+::v-deep .el-upload-dragger {
+  width: 300px;
 }
 </style>

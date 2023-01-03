@@ -3,10 +3,12 @@
     <div class="tt-accsituation--top">
       <div class="mr-15">
         <el-select
+          size="medium"
           ref="gropuSelect"
           clearable
           v-model="group"
           placeholder="设置分组"
+          @change="setLocalGroup"
         >
           <el-option
             v-for="item in groupList"
@@ -19,6 +21,8 @@
 
       <div class="mr-15">
         <el-cascader
+          size="medium"
+          @change="setLocalType"
           clearable
           :props="{ checkStrictly: true, value: 'value' }"
           :options="typeList"
@@ -28,7 +32,13 @@
       </div>
 
       <div class="mr-15">
-        <el-select clearable v-model="fans" placeholder="粉丝量">
+        <el-select
+          size="medium"
+          @change="setLocalFans"
+          clearable
+          v-model="fans"
+          placeholder="粉丝量"
+        >
           <el-option
             v-for="item in fans_option"
             :value="item.value"
@@ -48,15 +58,21 @@
           ></el-option>
         </el-select>
       </div> -->
-      <el-button class="base-btn search-btn" @click="handlerSearch"
+      <el-button
+        size="medium"
+        class="base-btn search-btn"
+        @click="handlerSearch"
         >搜索</el-button
       >
-      <el-button class="base-btn search-btn" @click="RestQuery">重置</el-button>
+      <el-button size="medium" class="base-btn search-btn" @click="RestQuery"
+        >重置</el-button
+      >
       <!-- <el-button class="base-btn">账号分配</el-button> -->
       <!--       <el-button @click="handleFollow" class="base-btn">{{
         followBtnText
       }}</el-button> -->
       <el-button
+        size="medium"
         class="base-btn"
         style="width: 150px"
         @click="showBatchEditorDialog"
@@ -66,39 +82,69 @@
     </div>
 
     <div class="tt-accsituation-main">
-      <div class="flex-jus-spacebet pad-0-20">
+      <div style="height: 40px" class="flex-jus-spacebet pad-0-20">
         <div class="flex-jus-spacebet">
-          <p class="mr-30">共{{ tota }}个账号</p>
-          <p class="mr-30">已选择{{}}个账号</p>
-          <el-checkbox>选择所有账号</el-checkbox>          
+          <p class="mr-30 fz-14">共{{ total }}个账号</p>
+          <p class="mr-30 fz-14" style="color: #ff411f">
+            已选择{{ accTotal }}个账号
+          </p>
         </div>
 
-        <div>
-          <el-select style="width:100px"  v-model="sortQuery">
-            <el-option
-              v-for="item in sortQueryOption"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
-            </el-option>
-          </el-select>
+        <div style="width: 50%" class="flex-jus-spacebet">
+          <div class="search-input-wrap flex-jus-spacebet">
+            <el-input
+              size="medium"
+              clearable
+              class="search-uid--input mr-30"
+              v-model="accUid"
+              placeholder="请输入账号UID"
+            ></el-input>
+            <el-button size="medium" @click="searchUid">搜索</el-button>
+          </div>
 
-          <el-select style="width:100px" class="ml-15" v-model="sortWay">
-            <el-option
-              v-for="item in sortOption"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+          <div>
+            <el-select
+              size="medium"
+              style="width: 110px"
+              v-model="sortQuery"
+              clearable
+              placeholder="粉丝"
             >
-            </el-option>
-          </el-select>
+              <el-option
+                v-for="item in sortQueryOption"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
 
-          <el-button class="ml-15">查 看</el-button>
+            <el-select
+              size="medium"
+              clearable
+              style="width: 100px"
+              class="ml-15"
+              placeholder="升序"
+              v-model="sortWay"
+            >
+              <el-option
+                v-for="item in sortOption"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+
+            <el-button size="medium" @click="handleSort" class="ml-15"
+              >查 看</el-button
+            >
+          </div>
         </div>
       </div>
 
       <table-custom
+        ref="multipleTable"
         class="tt-accsituation--tabel"
         :mutiSelect="true"
         @handleSelectionChange="handleSelectChange"
@@ -111,6 +157,7 @@
     <Pagination
       :total="total"
       :page="page"
+      :limit="limit"
       :size="limit"
       @pagination="handlePagination"
     />
@@ -162,6 +209,7 @@
 </template>
 
 <script>
+import store from "store";
 import tableCustom from "@/components/myComponent/table/tableCustom";
 import Pagination from "@/components/myComponent/table/pagination";
 import EditorDialog from "./editoDialog/editorDialog";
@@ -187,57 +235,49 @@ export default {
     ConfrimDelDialog,
   },
   computed: {
-    followBtnText() {
-      return this.isFollow === true ? "一键回关已开启" : "开启一键回关";
-    },
     batchEditorLength() {
       return this.batchEditorList.length;
     },
     accTotal() {
-      return this.check_all === "true" ? 100 : 0;
-    },
-    isTaskConfigDisabled() {
-      return (
-        this.classiFication.length === 0 || this.batchEditorList.length === 0
-      );
-    },
-    typeSelectPlaceholder() {
-      return this.group === "" ? "请先选择分组" : "选择分类";
-    },
-    isTypeSelectDis() {
-      return this.group === "";
+      return this.check_all === true ? this.total : this.editorTota;
     },
   },
   watch: {
-    classiFication() {
+    page(newVal) {
+      store.set("page", newVal);
+    },
+    limit(newVal) {
+      store.set("limit", newVal);
+    },
+    /*     classiFication() {
       let data = {
         typecontrol_id: this.formatTypeId(),
         limit: this.limit,
         page: this.page,
         grouping_id: this.group ?? "",
       };
-      let arr = Object.entries(this.typeList); /* .find((item) => {
+      let arr = Object.entries(this.typeList);  .find((item) => {
         return item?.[1]?.grouping_id === newVal;
-      }); */
+      }); 
       console.log(arr);
       this.getMemberList(data);
     },
-
+ */
     async group(newVal) {
       let arr = Object.entries(this.groupList).find((item) => {
         return item?.[1]?.grouping_id === newVal;
       });
       this.groupString = arr?.[1]?.grouping_name;
-      let data = {
+      /*       let data = {
         typecontrol_id: this.formatTypeId(),
         grouping_id: this.group ?? "",
         limit: this.limit ?? 10,
         page: this.page ?? 1,
-      };
+      }; */
       let searchTypeData = {
         grouping_id: this.group,
       };
-      this.getMemberList(data);
+      //this.getMemberList(data);
       let result = await this.$api({
         type: "getTypecontrol",
         data: searchTypeData,
@@ -247,6 +287,7 @@ export default {
   },
   data() {
     return {
+      accUid: "", //账号UID
       showConfrimDel: false,
       showReleaseVideoDialog: false, //控制发布视频dialog展示
       showBatchEditor: false,
@@ -255,8 +296,8 @@ export default {
       shwoVideoTabel: false, //是否展示视频播放弹窗
       showViewerTabel: false, //是否展示访问列表表格
       isFollow: false, //是否开启一键回关
-      sortQuery: "粉丝", //排序字段
-      sortWay:"升序",//排序方式
+      sortQuery: "", //排序字段
+      sortWay: "", //排序方式
       searchForm: {
         grouping_id: "",
         typecontrol_id: "",
@@ -266,29 +307,29 @@ export default {
       },
       sortOption: [
         {
-          value: "升序",
+          value: "0",
           label: "升序",
         },
         {
-          value: "降序",
+          value: "1",
           label: "降序",
         },
       ],
       sortQueryOption: [
         {
-          value: "粉丝",
+          value: "0",
           label: "粉丝",
         },
         {
-          value: "访问人数",
+          value: "1",
           label: "访问人数",
         },
         {
-          value: "关注",
+          value: "2",
           label: "关注",
         },
         {
-          value: "获赞",
+          value: "3",
           label: "获赞",
         },
       ],
@@ -342,8 +383,8 @@ export default {
                   ></el-image>
                 </a>
                 <div>
-                  <p style="font-size: 14px">{row.nickname}</p>
-                  <p style="font-size: 12px">ID ：{row.unique_id}</p>
+                  <p style="font-size: 14px;">{row.nickname}</p>
+                  <p style="font-size: 12px">ID ：{row.uid}</p>
                   <el-tooltip content="Top center" placement="right-start">
                     <div slot="content">
                       账号归属：
@@ -355,7 +396,7 @@ export default {
                       备份名称：
                       <br />
                     </div>
-                    <span style="display: inline-block; background-color: #FFDDA5">
+                    <span style="display: inline-block; background-color: #FFDDA5; font-size:12px; border-radius: 4px">
                       设备信息
                     </span>
                   </el-tooltip>
@@ -411,9 +452,15 @@ export default {
           align: "center",
           width: "120",
           render: (h, { row }) => {
+            let colorRed = "";
+            if (this.sortQuery == 1) {
+              colorRed = ";color:red";
+            } else {
+              colorRed = "";
+            }
             return (
               <span
-                style="cursor: pointer; font-size:12px"
+                style={"font-size: 12px" + colorRed}
                 onClick={this.toogleViewerTabel.bind(this, row)}
               >
                 {row.unread_viewer_count}
@@ -426,7 +473,17 @@ export default {
           label: "关注",
           align: "center",
           render: (h, { row }) => {
-            return <span style="font-size: 12px">{row.following_count}</span>;
+            let colorRed = "";
+            if (this.sortQuery == 2) {
+              colorRed = ";color:red";
+            } else {
+              colorRed = "";
+            }
+            return (
+              <span style={"font-size: 12px" + colorRed}>
+                {row.following_count}
+              </span>
+            );
           },
         },
         {
@@ -434,7 +491,17 @@ export default {
           label: "粉丝",
           align: "center",
           render: (h, { row }) => {
-            return <span style="font-size: 12px">{row.follower_status}</span>;
+            let colorRed = "";
+            if (this.sortQuery === "0") {
+              colorRed = ";color:red";
+            } else {
+              colorRed = "";
+            }
+            return (
+              <span style={"font-size: 12px" + colorRed}>
+                {row.follower_status}
+              </span>
+            );
           },
         },
         {
@@ -442,7 +509,17 @@ export default {
           label: "获赞",
           align: "center",
           render: (h, { row }) => {
-            return <span style="font-size: 12px">{row.total_favorited}</span>;
+            let colorRed = "";
+            if (this.sortQuery == 3) {
+              colorRed = ";color:red";
+            } else {
+              colorRed = "";
+            }
+            return (
+              <span style={"font-size: 12px" + colorRed}>
+                {row.total_favorited}
+              </span>
+            );
           },
         },
         {
@@ -472,6 +549,7 @@ export default {
           label: "操作",
           width: "200",
           align: "center",
+          fixed: "right",
           render: (h, { row }) => {
             return (
               <div style="display:flex">
@@ -479,13 +557,11 @@ export default {
                   style="margin-right:10px"
                   onsetOperation={this.setOperation.bind(this, row)}
                 />
-                <el-button
-                  size="mini"
-                  type="primary"
+                <el-image
+                  style="width: 40px;height: 30px"
+                  src={require("../../../assets/video.png")}
                   onClick={this.handleMonitor.bind(this, row)}
-                >
-                  监控
-                </el-button>
+                ></el-image>
               </div>
 
               /* <div>
@@ -538,11 +614,22 @@ export default {
         { value: "2", label: "李四" },
         { value: "3", label: "王五" },
       ],
+      fansMap: {
+        '1000': "小于1K",
+        "1000,5000": "1k-5k",
+        "5000,10000": "5k-10k",
+        "10000,50000": "10k-50k",
+        "0,50000": "大于50k",
+        "0,100000": "不限",
+      },
+
       fans_option: [
         //粉丝量下拉框options  TODO 数据可能要问后端拿，目前写死了
-        { value: [1000, 2000], label: "1k-2k" },
-        { value: [1000, 2000], label: "2k-9k" },
-        { value: [1000, 2000], label: "9k-10k" },
+        { value: [1000], label: "小于1K" },
+        { value: [1000, 5000], label: "1k-5k" },
+        { value: [5000, 10000], label: "5k-10k" },
+        { value: [10000, 50000], label: "10k-50k" },
+        { value: [0, 50000], label: "大于50k" },
       ],
       fans: "", //粉丝量查询框对应 model
       page: 1, //页码
@@ -581,24 +668,99 @@ export default {
         发布视频: "handleRelease",
         分析: "handleAnalysis",
       },
+      min: "",
+      max: "",
     };
   },
 
   mounted() {
-    const scrollView = document.getElementsByClassName("tt-main");
-    this.getMemberList();
+    // this.getMemberList();
     /*     this.getTypeControlList(); */
     this.getGroupList();
-    console.log(scrollView);
-    scrollView[0].addEventListener("scroll", this.scrollHandle, true);
+    this.initInterface();
   },
-  beforeDestroy() {
-    // 获取指定元素
-    const scrollview = document.getElementsByClassName("tt-main");
-    // 移除监听
-    scrollview[0].removeEventListener("scroll", this.scrollHandle, true);
-  },
+
   methods: {
+    async initInterface() {
+      this.page = store.get("page") ?? 1;
+      this.limit = store.get("limit") ?? 10;
+      let group = store.get("group") ?? "";
+      let typecontrol_id = store.get("typecontrol_id") ?? "";
+      let fans = store.get("fans") ?? "";
+      if (fans !== "") {
+        this.fans = fans;
+        fans = Object.entries(this.fansMap)
+          .find((item) => {
+            return item[1] == fans;
+          })[0]
+          .split(",");
+        this.min = fans[0] ?? "";
+        this.max = fans[1] ?? "";
+      }
+      this.group = group;
+      this.classiFication = typecontrol_id;
+      let data = {
+        min: this.min ?? "",
+        max: this.max ?? "",
+        typecontrol_id: this.classiFication ?? "",
+        grouping_id: this.group ?? "",
+        limit: this.limit ?? 10,
+        page: this.page ?? 1,
+      };
+      let result = await this.getMemberList(data);
+      console.log(result, "初始化");
+    },
+
+    setLocalGroup() {
+      store.set("group", this.group);
+      console.log("存储分组");
+    },
+
+    setLocalFans() {
+      console.log(this.fans.toString());
+      let fans = this.fansMap[this.fans.toString()];
+
+      store.set("fans", fans);
+    },
+
+    setLocalType() {
+      let typecontrol_id = this.formatTypeId();
+      store.set("typecontrol_id", typecontrol_id);
+      console.log("存储分类");
+    },
+
+    async searchUid() {
+      if (this.accUid === "") {
+        this.$message.error("请先填写UID");
+        return;
+      }
+      let data = { uid: this.accUid };
+      let result = await this.$api({
+        type: "getMember",
+        data: data,
+      });
+      if (result.status == 200) {
+        this.$message.success("查询成功");
+        this.memberList = result?.data?.list ?? [];
+        this.total = result?.data?.count ?? 0;
+        return;
+      }
+      this.$message.error(result?.msg ?? "查询失败");
+    },
+
+    handleSort() {
+      if (this.sortQuery === "" || this.sortWay === "") {
+        this.$message.error("排序字段或排序方式未选");
+        return;
+      }
+      this.$message.success("查询成功");
+      let data = {
+        sortQuery: this.sortQuery,
+        sortWay: this.sortWay,
+      };
+      console.log("查看", data);
+    },
+
     async confrimDel() {
       try {
         this.$message.success("操作成功");
@@ -619,7 +781,7 @@ export default {
       }
     },
     /* 
-        function: setOperation
+        function: closeConfrimDel
         params: null
         desc: 关闭确认删除弹窗
     */
@@ -634,6 +796,9 @@ export default {
     */
     setOperation(row, e) {
       console.log(5555, e);
+      if (e === "") {
+        return false;
+      }
       console.log(this.operationMap[e]);
       this[this.operationMap[e]](row) && this[this.operationMap[e]](row);
     },
@@ -696,8 +861,10 @@ export default {
         params: null
         desc: 单账号监控回调
     */
-    handleMonitor() {
-      console.log("监控");
+    handleMonitor(e, row) {
+      row.path[0].src = require("../../../assets/video-red.png");
+      //row.path[0].style.color = 'red'
+      console.log("监控", e, row.path[0].src);
     },
 
     /* 
@@ -746,6 +913,11 @@ export default {
       this.fans = "";
       this.searchForm.grouping_id = "";
       this.group = "";
+      store.remove('page')
+      store.remove('limit')
+      store.remove('group')
+      store.remove('typecontrol_id')
+      store.remove('fans')
       this.getMemberList();
       this.$message.success("重置成功");
     },
@@ -834,22 +1006,34 @@ export default {
         desc: 搜索按钮回调
     */
     async handlerSearch() {
-      let data = {
-        typecontrol_id: this.formatTypeId(),
-        uid: this.acc_id ?? "",
-        min: this.fans[0] ?? "",
-        max: this.fans[1] ?? "",
-        limit: this.limit ?? 10,
-        page: this.page ?? 1,
-        grouping_id: this.group ?? "",
-      };
-      let result = await this.$api({
-        type: "getMember",
-        data: data,
-      });
-      console.log(result);
-      this.memberList = result?.data?.list ?? [];
-      this.total = result?.data?.count ?? 0;
+      try {
+        this.loading = true;
+        let data = {
+          typecontrol_id: this.formatTypeId(),
+          uid: this.acc_id ?? "",
+          min: this.fans[0] ?? "",
+          max: this.fans[1] ?? "",
+          limit: this.limit ?? 10,
+          page: this.page ?? 1,
+          grouping_id: this.group ?? "",
+        };
+        let result = await this.$api({
+          type: "getMember",
+          data: data,
+        });
+        if (result.status == 200) {
+          this.memberList = result?.data?.list ?? [];
+          this.total = result?.data?.count ?? 0;
+          this.loading = false;
+          this.$message.success("搜索成功");
+          return;
+        }
+        this.loading = false;
+        this.$message.error("搜索失败");
+      } catch (error) {
+        this.loading = false;
+        console.error(error);
+      }
     },
 
     /* 
@@ -990,7 +1174,6 @@ export default {
     handleSelectChange(val) {
       this.member_ids = "";
       this.batchEditorList = val;
-      val.length === 100 ? (this.check_all = true) : (this.check_all = false);
       this.userIdList = this.batchEditorList.map((item) => {
         return item.uid;
       });
@@ -1046,6 +1229,7 @@ export default {
           type: "getMember",
           data: data,
         });
+        console.log(result);
         this.memberList = result.data.list;
         this.total = result.data.count;
         this.loading = false;
@@ -1111,6 +1295,10 @@ export default {
   background-color: $button-back-color;
   border-color: $button-bord-color;
   color: #fff;
+}
+
+.color-red {
+  color: red;
 }
 
 .tt-accsituation-searchForm {
@@ -1221,7 +1409,7 @@ export default {
   border-radius: 8px;
 }
 
-.tt-accsituation-main{
+.tt-accsituation-main {
   padding-top: 30px;
   background-color: #fff;
 }
@@ -1241,4 +1429,15 @@ export default {
   background-color: #ffdda5;
 }
 
+.search-uid--input {
+  padding-left: 10px;
+  border-radius: 10px;
+}
+
+.el-icon-search {
+  z-index: 1;
+
+  left: 10px;
+  top: 10px;
+}
 </style>
