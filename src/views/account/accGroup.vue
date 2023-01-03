@@ -238,7 +238,6 @@ export default {
         //多选事件
         selectionChange(val){
             this.delete_checkbox=[]
-      
             val.forEach(item => {
                this.delete_checkbox.push(item.grouping_id)
             });
