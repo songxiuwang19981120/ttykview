@@ -42,7 +42,7 @@
 
 
 
-        <table-custom style="width:100%" :mutiSelect="true" @handleSelectionChange="selectionChange" :tableData="tableData" :columns="columns"></table-custom>
+        <table-custom height="600" style="width:100%" :mutiSelect="true" @handleSelectionChange="selectionChange" :tableData="tableData" :columns="columns"></table-custom>
         <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination">
         </pagination>
     </div>

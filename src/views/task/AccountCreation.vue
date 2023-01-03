@@ -41,7 +41,7 @@
             </div>
            
         </div>
-        <table-custom :stripe="stripe" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+        <table-custom height="600" :stripe="stripe" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
         <el-dialog title="创建账号详情" :visible.sync="dialogCreation">
             <table-custom :stripe="stripe" :loading="loading" :tableData="dialogTableData" :columns="dialogColumns"></table-custom>
         </el-dialog>

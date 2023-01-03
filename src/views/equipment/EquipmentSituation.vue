@@ -90,7 +90,7 @@
         <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
       </div>
     </el-dialog>
-    <table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns" @handleSelectionChange="selectionChange"></table-custom>
+    <table-custom height="600" :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns" @handleSelectionChange="selectionChange"></table-custom>
     <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination">
     </pagination>
   </div>
@@ -351,6 +351,13 @@ export default {
       //表格的
       loading: false, //表格加载loading
       tableData: [
+        { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: 2, abnor: "123", tateKey: "123" },
+        { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: 2, abnor: "123", tateKey: "123" },
+        { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: 2, abnor: "123", tateKey: "123" },
+        { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: 2, abnor: "123", tateKey: "123" },
+        { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: 2, abnor: "123", tateKey: "123" },
+        { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: 2, abnor: "123", tateKey: "123" },
+        { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: 2, abnor: "123", tateKey: "123" },
         { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: 2, abnor: "123", tateKey: "123" },
         { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: 2, abnor: "123", tateKey: "123" },
         { num: "123", ch: "中国", stat: "https://avatars.githubusercontent.com/u/115990494?s=48&v=4", gross: 200000, abnor: "123", tateKey: "123" },],  //表格数据

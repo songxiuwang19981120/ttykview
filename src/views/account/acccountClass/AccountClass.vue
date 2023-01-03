@@ -24,9 +24,9 @@
     </div>
     <!-- 新增按钮 -->
     <!-- 新增弹窗 -->
-    <el-dialog title="新增" :visible.sync="dialogNewVisible" width="30%" :before-close="closeadd">
+    <el-dialog title="新增分类" :visible.sync="dialogNewVisible" width="600px" :before-close="closeadd">
       <el-form ref="form" :rules="rules" :model="formNew" label-width="140px">
-        <el-form-item label="账号分组选择:" prop="equipment">
+        <el-form-item label="选择账号分组:" prop="equipment">
           <el-select v-model="formNew.equipment" placeholder="账号分组选择" style="margin-right: 20px;width:200px"
             @change="getEquipmentGroupAdd">
             <el-option v-for="item in searchEquipmentList" :key="item.grouping_id" :label="item.grouping_name"
@@ -34,10 +34,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="新增分类名称:" prop="name">
-          <el-input v-model="formNew.name" style="width:200px" placeholder="新增分类名称"></el-input>
-        </el-form-item>
-        <el-form-item label="账号分类选择:">
+        <el-form-item label="选择账号分类:" prop="group">
           <el-cascader :disabled="disabled" :options="options_tw" :props="defaultPropsa" v-model="formNew.group"
             @change="menuchange" style="width:200px"><template slot-scope="{ node, data }">
               <span>
@@ -46,9 +43,12 @@
               </span>
             </template>
           </el-cascader>
-          <span @click="addlis()">
-            <el-checkbox style="margin-left:20px" v-model="checked">是否添加根目录分组</el-checkbox>
+          <span @click="addlis">
+            <el-checkbox style="margin-left:20px" v-model="checked">添加为一级分类</el-checkbox>
           </span>
+        </el-form-item>
+        <el-form-item label="新增分类名称:" prop="name">
+          <el-input v-model="formNew.name" style="width:200px" placeholder="新增分类名称"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -58,7 +58,7 @@
     </el-dialog>
 
     <!-- 表格 -->
-    <tableCustom style="width: 100%;border-radius: 8px" :tableData="tableData_tw_t" :columns="columns" :load="load">
+    <tableCustom height="600" :tableData="tableData_tw_t" :columns="columns" :load="load">
     </tableCustom>
     <el-dialog title="编辑" :visible.sync="dialogFormVisible">
       <el-form :model="form">
@@ -251,11 +251,13 @@ export default {
     },
     //是否根目录
     addlis() {
-      this.formNew.group = "";
       if (this.checked == true) {
+        this.formNew.group = "";
+        this.rules.group= [{ required: true, message: '请选择账号分类', trigger: 'blur' }]
         this.disabled = false;
         this.pid = 0
       } else {
+        this.rules.group=[]
         this.disabled = true;
       }
     },
@@ -305,15 +307,8 @@ export default {
         this.submitting = false;
         if (result.status == '200') {
           this.Typecontrol()
-          this.options_tw = []
-          this.dialogNewVisible = false
-          this.checked = false;
-          this.disabled = false;
-          this.formNew.equipment = ""
-          this.formNew.group = ""
-          this.formNew.name = ""
-          this.pid = ""
           this.$message.success('新增成功');
+          this.closeadd()
         }
         else {
           this.$message.error(result.msg)
@@ -323,6 +318,8 @@ export default {
       }
     },
     closeadd() {
+      this.$refs.form.resetFields();
+      this.rules.group= [{ required: true, message: '请选择账号分类', trigger: 'blur' }]
       this.options_tw = []
       this.dialogNewVisible = false
       this.searchTableData1.equipment = ""

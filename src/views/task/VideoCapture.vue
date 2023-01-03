@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
+        <table-custom height="600" :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
             @handleSelectionChange="selectionChange"></table-custom>
         <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination">
         </pagination>

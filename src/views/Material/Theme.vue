@@ -25,7 +25,7 @@
 				</div>
 			</div>
 		</div>
-		<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+		<table-custom height="600" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 
 		<el-dialog title="编辑" :visible="contentVisibleUpdate" @close="exitCancel" width="50%" style="margin-top:20px">
 			<el-form :model="ruleForm" ref="ruleForm" :rules="exitRules" label-width="120px">
