@@ -3,7 +3,7 @@
     <div class="tt-accsituation">
       <div class="tt-accsituation--operation">
         <div style="margin-right: 20px">
-          <el-select v-model="page.status" placeholder="请选择任务状态">
+          <el-select v-model="page.status" placeholder="请选择任务状态" size="medium">
             <el-option
               v-for="item in searchStateList"
               :key="item.value"
@@ -13,6 +13,7 @@
             </el-option>
           </el-select>
           <el-date-picker
+            size="medium"
             class="date-picker"
             v-model="date"
             type="daterange"
@@ -26,6 +27,7 @@
           </el-date-picker>
         </div>
         <el-button
+         size="medium"
           type="primary"
           class="seachbut"
           :loading="btnloading"
@@ -33,11 +35,12 @@
           
           >{{ btnloading ? "加载中..." : "搜索" }}</el-button
         >
-        <el-button type="primary" class="seachbut" @click="btnReset"
+        <el-button type="primary" size="medium" class="seachbut" @click="btnReset"
           >重置</el-button
         >
         <el-button
           type="primary"
+          size="medium"
           class="seachbut"
           @click="showLikeCommentDialog"
           >点赞任务</el-button
@@ -50,6 +53,7 @@
       :loading="loading"
       :tableData="tableData"
       :columns="columns"
+      height="700"
     ></table-custom>
     <!-- 分页 -->
     <pagination

@@ -1,8 +1,8 @@
 <template>
 	<el-dialog :visible="showdialog" title="权限配置" @close="btnCancel">
 		<el-row type="flex" justify="end">
-			<el-button type="primary" @click="btnOK">确定</el-button>
-			<el-button @click="btnCancel">取消</el-button>
+			<el-button type="primary" size="medium" @click="btnOK">确定</el-button>
+			<el-button @click="btnCancel" size="medium">取消</el-button>
 		</el-row>
 	</el-dialog>
 </template>

@@ -3,25 +3,25 @@
   <el-dialog :visible.sync="uploadShowDialog" title="上传素材" width="60%" :before-close="cancelMaterial">
     <el-form ref="newMaterialform" :rules="newMaterialrules" :model="materialForm" label-width="200px">
       <el-form-item label="ID库:" prop="libraryId">
-        <el-select v-model="materialForm.libraryId" placeholder="请选择ID库名称" style="width:50%" clearable filterable>
+        <el-select v-model="materialForm.libraryId" placeholder="请选择ID库名称" style="width:50%" clearable filterable size="medium">
           <el-option v-for="item in searchIDList" :key="item.libraryid_id" :label="item.name"
             :value="item.libraryid_id"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="已有素材id（一行一个）:">
-        <el-input type="textarea" :autosize="{ minRows: 3, maxRows: 10 }" v-model="materialForm.ids"
+        <el-input type="textarea" :autosize="{ minRows: 3, maxRows: 10 }" v-model="materialForm.ids" size="medium"
           placeholder="请输入已有的素材id，一行一个" style="width:50%"></el-input>
       </el-form-item>
       <el-form-item label="新素材链接：">
-        <el-input v-model="materialForm.link" placeholder="请输入素材链接" style="width:50%;margin-right: 10px;" clearable>
+        <el-input v-model="materialForm.link" placeholder="请输入素材链接" style="width:50%;margin-right: 10px;" clearable size="medium">
         </el-input>
-        <el-button type="primary"  :loading="searchLinking" @click="searchLink">{{ searchLinking ? '搜索中...': '搜 索'}}</el-button>
+        <el-button type="primary" size="medium"  :loading="searchLinking" @click="searchLink">{{ searchLinking ? '搜索中...': '搜 索'}}</el-button>
       </el-form-item>
     </el-form>
-    <table-custom v-if="tableData.length > 0 ? true : false" :tableData="tableData" :columns="columns"></table-custom>
+    <table-custom  v-if="tableData.length > 0 ? true : false"  height="700" :tableData="tableData" :columns="columns"></table-custom>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="cancelMaterial">取 消</el-button>
-      <el-button type="primary" :loading="materialSubmitting" @click="submitMaterial">{{ materialSubmitting ? '提交中...'
+      <el-button size="medium" @click="cancelMaterial">取 消</el-button>
+      <el-button type="primary" size="medium" :loading="materialSubmitting" @click="submitMaterial">{{ materialSubmitting ? '提交中...'
           : '提 交'
       }}</el-button>
     </span>

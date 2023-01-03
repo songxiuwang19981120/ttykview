@@ -4,31 +4,31 @@
       <div class="tt-accsituation--operation">
         <div>
           <el-select v-model="searchTableData.id" placeholder="请选择ID库名称" style="width: 150px; margin-right: 20px"
-            clearable filterable>
+            clearable filterable size="medium">
             <el-option v-for="item in searchIDList" :key="item.libraryid_id" :label="item.name"
               :value="item.name"></el-option>
           </el-select>
         </div>
-        <el-button type="primary" :loading="submitting" @click="searchTable">{{
+        <el-button  type="primary" size="medium" :loading="submitting" @click="searchTable">{{
             submitting ? "搜索中 ..." : "搜索"
         }}</el-button>
-        <el-button type="primary" @click="resetTable">重置</el-button>
-        <el-button type="primary" @click="libraryVisible = true">新增ID库</el-button>
-        <el-button type="primary" @click="uploadMaterialVisible = true">上传素材</el-button>
+        <el-button type="primary" size="medium" @click="resetTable">重置</el-button>
+        <el-button type="primary" size="medium" @click="libraryVisible = true">新增ID库</el-button>
+        <el-button type="primary" size="medium" @click="uploadMaterialVisible = true">上传素材</el-button>
       </div>
     </div>
-    <table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+    <table-custom height="700" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
     <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination"></pagination>
 
     <el-dialog title="新增ID库" :visible.sync="libraryVisible" width="40%" :before-close="cancelLibrary">
       <el-form ref="newlibraryform" :rules="newlibraryrules" :model="libraryForm" label-width="150px">
         <el-form-item label="ID库名称:" prop="name">
-          <el-input v-model="libraryForm.name" placeholder="请输入ID库名称" style="width:50%"></el-input>
+          <el-input v-model="libraryForm.name" placeholder="请输入ID库名称" style="width:50%" size="medium"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="cancelLibrary">取 消</el-button>
-        <el-button type="primary" :loading="librarySubmitting" @click="submitlibrary">{{ librarySubmitting ?
+        <el-button @click="cancelLibrary" size="medium">取 消</el-button>
+        <el-button type="primary" size="medium" :loading="librarySubmitting" @click="submitlibrary">{{ librarySubmitting ?
             '提交中...' : '提 交'
         }}</el-button>
       </span>
@@ -38,12 +38,12 @@
     <el-dialog title="编辑ID库" :visible.sync="editLibraryVisible" width="40%">
       <el-form ref="editLibraryform" :rules="editLibraryrules" :model="editLibraryForm" label-width="150px">
         <el-form-item label="ID库名称:" prop="name">
-          <el-input v-model="editLibraryForm.name" placeholder="请输入ID库名称" style="width:50%"></el-input>
+          <el-input v-model="editLibraryForm.name" placeholder="请输入ID库名称" style="width:50%" size="medium"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="cancelEditLibrary">取 消</el-button>
-        <el-button type="primary" :loading="editLibrarySubmitting" @click="submitEditLibrary">{{ editLibrarySubmitting ?
+        <el-button @click="cancelEditLibrary" size="medium">取 消</el-button>
+        <el-button type="primary" size="medium" :loading="editLibrarySubmitting" @click="submitEditLibrary">{{ editLibrarySubmitting ?
             '提交中...' : '提 交'
         }}</el-button>
       </span>

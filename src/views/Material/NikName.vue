@@ -4,29 +4,29 @@
 			<div class="tt-accsituation--operation">
 				<div>
 					<el-select v-model="searchTableData.equipment" placeholder="账号分组选择" style="margin-right: 20px"
-						@change="searchEquipmentChange" clearable>
+						@change="searchEquipmentChange" clearable size="medium">
 						<el-option v-for="item in searchEquipmentList" :key="item.grouping_id"
 							:label="item.grouping_name" :value="item.grouping_id">
 						</el-option>
 					</el-select>
 				</div>
 				<div>
-					<el-cascader :props="{ checkStrictly: true }" :options="searchTypecontrolList"
+					<el-cascader :props="{ checkStrictly: true }" :options="searchTypecontrolList" size="medium"
 						v-model="searchTableData.typecontrol" placeholder="账号分类选择"
 						style="margin-right: 20px" clearable></el-cascader>
 				</div>
 				<div>
 					<!-- 查询 -->
-					<el-button type="primary" :loading="btnloading" @click="searchNickName">{{ btnloading ? '加载中...'
+					<el-button type="primary" size="medium" :loading="btnloading" @click="searchNickName">{{ btnloading ? '加载中...'
 		: '搜索'
 }}</el-button>
-					<el-button type="primary" @click="btnReset">重置</el-button>
-					<el-button type="primary" @click="uploadNickName">上传</el-button>
+					<el-button type="primary" size="medium" @click="btnReset">重置</el-button>
+					<el-button type="primary" size="medium" @click="uploadNickName">上传</el-button>
 				</div>
 			</div>
 		</div>
 		<!-- 表格 -->
-		<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+		<table-custom height="700" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 		<!-- 详情弹层 -->
 
 		<NickNameDetailDialog :outerVisible.sync="showDetailDialog" ref="detailDialog" :upParameter="nickData">

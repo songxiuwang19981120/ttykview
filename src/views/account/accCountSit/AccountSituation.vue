@@ -33,7 +33,7 @@
       <el-button class="base-btn">一键监控选中账号</el-button>
     </div>
 
-    <table-custom class="tt-accsituation--tabel" :mutiSelect="true" @handleSelectionChange="handleSelectChange"
+    <table-custom height="700" :mutiSelect="true" @handleSelectionChange="handleSelectChange"
       :loading="loading" :tableData="memberList" :columns="columns"></table-custom>
 
     <Pagination :total="total" :page="page" :limit="limit" @pagination="handlePagination" />
@@ -849,11 +849,6 @@ export default {
   width: 100%;
   height: 60px;
   background-color: #fff;
-  border-radius: 8px;
-}
-
-.tt-accsituation--tabel {
-  width: 100% !important;
   border-radius: 8px;
 }
 

@@ -3,7 +3,7 @@
 		<!-- 新增条件选择 -->
 		<el-form :model="ruleForm" ref="ruleForm" :rules="rules" label-width="120px">
 			<el-form-item label="账号分组选择：" prop="grouping_id">
-				<el-select v-model="ruleForm.grouping_id" placeholder="账号分组选择" style="margin-right: 20px"
+				<el-select v-model="ruleForm.grouping_id" placeholder="账号分组选择" style="margin-right: 20px" size="medium"
 					@change="searchEquipmentChange" clearable>
 					<el-option v-for="item in searchEquipmentList" :key="item.grouping_id" :label="item.grouping_name"
 						:value="item.grouping_id">
@@ -11,12 +11,12 @@
 				</el-select>
 			</el-form-item>
 			<el-form-item label="账号分类选择：" prop="typecontrol">
-				<el-cascader clearable :props="{ checkStrictly: true }" :options="searchTypecontrolList"
+				<el-cascader clearable :props="{ checkStrictly: true }" :options="searchTypecontrolList" size="medium"
 					v-model="ruleForm.typecontrol" placeholder="账号分类选择" style="margin-right: 20px"></el-cascader>
 			</el-form-item>
 			<!-- 添加签名 -->
 			<el-form-item prop="nickname" label="添加昵称：">
-				<el-input type="textarea" placeholder="请输入昵称(一行仅限一个)" rows="6" v-model="ruleForm.nickname"
+				<el-input type="textarea" placeholder="请输入昵称(一行仅限一个)" rows="6" v-model="ruleForm.nickname" size="medium"
 					style="width: 60%">
 				</el-input>
 			</el-form-item>
@@ -25,8 +25,8 @@
 
 		<!-- 按钮 -->
 		<el-row type="flex" justify="end" slot="footer">
-			<el-button size="small" @click="btnCancel">取消</el-button>
-			<el-button type="primary" :loading="btnloading" @click="btnOK">{{
+			<el-button size="medium" @click="btnCancel">取消</el-button>
+			<el-button type="primary" size="medium" :loading="btnloading" @click="btnOK">{{
 		btnloading ? '上传中...' : '确定'
 				}}</el-button>
 		</el-row>

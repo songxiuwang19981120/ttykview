@@ -2,7 +2,7 @@
     <div id="customizedCalendar">
       <el-calendar
           :first-day-of-week=7
-          v-model="value">
+          v-model="value" size="medium">
         <template
             slot="dateCell"
             slot-scope="{data}">

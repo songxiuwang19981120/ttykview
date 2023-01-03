@@ -108,7 +108,7 @@
         :loading="loading"
         :tableData="videoList"
         :columns="columns"
-        class="table-custom"
+        height="700"
       />
       <Pagination
         :total="videoCount"
@@ -359,10 +359,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.table-custom {
-  border: 1px solid #ccc;
-  border-radius: 30px;
-}
 
 .color-rad {
   color: red;

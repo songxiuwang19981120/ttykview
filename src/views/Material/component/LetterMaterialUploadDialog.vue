@@ -4,25 +4,25 @@
 		<el-form :model="ruleForm" ref="ruleForm" :rules="rules" label-width="120px">
 			<el-form-item label="账号分组选择：" prop="grouping_id">
 				<el-select v-model="ruleForm.grouping_id" placeholder="账号分组选择" style="margin-right: 20px"
-					@change="searchEquipmentChange" clearable>
+					@change="searchEquipmentChange" clearable size="medium">
 					<el-option v-for="item in searchEquipmentList" :key="item.grouping_id" :label="item.grouping_name"
 						:value="item.grouping_id">
 					</el-option>
 				</el-select>
 			</el-form-item>
 			<el-form-item label="账号分类选择：" prop="typecontrol">
-				<el-cascader clearable :props="{ checkStrictly: true }" :options="searchTypecontrolList"
+				<el-cascader clearable :props="{ checkStrictly: true }" :options="searchTypecontrolList" size="medium"
 					v-model="ruleForm.typecontrol" placeholder="账号分类选择" style="margin-right: 20px"></el-cascader>
 			</el-form-item>
 			<el-form-item label="私信类型选择：" prop="type">
-				<el-select v-model="ruleForm.type" placeholder="私信类型选择" style="margin-right: 20px">
+				<el-select v-model="ruleForm.type" placeholder="私信类型选择" style="margin-right: 20px" size="medium">
 					<el-option v-for="item in searchTypeList" :key="item.value" :label="item.label" :value="item.value">
 					</el-option>
 				</el-select>
 			</el-form-item>
 			<!-- 添加私信 -->
 			<el-form-item prop="content" label="添加私信：">
-				<el-input placeholder="请输入私信" rows="6" v-model="ruleForm.content" style="width: 60%">
+				<el-input placeholder="请输入私信" rows="6" v-model="ruleForm.content" style="width: 60%" size="medium">
 				</el-input>
 			</el-form-item>
 		</el-form>
@@ -30,8 +30,8 @@
 
 		<!-- 按钮 -->
 		<el-row type="flex" justify="end" slot="footer">
-			<el-button size="small" @click="btnCancel">取消</el-button>
-			<el-button type="primary" :loading="btnloading" @click="btnOK">{{
+			<el-button size="medium" @click="btnCancel">取消</el-button>
+			<el-button type="primary" size="medium" :loading="btnloading" @click="btnOK">{{
 		btnloading ? '上传中...' : '确定'
 				}}</el-button>
 		</el-row>

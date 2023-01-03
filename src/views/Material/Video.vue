@@ -3,36 +3,36 @@
         <div class="tt-accsituation">
             <div class="tt-accsituation--operation">
                 <div>
-                    <el-select v-model="searchTableData.equipment" placeholder="请选择账号分组"
+                    <el-select v-model="searchTableData.equipment" placeholder="请选择账号分组" size="medium"
                         style="width:150px;margin-right:10px" @change="searchEquipmentChange" clearable>
                         <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
                             :key="item.grouping_id"></el-option>
                     </el-select>
                 </div>
                 <div>
-                    <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryList"
+                    <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryList" size="medium"
                         v-model="searchTableData.library" placeholder="账号分类选择"
                         style="width:180px;margin-right:10px"></el-cascader>
                 </div>
                 <div>
-                    <el-select v-model="searchTableData.status" placeholder="素材类型"
+                    <el-select v-model="searchTableData.status" placeholder="素材类型" size="medium"
                         style="width:160px;margin-right:10px">
                         <el-option v-for="item in searchTypeList" :key="item.value" :label="item.label"
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
                 <div>
-                    <el-select v-model="searchTableData.sort" placeholder="时间排序" style="width:110px;margin-right:20px">
+                    <el-select v-model="searchTableData.sort" placeholder="时间排序" style="width:110px;margin-right:20px" size="medium">
                         <el-option v-for="item in searchTimeSortList" :key="item.value" :label="item.label"
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
-                <el-button type="primary" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...'
+                <el-button type="primary" :loading="submitting" size="medium" @click="searchTable">{{ submitting ? '搜索中 ...'
         : '搜索'
 }}</el-button>
-                <el-button type="primary" @click="resetTable">重置</el-button>
-                <el-button type="primary" @click="videoUpLoad">上传视频</el-button>
-                <el-button type="primary" @click="batchDelete">批量删除</el-button>
+                <el-button type="primary" size="medium" @click="resetTable">重置</el-button>
+                <el-button type="primary" size="medium" @click="videoUpLoad">上传视频</el-button>
+                <el-button type="primary" size="medium" @click="batchDelete">批量删除</el-button>
 
 
             </div>
@@ -59,8 +59,8 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="videoUploadClose">取 消</el-button>
-                <el-button type="primary" :loading="videoSubmitting" @click="submitForVideo">{{ videoSubmitting
+                <el-button size="medium" @click="videoUploadClose">取 消</el-button>
+                <el-button type="primary" size="medium" :loading="videoSubmitting" @click="submitForVideo">{{ videoSubmitting
         ? '提交中...' : '提 交'
 }}</el-button>
             </span>

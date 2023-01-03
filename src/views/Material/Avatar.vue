@@ -3,38 +3,37 @@
         <div class="tt-accsituation">
             <div class="tt-accsituation--operation">
                 <div>
-                    <el-select v-model="searchTableData.equipment" placeholder="请选择账号分组"
+                    <el-select v-model="searchTableData.equipment" placeholder="请选择账号分组" size="medium"
                         style="width:150px;margin-right:20px" @change="searchEquipmentChange" clearable>
                         <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
                             :key="item.grouping_id"></el-option>
                     </el-select>
                 </div>
                 <div>
-                    <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryList"
+                    <el-cascader clearable :props="{ checkStrictly: true }" :options="libraryList" size="medium"
                         v-model="searchTableData.library" placeholder="账号分类选择"
                         style="width:180px;margin-right:20px"></el-cascader>
                 </div>
                 <div>
-                    <el-select v-model="searchTableData.status" placeholder="素材类型"
+                    <el-select v-model="searchTableData.status" placeholder="素材类型" size="medium"
                         style="width:160px;margin-right:20px">
                         <el-option v-for="item in searchTypeList" :key="item.value" :label="item.label"
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
                 <div>
-                    <el-select v-model="searchTableData.sort" placeholder="时间排序" style="width:110px;margin-right:20px">
+                    <el-select v-model="searchTableData.sort" placeholder="时间排序" style="width:110px;margin-right:20px" size="medium">
                         <el-option v-for="item in searchTimeSortList" :key="item.value" :label="item.label"
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
-                <el-button type="primary" class="seachbut" :loading="submitting" @click="searchTable">{{ submitting ?
+                <el-button type="primary" size="medium" class="seachbut" :loading="submitting" @click="searchTable">{{ submitting ?
         '搜索中 ...' :
         '搜索'
 }}</el-button>
-                <el-button type="primary" class="seachbut" @click="resetTable">重置</el-button>
-                <el-button type="primary" class="seachbut" @click="imgUpLoad">上传图片</el-button>
-                <el-button type="primary" class="seachbut" @click="batchDelete" :loading="deleteing">{{ deleteing ? '删除中
-                    ...' :'批量删除'}}</el-button>
+                <el-button type="primary" class="seachbut" size="medium" @click="resetTable">重置</el-button>
+                <el-button type="primary" class="seachbut" size="medium" @click="imgUpLoad">上传图片</el-button>
+                <el-button type="primary" class="seachbut" size="medium" @click="batchDelete" :loading="deleteing">{{ deleteing ? '删除中...' :'批量删除'}}</el-button>
             </div>
         </div>
         <el-dialog title="图片上传" :visible.sync="imgUploadVisible" width="40%" :before-close="imgUploadClose">
@@ -59,8 +58,8 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="imgUploadClose">取 消</el-button>
-                <el-button type="primary" :loading="imgSubmitting" @click="submitForimg">{{ imgSubmitting ? '提交中...' :
+                <el-button @click="imgUploadClose" size="medium">取 消</el-button>
+                <el-button type="primary" size="medium" :loading="imgSubmitting" @click="submitForimg">{{ imgSubmitting ? '提交中...' :
         '提 交'
 }}</el-button>
             </span>
@@ -72,9 +71,7 @@
             <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange" class="img">
                 <div v-for="(item, index) in tableData" :key="index" class="imgData">
                     <el-image :src="item.image" class="imgsize"></el-image>
-                    <el-checkbox :label="item.headimage_id" :key="item.headimage_id" class="imgNum">头像编号:100{{
-        item.headimage_id
-}}</el-checkbox>
+                    <el-checkbox :label="item.headimage_id" :key="item.headimage_id" class="imgNum">头像编号:100{{item.headimage_id}}</el-checkbox>
                     <div class="imgNum">上传时间:{{ item.usage_time }}</div>
                 </div>
             </el-checkbox-group>

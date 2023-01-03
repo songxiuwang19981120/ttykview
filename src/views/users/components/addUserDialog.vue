@@ -1,42 +1,47 @@
 <template>
-	<el-dialog :visible="showdialog" title="新增账户" @close="btnCancel">
+	<el-dialog :visible="showdialog" title="新增账户" @close="btnCancel" width="40%">
 		<el-form label-width="120px" :model="ruleForm" :rules="rules" ref="ruleForm">
-			<el-row type="flex">
+			<!-- <el-row type="flex"> -->
 				<el-form-item label="用户名：" prop="user">
 					<el-input
 						v-model="ruleForm.user"
-						style="width: 145px"
+						style="width: 60%"
 						placeholder="请输入用户名"
+						size="medium"
 					></el-input>
 				</el-form-item>
 				<el-form-item label="真实姓名：" prop="name">
 					<el-input
 						v-model="ruleForm.name"
-						style="width: 145px"
+						style="width: 60%"
 						placeholder="请输入真实姓名"
+						size="medium"
 					></el-input>
 				</el-form-item>
 				<el-form-item label="联系电话：" prop="phone">
 					<el-input
 						v-model="ruleForm.phone"
-						style="width: 145px"
+						style="width: 60%"
 						placeholder="请输入联系电话"
+						size="medium"
 					></el-input>
 				</el-form-item>
-			</el-row>
+			<!-- </el-row> -->
 			<el-form-item label="账户有效期：" prop="validity">
-				<el-radio-group v-model="ruleForm.validity">
+				<el-radio-group v-model="ruleForm.validity" size="medium">
 					<el-radio label="0">永久有效</el-radio>
 					<el-radio label="1">指定日期后失效</el-radio>
 				</el-radio-group>
 			</el-form-item>
 			<el-form-item label="角色选择：" prop="role_id">
 				<el-select
+					style="width: 60%"
 					v-model="ruleForm.role_id"
 					placeholder="请选择角色"
 					@focus="getRole"
 					:loading="roleLoading"
 					loading-text="数据加载中..."
+					size="medium"
 				>
 					<el-option
 						v-for="(item, index) in roleData"
@@ -48,14 +53,14 @@
 				</el-select>
 			</el-form-item>
 			<el-form-item label="备注说明：" prop="note">
-				<el-input v-model="ruleForm.note" type="textarea" :rows="3"></el-input>
+				<el-input style="width: 60%" v-model="ruleForm.note" size="medium" type="textarea" :rows="3"></el-input>
 			</el-form-item>
 			<el-row type="flex" justify="end">
 				<el-form-item>
-					<el-button type="primary" :loading="btnloading" @click="btnOK">{{
+					<el-button type="primary" size="medium" :loading="btnloading" @click="btnOK">{{
 						btnloading ? '上传中...' : '确定'
 					}}</el-button>
-					<el-button @click="btnCancel">取消</el-button>
+					<el-button @click="btnCancel" size="medium">取消</el-button>
 				</el-form-item>
 			</el-row>
 		</el-form>

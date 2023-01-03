@@ -3,22 +3,22 @@
 		<div class="tt-accsituation">
 			<div class="tt-accsituation--operation">
 				<span>私信类型：</span>
-				<el-select v-model="searchTableData.type" placeholder="私信类型选择" style="margin-right: 20px" size="small">
+				<el-select v-model="searchTableData.type" placeholder="私信类型选择" style="margin-right: 20px" size="medium">
 					<el-option v-for="item in searchTypeList" :key="item.value" :label="item.label" :value="item.value">
 					</el-option>
 				</el-select>
 				<div>
 					<!-- 查询 -->
-					<el-button type="primary" :loading="btnloading" @click="searchNickName"
+					<el-button type="primary" size="medium" :loading="btnloading" @click="searchNickName"
 						style="margin-right: 10px">{{ btnloading ? '加载中...' : '搜索' }}</el-button>
-					<el-button type="primary" @click="btnReset">重置</el-button>
-					<el-button @click="batchDelete" type="primary" :loading="deleteing">{{ deleteing ? '删除中 ...': '批量删除'}}</el-button>
+					<el-button type="primary" size="medium" @click="btnReset">重置</el-button>
+					<el-button @click="batchDelete" type="primary" size="medium" :loading="deleteing">{{ deleteing ? '删除中 ...': '批量删除'}}</el-button>
 				</div>
 			</div>
 		</div>
 		<!-- 详情页面内容 -->
 		<!-- 表格 -->
-		<table-custom :mutiSelect="true" @handleSelectionChange="selectionChange" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+		<table-custom  height="700" :mutiSelect="true" @handleSelectionChange="selectionChange" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 		<!-- 分页 -->
 		<pagination :total="total" :page="nickNameData.page" :limit="nickNameData.limit" @pagination="pageChange">
 		</pagination>
@@ -26,17 +26,17 @@
 		<el-dialog width="30%" title="私信编辑" :visible.sync="innerVisible" append-to-body @close="btnCancel2">
 			<el-form label-width="70px" :model="ruleForm" :rules="rules" ref="ruleForm">
 				<el-form-item label="昵称：" prop="content">
-					<el-input v-model="ruleForm.content" style="width: 90%"></el-input>
+					<el-input v-model="ruleForm.content" style="width: 90%" size="medium"></el-input>
 				</el-form-item>
 			</el-form>
 			<!-- 按钮 -->
 			<el-row type="flex" justify="end">
-				<el-button size="small" @click="btnCancel2">取消</el-button>
-				<el-button size="small" type="primary" @click="btnOK2">确定</el-button>
+				<el-button size="medium" @click="btnCancel2">取消</el-button>
+				<el-button size="medium" type="primary" @click="btnOK2">确定</el-button>
 			</el-row>
 		</el-dialog>
 		<div slot="footer" class="dialog-footer">
-			<el-button @click="btnCancel" size="small">取 消</el-button>
+			<el-button @click="btnCancel" size="medium">取 消</el-button>
 		</div>
 	</el-dialog>
 </template>

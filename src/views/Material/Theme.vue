@@ -3,7 +3,7 @@
 		<div class="tt-accsituation">
 			<div class="tt-accsituation--operation">
 				<div>
-					<el-select v-model="searchTableData.equipment" placeholder="账号分组选择" style="margin-right: 20px"
+					<el-select v-model="searchTableData.equipment" placeholder="账号分组选择" style="margin-right: 20px" size="medium"
 						@change="searchEquipmentChange" clearable>
 						<el-option v-for="item in searchEquipmentList" :key="item.grouping_id"
 							:label="item.grouping_name" :value="item.grouping_id">
@@ -11,21 +11,21 @@
 					</el-select>
 				</div>
 				<div>
-					<el-cascader :props="{ checkStrictly: true }" :options="searchTypecontrolList"
+					<el-cascader :props="{ checkStrictly: true }" :options="searchTypecontrolList" size="medium"
 						v-model="searchTableData.typecontrol" placeholder="账号分类选择" style="margin-right: 20px"
 						clearable></el-cascader>
 				</div>
 				<div>
 					<!-- 查询 -->
-					<el-button type="primary" :loading="btnloading" @click="searchNickName">{{ btnloading ? '加载中...'
+					<el-button type="primary" size="medium" :loading="btnloading" @click="searchNickName">{{ btnloading ? '加载中...'
 		: '搜索'
 }}</el-button>
-					<el-button type="primary" @click="btnReset">重置</el-button>
-					<el-button type="primary" @click="uploadNickName">上传</el-button>
+					<el-button type="primary" size="medium" @click="btnReset">重置</el-button>
+					<el-button type="primary" size="medium" @click="uploadNickName">上传</el-button>
 				</div>
 			</div>
 		</div>
-		<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+		<table-custom height="700" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 
 		<el-dialog title="编辑" :visible="contentVisibleUpdate" @close="exitCancel" width="50%" style="margin-top:20px">
 			<el-form :model="ruleForm" ref="ruleForm" :rules="exitRules" label-width="120px">
@@ -35,14 +35,14 @@
 				</el-form-item>
 			</el-form>
 			<el-row type="flex" justify="end" slot="footer">
-				<el-button size="small" @click="exitCancel">取消</el-button>
+				<el-button size="small"  @click="exitCancel">取消</el-button>
 				<el-button type="primary" :loading="exitLoading" @click="exitSubject">{{ exitLoading ? '修改中...' :'确定'}}</el-button>
 			</el-row>
 		</el-dialog>
 		<!-- 表格 -->
 		<el-dialog title="主题内容列表" :visible="contentVisible" @close="contentCancel" width="60%">
-			<el-button @click="batchDelete" type="primary" :loading="deleteing">{{ deleteing ? '删除中 ...' :'批量删除'}}</el-button>
-			<table-custom :mutiSelect="true" @handleSelectionChange="selectionChange" :loading="loadingList"
+			<el-button size="medium" @click="batchDelete" type="primary" :loading="deleteing">{{ deleteing ? '删除中 ...' :'批量删除'}}</el-button>
+			<table-custom height="700" :mutiSelect="true" @handleSelectionChange="selectionChange" :loading="loadingList"
 				:tableData="tableDataList" :columns="columnsList"></table-custom>
 			<pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination">
 			</pagination>
