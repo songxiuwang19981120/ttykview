@@ -27,12 +27,13 @@
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
-                <el-button type="primary" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...' :
-        '搜索'
+                <el-button type="primary" :loading="submitting" @click="searchTable">{{ submitting ? '搜索中 ...'
+        : '搜索'
 }}</el-button>
                 <el-button type="primary" @click="resetTable">重置</el-button>
                 <el-button type="primary" @click="videoUpLoad">上传视频</el-button>
                 <el-button type="primary" @click="batchDelete">批量删除</el-button>
+
 
             </div>
         </div>
@@ -49,7 +50,7 @@
                         v-model="videoForm.library" placeholder="分类选择"></el-cascader>
                 </el-form-item>
                 <el-form-item label="视频:" prop="video">
-                    <el-upload ref="videoUnload" class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple
+                    <el-upload ref="videoUnload" class="upload-demo" :file-list="fileList" drag :action="baseUrl + 'Base/upload'" multiple
                         accept=".mp4" :on-success="handleSucess" :on-error="handleError" :on-remove="handleRemove"
                         :before-upload="videoBefore">
                         <i class="el-icon-upload"></i>
@@ -59,21 +60,20 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="videoUploadClose">取 消</el-button>
-                <el-button type="primary" :loading="videoSubmitting" @click="submitForVideo">{{ videoSubmitting ?
-        '提交中...' : '提 交'
+                <el-button type="primary" :loading="videoSubmitting" @click="submitForVideo">{{ videoSubmitting
+        ? '提交中...' : '提 交'
 }}</el-button>
             </span>
         </el-dialog>
         <div>
             <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选 <span
-                    style="color:#FF411F;font-size: 12px;padding-left: 20px;"> 已选中 {{ checkedCities.length }}
-                    个视频</span></el-checkbox>
+                    style="color:#FF411F;font-size: 12px;padding-left: 20px;"> 已选中 {{ checkedCities.length
+}}个视频</span></el-checkbox>
             <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange" class="video">
                 <div v-for="(item, index) in tableData" :key="index" class="videoData">
                     <video controls loop :src="item.video_url" class="videosize"></video>
-                    <el-checkbox :label="item.material_id" :key="item.material_id" class="videoNum">视频编号:{{
-        item.video_num
-}}</el-checkbox>
+                    <el-checkbox :label="item.material_id" :key="item.material_id"
+                        class="videoNum">视频编号:{{ item.video_num }}</el-checkbox>
                     <div class="videoNum">上传时间:{{ item.add_time }}</div>
                 </div>
             </el-checkbox-group>
@@ -261,8 +261,8 @@ export default {
         // 校验视频大小
         videoBefore(file) {
             let { size } = file || {};
-            if (size > 3 * 1024 * 1024) {
-                this.$message.error('视频大小请不要超过2M');
+            if (size > 6 * 1024 * 1024) {
+                this.$message.error('视频大小请不要超过6M');
                 return false
             }
         },
@@ -279,8 +279,11 @@ export default {
             this.fileList = fileList
         },
         // 视频上传成功回调
-        handleSucess(response, file, fileList) {
-            this.fileList = fileList
+        handleSucess(response,file, fileList) {
+            if (response.status != '200') {
+                this.$message.warning(response.msg);
+                this.fileList.splice(this.fileList.indexOf(file), 1)
+            } 
         },
         // 视频上传失败回调
         handleError(err, file, fileList) {
@@ -395,13 +398,13 @@ export default {
                     this.$message.error({ message: result.msg })
                 }
             } catch (error) {
-                console.error(error);
             }
         },
         // 取消视频上传弹框
         videoUploadClose() {
             this.$refs.videoUnload.clearFiles()
             this.fileList = [];
+            this.videoSubmitting=false;
             this.videoForm = {
                 group: '',  //分组
                 library: '',  //库
@@ -438,7 +441,6 @@ export default {
                     this.$message.error({ message: result.msg })
                 }
             } catch (error) {
-                console.error(error);
             }
         },
         /*
@@ -453,12 +455,10 @@ export default {
           获取表格已选择的数据
        */
         selectionChange(val) {
-            console.log(val);
         },
         searchTable() {
             this.submitting = true
             this.getMaterialList()
-            console.log('搜索数据', this.searchTableData);
         },
         /*
             获取视频
@@ -503,7 +503,6 @@ export default {
             } catch (error) {
                 this.loading = false;
                 this.submitting = false
-                console.error(error);
             }
         },
         /*

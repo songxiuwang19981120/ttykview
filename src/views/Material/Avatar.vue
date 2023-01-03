@@ -33,7 +33,8 @@
 }}</el-button>
                 <el-button type="primary" class="seachbut" @click="resetTable">重置</el-button>
                 <el-button type="primary" class="seachbut" @click="imgUpLoad">上传图片</el-button>
-                <el-button type="primary" class="seachbut" @click="batchDelete" :loading="deleteing">{{ deleteing ? '删除中 ...' :'批量删除'}}</el-button>
+                <el-button type="primary" class="seachbut" @click="batchDelete" :loading="deleteing">{{ deleteing ? '删除中
+                    ...' :'批量删除'}}</el-button>
             </div>
         </div>
         <el-dialog title="图片上传" :visible.sync="imgUploadVisible" width="40%" :before-close="imgUploadClose">
@@ -49,9 +50,9 @@
                         v-model="imgForm.library" placeholder="请选择账号分类"></el-cascader>
                 </el-form-item>
                 <el-form-item label="图片:" prop="img">
-                    <el-upload ref="imgUnload" class="upload-demo" drag :action="baseUrl + 'Base/upload'" multiple
-                        accept=".png,.jpg,.jpeg" :on-success="handleSucess" :on-remove="handleRemove"
-                        :before-upload="imgBefore">
+                    <el-upload ref="imgUnload" class="upload-demo" :file-list="fileList" drag
+                        :action="baseUrl + 'Base/upload'" multiple accept=".png,.jpg,.jpeg" :on-success="handleSucess"
+                        :on-remove="handleRemove" :before-upload="imgBefore">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
                     </el-upload>
@@ -59,7 +60,9 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="imgUploadClose">取 消</el-button>
-                <el-button type="primary" :loading="imgSubmitting" @click="submitForimg">{{ imgSubmitting ? '提交中...' : '提 交'}}</el-button>
+                <el-button type="primary" :loading="imgSubmitting" @click="submitForimg">{{ imgSubmitting ? '提交中...' :
+        '提 交'
+}}</el-button>
             </span>
         </el-dialog>
         <div>
@@ -267,11 +270,9 @@ export default {
         },
         // 图片上传成功返回
         handleSucess(response, file, fileList) {
-            if (response.status == '200') {
-                this.fileList.push(file)
-            } else {
+            if (response.status != '200') {
                 this.$message.warning(response.msg);
-                fileList.splice(fileList.indexOf(file), 1)
+                this.fileList.splice(this.fileList.indexOf(file), 1)
             }
         },
         /*
@@ -297,7 +298,7 @@ export default {
                 grouping_id: this.searchTableData.equipment
             }
             try {
-                let result = await this.$api({ type: "getTypecontrol",data:data });
+                let result = await this.$api({ type: "getTypecontrol", data: data });
                 if (result.status == '200') {
                     this.getTreeData(result.data);
                     this.libraryList = result.data;
