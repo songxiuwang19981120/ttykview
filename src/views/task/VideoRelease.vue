@@ -38,7 +38,7 @@
         <el-button type="primary" class="seachbut" @click="showVideoTask"
           >发布视频</el-button
         >
-        <i class="el-icon-refresh-left"></i>
+        <!-- <i class="el-icon-refresh-left"></i> -->
       </div>
     </div>
     <!-- 表格 -->
