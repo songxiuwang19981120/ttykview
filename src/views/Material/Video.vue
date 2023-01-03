@@ -67,14 +67,15 @@
         </el-dialog>
         <div>
             <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选 <span
-                    style="color:#FF411F;font-size: 12px;padding-left: 20px;"> 已选中 {{ checkedCities.length
-}}个视频</span></el-checkbox>
-            <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange" class="video">
-                <div v-for="(item, index) in tableData" :key="index" class="videoData">
+                    style="color:#FF411F;font-size: 12px;padding-left: 20px;"> 已选中 {{ checkedCities.length}}个视频</span></el-checkbox>
+            <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
+                <div class="video">
+                    <div v-for="(item, index) in tableData" :key="index" class="videoData">
                     <video controls loop :src="item.video_url" class="videosize"></video>
                     <el-checkbox :label="item.material_id" :key="item.material_id"
                         class="videoNum">视频编号:{{ item.video_num }}</el-checkbox>
                     <div class="videoNum">上传时间:{{ item.add_time }}</div>
+                </div>
                 </div>
             </el-checkbox-group>
         </div>
@@ -528,6 +529,8 @@ export default {
     display: flex;
     justify-content: flex-start;
     flex-wrap: wrap;
+    max-height: 700px;
+    overflow-y: scroll;
 }
 
 .videoData {

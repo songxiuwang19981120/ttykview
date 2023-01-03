@@ -22,18 +22,22 @@
                     </el-select>
                 </div>
                 <div>
-                    <el-select v-model="searchTableData.sort" placeholder="时间排序" style="width:110px;margin-right:20px" size="medium">
+                    <el-select v-model="searchTableData.sort" placeholder="时间排序" style="width:110px;margin-right:20px"
+                        size="medium">
                         <el-option v-for="item in searchTimeSortList" :key="item.value" :label="item.label"
                             :value="item.value"></el-option>
                     </el-select>
                 </div>
-                <el-button type="primary" size="medium" class="seachbut" :loading="submitting" @click="searchTable">{{ submitting ?
-        '搜索中 ...' :
-        '搜索'
+                <el-button type="primary" size="medium" class="seachbut" :loading="submitting" @click="searchTable">{{
+        submitting ?
+            '搜索中 ...' :
+            '搜索'
 }}</el-button>
                 <el-button type="primary" class="seachbut" size="medium" @click="resetTable">重置</el-button>
                 <el-button type="primary" class="seachbut" size="medium" @click="imgUpLoad">上传图片</el-button>
-                <el-button type="primary" class="seachbut" size="medium" @click="batchDelete" :loading="deleteing">{{ deleteing ? '删除中...' :'批量删除'}}</el-button>
+                <el-button type="primary" class="seachbut" size="medium" @click="batchDelete" :loading="deleteing">{{
+        deleteing ? '删除中...' : '批量删除'
+}}</el-button>
             </div>
         </div>
         <el-dialog title="图片上传" :visible.sync="imgUploadVisible" width="40%" :before-close="imgUploadClose">
@@ -59,7 +63,8 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="imgUploadClose" size="medium">取 消</el-button>
-                <el-button type="primary" size="medium" :loading="imgSubmitting" @click="submitForimg">{{ imgSubmitting ? '提交中...' :
+                <el-button type="primary" size="medium" :loading="imgSubmitting" @click="submitForimg">{{ imgSubmitting
+        ? '提交中...' :
         '提 交'
 }}</el-button>
             </span>
@@ -68,11 +73,14 @@
             <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选 <span
                     style="color:#FF411F;font-size: 12px;padding-left: 20px;"> 已选中 {{ checkedCities.length }}
                     个图片</span></el-checkbox>
-            <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange" class="img">
-                <div v-for="(item, index) in tableData" :key="index" class="imgData">
-                    <el-image :src="item.image" class="imgsize"></el-image>
-                    <el-checkbox :label="item.headimage_id" :key="item.headimage_id" class="imgNum">头像编号:100{{item.headimage_id}}</el-checkbox>
-                    <div class="imgNum">上传时间:{{ item.usage_time }}</div>
+            <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
+                <div class="img">
+                    <div v-for="(item, index) in tableData" :key="index" class="imgData">
+                        <el-image :src="item.image" class="imgsize"></el-image>
+                        <el-checkbox :label="item.headimage_id" :key="item.headimage_id"
+                            class="imgNum">头像编号:100{{ item.headimage_id }}</el-checkbox>
+                        <div class="imgNum">上传时间:{{ item.usage_time }}</div>
+                    </div>
                 </div>
             </el-checkbox-group>
         </div>
@@ -507,6 +515,8 @@ export default {
     display: flex;
     justify-content: flex-start;
     flex-wrap: wrap;
+    max-height: 700px;
+    overflow-y: scroll;
 }
 
 .imgData {
