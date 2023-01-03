@@ -2,19 +2,20 @@
 	<el-dialog :visible="showdialog" title="重置密码" width="40%" @close="btnCancel">
 		<el-form label-width="120px" :model="ruleForm" :rules="rules" ref="ruleForm">
 			<el-form-item label="新密码：" prop="pwd">
-				<el-input v-model="ruleForm.pwd" placeholder="请输入新密码" style="width: 90%"></el-input>
+				<el-input v-model="ruleForm.pwd" placeholder="请输入新密码" style="width: 60%" size="medium"></el-input>
 			</el-form-item>
 			<el-form-item label="确认密码：" prop="repwd">
 				<el-input
 					v-model="ruleForm.repwd"
 					placeholder="请再次输入新密码"
-					style="width: 90%"
+					style="width: 60%"
+					size="medium"
 				></el-input>
 			</el-form-item>
 		</el-form>
 		<el-row type="flex" justify="end">
-			<el-button type="primary" @click="btnOK">确定</el-button>
-			<el-button @click="btnCancel">取消</el-button>
+			<el-button type="primary" size="medium" @click="btnOK">确定</el-button>
+			<el-button @click="btnCancel" size="medium">取消</el-button>
 		</el-row>
 	</el-dialog>
 </template>

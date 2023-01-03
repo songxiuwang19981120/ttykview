@@ -10,19 +10,10 @@
  */
 
 <template>
-  <div :class="{'hidden':hidden}" class="pagination-container">
-    <el-pagination
-      :background="background"
-      :current-page="currentPage"
-      :page-size="limit"
-      :layout="layout"
-      :page-sizes="pageSizes"
-      :pager-count="pagerCount"
-      :total="total"
-      v-bind="$attrs"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
+  <div :class="{ 'hidden': hidden }" class="pagination-container">
+    <el-pagination :background="background" :current-page="currentPage" :page-size="limit" :layout="layout"
+      :page-sizes="pageSizes" :pager-count="pagerCount" :total="total" v-bind="$attrs" @size-change="handleSizeChange"
+      @current-change="handleCurrentChange" />
   </div>
 </template>
 
@@ -47,7 +38,7 @@ export default {
     pageSizes: {
       type: Array,
       default() {
-        return [10, 20, 30, 50, 100, 200]
+        return [10, 20, 50, 100, 200, 500, 1000]
       }
     },
     // 移动端页码按钮的数量端默认值5
@@ -114,6 +105,7 @@ export default {
   padding: 10px;
   text-align: right;
 }
+
 .pagination-container.hidden {
   display: none;
 }

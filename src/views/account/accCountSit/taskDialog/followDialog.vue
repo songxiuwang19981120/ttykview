@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog
-      width="30%"
+      width="40%"
       :visible="showFollowDialog"
       :before-close="handlerClose"
     >
@@ -19,7 +19,7 @@
       
         <el-form-item prop="group" label="选择分组 ：">
           <el-select
-            style="width: 45%"
+            style="width: 60%"
             ref="gropuSelect"
             clearable
             v-model="followTaskForm.group"
@@ -36,7 +36,7 @@
 
         <el-form-item prop="typecontrol_id" label="选择分类 ：">
           <el-cascader
-            style="width: 45%"
+            style="width: 60%"
             clearable
             :props="{ checkStrictly: true, value: 'value' }"
             :options="typeList"
@@ -50,7 +50,7 @@
           v-model="followTaskForm.account_region"
         >
           <el-select
-            style="width: 38%"
+            style="width: 60%"
             v-model="followTaskForm.account_region"
             placeholder="选择国家"
           >
@@ -69,7 +69,7 @@
           prop="user_chat_upper_limit"
         >
           <el-input
-            style="width: 38%"
+            style="width: 60%"
             type="text"
             v-model="followTaskForm.user_chat_upper_limit"
             placeholder="输入单号私信上限"
@@ -82,7 +82,7 @@
           prop="total_task_num"
         >
           <el-input
-            style="width: 38%"
+            style="width: 60%"
             class="lettertask-input--between"
             v-model="followTaskForm.total_task_num"
             autocomplete="off"
@@ -97,7 +97,7 @@
         >
           <el-input
             placeholder="输入备注"
-            style="width: 38%"
+            style="width: 60%"
             v-model="followTaskForm.task_name"
           ></el-input>
         </el-form-item>
@@ -115,7 +115,7 @@
           label="选择私信素材 ："
         >
           <el-select
-            style="width: 35%"
+            style="width: 60%"
             v-model="followTaskForm.privateletter_id"
             placeholder="私信素材"
           >
@@ -146,9 +146,9 @@
       </el-form>
 
       <span slot="footer" class="dialog-footer">
-        <el-button @click="handleReset">重 置</el-button>
-        <el-button @click="handlerClose">取 消</el-button>
-        <el-button type="primary" @click="handlerConfrim">确认并执行</el-button>
+        <el-button @click="handleReset" size="medium">重 置</el-button>
+        <el-button @click="handlerClose" size="medium">取 消</el-button>
+        <el-button type="primary" @click="handlerConfrim" size="medium">确认并执行</el-button>
       </span>
     </el-dialog>
   </div>

@@ -18,16 +18,16 @@
 				</div>
 				<div>
 					<!-- 查询 -->
-					<el-button type="primary" :loading="btnloading" @click="searchNickName">{{
-						btnloading ? '加载中...' : '搜索'
-					}}</el-button>
-					<el-button type="primary" @click="btnReset">重置</el-button>
-					<el-button type="primary" @click="uploadNickName">上传</el-button>
+					<el-button type="primary" size="medium" :loading="btnloading" @click="searchNickName">{{ btnloading ? '加载中...'
+		: '搜索'
+}}</el-button>
+					<el-button type="primary" size="medium" @click="btnReset">重置</el-button>
+					<el-button type="primary" size="medium" @click="uploadNickName">上传</el-button>
 				</div>
 			</div>
 		</div>
 		<!-- 表格 -->
-		<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+		<table-custom height="700" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 		<!-- 详情弹层 -->
 
 		<NickNameDetailDialog

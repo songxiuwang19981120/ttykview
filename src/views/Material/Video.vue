@@ -21,6 +21,7 @@
 						v-model="searchTableData.status"
 						placeholder="素材类型"
 						style="width: 160px; margin-right: 10px"
+                        size="medium"
 					>
 						<el-option
 							v-for="item in searchTypeList"
@@ -35,6 +36,7 @@
 						v-model="searchTableData.sort"
 						placeholder="时间排序"
 						style="width: 110px; margin-right: 20px"
+                        size="medium"
 					>
 						<el-option
 							v-for="item in searchTimeSortList"
@@ -44,12 +46,13 @@
 						></el-option>
 					</el-select>
 				</div>
-				<el-button type="primary" :loading="submitting" @click="searchTable">{{
-					submitting ? '搜索中 ...' : '搜索'
-				}}</el-button>
-				<el-button type="primary" @click="resetTable">重置</el-button>
-				<el-button type="primary" @click="videoUpLoad">上传视频</el-button>
-				<el-button type="primary" @click="batchDelete">批量删除</el-button>
+				<el-button type="primary" :loading="submitting" size="medium" @click="searchTable">{{ submitting ? '搜索中 ...'
+        : '搜索'
+}}</el-button>
+                <el-button type="primary" size="medium" @click="resetTable">重置</el-button>
+                <el-button type="primary" size="medium" @click="videoUpLoad">上传视频</el-button>
+                <el-button type="primary" size="medium" @click="batchDelete">批量删除</el-button>
+
 			</div>
 		</div>
 		<el-dialog
@@ -88,10 +91,10 @@
 				</el-form-item>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
-				<el-button @click="videoUploadClose">取 消</el-button>
-				<el-button type="primary" :loading="videoSubmitting" @click="submitForVideo">{{
-					videoSubmitting ? '提交中...' : '提 交'
-				}}</el-button>
+                <el-button size="medium" @click="videoUploadClose">取 消</el-button>
+                <el-button type="primary" size="medium" :loading="videoSubmitting" @click="submitForVideo">{{ videoSubmitting
+        ? '提交中...' : '提 交'
+}}</el-button>
 			</span>
 		</el-dialog>
 		<div>
@@ -508,63 +511,58 @@
 			/*
           获取表格已选择的数据
        */
-			selectionChange(val) {
-				console.log(val);
-			},
-			searchTable() {
-				this.submitting = true;
-				this.getMaterialList();
-				console.log('搜索数据', this.searchTableData);
-			},
-			/*
+        selectionChange(val) {
+        },
+        searchTable() {
+            this.submitting = true
+            this.getMaterialList()
+        },
+        /*
             获取视频
         */
-			async getMaterialList() {
-				let order = '';
-				let status = '';
-				if (this.searchTableData.sort != '') {
-					order = 'add_time';
-				}
-				if (this.searchTableData.status == '2') {
-					status = '';
-				}
-				let typecontrolId =
-					this.searchTableData.library[this.searchTableData.library.length - 1] ?? '';
-				let data = {
-					limit: this.current_limit,
-					page: this.current_page,
-					video_num: '',
-					add_time_start: '',
-					add_time_end: '',
-					typecontrol_id: typecontrolId,
-					order: order,
-					sort: this.searchTableData.sort,
-					grouping_id: this.searchTableData.equipment,
-					status: status,
-				};
-				try {
-					this.loading = true;
-					let result = await this.$api({ type: 'getMaterialList', data: data });
-					if (result.status == '200') {
-						this.tableData = result.data.list;
-						this.total = result.data.count;
-						this.statisticsData[0].unloadNumber = result.data.count;
-						this.statisticsData[0].name =
-							result.data.type_title == '' ? '全部' : result.data.type_title;
-						this.statisticsData[0].use = result.data.yy;
-						this.statisticsData[0].used = result.data.count - result.data.yy;
-					} else {
-						this.$message.error({ message: result.msg });
-					}
-					this.loading = false;
-					this.submitting = false;
-				} catch (error) {
-					this.loading = false;
-					this.submitting = false;
-					console.error(error);
-				}
-			},
-			/*
+        async getMaterialList() {
+            let order = ''
+            let status = ''
+            if (this.searchTableData.sort != '') {
+                order = 'add_time'
+            }
+            if (this.searchTableData.status == '2') {
+                status = ''
+            }
+            let typecontrolId = this.searchTableData.library[this.searchTableData.library.length - 1] ?? ''
+            let data = {
+                limit: this.current_limit,
+                page: this.current_page,
+                video_num: '',
+                add_time_start: '',
+                add_time_end: '',
+                typecontrol_id: typecontrolId,
+                order: order,
+                sort: this.searchTableData.sort,
+                grouping_id: this.searchTableData.equipment,
+                status: status,
+            }
+            try {
+                this.loading = true;
+                let result = await this.$api({ type: "getMaterialList", data: data });
+                if (result.status == '200') {
+                    this.tableData = result.data.list;
+                    this.total = result.data.count
+                    this.statisticsData[0].unloadNumber = result.data.count
+                    this.statisticsData[0].name = (result.data.type_title == '' ? '全部' : result.data.type_title)
+                    this.statisticsData[0].use = result.data.yy
+                    this.statisticsData[0].used = result.data.count - result.data.yy
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+                this.loading = false;
+                this.submitting = false
+            } catch (error) {
+                this.loading = false;
+                this.submitting = false
+            }
+        },
+        /*
             搜索重置
         */
 			resetTable() {
@@ -583,11 +581,13 @@
 </script>
 
 <style scoped>
-	.video {
-		display: flex;
-		justify-content: flex-start;
-		flex-wrap: wrap;
-	}
+.video {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    max-height: 700px;
+    overflow-y: scroll;
+}
 
 	.videoData {
 		width: 170px;

@@ -44,14 +44,16 @@
 						></el-option>
 					</el-select>
 				</div>
-				<el-button type="primary" class="seachbut" :loading="submitting" @click="searchTable">{{
-					submitting ? '搜索中 ...' : '搜索'
-				}}</el-button>
-				<el-button type="primary" class="seachbut" @click="resetTable">重置</el-button>
-				<el-button type="primary" class="seachbut" @click="imgUpLoad">上传图片</el-button>
-				<el-button type="primary" class="seachbut" @click="batchDelete" :loading="deleteing">{{
-					deleteing ? '删除中 ...' : '批量删除'
-				}}</el-button>
+				<el-button type="primary" size="medium" class="seachbut" :loading="submitting" @click="searchTable">{{
+        submitting ?
+            '搜索中 ...' :
+            '搜索'
+}}</el-button>
+                <el-button type="primary" class="seachbut" size="medium" @click="resetTable">重置</el-button>
+                <el-button type="primary" class="seachbut" size="medium" @click="imgUpLoad">上传图片</el-button>
+                <el-button type="primary" class="seachbut" size="medium" @click="batchDelete" :loading="deleteing">{{
+        deleteing ? '删除中...' : '批量删除'
+}}</el-button>
 			</div>
 		</div>
 		<el-dialog
@@ -336,11 +338,9 @@
 			},
 			// 图片上传成功返回
 			handleSucess(response, file, fileList) {
-				if (response.status == '200') {
-					this.fileList.push(file);
-				} else {
+				if (response.status != '200') {
 					this.$message.warning(response.msg);
-					fileList.splice(fileList.indexOf(file), 1);
+					this.fileList.splice(this.fileList.indexOf(file), 1)
 				}
 			},
 			/*
@@ -558,11 +558,13 @@
 		border-radius: 100px;
 	}
 
-	.img {
-		display: flex;
-		justify-content: flex-start;
-		flex-wrap: wrap;
-	}
+.img {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    max-height: 700px;
+    overflow-y: scroll;
+}
 
 	.imgData {
 		width: 170px;

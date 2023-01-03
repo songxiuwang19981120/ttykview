@@ -2,11 +2,11 @@
 	<div>
 		<div class="tt-accsituation">
 			<div class="tt-accsituation--operation">
-				<el-button type="primary" @click="addRole">新增</el-button>
+				<el-button type="primary" size="medium" @click="addRole">新增</el-button>
 			</div>
 		</div>
 		<!-- 表格 -->
-		<table-custom :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+		<table-custom height="700" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 		<!-- 分页 -->
 		<pagination
 			:total="total"

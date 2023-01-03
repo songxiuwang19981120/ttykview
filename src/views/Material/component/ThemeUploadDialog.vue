@@ -19,6 +19,7 @@
 					rows="6"
 					v-model="ruleForm.nickname"
 					style="width: 60%"
+					size="medium"
 				>
 				</el-input>
 			</el-form-item>
@@ -27,8 +28,8 @@
 
 		<!-- 按钮 -->
 		<el-row type="flex" justify="end" slot="footer">
-			<el-button size="small" @click="btnCancel">取消</el-button>
-			<el-button size="small" type="primary" @click="btnOK">确定</el-button>
+			<el-button size="medium" @click="btnCancel">取消</el-button>
+			<el-button size="medium" type="primary" @click="btnOK">确定</el-button>
 		</el-row>
 	</el-dialog>
 </template>

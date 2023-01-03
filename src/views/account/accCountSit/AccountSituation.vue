@@ -2,55 +2,30 @@
   <div class="tt-accsituation" ref="accsituation">
     <div class="tt-accsituation--top">
       <div class="mr-15">
-        <el-select
-          ref="gropuSelect"
-          clearable
-          v-model="group"
-          placeholder="设置分组"
-        >
-          <el-option
-            v-for="item in groupList"
-            :value="item.grouping_id"
-            :label="item.grouping_name"
-            :key="item.grouping_id"
-          ></el-option>
+        <el-select ref="gropuSelect" clearable v-model="group" placeholder="设置分组">
+          <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
+            :key="item.grouping_id"></el-option>
         </el-select>
       </div>
 
       <div class="mr-15">
-        <el-cascader
-          clearable
-          :props="{ checkStrictly: true, value: 'value' }"
-          :options="typeList"
-          v-model="classiFication"
-          placeholder="设置分类"
-        ></el-cascader>
+        <el-cascader clearable :props="{ checkStrictly: true, value: 'value' }" :options="typeList"
+          v-model="classiFication" placeholder="设置分类"></el-cascader>
       </div>
 
       <div class="mr-15">
         <el-select clearable v-model="fans" placeholder="粉丝量">
-          <el-option
-            v-for="item in fans_option"
-            :value="item.value"
-            :label="item.label"
-            :key="item.label"
-          ></el-option>
+          <el-option v-for="item in fans_option" :value="item.value" :label="item.label" :key="item.label"></el-option>
         </el-select>
       </div>
 
       <div class="mr-15">
         <el-select clearable v-model="ascription" placeholder="账号归属">
-          <el-option
-            v-for="item in ascription_option"
-            :value="item.value"
-            :label="item.label"
-            :key="item.label"
-          ></el-option>
+          <el-option v-for="item in ascription_option" :value="item.value" :label="item.label"
+            :key="item.label"></el-option>
         </el-select>
       </div>
-      <el-button class="base-btn search-btn" @click="handlerSearch"
-        >搜索</el-button
-      >
+      <el-button class="base-btn search-btn" @click="handlerSearch">搜索</el-button>
       <el-button class="base-btn search-btn" @click="RestQuery">重置</el-button>
       <el-button class="base-btn">账号分配</el-button>
       <el-button @click="handleFollow" class="base-btn">{{
@@ -65,21 +40,10 @@
       <el-button class="base-btn">一键监控选中账号</el-button>
     </div>
 
-    <table-custom
-      class="tt-accsituation--tabel"
-      :mutiSelect="true"
-      @handleSelectionChange="handleSelectChange"
-      :loading="loading"
-      :tableData="memberList"
-      :columns="columns"
-    ></table-custom>
+    <table-custom height="700" :mutiSelect="true" @handleSelectionChange="handleSelectChange"
+      :loading="loading" :tableData="memberList" :columns="columns"></table-custom>
 
-    <Pagination
-      :total="total"
-      :page="page"
-      :size="limit"
-      @pagination="handlePagination"
-    />
+    <Pagination :total="total" :page="page" :limit="limit" @pagination="handlePagination" />
 
     <ConfrimDelDialog
       :showConfrimDel="showConfrimDel"
@@ -1039,6 +1003,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/assets/base/base.scss";
+
 .base-btn {
   background-color: $button-back-color;
   border-color: $button-bord-color;
@@ -1087,11 +1052,6 @@ export default {
   width: 100%;
   height: 60px;
   background-color: #fff;
-  border-radius: 8px;
-}
-
-.tt-accsituation--tabel {
-  width: 100% !important;
   border-radius: 8px;
 }
 
@@ -1150,6 +1110,6 @@ export default {
   height: 80px;
   background-color: #ffdda5;
 }
-.table-avatar {
-}
+
+.table-avatar {}
 </style>

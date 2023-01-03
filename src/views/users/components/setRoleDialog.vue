@@ -12,8 +12,8 @@
 		>
 		</el-tree>
 		<el-row type="flex" justify="end" style="margin-top: 20px;">
-			<el-button type="primary" @click="btnOK">确定</el-button>
-			<el-button @click="btnCancel">取消</el-button>
+			<el-button type="primary" size="medium" @click="btnOK">确定</el-button>
+			<el-button @click="btnCancel" size="medium">取消</el-button>
 		</el-row>
 	</el-dialog>
 </template>

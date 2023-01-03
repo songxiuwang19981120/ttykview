@@ -19,6 +19,7 @@
 					rows="6"
 					v-model="ruleForm.label"
 					style="width: 60%"
+					size="medium"
 				>
 				</el-input>
 			</el-form-item>
@@ -27,10 +28,10 @@
 
 		<!-- 按钮 -->
 		<el-row type="flex" justify="end" slot="footer">
-			<el-button size="small" @click="btnCancel">取消</el-button>
-			<el-button type="primary" :loading="btnloading" @click="btnOK">{{
-				btnloading ? '上传中...' : '确定'
-			}}</el-button>
+			<el-button size="medium" @click="btnCancel">取消</el-button>
+			<el-button type="primary" size="medium" :loading="btnloading" @click="btnOK">{{
+		btnloading ? '上传中...' : '确定'
+				}}</el-button>
 		</el-row>
 	</el-dialog>
 </template>

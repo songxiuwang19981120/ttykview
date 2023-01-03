@@ -18,13 +18,14 @@
 						:key="item.value"
 						:label="item.label"
 						:value="item.value"
+						size="medium"
 					>
 					</el-option>
 				</el-select>
 			</el-form-item>
 			<!-- 添加私信 -->
 			<el-form-item prop="content" label="添加私信：">
-				<el-input placeholder="请输入私信" rows="6" v-model="ruleForm.content" style="width: 60%">
+				<el-input placeholder="请输入私信" rows="6" v-model="ruleForm.content" style="width: 60%" size="medium">
 				</el-input>
 			</el-form-item>
 		</el-form>
@@ -32,10 +33,10 @@
 
 		<!-- 按钮 -->
 		<el-row type="flex" justify="end" slot="footer">
-			<el-button size="small" @click="btnCancel">取消</el-button>
-			<el-button type="primary" :loading="btnloading" @click="btnOK">{{
-				btnloading ? '上传中...' : '确定'
-			}}</el-button>
+			<el-button size="medium" @click="btnCancel">取消</el-button>
+			<el-button type="primary" size="medium" :loading="btnloading" @click="btnOK">{{
+		btnloading ? '上传中...' : '确定'
+				}}</el-button>
 		</el-row>
 	</el-dialog>
 </template>

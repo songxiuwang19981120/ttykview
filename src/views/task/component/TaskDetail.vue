@@ -12,6 +12,7 @@
         :loading="loading"
         :tableData="tableData"
         :columns="columns"
+        height="700"
       >
       </table-custom>
     </el-dialog>
