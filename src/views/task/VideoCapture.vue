@@ -5,7 +5,7 @@
             <div class="tt-accsituation--operation">
                 <el-input v-model="numberValidateForm.age" placeholder="请输入完整素材链接https://www.tiktok.com/@..."
                     style="width:30%;margin-right: 20px;" clearable></el-input>
-                <el-button type="primary" @click="searchLink" :loading="searching">{{ searching ? '获取中 ...' :
+                <el-button size="medium" type="primary" @click="searchLink" :loading="searching">{{ searching ? '获取中 ...' :
         '获取TT视频'
 }}</el-button>
 
@@ -19,9 +19,9 @@
                         :value="item.value">
                     </el-option>
                 </el-select>
-                <el-button type="primary" @click="videocaptureIndex">搜 索</el-button>
-                <el-button type="primary" @click="videocaptureIndexs">重 置</el-button>
-                <el-button type="primary" :disabled="disableda" @click="transition()">导出下载地址</el-button>
+                <el-button type="primary" @click="videocaptureIndex" size="medium">搜 索</el-button>
+                <el-button type="primary" @click="videocaptureIndexs" size="medium">重 置</el-button>
+                <el-button type="primary" :disabled="disableda" @click="transition()" size="medium">导出下载地址</el-button>
             </div>
         </div>
 

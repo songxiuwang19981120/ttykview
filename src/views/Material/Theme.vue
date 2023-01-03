@@ -17,11 +17,11 @@
 				</div>
 				<div>
 					<!-- 查询 -->
-					<el-button type="primary" :loading="btnloading" @click="searchNickName">{{ btnloading ? '加载中...'
+					<el-button size="medium" type="primary" :loading="btnloading" @click="searchNickName">{{ btnloading ? '加载中...'
 		: '搜索'
 }}</el-button>
-					<el-button type="primary" @click="btnReset">重置</el-button>
-					<el-button type="primary" @click="uploadNickName">上传</el-button>
+					<el-button size="medium" type="primary" @click="btnReset">重置</el-button>
+					<el-button size="medium" type="primary" @click="uploadNickName">上传</el-button>
 				</div>
 			</div>
 		</div>

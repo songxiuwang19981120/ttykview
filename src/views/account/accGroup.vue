@@ -1,18 +1,18 @@
 <template>
     <div>
         <div style="margin:10px 0 20px 0">
-            <el-button type="primary" @click="dialogVisible = true"><i class="el-icon-plus"></i>添加分组</el-button>
+            <el-button style="margin-right:20px" size="medium" type="primary" @click="dialogVisible = true"><i class="el-icon-plus"></i>添加分组</el-button>
             <el-popconfirm
                                     confirm-button-text='删除'
                                     cancel-button-text='取消'
-                                    title="确认删除此视频？"
+                                    title="确认删除分组？"
                                     @confirm="deleteselect"
                                 >
-                                    <i slot="reference" class="el-icon-delete" ></i>
+                                <el-button slot="reference" size="medium"  type="primary" >批量删除</el-button>
                                 </el-popconfirm>
 
         </div>
-        <el-dialog title="添加分组" :visible.sync="dialogVisible" width="600px" center :before-close="addhandleClose">
+        <el-dialog title="添加分组" :visible.sync="dialogVisible" width="600px" :before-close="addhandleClose">
             <el-form ref="form" :rules="addRules" :model="addform" label-width="140px">
                 <el-form-item label="分组名称:" prop="grouping_name">
                     <el-input v-model="addform.grouping_name" placeholder="请输入分组名称" style="width:60%"></el-input>
@@ -27,7 +27,7 @@
 
 
 
-        <el-dialog title="编辑分组名称" :visible.sync="exitDialogVisible" width="600px" center :before-close="exithandleClose">
+        <el-dialog title="编辑分组名称" :visible.sync="exitDialogVisible" width="600px" :before-close="exithandleClose">
             <el-form ref="form" :rules="exitRules" :model="exitform" label-width="140px">
                 <el-form-item label="分组名称:" prop="grouping_name">
                     <el-input v-model="exitform.grouping_name" placeholder="请输入分组名称" style="width:60%"></el-input>
@@ -254,6 +254,7 @@ export default {
                     }
                 });
                 if (result.status == 200) {
+                    this.$message.success({ message: result.msg })
                     this.getGrouping()
                 } else {
                     this.$message.error({ message: result.msg })

@@ -3,11 +3,16 @@
     <div style="padding:10px">
 
       <el-select v-model="searchTableData.equipment" placeholder="账号分组选择" style="margin-right: 20px"
-        @change="getTypecontrol" :loading="equipmentLoading" loading-text="数据加载中...">
+        @change="getTypecontrol"
+        :loading="equipmentLoading" loading-text="数据加载中...">
         <el-option v-for="item in searchEquipmentList" :key="item.grouping_id" :label="item.grouping_name"
           :value="item.grouping_id">
         </el-option>
       </el-select>
+
+
+      
+
       <el-cascader :options="options" v-model="val_Tw" style="padding:0" :props="{ checkStrictly: true }"
         placeholder="账号分类选择">
         <template slot-scope="{ node, data }">
@@ -15,16 +20,17 @@
             <span>{{ data.label }}</span>
             <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
           </span>
+          
         </template>
       </el-cascader>
-      <el-button style="margin-left:20px" type="primary" @click="FnNewzh()">重置</el-button>
-      <el-button type="primary" @click="handleChange2">搜索</el-button>
-      <el-button type="primary" @click="dialogNewVisibleadd()"><i class="el-icon-plus"></i>新增</el-button>
+      <el-button style="margin-left:20px" type="primary" @click="FnNewzh()" size="medium">重置</el-button>
+      <el-button type="primary" @click="handleChange_search" size="medium">搜索</el-button>
+      <el-button type="primary" @click="dialogNewVisibleadd()" size="medium"><i class="el-icon-plus"></i>新增</el-button>
 
     </div>
     <!-- 新增按钮 -->
     <!-- 新增弹窗 -->
-    <el-dialog title="新增分类" :visible.sync="dialogNewVisible" width="600px" :before-close="closeadd">
+    <el-dialog title="新增分类" :visible.sync="dialogNewVisible" width="700px" :before-close="closeadd">
       <el-form ref="form" :rules="rules" :model="formNew" label-width="140px">
         <el-form-item label="选择账号分组:" prop="equipment">
           <el-select v-model="formNew.equipment" placeholder="账号分组选择" style="margin-right: 20px;width:200px"
@@ -35,7 +41,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="选择账号分类:" prop="group">
-          <el-cascader :disabled="disabled" :options="options_tw" :props="defaultPropsa" v-model="formNew.group"
+          <!-- <el-cascader :disabled="disabled" :options="options_tw" :props="defaultPropsa" v-model="formNew.group"
             @change="menuchange" style="width:200px"><template slot-scope="{ node, data }">
               <span>
                 <span>{{ data.label }}</span>
@@ -45,7 +51,89 @@
           </el-cascader>
           <span @click="addlis">
             <el-checkbox style="margin-left:20px" v-model="checked">添加为一级分类</el-checkbox>
-          </span>
+          </span> -->
+
+          <el-select
+            v-model="formNew.group"
+            placeholder="一级"
+            ref="template"
+            @visible-change="(v) => visibleChange(v, 'template')"
+            style="width:120px"
+          >
+            <el-option
+              v-for="item in options_tww"
+              :key="item.typecontrol_id"
+              :label="item.label"
+              :value="item.value"
+            >
+              <span style="float: left" class="span-style">{{ item.label }}</span>
+          
+
+            </el-option>
+          </el-select>
+
+
+          <el-select
+            v-model="formNew.group"
+            placeholder="二级"
+            ref="template1"
+            @visible-change="(v) => visibleChange(v, 'template1')"
+            style="width:120px"
+          >
+            <el-option
+              v-for="item in searchEquipmentList"
+              :key="item.grouping_id"
+              :label="item.grouping_name"
+              :value="item.grouping_id"
+            >
+              <span style="float: left" class="span-style">{{ item.grouping_name }}</span>
+          
+
+            </el-option>
+          </el-select>
+
+
+          <el-select
+            v-model="formNew.group"
+            placeholder="三级"
+            ref="template2"
+            @visible-change="(v) => visibleChange(v, 'template2')"
+            style="width:120px"
+          >
+            <el-option
+              v-for="item in searchEquipmentList"
+              :key="item.grouping_id"
+              :label="item.grouping_name"
+              :value="item.grouping_id"
+            >
+              <span style="float: left" class="span-style">{{ item.grouping_name }}</span>
+          
+
+            </el-option>
+          </el-select>
+
+
+          <el-select
+            v-model="formNew.group"
+            placeholder="四级"
+            ref="template3"
+            @visible-change="(v) => visibleChange(v, 'template3')"
+            style="width:120px"
+          >
+            <el-option
+              v-for="item in searchEquipmentList"
+              :key="item.grouping_id"
+              :label="item.grouping_name"
+              :value="item.grouping_id"
+            >
+              <span style="float: left" class="span-style">{{ item.grouping_name }}</span>
+          
+
+            </el-option>
+          </el-select>
+
+
+
         </el-form-item>
         <el-form-item label="新增分类名称:" prop="name">
           <el-input v-model="formNew.name" style="width:200px" placeholder="新增分类名称"></el-input>
@@ -58,8 +146,9 @@
     </el-dialog>
 
     <!-- 表格 -->
-    <tableCustom height="600" :tableData="tableData_tw_t" :columns="columns" :load="load">
+    <tableCustom height="600" :tableData="tableData_tw_t" row-key="value" :columns="columns" :load="load" :loading="loading">
     </tableCustom>
+  
     <el-dialog title="编辑" :visible.sync="dialogFormVisible">
       <el-form :model="form">
         <el-form-item label="修改名称:" label-width="100px">
@@ -89,6 +178,9 @@ export default {
   components: { pagination, tableCustom },
   data() {
     return {
+      options_tww:[],//第一级下拉
+      loading:false,
+      labelslist: [],
       submitting: false,
       rules: {
         equipment: [{ required: true, message: '请选择账号分组', trigger: 'blur' }],
@@ -197,24 +289,33 @@ export default {
         console.error(error)
       }
     },
-    //查询
+    //分类
     async getEquipmentGroupAdd() {
+      
       try {
         let result = await this.$api({
           type: "getTypecontrol",
           data: {
-            grouping_id: this.searchTableData1.equipment
+            grouping_id: this.searchTableData1.equipment,
           }
         });
         if (result.status == 200) {
           this.options_tw = result.data;
+          console.log(this.options_tw)
+          
+          this.options_tw.forEach(item => {
+            if(item.grouping_name==this.searchTableData1.equipment){
+              this.options_tww.push(item)
+            }
+            
+          });
+          console.log(this.searchTableData.equipment)
           this.$nextTick(() => {
             this.filterTreeDate(result.data)//联动后方无内容
-
           })
-
+        } else {
+          this.$message.error(res.msg);
         }
-
       } catch (error) {
         console.error(error)
       }
@@ -239,9 +340,10 @@ export default {
     },
     //重置按钮
     FnNewzh() {
-      this.val_Tw = [];
+      this.searchTableData.equipment=""
+      this.val_Tw = "";
       this.options = [];
-      this.searchTableData = {}
+
       this.Typecontrol()
     },
 
@@ -342,7 +444,7 @@ export default {
         return null;
       });
     },
-    handleChange2() {
+    handleChange_search() {
       this.vals_tee = this.getCascaderObj2(this.val_Tw, this.menudata_t); //选中节点数据 
       this.tableData_tw_t = [];
       this.vals_tee.forEach(item => {
@@ -371,22 +473,27 @@ export default {
         page: this.current_page,
       }
       try {
+        this.loading=true
         let result = await this.$api({
           type: "getTypecontrol",
           data: data
         });
         if (result.status == '200') {
+
           this.tableData_tw_t = result.data;
           this.menudata = result.data;
           this.menudata_t = result.data;
           this.filterTreeDate(result.data)//联动后方无内容
+          
         } else {
           this.$message.error({ message: result.msg })
-
         }
       } catch (error) {
         console.error(error)
+      }finally {
+        this.loading=false
       }
+      
     },
 
     //操作
@@ -453,6 +560,45 @@ export default {
         resolve(tree.children)
       }, 100)
     },
+
+
+    // 添加分类标签
+    showShipTemplate() {
+      this.$prompt("请输入新的分类名称", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+      }).then(({ value }) => {
+        console.log(value)
+       
+      });
+    },
+    visibleChange(visible, refName) {
+      if (visible) {
+        const ref = this.$refs[refName];
+        let popper = ref.$refs.popper;
+        if (popper.$el) popper = popper.$el;
+        if (
+          !Array.from(popper.children).some(
+            (v) => v.className === "el-template-menu__list"
+          )
+        ) {
+          const el = document.createElement("ul");
+          el.className = "el-template-menu__list";
+          el.style =
+            "border-top:2px solid rgb(219 225 241); padding:0; color:rgb(64 158 255);font-size: 13px";
+          el.innerHTML = `<li class="el-cascader-node text-center" style="height:37px;line-height: 50px;margin-left:10px;">
+            <span class="el-cascader-node__label"><i class="font-blue el-icon-plus"></i>添加分类</span>
+            </li>`;
+          popper.appendChild(el);
+          el.onclick = () => {
+            this.showShipTemplate(null, false);
+          };
+        }
+      }
+    },
+
+
+
   },
 };
 </script>

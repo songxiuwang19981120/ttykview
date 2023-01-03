@@ -16,10 +16,10 @@
             </el-option>
           </el-select>
         </div>
-        <el-button type="primary" @click="examine_index">查看</el-button>
-        <el-button type="primary" @click="reset">重置</el-button>
-        <el-button type="primary" @click="dialog = true">修改分组</el-button>
-        <el-button style="margin-right: 20px;" type="primary" @click="dialogFormVisible = true">创建账号</el-button>
+        <el-button type="primary" @click="examine_index" size="medium">查看</el-button>
+        <el-button type="primary" @click="reset" size="medium">重置</el-button>
+        <el-button type="primary" @click="dialog = true" size="medium">修改分组</el-button>
+        <el-button style="margin-right: 20px;" type="primary" @click="dialogFormVisible = true" size="medium">创建账号</el-button>
       </div>
       <div style="background-color:white;height: 28px;">
         <span class="position_select_num">已选中{{totalChange}}个设备</span>
