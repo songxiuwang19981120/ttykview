@@ -100,7 +100,7 @@
 			},
 			// 分类选择
 			handleTypeChange(e) {
-				this.ruleForm.typecontrol_id = e;
+				this.ruleForm.typecontrol = e;
 			},
 			// 获取账号分组数据
 			async getaccGroup() {
