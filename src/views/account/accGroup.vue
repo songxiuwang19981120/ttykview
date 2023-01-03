@@ -2,11 +2,17 @@
     <div>
         <div style="margin:10px 0 20px 0">
             <el-button type="primary" @click="dialogVisible = true"><i class="el-icon-plus"></i>添加分组</el-button>
+            <el-popconfirm
+                                    confirm-button-text='删除'
+                                    cancel-button-text='取消'
+                                    title="确认删除此视频？"
+                                    @confirm="deleteselect"
+                                >
+                                    <i slot="reference" class="el-icon-delete" ></i>
+                                </el-popconfirm>
+
         </div>
-
-
-
-        <el-dialog title="添加分组" :visible.sync="dialogVisible" width="40%" :before-close="addhandleClose">
+        <el-dialog title="添加分组" :visible.sync="dialogVisible" width="600px" center :before-close="addhandleClose">
             <el-form ref="form" :rules="addRules" :model="addform" label-width="140px">
                 <el-form-item label="分组名称:" prop="grouping_name">
                     <el-input v-model="addform.grouping_name" placeholder="请输入分组名称" style="width:60%"></el-input>
@@ -21,7 +27,7 @@
 
 
 
-        <el-dialog title="编辑分组名称" :visible.sync="exitDialogVisible" width="40%" :before-close="exithandleClose">
+        <el-dialog title="编辑分组名称" :visible.sync="exitDialogVisible" width="600px" center :before-close="exithandleClose">
             <el-form ref="form" :rules="exitRules" :model="exitform" label-width="140px">
                 <el-form-item label="分组名称:" prop="grouping_name">
                     <el-input v-model="exitform.grouping_name" placeholder="请输入分组名称" style="width:60%"></el-input>
@@ -36,7 +42,7 @@
 
 
 
-        <table-custom style="width:100%" :tableData="tableData" :columns="columns"></table-custom>
+        <table-custom style="width:100%" :mutiSelect="true" @handleSelectionChange="selectionChange" :tableData="tableData" :columns="columns"></table-custom>
         <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination">
         </pagination>
     </div>
@@ -52,6 +58,7 @@ export default {
     },
     data() {
         return {
+            delete_checkbox:[],//选中的唯一ID
             submitting:false,
             exitDialogVisible:false,
             addform:{
@@ -228,10 +235,46 @@ export default {
             this.current_page = val.page;  //页数
             this.current_limit = val.limit  //条数
         },
+        //多选事件
+        selectionChange(val){
+            this.delete_checkbox=[]
+      
+            val.forEach(item => {
+               this.delete_checkbox.push(item.grouping_id)
+            });
+            this.delete_checkbox=this.delete_checkbox.toString()
+            console.log(this.delete_checkbox)
+        },
+          //删除选中
+          async deleteselect() {
+            try {
+                let result = await this.$api({
+                    type: "deletaGrouping",
+                    data: {
+                        grouping_ids:this.delete_checkbox
+                    }
+                });
+                if (result.status == 200) {
+                    this.getGrouping()
+                } else {
+                    this.$message.error({ message: result.msg })
+                }
+            } catch (error) {
+            }
+        },
     },
 };
 </script>
 
-<style lang="stylus" scoped>
+<style scoped>
+.el-icon-delete{
+    color:#FF3E1E;
+    font-size:28px;
+    position: relative;
+    top: 4px;
+    left: 20px;
+    cursor: pointer;
+    font-weight: 600;
+}
 
 </style>
