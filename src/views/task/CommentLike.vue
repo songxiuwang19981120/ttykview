@@ -4,102 +4,47 @@
       <div class="tt-accsituation--operation">
         <div style="margin-right: 20px">
           <el-select v-model="page.status" placeholder="请选择任务状态" size="medium">
-            <el-option
-              v-for="item in searchStateList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
+            <el-option v-for="item in searchStateList" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
-          <el-date-picker
-            size="medium"
-            class="date-picker"
-            v-model="date"
-            type="daterange"
-            align="right"
-            unlink-panels
-            range-separator="——"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            :picker-options="pickerOptions"
-          >
+          <el-date-picker size="medium" class="date-picker" v-model="date" type="daterange" align="right" unlink-panels
+            range-separator="——" start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="pickerOptions">
           </el-date-picker>
         </div>
-        <el-button
-         size="medium"
-          type="primary"
-          class="seachbut"
-          :loading="btnloading"
-          @click="searchTasks"
-          
-          >{{ btnloading ? "加载中..." : "搜索" }}</el-button
-        >
-        <el-button type="primary" size="medium" class="seachbut" @click="btnReset"
-          >重置</el-button
-        >
-        <el-button
-          type="primary"
-          size="medium"
-          class="seachbut"
-          @click="showLikeCommentDialog"
-          >点赞任务</el-button
-        >
-		<!-- <i class="el-icon-refresh-left"></i> -->
+        <el-button size="medium" type="primary" class="seachbut" :loading="btnloading" @click="searchTasks">{{
+    btnloading ? "加载中..." : "搜索"
+}}</el-button>
+        <el-button type="primary" size="medium" class="seachbut" @click="btnReset">重置</el-button>
+        <el-button type="primary" size="medium" class="seachbut" @click="showLikeCommentDialog">点赞任务</el-button>
+        <!-- <i class="el-icon-refresh-left"></i> -->
       </div>
     </div>
     <!-- 表格 -->
-    <table-custom
-      :loading="loading"
-      :tableData="tableData"
-      :columns="columns"
-      height="700"
-    ></table-custom>
+    <table-custom :loading="loading" :tableData="tableData" :columns="columns" height="700"></table-custom>
     <!-- 分页 -->
-    <pagination
-      :total="total"
-      :page="page.page"
-      :limit="page.limit"
-      @pagination="pageChange"
-    ></pagination>
+    <pagination :total="total" :page="page.page" :limit="page.limit" @pagination="pageChange"></pagination>
     <!-- 弹层 -->
-    <CommentLikeDialogComponent
-      ref="dialog"
-      :showDialog.sync="dialog"
-      :curId="curId"
-    ></CommentLikeDialogComponent>
-    <LikeCommentDialog
-      @closeLikeCommentTask="closeLikeCommentTask"
-      :showLikeCommentTask="showLikeCommentTask"
-    />
-		    <TaskDetail
-      @closeTaskDetail="closeTaskDetail"
-      :showTaskDetail="showTaskDetail"
-      :tableData="tableData"
-      :title="title"
-    />
+    <commentLikeDetail ref="taskDialog" @closeTaskDetail="closeTaskDetail" :showTaskDetail="showTaskDetail" :tableData="tableData"></commentLikeDetail>
+    <newCommentLike ref="likecommment" @closeLikeCommentTask="closeLikeCommentTask" :showLikeCommentTask="showLikeCommentTask" />
   </div>
 </template>
 <script>
 import tableCustom from "@/components/myComponent/table/tableCustom.vue";
-import CommentLikeDialogComponent from "./component/CommentLikeDialogComponent.vue";
+import commentLikeDetail from "./component/commentLikeDetail.vue";
 import pagination from "@/components/myComponent/table/pagination.vue";
-import LikeCommentDialog from "@/views/account/accCountSit/taskDialog/likeCommentDialog.vue";
-import TaskDetail from "./component/TaskDetail.vue";
+import newCommentLike from "./component/newCommentLike.vue";
 export default {
   name: "TtCommentLike",
   components: {
     tableCustom,
-    CommentLikeDialogComponent,
     pagination,
-    LikeCommentDialog,
-	TaskDetail
+    commentLikeDetail,
+    newCommentLike,
   },
   data() {
     return {
-      date:'',
-		title:'评论点赞任务详情',
-		showTaskDetail:false,
+      date: '',
+      showTaskDetail: false,
       showLikeCommentTask: false,
       // 下拉选择数据
       searchStateList: [
@@ -159,27 +104,31 @@ export default {
           render: (h, { row }) => {
             return (
               <div>
-     			<el-button
-                  type="primary"
+                <el-button
+                  type="success"
                   size="mini"
                   onClick={this.toDetail.bind(this, row.tasklist_id)}
                 >
                   查看详情
                 </el-button>
                 <el-button
-                  type="primary"
-                  size="mini"
-                  onClick={this.delete.bind(this, row.tasklist_id)}
-                >
-                  删除
-                </el-button>
-                <el-button
-                  type="primary"
+                  type="warning"
                   size="mini"
                   onClick={this.suspend.bind(this, row.tasklist_id)}
+                  style="margin-right:10px"
                 >
                   暂停
                 </el-button>
+                <el-popconfirm
+                  confirm-button-text="删除"
+                  cancel-button-text="取消"
+                  title="确认删除该任务吗？"
+                  onConfirm={this.delete.bind(this, row.subjectcontent_id)}
+                >
+                  <el-button slot="reference" type="danger" size="mini">
+                    删除
+                  </el-button>
+                </el-popconfirm>
               </div>
             );
           },
@@ -229,16 +178,25 @@ export default {
   },
 
   created() {
-    // 获取评论区点赞任务列表
+  },
+
+  mounted() {
     this.getVideoTasks(this.page);
   },
 
-  mounted() {},
-
   methods: {
-	closeTaskDetail(){
-		this.showTaskDetail = false
-	},
+    delete(id) {
+      this.$message.success('删除成功');
+
+    },
+    // 暂停
+    suspend(id) {
+      this.$message.success('操作成功');
+    },
+    // 隐藏评论点赞任务详情
+    closeTaskDetail() {
+      this.showTaskDetail = false
+    },
     // 获取评论区点赞任务列表
     async getVideoTasks(data) {
       try {
@@ -264,16 +222,12 @@ export default {
     // 查看详情
     toDetail(id) {
       this.showTaskDetail = true;
-      this.curId = id;
-      this.$refs.dialog.getTaskListDetail({
-        page: 1,
-        limit: 10,
-        tasklist_id: id,
-      });
+      this.$refs.taskDialog.getTaskListDetail(id);
     },
     // 当前页数据条数/页码改变
     pageChange(obj) {
-      (this.page.page = obj.page), (this.page.limit = obj.limit);
+      this.page.page = obj.page
+      this.page.limit = obj.limit;
       this.getVideoTasks(this.page);
     },
     // 点击查询按钮
@@ -308,22 +262,23 @@ export default {
     */
     showLikeCommentDialog() {
       this.showLikeCommentTask = true;
+      this.$refs.likecommment.getList()
     },
   },
 };
 </script>
 
 <style  lang="scss" scoped>
-	@import '@/assets/base/_color_variables.scss';
+@import '@/assets/base/_color_variables.scss';
 
 .date-picker {
-	margin-left: 16px;
+  margin-left: 16px;
 }
 
 .el-icon-refresh-left {
-	margin: 5px 0 0 50px;
-	font-size: 30px;
-	color: $button-back-color;
-	cursor: pointer;
+  margin: 5px 0 0 50px;
+  font-size: 30px;
+  color: $button-back-color;
+  cursor: pointer;
 }
 </style>
