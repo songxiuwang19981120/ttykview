@@ -283,7 +283,9 @@ export default {
             if (response.status != '200') {
                 this.$message.warning(response.msg);
                 this.fileList.splice(this.fileList.indexOf(file), 1)
-            } 
+            }else{
+                this.fileList=fileList
+            }
         },
         // 视频上传失败回调
         handleError(err, file, fileList) {
@@ -361,6 +363,7 @@ export default {
         },
         // 视频上传提交
         submitForVideo() {
+            console.log(this.fileList);
             if (this.fileList.length == 0) {
                 return this.$message.warning({ message: '请选择需要上传的视频' });
             }

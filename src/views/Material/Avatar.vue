@@ -273,6 +273,8 @@ export default {
             if (response.status != '200') {
                 this.$message.warning(response.msg);
                 this.fileList.splice(this.fileList.indexOf(file), 1)
+            }else{
+                this.fileList=fileList
             }
         },
         /*
