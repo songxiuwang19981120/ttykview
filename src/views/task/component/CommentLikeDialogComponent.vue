@@ -45,6 +45,7 @@
 				:loading="loading"
 				:tableData="tableData"
 				:columns="columns"
+				height="700"
 			></table-custom>
 			<!-- 分页 -->
 			<pagination
@@ -96,6 +97,10 @@
 						value: '1',
 						label: '未开始',
 					},
+					{
+						value: '3',
+						label: '领取中',
+					},
 				],
 				loading: false,
 				btnloading: false,
@@ -137,7 +142,9 @@
 								state = '未开始';
 							} else if (status == 2) {
 								state = '失败';
-							}
+							} else if (status == 3) {
+								state = '领取中';
+							} 
 							return <div>{state}</div>;
 						},
 					},
@@ -148,10 +155,9 @@
 						render(h, { row }) {
 							if (
 								row.reason &&
-								JSON.parse(row.reason).detail &&
-								JSON.parse(row.reason).detail.length
+								row.reason !== 'null'
 							) {
-								return <div>{JSON.parse(row.reason).detail[0].msg}</div>;
+								return <div>{row.reason}</div>;
 							} else if (row.status == 2) {
 								return <div>暂无失败原因</div>;
 							} else {

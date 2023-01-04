@@ -1,28 +1,11 @@
 <template>
-  <el-table
-    ref="tableCustom"
-    highlight-current-row
-    v-loading="loading"
-    :row-key="rowKey"
-    :data="tableData"
-    :span-method="spanmethod"
-    :cell-class-name="cellClassName"
-    :header-cell-class-name="headerCellClassCame"
-    :height="height"
-    @select="handleSelect"
-    @select-all="handleSelectAll"
-    @selection-change="handleSelectionChange"
-    @sort-change="sortChange"
-    @expand-change="expandChange"
-    style="margin: 0 auto"
-    stripe
-  >
-    <el-table-column
-      type="selection"
-      width="50"
-      :selectable="checkboxJudge"
-      v-if="mutiSelect"
-    ></el-table-column>
+  <el-table :ref="tableCustom" highlight-current-row v-loading="loading" :row-key="rowKey" :data="tableData"
+    :span-method="spanmethod" :cell-class-name="cellClassName" :header-cell-class-name="headerCellClassCame"
+    :max-height="height" @select="handleSelect" @select-all="handleSelectAll" @selection-change="handleSelectionChange"
+    @sort-change="sortChange" @expand-change="expandChange" style=" margin: 0 auto" stripe>
+    <el-table-column type="index" width="50" v-if="isIndex" align="center" :fixed="true" label="序号"></el-table-column>
+
+    <el-table-column type="selection" width="45" :selectable="checkboxJudge" v-if="mutiSelect"></el-table-column>
     <el-table-column v-if="isExpand" width="24" type="expand">
       <template slot-scope="scope">
         <table-charts ref="tableChartsRef" :scope="scope.row"></table-charts>
@@ -120,6 +103,12 @@ export default {
         return false;
       },
     },
+    isIndex: {
+      type: Boolean,
+      default() {
+        return false;
+      },
+    },
     isExpand: {
       type: Boolean,
       default() {
@@ -176,4 +165,13 @@ export default {
   },
 };
 </script>
+<style>
+.el-table th.el-table__cell>.cell {
+  font-size: 13px;
+}
+
+.el-table td.el-table__cell div {
+  font-size: 12px;
+}
+</style>
   

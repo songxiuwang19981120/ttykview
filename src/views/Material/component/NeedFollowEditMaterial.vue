@@ -1,11 +1,11 @@
 <template>
   <!-- <div> -->
   <el-dialog :visible.sync="editShowDialog" title="编辑素材" width="70%" :before-close="cancelMaterial">
-    <el-button @click="batchDelete" type="primary" :loading="deleteing">{{ deleteing ? '删除中 ...': '批量删除'}}</el-button>
-    <table-custom  :mutiSelect="true" @handleSelectionChange="selectionChange" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+    <el-button @click="batchDelete" type="primary" size="medium" :loading="deleteing">{{ deleteing ? '删除中 ...': '批量删除'}}</el-button>
+    <table-custom  height="700"  :mutiSelect="true" @handleSelectionChange="selectionChange" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
     <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination"></pagination>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="cancelMaterial">取 消</el-button>
+      <el-button size="medium" @click="cancelMaterial">取 消</el-button>
     </span>
   </el-dialog>
   <!-- </div> -->

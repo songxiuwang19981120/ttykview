@@ -38,6 +38,7 @@
           :loading="loading"
           :tableData="tableData"
           :columns="columns"
+          height="700"
         ></table-custom>
       </happy-scroll>
     </el-card>

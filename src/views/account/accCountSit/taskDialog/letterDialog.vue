@@ -73,6 +73,7 @@
             style="width: 38%"
             v-model="letterTaskForm.tasklist_id_list"
             placeholder="选择数据来源"
+            v-loadMore="sourceLoadMore"
           >
             <el-option
               v-for="item in sourceData"
@@ -96,10 +97,11 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item 
-        label-width="150px" 
-        label="关注频率 ：" 
-        required>
+        <el-form-item
+          label-width="150px"
+          label="关注频率 ："
+          prop="follow_rate"
+        >
           <div class="between-input">
             <el-form-item class="rate-min" prop="rate_min">
             <el-input
@@ -219,14 +221,16 @@ export default {
       rules: letter,
       blackList: ["无昵称", "无作品", "无头像", "历史已操作用户"],
       blackListMap: {
-        '无头像': "no_avatar",
-        '无作品': "no_aweme",
-        '历史已操作用户': "historical_users",
-        '无昵称': "no_nickname",
+        无头像: "no_avatar",
+        无作品: "no_aweme",
+        历史已操作用户: "historical_users",
+        无昵称: "no_nickname",
       },
       typeList:[],
       groupList:[],
       sourceData: [],
+      page: 1,
+      limit: 20,
       // TODO 国家options
       countryOptions: [
         {
@@ -280,7 +284,7 @@ export default {
         user_follow_upper_limit: "", //单号关注上限
         rate_min: "", //关注频率最小值
         rate_max: "", //关注频率最大值
-        typecontrol_id:'',
+        sourceCount: "",
         follower_status: "", //粉丝量小于
         tasklist_id_list: [], //数据来源
         following_count: "", //关注数量小于
@@ -303,8 +307,21 @@ export default {
   },
 
   methods: {
-    async getTasklist() {
-      let result = await this.$api();
+    async sourceLoadMore() {
+      this.page = ++this.page;
+      let data = {
+        task_type: "CollectionUser",
+        page: this.page,
+        limit: this.limit,
+      };
+      let result = await this.$api({ type: "getTasklist", data });
+      console.log("数据来源", result);
+      result.data.list.forEach((item) => {
+        this.sourceData.push(item);
+      });
+      if (this.sourceData.length == this.sourceCount) {
+        this.$message.warning("刷到底了");
+      }
     },
 
 handleReset(){
@@ -353,6 +370,8 @@ handleReset(){
     },
 
     handlerClose() {
+      this.page = 1;
+      this.getTasklist();
       console.log("执行了");
       this.$emit("closeLetterTask");
       this.resetForm();
@@ -382,32 +401,34 @@ handleReset(){
               return this.blackListMap[item];
             }
           );
-         
+
           let data = this.letterTaskForm;
-          
-          this.aaa(data)
-          
+
+          this.confrimTask(data);
         }
       });
     },
-    async aaa(data){
+    async confrimTask(data) {
       let result = await this.$api({ type: "pushFollowTask", data: data });
-          if (result.status == 200) {
-            this.$message.success(res.msg);
-            this.resetForm();
-            this.handlerClose();
-          }else{
-            console.log('11111111111111111',result);
-          this.$message.warning(result.msg);
-          this.resetForm();
-          }
-
+      console.log(result.status)
+      if (result.status == 200) {
+        this.$message.success("操作成功,任务正在发布中");
+        this.resetForm();
+        this.letterTaskForm.black_list = []
+        this.handlerClose();
+      } else {
+        console.log("11111111111111111", result);
+        this.$message.warning(result.msg);
+        this.letterTaskForm.black_list = []
+      }
     },
 
     async getTasklist() {
       let data = { task_type: "CollectionUser" };
       let result = await this.$api({ type: "getTasklist", data });
+      console.log("数据来源", result);
       this.sourceData = result.data.list;
+      this.sourceCount = result.data.count;
     },
 
     /* 
@@ -417,9 +438,9 @@ handleReset(){
     */
     resetForm() {
       this.$refs["letterForm"].resetFields();
-      this.letterTaskForm.rate_min = '',
-      this.letterTaskForm.rate_max = '',
-      this.letterTaskForm.black_list = []
+      (this.letterTaskForm.rate_min = ""),
+        (this.letterTaskForm.rate_max = ""),
+        (this.letterTaskForm.black_list = []);
     },
   },
 };

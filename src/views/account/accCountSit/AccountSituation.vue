@@ -50,12 +50,8 @@
 
       <!--       <div class="mr-15">
         <el-select clearable v-model="ascription" placeholder="账号归属">
-          <el-option
-            v-for="item in ascription_option"
-            :value="item.value"
-            :label="item.label"
-            :key="item.label"
-          ></el-option>
+          <el-option v-for="item in ascription_option" :value="item.value" :label="item.label"
+            :key="item.label"></el-option>
         </el-select>
       </div> -->
       <el-button
@@ -1258,6 +1254,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/assets/base/base.scss";
+
 .base-btn {
   background-color: $button-back-color;
   border-color: $button-bord-color;
@@ -1310,11 +1307,6 @@ export default {
   width: 100%;
   height: 60px;
   background-color: #fff;
-  border-radius: 8px;
-}
-
-.tt-accsituation--tabel {
-  width: 100% !important;
   border-radius: 8px;
 }
 
@@ -1407,4 +1399,5 @@ export default {
   left: 10px;
   top: 10px;
 }
+.table-avatar {}
 </style>
