@@ -25,7 +25,7 @@
             <!-- <Calendar></Calendar> -->
 
         </div>
-        <table-custom height="700" :stripe="stripe" :mutiSelect="true" @handleSelectionChange="selectionChange" :loading="loading"
+        <table-custom height="700" :mutiSelect="true" @handleSelectionChange="selectionChange" :loading="loading"
             :tableData="tableData" :columns="columns"></table-custom>
 
 

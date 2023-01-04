@@ -97,6 +97,7 @@ export default {
   },
   data() {
     return {
+      date:'',
 		title:'评论点赞任务详情',
 		showTaskDetail:false,
       showLikeCommentTask: false,
