@@ -210,6 +210,8 @@
 
 <script>
 import store from "store";
+import MINXIN from "@/core/minxin";
+import configureMap from '@/config/accountConfig/configureMap.config'
 import tableCustom from "@/components/myComponent/table/tableCustom";
 import Pagination from "@/components/myComponent/table/pagination";
 import EditorDialog from "./editoDialog/editorDialog";
@@ -220,6 +222,7 @@ import ViewerTabel from "./ViewerLabel/viewerTabel";
 import BatchEditor from "./taskDialog/batchEditor";
 import TableOperation from "./tableOperation/operationSelect";
 import ConfrimDelDialog from "./confrimDelDialog/confrimDelDialog";
+const {fansMap,fansOption,operationMap,accStatusMap,operationOption,sortQueryOption} = configureMap
 export default {
   name: "AccountSituation",
   components: {
@@ -287,6 +290,7 @@ export default {
   },
   data() {
     return {
+      mixins: [MINXIN],
       accUid: "", //账号UID
       showConfrimDel: false,
       showReleaseVideoDialog: false, //控制发布视频dialog展示
@@ -315,49 +319,9 @@ export default {
           label: "降序",
         },
       ],
-      sortQueryOption: [
-        {
-          value: "0",
-          label: "粉丝",
-        },
-        {
-          value: "1",
-          label: "访问人数",
-        },
-        {
-          value: "2",
-          label: "关注",
-        },
-        {
-          value: "3",
-          label: "获赞",
-        },
-      ],
-      operationOption: [
-        {
-          value: "编辑",
-          label: "编辑",
-        },
-        {
-          value: "删除",
-          label: "删除",
-        },
-        {
-          value: "分析",
-          label: "分析",
-        },
-        {
-          value: "发布视频",
-          label: "发布视频",
-        },
-      ],
-      accStatusMap: {
-        1: "正常",
-        0: "封禁",
-        2: "登出",
-        2096: "私密账号",
-        3002290: "个人资料，查看历史记录不可用",
-      }, //账号状态
+      sortQueryOption: sortQueryOption, //排序字段
+      operationOption: operationOption,
+      accStatusMap: accStatusMap, //账号状态
       classiFication: [], //设置分类
       typeList: [], //设置分类options   从接口拿的，动态渲染
       loading: false, //表格懒加载选项
@@ -609,28 +573,8 @@ export default {
       ],
       acc_id: "", //查询框的账号ID
       ascription: "",
-      ascription_option: [
-        { value: "1", label: "张三" },
-        { value: "2", label: "李四" },
-        { value: "3", label: "王五" },
-      ],
-      fansMap: {
-        '1000': "小于1K",
-        "1000,5000": "1k-5k",
-        "5000,10000": "5k-10k",
-        "10000,50000": "10k-50k",
-        "0,50000": "大于50k",
-        "0,100000": "不限",
-      },
-
-      fans_option: [
-        //粉丝量下拉框options  TODO 数据可能要问后端拿，目前写死了
-        { value: [1000], label: "小于1K" },
-        { value: [1000, 5000], label: "1k-5k" },
-        { value: [5000, 10000], label: "5k-10k" },
-        { value: [10000, 50000], label: "10k-50k" },
-        { value: [0, 50000], label: "大于50k" },
-      ],
+      fansMap: fansMap,
+      fans_option: fansOption,
       fans: "", //粉丝量查询框对应 model
       page: 1, //页码
       taskConfig: "", //对应设置任务下拉框 model
@@ -662,12 +606,7 @@ export default {
       editorTota: 0,
       userInfo: "", //账号信息
       delId: "", //需要删除账号的ID
-      operationMap: {
-        编辑: "handleEdit",
-        删除: "handleDelete",
-        发布视频: "handleRelease",
-        分析: "handleAnalysis",
-      },
+      operationMap: operationMap, //表格下拉框相应
       min: "",
       max: "",
     };
@@ -681,6 +620,11 @@ export default {
   },
 
   methods: {
+    /* 
+        function: initInterface
+        params: null
+        desc: 读取本地存储字段并赋值，初始化页面账号信息为刷新页面之前状态
+    */
     async initInterface() {
       this.page = store.get("page") ?? 1;
       this.limit = store.get("limit") ?? 10;
@@ -711,22 +655,33 @@ export default {
       console.log(result, "初始化");
     },
 
+    /* 
+        function: setLocalGroup
+        params: null
+        desc: 本地存储 group 字段（分组）
+    */
     setLocalGroup() {
       store.set("group", this.group);
-      console.log("存储分组");
     },
 
+    /* 
+        function: setLocalFans
+        params: null
+        desc: 本地存储 fans 字段（粉丝）
+    */
     setLocalFans() {
-      console.log(this.fans.toString());
       let fans = this.fansMap[this.fans.toString()];
-
       store.set("fans", fans);
     },
 
+    /* 
+        function: setLocalType
+        params: null
+        desc: 本地存储 typecontrol_id 字段（分类）
+    */
     setLocalType() {
-      let typecontrol_id = this.formatTypeId();
+      let typecontrol_id = this.fformatTypeId(classiFication);
       store.set("typecontrol_id", typecontrol_id);
-      console.log("存储分类");
     },
 
     async searchUid() {
@@ -748,6 +703,11 @@ export default {
       this.$message.error(result?.msg ?? "查询失败");
     },
 
+    /* 
+        function: handleSort
+        params: null
+        desc: 排序回调
+    */
     handleSort() {
       if (this.sortQuery === "" || this.sortWay === "") {
         this.$message.error("排序字段或排序方式未选");
@@ -761,6 +721,12 @@ export default {
       console.log("查看", data);
     },
 
+
+    /* 
+        function: confrimDel
+        params: null
+        desc: 确认删除账号
+    */
     async confrimDel() {
       try {
         this.$message.success("操作成功");
@@ -780,6 +746,7 @@ export default {
         this.$message.error("操作失败");
       }
     },
+
     /* 
         function: closeConfrimDel
         params: null
@@ -788,6 +755,7 @@ export default {
     closeConfrimDel() {
       this.showConfrimDel = false;
     },
+
     /* 
         function: setOperation
         params: row | 表格对应行的数据
@@ -795,11 +763,9 @@ export default {
         desc: 打开相应操作界面
     */
     setOperation(row, e) {
-      console.log(5555, e);
       if (e === "") {
         return false;
       }
-      console.log(this.operationMap[e]);
       this[this.operationMap[e]](row) && this[this.operationMap[e]](row);
     },
 
@@ -807,15 +773,7 @@ export default {
       console.log(e, 1111);
     },
 
-    /* 
-        function: formatTypeId
-        params: null
-        desc: 格式化分类ID
-        return: 格式化之后的分类ID，数组最后一位
-    */
-    formatTypeId() {
-      return this.classiFication[this.classiFication.length - 1] ?? "";
-    },
+
     /* 
         function: handleFollow
         params: null
@@ -858,13 +816,12 @@ export default {
     },
     /* 
         function: handleMonitor
-        params: null
+        params: e   |   event
+                row |   表格对应行数据
         desc: 单账号监控回调
     */
     handleMonitor(e, row) {
       row.path[0].src = require("../../../assets/video-red.png");
-      //row.path[0].style.color = 'red'
-      console.log("监控", e, row.path[0].src);
     },
 
     /* 
@@ -902,6 +859,20 @@ export default {
       this.getMemberList();
     },
 
+
+    /* 
+        function: removeLocal
+        params: null
+        desc: 清空缓存字段
+    */
+    removeLocal(){
+      store.remove('page')
+      store.remove('limit')
+      store.remove('group')
+      store.remove('typecontrol_id')
+      store.remove('fans')
+    },
+
     /* 
         function: RestQuery
         params: null
@@ -913,11 +884,7 @@ export default {
       this.fans = "";
       this.searchForm.grouping_id = "";
       this.group = "";
-      store.remove('page')
-      store.remove('limit')
-      store.remove('group')
-      store.remove('typecontrol_id')
-      store.remove('fans')
+      this.removeLocal()
       this.getMemberList();
       this.$message.success("重置成功");
     },
