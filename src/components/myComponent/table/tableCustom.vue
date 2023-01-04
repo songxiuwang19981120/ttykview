@@ -1,5 +1,5 @@
 <template>
-  <el-table :ref="tableCustom" highlight-current-row v-loading="loading" :row-key="rowKey" :data="tableData"
+  <el-table ref="tableCustom" highlight-current-row v-loading="loading" :row-key="rowKey" :data="tableData"
     :span-method="spanmethod" :cell-class-name="cellClassName" :header-cell-class-name="headerCellClassCame"
     :max-height="height" @select="handleSelect" @select-all="handleSelectAll" @selection-change="handleSelectionChange"
     @sort-change="sortChange" @expand-change="expandChange" style=" margin: 0 auto" stripe>
