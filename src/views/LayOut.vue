@@ -46,10 +46,13 @@ export default {
   width: 100% !important;
 }
 
+
+
 .tt-header--wrap {
+  z-index: 2
   height: 70px !important;
   padding: 10px 20px 10px;
-  box-shadow: 10px 10px 10px #221e1e;
+  box-shadow: 7px 6px 15px #c1c1c9
 }
 
 .tt-main {

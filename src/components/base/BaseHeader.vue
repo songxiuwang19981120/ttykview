@@ -4,7 +4,7 @@
     <div class="tt-header--login">
       <i class="el-icon-bell fz-20"></i>
       <el-image class="ml-12 tt-avatar-img" :src="src" fit="cover"></el-image>
-      <p class="fz-14 tt-header-name">东燊网络</p>
+      <p class="fz-14 tt-header-name">{{userName}}</p>
       <svg
         @click="logout"
         t="1672657190113"
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   name: "TtprojectBaseHeader",
 
@@ -37,11 +38,16 @@ export default {
   },
 
   mounted() {},
-
+  computed:{
+    ...mapGetters(['userInfo']),
+    userName(){
+      return this.userInfo.username
+    }
+  },
   methods: {
     logout() {
-      this.$message.success('退出登录')
-      console.log("退出登录");
+      this.$store.dispatch('logout')
+      this.$router.push('/login')
     },
   },
 };
@@ -61,7 +67,9 @@ export default {
   cursor pointer
 
 .tt-header {
+  z-index:2
   height: 100%;
+  width: 100%
   display: flex;
   justify-content: space-between;
   align-items: center;

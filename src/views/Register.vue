@@ -17,8 +17,16 @@
               placeholder="设置用户名"
             ></el-input>
           </el-form-item>
+          <el-form-item prop="email" label="设置邮箱 ：">
+            <el-input
+              style="width: 70%"
+              v-model="registerForm.email"
+              placeholder="设置邮箱"
+            ></el-input>
+          </el-form-item>
           <el-form-item prop="password" label="设置密码 ：">
             <el-input
+              type="password"
               style="width: 70%"
               v-model="registerForm.password"
               placeholder="设置密码"
@@ -26,6 +34,7 @@
           </el-form-item>
           <el-form-item prop="isSamePwd" label="确认密码 ：">
             <el-input
+              type="password"
               style="width: 70%"
               v-model="registerForm.isSamePwd"
               placeholder="确认密码"
@@ -34,7 +43,6 @@
         </el-form>
 
         <div class="flex-jus-space-bet">
-          <el-checkbox>勾选并同意<span>《用户服务协议》</span></el-checkbox>
           <p class="fz-14">
             已有账号？
             <router-link to="/login" class="color-18A1FF">马上登录</router-link>
@@ -42,7 +50,7 @@
         </div>
 
         <div class="register-bottom">
-          <el-button @click="register" class="register-btn">注册</el-button>
+          <el-button @click="confrim" class="register-btn">注册</el-button>
         </div>
       </el-card>
     </div>
@@ -61,6 +69,7 @@ export default {
         username: "",
         password: "",
         isSamePwd: "",
+        email: "",
       },
     };
   },
@@ -74,15 +83,39 @@ export default {
           this.$message.error("两次密码输入不一致，请重新输入");
           return false;
         }
-        this.$refs["registerForm"].validate((valid) => {
-          if (valid) {
-            console.log("注册", this.registerForm);
-          }
-        });
+
+        let data = {
+          username: this.registerForm.username,
+          password: this.registerForm.password,
+        };
+        this.$store.dispatch("register", { data });
+        /*  let result = await this.$api({ type: "register", registerData });
+        console.log(result);
+        if (result.status == 200) {
+          this.$notify.success({
+            title: "注册成功",
+          });
+          this.$store.dispatch("login", { loginData }); */
+
+        /*           let userInfo = JSON.stringify(result.data);
+          this.$store.dispatch("login", { userInfo });
+          this.$router.push("/index"); */
+        return;
       } catch (error) {
+        this.$notify.errorerror({
+          title: "登录失败",
+          message: `未知错误，请重新登录`,
+        });
         console.error(error);
-        this.$message.error("登陆失败");
       }
+    },
+
+    async confrim() {
+      this.$refs["registerForm"].validate((valid) => {
+        if (valid) {
+          this.register();
+        }
+      });
     },
   },
 };
@@ -108,7 +141,7 @@ export default {
 
 .register-card {
   width: 30%;
-  height: 40%;
+  height: 410px;
   margin: 0 auto;
 }
 

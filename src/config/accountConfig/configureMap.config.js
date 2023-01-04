@@ -8,7 +8,7 @@ export default {
         "0,100000": "不限",
       },
       fansOption: [
-        //粉丝量下拉框options  TODO 数据可能要问后端拿，目前写死了
+        //粉丝量下拉框options  
         { value: [1000], label: "小于1K" },
         { value: [1000, 5000], label: "1k-5k" },
         { value: [5000, 10000], label: "5k-10k" },

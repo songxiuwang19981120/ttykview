@@ -310,10 +310,7 @@ export default {
     url: '/User/updatePassword',
     method: 'POST',
   },
-  'login': {
-    url: '/User/login',
-    method: 'POST',
-  },
+
   //User  API end
 
 
@@ -443,8 +440,6 @@ export default {
     url: 'Subjectcontent/delete',
     method: 'POST'
   },
-
-
 
   'collectionUser': {    //用户采集
     url: 'Collection/user',
@@ -583,15 +578,25 @@ export default {
     method: 'POST'
   },
   // Role API end
-  'getCountry':{    //获取国家数据
-    url:'/member/country',
-    method:'POST'
+  'getCountry': {    //获取国家数据
+    url: '/member/country',
+    method: 'POST'
   },
-   'updateUserType':{ //更新用户分组分类
-      url:'member/BatchUpdateUserType',
-     method:'POST'
-     }
-  
+  'updateUserType': { //更新用户分组分类
+    url: 'member/BatchUpdateUserType',
+    method: 'POST'
+  },
+  'register':{ //注册
+    url:'/Apiuser/register',
+    method:'POST',
+    setToken:true
+  },
+  'login': {  //登录
+    url: '/Apiuser/login',
+    method: 'POST',
+    setToken:true
+  },
+
 }
 
 
