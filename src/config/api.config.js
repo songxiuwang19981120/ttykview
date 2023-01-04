@@ -586,21 +586,51 @@ export default {
     url: 'member/BatchUpdateUserType',
     method: 'POST'
   },
-  'register':{ //注册
-    url:'/Apiuser/register',
-    method:'POST',
-    setToken:true
+  'register': { //注册
+    url: '/Apiuser/register',
+    method: 'POST',
+    setToken: true
   },
   'login': {  //登录
     url: '/Apiuser/login',
     method: 'POST',
-    setToken:true
+    setToken: true
   },
 
   'baseUpload': { //上传
     url: 'Base/upload',
     method: 'POST'
-  }
+  },
+
+
+  //Apiusergroup  API start
+  'getApiusergroup': {
+    url: '/Apiusergroup/index',
+    method: 'POST',
+  },
+  'addApiusergroup': {
+    url: '/Apiusergroup/add',
+    method: 'POST',
+  },
+  'updateApiusergroup': {
+    url: '/Apiusergroup/update',
+    method: 'POST',
+  },
+  'deleteApiusergroup': {
+    url: '/Apiusergroup/delete',
+    method: 'POST',
+  },
+  'setRole': {
+    url: '/Apiusergroup/set_rule',
+    method: 'POST',
+  },
+  //Apiusergroup  API end
+
+  'getRouteTree': {
+    url: '/Apiuser/get_rule_tree',
+    method: 'GET',
+  },
+
 }
 
 
