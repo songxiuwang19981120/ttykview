@@ -3,21 +3,21 @@
         <div class="tt-accsituation">
             <div class="tt-accsituation--operation ">
                 <span>任务状态：</span>
-                <el-select v-model="CreationState" placeholder="请选择">
+                <el-select v-model="CreationState" placeholder="请选择" size="medium">
                     <el-option v-for="item in optionsCreationState" :key="item.value" :label="item.label"
                         :value="item.value">
                     </el-option>
                 </el-select>
 
                 <el-date-picker style="margin-left:20px" v-model="CreationDate" type="daterange" range-separator="——"
-                    start-placeholder="开始日期" end-placeholder="结束日期" value-format="timestamp" @change="consleDate">
+                    start-placeholder="开始日期" end-placeholder="结束日期" value-format="timestamp" @change="consleDate" size="medium">
                 </el-date-picker>
 
-                <el-button type="primary" class="seachbut" :loading="btnloading" @click="searchTasks"
+                <el-button type="primary" size="medium" class="seachbut" :loading="btnloading" @click="searchTasks"
                     style="margin-left: 30px">{{btnloading ? '加载中...' : '查看'}}</el-button>
-                <el-button type="primary" class="seachbut" @click="btnReset"><i
+                <el-button type="primary" size="medium" class="seachbut" @click="btnReset"><i
                         class="el-icon-refresh-right"></i>重置</el-button>
-                <el-button type="primary" class="seachbut" @click="dialogConfig">配置养号</el-button>
+                <el-button type="primary" size="medium" class="seachbut" @click="dialogConfig">配置养号</el-button>
             </div>
 
 
@@ -25,7 +25,7 @@
             <!-- <Calendar></Calendar> -->
 
         </div>
-        <table-custom height="600" :stripe="stripe" :mutiSelect="true" @handleSelectionChange="selectionChange" :loading="loading"
+        <table-custom height="700" :stripe="stripe" :mutiSelect="true" @handleSelectionChange="selectionChange" :loading="loading"
             :tableData="tableData" :columns="columns"></table-custom>
 
 
@@ -33,7 +33,7 @@
 
             <el-form :model="rule_act" :rules="rules_act" ref="ruleForm" label-width="120px" style="margin-top:30px">
                 <el-form-item label="设备分组:" prop="cult_equipment">
-                    <el-select v-model="rule_act.cult_equipment" placeholder="请选择设备分组" size="mini">
+                    <el-select v-model="rule_act.cult_equipment" placeholder="请选择设备分组" size="medium">
                         <el-option v-for="item in options_equipment" :key="item.value" :label="item.label"
                             :value="item.value">
                         </el-option>
@@ -41,12 +41,12 @@
                 </el-form-item>
 
                 <el-form-item label="账号分类:" prop="cult_classify">
-                    <el-select v-model="rule_act.cult_classify" placeholder="请选择账号分类" size="mini">
+                    <el-select v-model="rule_act.cult_classify" placeholder="请选择账号分类" size="medium">
                         <el-option v-for="item in options_classify" :key="item.value" :label="item.label"
                             :value="item.value">
                         </el-option>
                     </el-select>
-                    <span style="position:absolute;left:-60px" class="size_color">当前已选择账号<span class="num_color">{{
+                    <span style="position:absolute;left:-30px" class="size_color">当前已选择账号<span class="num_color">{{
         Task_num
 }}</span>个</span>
                 </el-form-item>
@@ -54,19 +54,19 @@
 
                 <el-form-item label="养号时间段:" prop="DialogCreationDate">
                     <el-date-picker v-model="rule_act.DialogCreationDate" type="daterange" range-separator="——"
-                        start-placeholder="开始日期" end-placeholder="结束日期" value-format="timestamp" @change="consleDate">
+                        start-placeholder="开始日期" end-placeholder="结束日期" value-format="timestamp" @change="consleDate" size="medium"> 
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="养号时长:" prop="name">
-                    <el-input style="width: 35%;" v-model.number="rule_act.name" placeholder="请输入养号天数"></el-input>
-                    <el-button style="margin-left:45px" type="primary" class="seachbut_whi"
+                    <el-input style="width: 35%;" v-model.number="rule_act.name" placeholder="请输入养号天数" size="medium"></el-input>
+                    <el-button style="margin-left:45px" type="primary" size="medium" class="seachbut_whi"
                         @click="dialogCultivate_btnconfig">点击配置养号参数</el-button>
                 </el-form-item>
             </el-form>
 
             <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogCultivate_unbtn_close">取消</el-button>
-                <el-button style="margin-left:45px" type="primary" class="seachbut"
+                <el-button @click="dialogCultivate_unbtn_close" size="medium">取消</el-button>
+                <el-button style="margin-left:45px" type="primary" size="medium" class="seachbut"
                     @click="dialogCultivate_starbtn('ruleForm')">开始养号</el-button>
             </span>
 
@@ -138,26 +138,26 @@
                             </el-select>
                         </div>
 
-                        <div class="all_margin_top"><el-checkbox v-model="sp.comment_pro"></el-checkbox>进入评论区比例<el-input
+                        <div class="all_margin_top"><el-checkbox v-model="sp.comment_pro" size="mini"></el-checkbox>进入评论区比例<el-input
                                 v-model="sp_content.comment_pro" class="all_class_margin" size="mini"></el-input>%</div>
                         <div class="all_margin_top"><el-checkbox
-                                v-model="sp.comment_like_pro"></el-checkbox>评论区点赞比例<el-input
+                                v-model="sp.comment_like_pro" size="mini"></el-checkbox>评论区点赞比例<el-input
                                 v-model="sp_content.comment_like_pro" class="all_class_margin" size="mini"></el-input>%
                         </div>
                         <div class="all_margin_top"><el-checkbox
-                                v-model="sp.comment_word_pro"></el-checkbox>评论区留言比例<el-input
+                                v-model="sp.comment_word_pro" size="mini"></el-checkbox>评论区留言比例<el-input
                                 v-model="sp_content.comment_word_pro" class="all_class_margin" size="mini"></el-input>%
                         </div>
                         <div class="all_margin_top"><el-checkbox
-                                v-model="sp.home_check_pro"></el-checkbox>进入主页查看比例<el-input
+                                v-model="sp.home_check_pro" size="mini"></el-checkbox>进入主页查看比例<el-input
                                 v-model="sp_content.home_check_pro" class="all_class_margin" size="mini"></el-input>%
                         </div>
                         <div class="all_margin_top"><el-checkbox
-                                v-model="sp.video_collect_pro"></el-checkbox>视频收藏比例<el-input
+                                v-model="sp.video_collect_pro" size="mini"></el-checkbox>视频收藏比例<el-input
                                 v-model="sp_content.video_collect_pro" class="all_class_margin" size="mini"></el-input>%
                         </div>
                         <div class="all_margin_top">
-                            <el-checkbox v-model="sp.search_label_pro"></el-checkbox>
+                            <el-checkbox v-model="sp.search_label_pro" size="mini"></el-checkbox>
                             选择要搜索的标签
                             <el-select v-model="search_label" placeholder="被搜索标签" size="mini">
                                 <el-option v-for="item in options_search_label" :key="item.value" :label="item.label"
@@ -170,24 +170,24 @@
                     <el-col :span="1"></el-col>
                     <el-col :span="11">
                         <div>
-                            <span><el-checkbox v-model="sp.video_live_pro"></el-checkbox>视频点赞比例<el-input
+                            <span><el-checkbox v-model="sp.video_live_pro" size="mini"></el-checkbox>视频点赞比例<el-input
                                     v-model="id_att" style="width:60px;margin-right: 10px;margin-left: 20px;"
                                     size="mini"></el-input>%</span>
                             <span style="margin-left:20px"><el-checkbox v-model="sp.video_end"></el-checkbox>视频完播</span>
                         </div>
                         <div class="all_margin_top"><el-checkbox
-                                v-model="sp.comment_stay_time"></el-checkbox>评论区停留时间<el-input v-model="start_time"
+                                v-model="sp.comment_stay_time" size="mini"></el-checkbox>评论区停留时间<el-input v-model="start_time"
                                 class="all_class_margin" size="mini"></el-input>——<el-input v-model="end_time"
                                 class="all_class_margin" size="mini"></el-input>秒</div>
                         <div class="all_margin_top"><el-checkbox
-                                v-model="sp.comment_like_num"></el-checkbox>评论区点赞数量<el-input v-model="start_time"
+                                v-model="sp.comment_like_num" size="mini"></el-checkbox>评论区点赞数量<el-input v-model="start_time"
                                 class="all_class_margin" size="mini"></el-input>——<el-input v-model="end_time"
                                 class="all_class_margin" size="mini"></el-input>个</div>
-                        <div class="all_margin_top"><el-checkbox v-model="sp.brush_num"></el-checkbox>被刷到次数<el-input
+                        <div class="all_margin_top"><el-checkbox v-model="sp.brush_num" size="mini"></el-checkbox>被刷到次数<el-input
                                 v-model="start_time" class="all_class_margin" size="mini"></el-input>——<el-input
                                 v-model="end_time" class="all_class_margin" size="mini"></el-input>次关注该账号</div>
                         <div class="all_margin_top"><el-checkbox
-                                v-model="sp.home_look_time"></el-checkbox>进入主页查看时间<el-input v-model="start_time"
+                                v-model="sp.home_look_time" size="mini"></el-checkbox>进入主页查看时间<el-input v-model="start_time"
                                 class="all_class_margin" size="mini"></el-input>——<el-input v-model="end_time"
                                 class="all_class_margin" size="mini"></el-input></div>
                         <div class="all_margin_top"><el-checkbox v-model="sp.open_label_search"></el-checkbox><el-input
@@ -410,7 +410,6 @@ export default {
                     label: '水平'
                 },],
             vertical_direction_big: "",
-            stripe: true,//斑马线
             //任务状态
             optionsCreationState: [
                 {

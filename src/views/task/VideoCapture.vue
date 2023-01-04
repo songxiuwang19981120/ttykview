@@ -3,29 +3,26 @@
     <div>
         <div class="tt-accsituation">
             <div class="tt-accsituation--operation">
-                <el-input v-model="numberValidateForm.age" placeholder="请输入完整素材链接https://www.tiktok.com/@..."
+                <el-input size="medium" v-model="numberValidateForm.age" placeholder="请输入完整素材链接https://www.tiktok.com/@..."
                     style="width:30%;margin-right: 20px;" clearable></el-input>
-                <el-button size="medium" type="primary" @click="searchLink" :loading="searching">{{ searching ? '获取中 ...' :
-        '获取TT视频'
-}}</el-button>
-
+                <el-button size="medium" type="primary" @click="searchLink" :loading="searching">{{ searching ? '获取中 ...' :'获取TT视频'}}</el-button>
             </div>
         </div>
         <div class="tt-accsituation">
             <div class="tt-accsituation--operation">
-                <el-select v-model="searchTableData.equipment" placeholder="请选择状态"
+                <el-select size="medium" v-model="searchTableData.equipment" placeholder="请选择状态"
                     style="width:150px; margin-right:20px">
                     <el-option v-for="item in searchEquipentList" :key="item.value" :label="item.label"
                         :value="item.value">
                     </el-option>
                 </el-select>
-                <el-button type="primary" @click="videocaptureIndex" size="medium">搜 索</el-button>
-                <el-button type="primary" @click="videocaptureIndexs" size="medium">重 置</el-button>
-                <el-button type="primary" :disabled="disableda" @click="transition()" size="medium">导出下载地址</el-button>
+                <el-button type="primary" size="medium" @click="videocaptureIndex">搜 索</el-button>
+                <el-button type="primary" size="medium" @click="videocaptureIndexs">重 置</el-button>
+                <el-button type="primary" size="medium" :disabled="disableda" @click="transition()">导出下载地址</el-button>
             </div>
         </div>
 
-        <table-custom height="600" :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
+        <table-custom  height="700" :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
             @handleSelectionChange="selectionChange"></table-custom>
         <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination">
         </pagination>

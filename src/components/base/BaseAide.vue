@@ -5,19 +5,19 @@
       :default-active="activeIndex"
       :unique-opened="true"
       router
-      background-color="#2d2f33"
-      text-color="#fff"
+      background-color="#F5F8FD"
+      text-color="#415058"
+      active-text-color="#FF411F"
       ref="baseAside"
     >
-
-        <div class="tt-aside--logo">LOGO</div>
+      <div class="tt-aside--logo">LOGO</div>
       <div v-for="item in NAV_LIST" :key="item.title">
         <el-menu-item v-if="!item.children" :index="item.to">
           <i :class="item.icon"></i>
           {{ item.title }}
         </el-menu-item>
 
-        <el-submenu v-if="item.children" :index="item.title">
+        <el-submenu  v-if="item.children" :index="item.title">
           <template slot="title">
             <i :class="item.icon"></i>
             {{ item.title }}
@@ -60,13 +60,21 @@ export default {
 </script>
 
 <style lang="stylus">
+.el-aside::-webkit-scrollbar {
+  display: none;
+}
+
+.el-submenu .el-menu-item
+  min-width none
+
 .tt-aside {
   height: 100vh;
-  width: 100% !important
+  width: 100% !important;
 }
+
 .tt-aside--logo
     height: 80px
-    background-color #555555
+    background-color #F5F8FD
     text-align: center
     line-height 80px
     font-size 30px

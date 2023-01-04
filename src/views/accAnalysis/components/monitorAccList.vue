@@ -3,9 +3,10 @@
     <el-card class="monitor-wrap">
       <div class="monitor-screen">
         <el-select
+          class="monitor-select"
           style="width: 140px"
-          v-model="query"
-          placeholder="请选择字段"
+          v-model="searchForm.query"
+          placeholder="选择字段"
         >
           <el-option
             v-for="item in queryOptions"
@@ -17,8 +18,8 @@
         </el-select>
         <el-select
           style="width: 140px"
-          v-model="sort"
-          placeholder="请选择排序方式"
+          v-model="searchForm.sort"
+          placeholder="选择排序方式"
         >
           <el-option
             v-for="item in sortOption"
@@ -29,7 +30,7 @@
           </el-option>
         </el-select>
 
-        <el-button size="mini">确定</el-button>
+        <el-button @click="handleConfrim" size="mini">确定</el-button>
       </div>
 
       <happy-scroll class="scroll">
@@ -37,6 +38,7 @@
           :loading="loading"
           :tableData="tableData"
           :columns="columns"
+          height="700"
         ></table-custom>
       </happy-scroll>
     </el-card>
@@ -56,8 +58,11 @@ export default {
         { value: 1, label: "升序" },
         { value: 0, label: "降序" },
       ],
+      searchForm:{
       query: "",
-      sort: "",
+      sort: ""       
+      },
+
       tableData: [
         {
           avatar: "http://192.168.4.30/uploads/file/7164384802589606918.png",
@@ -235,6 +240,10 @@ export default {
   mounted() {},
 
   methods: {
+    handleConfrim(){
+      console.log(this.searchForm)
+    },
+
     handlePK() {
       console.log("PK");
     },
@@ -249,8 +258,6 @@ export default {
   border-radius: 33px;
 }
 
-
-
 .scroll
   height: 400px
 
@@ -264,4 +271,19 @@ export default {
   background-color: #EFEFEF;
   border-radius: 26px;
 }
+
+/* hark */
+::v-deep .el-input__inner
+  height: 28px
+  background-color: #ccc 
+
+::v-deep .el-input__icon
+  line-height 0
+
+::v-deep .el-select__caret::before
+  color: rgba(65, 80, 88, 1)
+
+::v-deep input::-webkit-input-placeholder
+  color rgba(65, 80, 88, 1)
+  font-size: 14px;
 </style>

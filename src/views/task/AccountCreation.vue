@@ -3,7 +3,7 @@
         <div class="tt-accsituation">
             <div class="tt-accsituation--operation ">
                 <span>任务状态：</span>
-                <el-select @change="CreationState_select($event)" v-model="CreationState" placeholder="请选择" >
+                <el-select @change="CreationState_select($event)" v-model="CreationState" placeholder="请选择" size="medium">
                     <el-option
                     v-for="item in optionsCreationState"
                     :key="item.value"
@@ -14,7 +14,7 @@
                 </el-select>
 
                 <span style="margin-left:20px">上传话题：</span>
-                <el-select v-model="Topic" placeholder="请选择">
+                <el-select v-model="Topic" placeholder="请选择" size="medium">
                     <el-option
                     v-for="item in optionsTopic"
                     :key="item.value"
@@ -24,6 +24,7 @@
                 </el-select>
 
                 <el-date-picker
+                size="medium"
                 style="margin-left:20px"
                 v-model="CreationDate"
                 type="daterange"
@@ -34,16 +35,16 @@
                 @change="consleDate">
                 </el-date-picker>
 
-                <el-button  type="primary"  class="seachbut" :loading="btnloading" @click="searchTasks" style="margin-right: 20px;margin-left: 30px">{{
+                <el-button  type="primary" size="medium"  class="seachbut" :loading="btnloading" @click="searchTasks" style="margin-right: 20px;margin-left: 30px">{{
 							btnloading ? '加载中...' : '查看'
 					}}</el-button>
-					<el-button type="primary" class="seachbut" @click="btnReset"><i class="el-icon-refresh-right"></i>重置</el-button>
+					<el-button type="primary" size="medium" class="seachbut" @click="btnReset"><i class="el-icon-refresh-right"></i>重置</el-button>
             </div>
            
         </div>
-        <table-custom height="600" :stripe="stripe" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+        <table-custom height="700" :stripe="stripe" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
         <el-dialog title="创建账号详情" :visible.sync="dialogCreation">
-            <table-custom :stripe="stripe" :loading="loading" :tableData="dialogTableData" :columns="dialogColumns"></table-custom>
+            <table-custom height="700" :loading="loading" :tableData="dialogTableData" :columns="dialogColumns"></table-custom>
         </el-dialog>
     </div>
 </template>
@@ -57,7 +58,6 @@ export default {
 	},
     data() {
         return {
-            stripe:true,//斑马线
             //任务状态
             optionsCreationState: [
                 {

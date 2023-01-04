@@ -1,22 +1,22 @@
 <template>
   <div>
     <div class="EquipmentSituation">
-    <div class="tt-accsituation">
-      <div class="tt-accsituation--operation">
-        <div style="margin-right: 10px;">
-          <el-select v-model="equipment" placeholder="请选择分组" style="width:150px;">
-            <el-option v-for="item in searchEquipentList" :key="item.value" :label="item.label"
-              :value="item.value"></el-option>
-          </el-select>
-        </div>
-        <div style="margin-right: 10px;">
-          <el-select v-model="equipmentState" placeholder="请选择状态" style="width:150px;">
-            <el-option v-for="item in searchEquipentListState" :key="item.value" :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </div>
-        <el-button type="primary" @click="examine_index" size="medium">查看</el-button>
+      <div class="tt-accsituation">
+        <div class="tt-accsituation--operation">
+          <div style="margin-right: 10px;">
+            <el-select v-model="equipment" placeholder="请选择分组" style="width:150px;" size="medium">
+              <el-option v-for="item in searchEquipentList" :key="item.value" :label="item.label"
+                :value="item.value"></el-option>
+            </el-select>
+          </div>
+          <div style="margin-right: 10px;">
+            <el-select v-model="equipmentState" placeholder="请选择状态" style="width:150px;" size="medium">
+              <el-option v-for="item in searchEquipentListState" :key="item.value" :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </div>
+          <el-button type="primary" @click="examine_index" size="medium">查看</el-button>
         <el-button type="primary" @click="reset" size="medium">重置</el-button>
         <el-button type="primary" @click="dialog = true" size="medium">修改分组</el-button>
         <el-button style="margin-right: 20px;" type="primary" @click="dialogFormVisible = true" size="medium">创建账号</el-button>
@@ -25,75 +25,71 @@
         <span class="position_select_num">已选中{{totalChange}}个设备</span>
         <span class="position_num">共{{total}}个设备</span>
       </div>
-      
-    </div>
 
-    <el-drawer title="修改分组" :before-close="handleClose" :visible.sync="dialog" direction="rtl"
+      </div>
+
+
+      <el-dialog title="修改分组" :before-close="handleClose" :visible.sync="dialog"
       custom-class="demo-drawer" ref="drawer">
-      <div class="">
         <el-form :model="form">
           <el-form-item label="修改分组" :label-width="formLabelWidth">
-            <el-select v-model="form.region" placeholder="请选择分组">
+            <el-select v-model="form.region" placeholder="请选择分组" size="medium">
               <el-option v-for="item in searchEquipentList" :key="item.value" :label="item.label"
                 :value="item.value"></el-option>
             </el-select>
           </el-form-item>
         </el-form>
-        <!-- 更改显示状态的列表 -->
-        <table-custom :loading="loading" :tableData="drawer_tableData" :columns="columns_T"></table-custom>
-        <div style="float: right;margin-right: 20px;margin-top: 20px;">
-          <el-button @click="handleClose">关 闭</el-button>
-          <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading
-    ?
-    '提交中 ...' : '确 定'
-}}</el-button>
-        </div>
-      </div>
-    </el-drawer>
-    <el-dialog title="创建账号" style="width:60%; margin:0 auto" :visible.sync="dialogFormVisible"
-      :before-close="handleCloseDialog">
-      <!-- 四级联动 -->
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
-        <el-form-item label="选择账号分组:" :disabled="false" prop="equipment" label-width="120px">
-          <el-select :disabled="disabled" v-model="ruleForm.equipment" placeholder="账号分组选择" style="margin-right: 10px"
-            @focus="getaccGroup" :loading="equipmentLoading" loading-text="数据加载中...">
-            <el-option v-for="item in searchEquipmentList" :key="item.grouping_id" :label="item.grouping_name"
-              :value="item.grouping_id">
-            </el-option>
-          </el-select>
-          <span @click="All_lis">
-            <el-checkbox v-model="checked">选择未分组</el-checkbox>
-          </span>
-        </el-form-item>
+        <table-custom height="700" :loading="loading" :tableData="drawer_tableData" :columns="columns_T"></table-custom>
 
-        <el-form-item label="选择账号分类:" prop="classify" label-width="120px">
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="handleClose" size="medium">关 闭</el-button>
+          <el-button type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading" size="medium">{{ loading?'提交中 ...' : '确 定'}}</el-button>
+        </span>
 
-          <el-cascader :options="classify_options" :props="defaultPropsa" v-model="ruleForm.classify"
-            @change="handleChange"><template slot-scope="{ node, data }">
-              <span>
-                <span>{{ data.label }}</span>
-                <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
-              </span>
-            </template>
-          </el-cascader>
-        </el-form-item>
-
-
-        <el-form-item label="单设备账号容量:" label-width="120px">
-          <!-- 计数器 -->
-          <el-input-number v-model="ruleForm.num" @change="handleChangeNum" :min="1" :max="10" 
-            label="请输入单设备最大容量"></el-input-number>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" style="margin-top: 100px;">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
-      </div>
     </el-dialog>
-    <table-custom height="600" :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns" @handleSelectionChange="selectionChange"></table-custom>
-    <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination">
-    </pagination>
-  </div>
+      <el-dialog title="创建账号" style="width:60%; margin:0 auto" :visible.sync="dialogFormVisible"
+        :before-close="handleCloseDialog">
+        <!-- 四级联动 -->
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
+          <el-form-item label="选择账号分组:" :disabled="false" prop="equipment" label-width="120px">
+            <el-select :disabled="disabled" v-model="ruleForm.equipment" placeholder="账号分组选择" style="margin-right: 10px"
+              @focus="getaccGroup" :loading="equipmentLoading" loading-text="数据加载中..." size="medium">
+              <el-option v-for="item in searchEquipmentList" :key="item.grouping_id" :label="item.grouping_name"
+                :value="item.grouping_id">
+              </el-option>
+            </el-select>
+            <span @click="All_lis">
+              <el-checkbox v-model="checked" size="medium">选择未分组</el-checkbox>
+            </span>
+          </el-form-item>
+
+          <el-form-item label="选择账号分类:" prop="classify" label-width="120px">
+
+            <el-cascader :options="classify_options" :props="defaultPropsa" v-model="ruleForm.classify"
+              @change="handleChange"><template slot-scope="{ node, data }" size="medium">
+                <span>
+                  <span>{{ data.label }}</span>
+                  <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
+                </span>
+              </template>
+            </el-cascader>
+          </el-form-item>
+          <el-form-item label="单设备账号容量:" label-width="120px">
+            <!-- 计数器 -->
+            <el-input-number v-model="ruleForm.num" @change="handleChangeNum" :min="1" :max="10" label="请输入单设备最大容量"
+              size="medium"></el-input-number>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" style="margin-top: 100px;">
+          <el-button @click="dialogFormVisible = false" size="medium">取 消</el-button>
+          <el-button type="primary" @click="submitForm('ruleForm')" size="medium">确 定</el-button>
+        </div>
+      </el-dialog>
+      <table-custom height="700" :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
+        @handleSelectionChange="selectionChange"></table-custom>
+      <pagination :total="total" :page="current_page" :size="current_limit" @pagination="handlePagination">
+      </pagination>
+    </div>
   </div>
 </template>
 
@@ -108,11 +104,11 @@ export default {
   },
   data() {
     return {
-      selection_number:[],//选中的数据
+      selection_number: [],//选中的数据
       defaultPropsa: {
         checkStrictly: true
       },//选择的点是否开启
-      totalChange:0,//已选中设备
+      totalChange: 0,//已选中设备
       checked: false,//是否添加根目录分组
       disabled: false,
       //联级选择器
@@ -469,14 +465,14 @@ export default {
       }
     },
     //点击查看
-    examine_index(){
+    examine_index() {
       console.log("查看")
     },
     //点击重置
-    reset(){
+    reset() {
       console.log("重置")
-      this.equipment="";
-      this.equipmentState=""
+      this.equipment = "";
+      this.equipmentState = ""
     },
 
     //是否根目录
@@ -484,7 +480,7 @@ export default {
       this.ruleForm.equipment = [];
       if (this.checked == true) {
         this.disabled = false;
-        this.ruleForm.equipment=""
+        this.ruleForm.equipment = ""
         this.rules.equipment = [
           { required: true, message: '请选择分组', trigger: 'blur' },
         ]
@@ -510,8 +506,8 @@ export default {
     handleChangeNum(value) {
       console.log(value);
     },
-     //四级联动点完后的事件
-     getCascaderObj2(classify, opt) {
+    //四级联动点完后的事件
+    getCascaderObj2(classify, opt) {
       return classify.map(function (value, index, array) {
         for (var itm of opt) {
           if (itm.value == value) {
@@ -524,14 +520,14 @@ export default {
     },
     //联级选择器
     handleChange() {
-      this.selection_number=this.getCascaderObj2(this.ruleForm.classify, this.classify_options)
+      this.selection_number = this.getCascaderObj2(this.ruleForm.classify, this.classify_options)
       console.log(this.selection_number)
     },
     //选择框选中
     selectionChange(val) {
       this.drawer_tableData = val;
-      this.totalChange=val.length
-      
+      this.totalChange = val.length
+
     },
     //确认删除
     delete_abnormal(row) {
@@ -552,11 +548,11 @@ export default {
     },
     //dialog弹出框关闭时
     handleCloseDialog() {
-      this.dialogFormVisible=false
+      this.dialogFormVisible = false
     },
     //抽屉关闭时
     handleClose() {
-      this.dialog=false
+      this.dialog = false
       this.loading = false;
     },
     /**
@@ -570,14 +566,15 @@ export default {
 };
 </script>
 <style scoped>
-.position_num{
-  color:#6C6C6C;
+.position_num {
+  color: #6C6C6C;
   margin-left: 20px;
   font-size: 14px;
   line-height: 28px;
 
 }
-.position_select_num{
+
+.position_select_num {
   color: #FF411F;
   margin-left: 20px;
   font-size: 14px;

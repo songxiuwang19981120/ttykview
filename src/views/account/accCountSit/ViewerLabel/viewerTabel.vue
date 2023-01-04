@@ -10,6 +10,7 @@
         :loading="loading"
         :tableData="vistList"
         :columns="columns"
+        height="700"
       ></table-custom>
       <Pagination
         :total="visterTotal || 0"

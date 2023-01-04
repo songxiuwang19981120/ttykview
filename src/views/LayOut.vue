@@ -14,7 +14,7 @@
           </el-header>
 
           <el-main class="tt-main">
-              <router-view></router-view>
+              <router-view ref="view"></router-view>
            
           </el-main>
         </el-container>

@@ -3,12 +3,12 @@ export default {
         {
             title: '首页',
             to: '/index',
-            icon: 'el-icon-s-tools',
+            icon: 'el-icon-s-home',
         },
         {
             title: '设备管理',
             to: '',
-            icon: 'el-icon-s-tools',
+            icon: 'el-icon-mobile-phone',
             children: [
                 {
                     title: '设备情况',
@@ -25,7 +25,7 @@ export default {
         {
             title: '账号管理',
             to: '',
-            icon: 'el-icon-s-tools',
+            icon: 'el-icon-receiving',
             children: [
                 {
                     title: '账号情况',
@@ -47,7 +47,7 @@ export default {
         {
             title: '任务管理',
             to: '',
-            icon: 'el-icon-s-tools',
+            icon: 'el-icon-tickets',
             children: [
                 {
                     title: '视频发布',
@@ -82,20 +82,19 @@ export default {
                 {
                     title: '视频采集',
                     to: '/videocapture',
-                    icon: 'el-icon-s-platform'
+                    icon: ''
                 },
                 {
                     title: '用户采集',
                     to: '/usercapture',
-                    icon: 'el-icon-s-platform'
+                    icon: ''
                 }
-                
             ]
         },
         {
             title: '素材管理',
             to: '',
-            icon: 'el-icon-s-tools',
+            icon: 'el-icon-magic-stick',
             children: [
                 {
                     title: '视频',
@@ -143,7 +142,7 @@ export default {
         {
             title: '账户管理',
             to: '',
-            icon: 'el-icon-s-tools',
+            icon: 'el-icon-user',
             children: [
                 {
                     title: '用户管理',

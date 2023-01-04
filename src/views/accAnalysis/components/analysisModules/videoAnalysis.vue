@@ -80,10 +80,13 @@
         <i :class="[icon]" class="color-rad"></i>
         <span class="fz-20">视频列表</span>
       </div>
-      <div>
-        <span class="fz-16">共{{ videoCount }}条视频</span>
+      <div class="flex-space-between  mar-bot-10 pad-80">
+        <p class="fw-bold fz-16 font-source">共
+          <span class="color-BD4F6C">{{ videoCount }}</span>
+          条视频
+        </p>
         <div>
-          <el-select v-model="searchForm.query" placeholder="请选择">
+          <el-select class="video-select" style="width: 94px" v-model="searchForm.query" placeholder="请选择">
             <el-option
               v-for="item in queryOptions"
               :key="item.value"
@@ -92,7 +95,7 @@
             >
             </el-option>
           </el-select>
-          <el-select v-model="searchForm.sort" placeholder="请选择">
+          <el-select class="mr-36 video-select" style="width: 94px" v-model="searchForm.sort" placeholder="请选择">
             <el-option
               v-for="item in sortOptions"
               :key="item.value"
@@ -101,20 +104,24 @@
             >
             </el-option>
           </el-select>
-          <el-button>确定</el-button>
+          <el-button size="mini">确定</el-button>
         </div>
       </div>
       <TableCustom
         :loading="loading"
         :tableData="videoList"
         :columns="columns"
-        class="table-custom"
+        height="700"
       />
       <Pagination
         :total="videoCount"
         :page="page"
         :limit="limit"
         @pagination="handlePagination"
+      />
+      <VideoDetail 
+      :showVideoDetail="showVideoDetail"
+      :videoInfo="videoDetailInfo"
       />
     </el-card>
   </div>
@@ -127,6 +134,7 @@ import TableCustom from "@/components/myComponent/table/tableCustom";
 import PieEcharts from "@/components/myComponent/echarts/pie";
 import Echarts from "@/components/myComponent/echarts/axis";
 import TabTime from "@/components/index/chooseduration";
+import VideoDetail from './videoAnalysis/videoDetail'
 export default {
   name: "TtprojectVideoAnalysis",
   components: {
@@ -136,6 +144,7 @@ export default {
     PieEcharts,
     Echarts,
     TabTime,
+    VideoDetail
   },
   data() {
     return {
@@ -143,6 +152,8 @@ export default {
       loading: false,
       member_id: "",
       icon: "el-icon-s-flag",
+      showVideoDetail:false,
+      videoDetailInfo:{},
       searchForm: {
         query: "",
         sort: "",
@@ -313,11 +324,17 @@ export default {
 
   mounted() {
     this.initPage();
-    this.initPieEchart()
+    this.initPieEchart();
   },
 
   methods: {
-    showDetail() {},
+    showDetail(row) {
+      this.videoDetailInfo = row
+      this.showVideoDetail = true
+    },
+    closeDetail(){
+      this.showVideoDetail = false
+    },
     chooseFansDur(index) {
       console.log(index);
     },
@@ -359,28 +376,49 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.table-custom {
-  border: 1px solid #ccc;
-  border-radius: 30px;
-}
+
+.color-BD4F6C
+  color #BD4F6C
 
 .color-rad {
   color: red;
   margin-right: 10px;
 }
 
-.pad-50-80
-    padding:50px 80px;
+.mar-bot-10
+  margin-bottom 10px
 
-.fz-16
-    font-size: 16px
+.mr-36
+  margin-right: 36px
 
-.fz-20
-    font-size 20px
+.pad-50-80 {
+  padding: 50px 80px;
+}
+
+.fw-bold
+  font-weight: bold
+
+.font-source
+  font-family: SourceHanSansSC-regular;
+
+.pad-80
+  padding 0 110px
+
+.fz-16 {
+  font-size: 16px;
+}
+
+.fz-20 {
+  font-size: 20px;
+}
 
 .dis-flex {
   display: flex;
 }
+
+.flex-space-between
+  display: flex
+  justify-content: space-between
 
 .data-desc {
   display: flex;
@@ -414,8 +452,9 @@ export default {
   padding: 30px 80px;
 }
 
-.data-mid
-    justify-content: space-between
+.data-mid {
+  justify-content: space-between;
+}
 
 .data-bot {
   display: flex;
@@ -423,5 +462,24 @@ export default {
   padding: 30px 140px;
   margin-bottom: 20px;
   border-bottom: 1px solid #ccc;
+}
+
+/* hark */
+::v-deep .video-select .el-input__inner {
+  height: 28px;
+  background-color: #ccc;
+}
+
+::v-deep .video-select .el-input__icon {
+  line-height: 0;
+}
+
+::v-deep .video-select .el-select__caret::before {
+  color: rgba(65, 80, 88, 1);
+}
+
+::v-deep .el-input__inner::-webkit-input-placeholder {
+  color: rgba(65, 80, 88, 1);
+  font-size: 14px;
 }
 </style>

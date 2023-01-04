@@ -5,7 +5,7 @@
 		<el-button @click="batchDelete" type="primary" :loading="deleteing">{{ deleteing ? '删除中 ...'
 		: '批量删除'
 }}</el-button>
-		<table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
+		<table-custom  height="700" :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
 			@handleSelectionChange="selectionChange"></table-custom>
 		<!-- 分页 -->
 		<pagination :total="total" :page="nickNameData.page" :limit="nickNameData.limit" @pagination="pageChange">
@@ -14,17 +14,17 @@
 		<el-dialog width="30%" title="签名编辑" :visible.sync="innerVisible" append-to-body @close="btnCancel2">
 			<el-form label-width="70px" :model="ruleForm" :rules="rules" ref="ruleForm">
 				<el-form-item label="签名：" prop="autograph">
-					<el-input v-model="ruleForm.autograph" style="width: 90%"></el-input>
+					<el-input size="medium" v-model="ruleForm.autograph" style="width: 90%"></el-input>
 				</el-form-item>
 			</el-form>
 			<!-- 按钮 -->
 			<el-row type="flex" justify="end">
-				<el-button size="small" @click="btnCancel2">取消</el-button>
-				<el-button size="small" type="primary" @click="btnOK2">确定</el-button>
+				<el-button size="medium"  @click="btnCancel2">取消</el-button>
+				<el-button size="medium" type="primary" @click="btnOK2">确定</el-button>
 			</el-row>
 		</el-dialog>
 		<div slot="footer" class="dialog-footer">
-			<el-button @click="btnCancel" size="small">取 消</el-button>
+			<el-button @click="btnCancel" size="medium">取 消</el-button>
 		</div>
 	</el-dialog>
 </template>

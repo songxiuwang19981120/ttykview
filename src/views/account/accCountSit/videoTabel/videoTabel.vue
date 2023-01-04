@@ -5,6 +5,7 @@
         :loading="loading"
         :tableData="videoList"
         :columns="columns"
+        height="700"
       ></table-custom>
       <el-dialog
       class="video-dialog"

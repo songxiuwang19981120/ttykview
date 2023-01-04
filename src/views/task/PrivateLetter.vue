@@ -3,7 +3,7 @@
     <div class="tt-accsituation">
       <div class="tt-accsituation--operation">
         <div style="margin-right: 20px">
-          <el-select v-model="page.status" placeholder="请选择任务状态">
+          <el-select v-model="page.status" placeholder="请选择任务状态" size="medium"> 
             <el-option
               v-for="item in searchStateList"
               :key="item.value"
@@ -23,28 +23,31 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             :picker-options="pickerOptions"
+            size="medium"
           >
           </el-date-picker>
         </div>
         <!-- 查询 -->
         <el-button
           type="primary"
+          size="medium"
           class="seachbut"
           :loading="btnloading"
           @click="searchTasks"
           >{{ btnloading ? "加载中..." : "搜索" }}</el-button
         >
-        <el-button type="primary" class="seachbut" @click="btnReset"
+        <el-button type="primary" size="medium" class="seachbut" @click="btnReset"
           >重置</el-button
         >
-        <el-button type="primary" class="seachbut" @click="showFollowTaskDialog"
+        <el-button type="primary" size="medium" class="seachbut" @click="showFollowTaskDialog"
           >私信任务</el-button
         >
-		<i class="el-icon-refresh-left"></i>
+		<!-- <i class="el-icon-refresh-left"></i> -->
       </div>
     </div>
     <!-- 表格 -->
     <table-custom
+      height="700"
       :loading="loading"
       :tableData="tableData"
       :columns="columns"
@@ -94,6 +97,8 @@ export default {
   data() {
     return {
 		date:'',
+    title:'',
+    showTaskDetail:false,
       showFollowDialog: false,
       // 下拉选择数据
       searchStateList: [
