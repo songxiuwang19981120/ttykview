@@ -583,15 +583,18 @@ export default {
     method: 'POST'
   },
   // Role API end
-  'getCountry':{    //获取国家数据
-    url:'/member/country',
-    method:'POST'
+  'getCountry': {    //获取国家数据
+    url: '/member/country',
+    method: 'POST'
   },
-   'updateUserType':{ //更新用户分组分类
-      url:'member/BatchUpdateUserType',
-     method:'POST'
-     }
-  
+  'updateUserType': { //更新用户分组分类
+    url: 'member/BatchUpdateUserType',
+    method: 'POST'
+  },
+  'baseUpload': { //上传
+    url: 'Base/upload',
+    method: 'POST'
+  }
 }
 
 
