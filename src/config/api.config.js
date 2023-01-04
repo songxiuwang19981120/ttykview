@@ -597,6 +597,10 @@ export default {
     setToken:true
   },
 
+  'baseUpload': { //上传
+    url: 'Base/upload',
+    method: 'POST'
+  }
 }
 
 
