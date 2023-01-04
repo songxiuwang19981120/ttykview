@@ -3,15 +3,14 @@
     <div style="padding:10px">
 
       <el-select v-model="searchTableData.equipment" placeholder="账号分组选择" style="margin-right: 20px"
-        @change="getTypecontrol"
-        :loading="equipmentLoading" loading-text="数据加载中...">
+        @change="getTypecontrol" :loading="equipmentLoading" loading-text="数据加载中...">
         <el-option v-for="item in searchEquipmentList" :key="item.grouping_id" :label="item.grouping_name"
           :value="item.grouping_id">
         </el-option>
       </el-select>
 
 
-      
+
 
       <el-cascader :options="options" v-model="val_Tw" style="padding:0" :props="{ checkStrictly: true }"
         placeholder="账号分类选择">
@@ -20,7 +19,7 @@
             <span>{{ data.label }}</span>
             <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
           </span>
-          
+
         </template>
       </el-cascader>
       <el-button style="margin-left:20px" type="primary" @click="FnNewzh()" size="medium">重置</el-button>
@@ -40,99 +39,48 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="选择账号分类:" prop="group">
-          <!-- <el-cascader  :options="options_tw"  v-model="formNew.group"
-            @change="menuchange" style="width:200px">
-            <template slot-scope="{ node, data }">
-              <span>
-                <span>{{ data.label }}</span>
-                <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
-              </span>
-            </template>
-          </el-cascader>
-          <span @click="addlis">
-            <el-checkbox style="margin-left:20px" v-model="checked">添加为一级分类</el-checkbox>
-          </span> -->
+        <el-form-item label="选择账号分类:">
 
-          <el-select
-          :disabled="disabledacc.first_level"
-            v-model="formNew.first_level"
-            placeholder="一级"
-            ref="template"
-            @change="second_levelFn"
-            @visible-change="(v) => visibleChange(v, 'template')"
-            style="width:120px;margin-right: 10px;"
-          >
-            <el-option
-              v-for="item in options_tw"
-              :key="item.typecontrol_id"
-              :label="item.label"
-              :value="item.value"
-            >
+          <el-select :disabled="disabledacc.first_level" v-model="formNew.first_level" placeholder="一级" ref="template"
+            @change="first_levelFn" @visible-change="(v) => visibleChange(v, 'template')"
+            style="width:120px;margin-right: 10px;">
+            <el-option v-for="item in options_tw" :key="item.typecontrol_id" :label="item.label" :value="item.value">
               <span style="float: left" class="span-style">{{ item.label }}</span>
-          
-            </el-option>
-          </el-select>
-
-
-          <el-select
-          :disabled="disabledacc.second_level"
-            v-model="formNew.second_level"
-            placeholder="二级"
-            ref="template1"
-            @visible-change="(v) => visibleChange(v, 'template1')"
-            style="width:120px;margin-right: 10px;"
-          >
-            <el-option
-              v-for="item in searchEquipmentList_second_level"
-              :key="item.grouping_id"
-              :label="item.grouping_name"
-              :value="item.grouping_id"
-            >
-              <span style="float: left" class="span-style">{{ item.grouping_name }}</span>
-          
 
             </el-option>
           </el-select>
 
 
-          <el-select
-          :disabled="disabledacc.three_level"
-            v-model="formNew.three_level"
-            placeholder="三级"
-            ref="template2"
-            @visible-change="(v) => visibleChange(v, 'template2')"
-            style="width:120px;margin-right: 10px;"
-          >
-            <el-option
-              v-for="item in searchEquipmentList"
-              :key="item.grouping_id"
-              :label="item.grouping_name"
-              :value="item.grouping_id"
-            >
-              <span style="float: left" class="span-style">{{ item.grouping_name }}</span>
-          
+          <el-select :disabled="disabledacc.second_level" v-model="formNew.second_level" placeholder="二级"
+            ref="template1" @change="second_levelFn" @visible-change="(v) => visibleChange1(v, 'template1')"
+            style="width:120px;margin-right: 10px;">
+            <el-option v-for="item in searchEquipmentList_second_level" :key="item.typecontrol_id" :label="item.label"
+              :value="item.value">
+              <span style="float: left" class="span-style">{{ item.label }}</span>
+
 
             </el-option>
           </el-select>
 
 
-          <el-select
-          :disabled="disabledacc.four_level"
-            v-model="formNew.four_level"
-            placeholder="四级"
-            ref="template3"
-            @visible-change="(v) => visibleChange(v, 'template3')"
-            style="width:120px"
-          >
-            <el-option
-              v-for="item in searchEquipmentList"
-              :key="item.grouping_id"
-              :label="item.grouping_name"
-              :value="item.grouping_id"
-            >
-              <span style="float: left" class="span-style">{{ item.grouping_name }}</span>
-          
+          <el-select :disabled="disabledacc.three_level" v-model="formNew.three_level" placeholder="三级" ref="template2"
+            @change="three_levelFn" @visible-change="(v) => visibleChange2(v, 'template2')"
+            style="width:120px;margin-right: 10px;">
+            <el-option v-for="item in searchEquipmentList_three_level" :key="item.typecontrol_id" :label="item.label"
+              :value="item.value">
+              <span style="float: left" class="span-style">{{ item.label }}</span>
+
+
+            </el-option>
+          </el-select>
+
+
+          <el-select :disabled="disabledacc.four_level" v-model="formNew.four_level" placeholder="四级" ref="template3"
+            @change="four_levelFn" @visible-change="(v) => visibleChange3(v, 'template3')" style="width:120px">
+            <el-option v-for="item in searchEquipmentList_four_level" :key="item.typecontrol_id" :label="item.label"
+              :value="item.value">
+              <span style="float: left" class="span-style">{{ item.label }}</span>
+
 
             </el-option>
           </el-select>
@@ -140,20 +88,23 @@
 
 
         </el-form-item>
-        <el-form-item label="新增分类名称:" prop="name">
-          <el-input v-model="formNew.name" style="width:200px" placeholder="新增分类名称"></el-input>
+        <el-form-item label="新增分类展示:" prop="name">
+          <el-input :disabled="disabled_name" v-model="formNew.name" style="width:200px"
+            placeholder="新增分类展示"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="closeadd">取 消</el-button>
-        <el-button type="primary" @click="addSubject" :loading="submitting">{{ submitting ? '提交中 ...' : '确 定'}}</el-button>
+        <el-button type="primary" @click="addSubject" :loading="submitting">{{
+          submitting? '提交中 ...': '确定'}}</el-button>
       </span>
     </el-dialog>
 
     <!-- 表格 -->
-    <tableCustom height="600" :tableData="tableData_tw_t" row-key="value" :columns="columns" :load="load" :loading="loading">
+    <tableCustom height="600" :tableData="tableData_tw_t" row-key="value" :columns="columns" :load="load"
+      :loading="loading">
     </tableCustom>
-  
+
     <el-dialog title="编辑" :visible.sync="dialogFormVisible">
       <el-form :model="form">
         <el-form-item label="修改名称:" label-width="100px">
@@ -183,8 +134,8 @@ export default {
   components: { pagination, tableCustom },
   data() {
     return {
-      options_tww:[],//第一级下拉
-      loading:false,
+      options_tww: [],//第一级下拉
+      loading: false,
       labelslist: [],
       submitting: false,
       rules: {
@@ -229,6 +180,7 @@ export default {
       defaultPropsa: {
         checkStrictly: true
       },
+      first_label: "",
       menudata: [],//下拉数据
       val: [],
       vals: [],
@@ -239,6 +191,7 @@ export default {
       //新的
       dialogNewVisible: false,//新增的弹窗显隐
       pid: "",//编辑的pid
+      pidd: "",
       typecontrol_id: "",//修改主键ID
       dialogFormVisible: false,
       total: 0,  //数据总量
@@ -252,22 +205,30 @@ export default {
         name: '',
       },
       formNew: {
-        name: '',
-        first_level:"",//一级分类
-        second_level:"",//二级分类
-        three_level:"",
-        four_level:"",
+        firstch: "",
+        secch: "",
+        threech: "",
+        fourch: "",
+        name: "",
+        first_level: "",//一级分类
+        second_level: "",//二级分类
+        three_level: "",
+        four_level: "",
+        equipment: ""
       },//新增分组名称
       options_tw: [],
+      disabled_name: true,//新增分类展示禁用状态
       //下拉是否显示
-      disabledacc:{
-        first_level:true,//一级分类
-        second_level:true,//二级分类
-        three_level:true,
-        four_level:true,
+      disabledacc: {
+        first_level: true,//一级分类
+        second_level: true,//二级分类
+        three_level: true,
+        four_level: true,
       },
       //下拉数据
-      searchEquipmentList_second_level:[],
+      searchEquipmentList_second_level: [],
+      searchEquipmentList_three_level: [],
+      searchEquipmentList_four_level: [],
     }
   },
   mounted() {
@@ -295,6 +256,7 @@ export default {
           }
         });
         if (result.status == 200) {
+          this.formNew.equipment = result.data.grouping_id
           this.options = result.data;
           this.filterTreeDate(result.data)
         }//联动后方无内容
@@ -304,24 +266,25 @@ export default {
     },
     //分类
     async getEquipmentGroupAdd() {
-      this.formNew.first_level=""
-      this. disabledacc={
-        first_level:true,//一级分类
-        second_level:true,//二级分类
-        three_level:true,
-        four_level:true,
+      this.formNew.first_level = ""
+      this.disabledacc = {
+        first_level: true,//一级分类
+        second_level: true,//二级分类
+        three_level: true,
+        four_level: true,
       };
+      this.formNew.name = ""
       try {
         let result = await this.$api({
           type: "getTypecontrol",
           data: {
-            grouping_id:this.formNew.equipment
+            grouping_id: this.formNew.equipment
           }
         });
         if (result.status == 200) {
           this.options_tw = result.data;
-          console.log(this.options_tw,"123")
-          this.disabledacc.first_level=false
+          console.log(result, "123")
+          this.disabledacc.first_level = false
           this.$nextTick(() => {
             this.filterTreeDate(result.data)//联动后方无内容
           })
@@ -332,13 +295,124 @@ export default {
         console.error(error)
       }
     },
-    //第一个下拉分类
-    second_levelFn(val){
-    console.log(val)
-    if(this.formNew.first_level){
-      console.log(this.formNew.first_level)
-    }
+    //第一个下拉分类change事件
+    async first_levelFn(val) {
+      let _self = this;
+      this.searchEquipmentList_second_level = []
+      this.searchEquipmentList_three_level = []
+      this.searchEquipmentList_four_level = []
+      this.disabledacc.second_level = false;
+      this.disabledacc.three_level = true;
+      this.disabledacc.four_level = true;
+      this.formNew.name = ""
+      this.formNew.firstch = ""
+      this.formNew.secch = ""
+      this.formNew.threech = ""
+      this.formNew.fourch = ""
+      this.formNew.second_level = ""
+      this.formNew.three_level = ""
+      this.formNew.four_level = ""
+      if (val) {
+        this.options_tw.forEach(item => {
+          if (item.value == val) {
+            this.formNew.firstch = item.label
+            this.formNew.name = this.formNew.firstch + this.formNew.secch + this.formNew.threech + this.formNew.fourch
+          }
+        });
+        try {
+          let result = await this.$api({
+            type: "getTypecontrol",
+          });
+          if (result.status == 200) {
+            result.data.forEach(item => {
+              if (item.value == val) {
+                item.children.forEach(element => {
+                  _self.searchEquipmentList_second_level.push(element)
+                  console.log(_self.searchEquipmentList_second_level)
+                });
 
+              }
+            });
+            console.log(this.searchEquipmentList_second_level, "二级分类数据")
+          } else {
+            this.$message.error(res.msg);
+            _self.searchEquipmentList_second_level = []
+          }
+        } catch (error) {
+          console.error(error)
+        }
+      }
+    },
+    //第二个下拉分类change事件
+    second_levelFn(val) {
+      let _self = this
+      this.searchEquipmentList_three_level = []
+      this.searchEquipmentList_four_level = []
+      this.disabledacc.three_level = false;
+      this.disabledacc.four_level = true;
+      this.formNew.name = ""
+      this.formNew.secch = ""
+      this.formNew.threech = ""
+      this.formNew.fourch = ""
+      this.formNew.three_level = ""
+      this.formNew.four_level = ""
+      if (val) {
+        this.searchEquipmentList_second_level.forEach(item => {
+          if (item.value == val) {
+            this.formNew.secch = item.label
+            this.formNew.name = this.formNew.firstch + "/" + this.formNew.secch + this.formNew.threech + this.formNew.fourch
+          }
+        });
+        this.searchEquipmentList_second_level.forEach(item => {
+          if (item.value == val) {
+            item.children.forEach(element => {
+              _self.searchEquipmentList_three_level.push(element)
+              console.log(_self.searchEquipmentList_three_level)
+            });
+
+          }
+        });
+      }
+    },
+    //第三个下拉分类change事件
+    three_levelFn(val) {
+      let _self = this
+      this.searchEquipmentList_four_level = []
+      this.disabledacc.four_level = false;
+      this.formNew.name = ""
+      this.formNew.threech = ""
+      this.formNew.fourch = ""
+      this.formNew.four_level = ""
+      if (val) {
+        this.searchEquipmentList_three_level.forEach(item => {
+          if (item.value == val) {
+            this.formNew.threech = item.label
+            this.formNew.name = this.formNew.firstch + "/" + this.formNew.secch + "/"+this.formNew.threech + this.formNew.fourch
+          }
+        });
+        this.searchEquipmentList_three_level.forEach(item => {
+          if (item.value == val) {
+            item.children.forEach(element => {
+              _self.searchEquipmentList_four_level.push(element)
+              console.log(_self.searchEquipmentList_four_level)
+            });
+
+          }
+        });
+      }
+    },
+    //第四个个下拉分类change事件
+    four_levelFn(val) {
+      this.formNew.name = ""
+      this.formNew.fourch = ""
+      if (val) {
+        this.searchEquipmentList_four_level.forEach(item => {
+          if (item.value == val) {
+            this.formNew.fourch = item.label
+            this.formNew.name = this.formNew.firstch + '/' + this.formNew.secch + '/' + this.formNew.threech + '/' + this.formNew.fourch
+          }
+        });
+      }
     },
     // 获取账号分组数据
     async getEquipmentGroup() {
@@ -360,7 +434,7 @@ export default {
     },
     //重置按钮
     FnNewzh() {
-      this.searchTableData.equipment=""
+      this.searchTableData.equipment = ""
       this.val_Tw = "";
       this.options = [];
 
@@ -372,17 +446,17 @@ export default {
       this.dialogNewVisible = true;
     },
     //是否根目录
-    addlis() {
-      if (this.checked == true) {
-        this.formNew.group = "";
-        this.rules.group= [{ required: true, message: '请选择账号分类', trigger: 'blur' }]
-        this.disabled = false;
-        this.pid = 0
-      } else {
-        this.rules.group=[]
-        this.disabled = true;
-      }
-    },
+    // addlis() {
+    //   if (this.checked == true) {
+    //     this.formNew.group = "";
+    //     this.rules.group= [{ required: true, message: '请选择账号分类', trigger: 'blur' }]
+    //     this.disabled = false;
+    //     this.pid = 0
+    //   } else {
+    //     this.rules.group=[]
+    //     this.disabled = true;
+    //   }
+    // },
     //新增的四级下拉
     //element组件里的 getCheckedNodes	获取选中的节点	
     getCascaderObj(val, opt) {
@@ -404,16 +478,62 @@ export default {
       this.pid = this.vals_tree_t[0].typecontrol_id
     },
     addSubject() {
+
       this.$refs['form'].validate((valid) => {
         if (!valid) return false;
-        if (this.pid != '' || this.pid == 0) {
-          this.submitting = true;
-          this.TypecontrolAdd()
-        }
-        else {
-          return this.$message.warning('请选择账号分类');
-        }
-      })
+        this.submitting = true
+        this.options_tw.forEach(item => {
+        
+          if (item.value == item.label) {
+            this.pid = 0
+            this.formNew.name = this.formNew.first_level
+            this.loading = true;
+            this.TypecontrolAdd()
+            //这边暂时先这样,需要改
+            setTimeout(() => {
+              //第二个提交
+              this.TypecontrolAddd()
+            }, 1000);
+            setTimeout(() => {
+              //第三个提交
+              this.TypecontrolAdddd()
+            }, 2000);
+            setTimeout(() => {
+              //第四个提交
+              this.TypecontrolAddddd()
+            }, 3000);
+          } else if (item.value == this.formNew.first_level) {
+            this.pidd = item.typecontrol_id
+            this.TypecontrolAddd()
+            setTimeout(() => {
+              //第三个提交
+              this.TypecontrolAdddd()
+            }, 1000);
+            setTimeout(() => {
+              //第四个提交
+              this.TypecontrolAddddd()
+            }, 2000);
+          } else if (item.value == this.formNew.second_level) {
+            this.pidd = item.typecontrol_id
+            this.TypecontrolAdddd()
+            setTimeout(() => {
+              //第四个提交
+              this.TypecontrolAddddd()
+            }, 1000);
+          } else if (item.value == this.formNew.three_level) {
+            this.pidd = item.typecontrol_id
+            this.TypecontrolAddddd()
+          }
+
+          setTimeout(() => {
+            this.submitting = false
+          }, 3000);
+        });
+              
+      });
+  
+
+  
     },
     //新增按钮确认
     async TypecontrolAdd() {
@@ -426,11 +546,84 @@ export default {
             grouping_id: this.formNew.equipment
           },
         });
-        this.submitting = false;
+
         if (result.status == '200') {
           this.Typecontrol()
           this.$message.success('新增成功');
-          this.closeadd()
+          this.pidd = result.data
+
+        }
+        else {
+          this.$message.error(result.msg)
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    //新增按钮确认2
+    async TypecontrolAddd() {
+      try {
+        let result = await this.$api({
+          type: "addTypecontrol",
+          data: {
+            type_title: this.formNew.secch,
+            pid: this.pidd,
+            grouping_id: this.formNew.equipment
+          },
+        });
+
+        if (result.status == '200') {
+          this.Typecontrol()
+          this.pidd = result.data
+
+        }
+        else {
+          this.$message.error(result.msg)
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    //新增按钮确认2
+    async TypecontrolAdddd() {
+      try {
+        let result = await this.$api({
+          type: "addTypecontrol",
+          data: {
+            type_title: this.formNew.threech,
+            pid: this.pidd,
+            grouping_id: this.formNew.equipment
+          },
+        });
+
+        if (result.status == '200') {
+          this.Typecontrol()
+          this.pidd = result.data
+        }
+        else {
+          this.$message.error(result.msg)
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    //新增按钮确认2
+    async TypecontrolAddddd() {
+      try {
+        let result = await this.$api({
+          type: "addTypecontrol",
+          data: {
+            type_title: this.formNew.fourch,
+            pid: this.pidd,
+            grouping_id: this.formNew.equipment
+          },
+        });
+
+        if (result.status == '200') {
+          this.Typecontrol()
+          this.pidd = result.data
+          this.closeadd()//最后一个函数放
+
         }
         else {
           this.$message.error(result.msg)
@@ -441,7 +634,7 @@ export default {
     },
     closeadd() {
       this.$refs.form.resetFields();
-      this.rules.group= [{ required: true, message: '请选择账号分类', trigger: 'blur' }]
+      this.rules.group = [{ required: true, message: '请选择账号分类', trigger: 'blur' }]
       this.options_tw = []
       this.dialogNewVisible = false
       this.checked = false;
@@ -450,15 +643,15 @@ export default {
       this.formNew.group = ""
       this.formNew.name = ""
       this.pid = ""
-      this.formNew.first_level=""
-      this.formNew.second_level=""
-      this.formNew.three_level=""
-      this.formNew.four_level=""
-      this. disabledacc={
-        first_level:true,//一级分类
-        second_level:true,//二级分类
-        three_level:true,
-        four_level:true,
+      this.formNew.first_level = ""
+      this.formNew.second_level = ""
+      this.formNew.three_level = ""
+      this.formNew.four_level = ""
+      this.disabledacc = {
+        first_level: true,//一级分类
+        second_level: true,//二级分类
+        three_level: true,
+        four_level: true,
       }
     },
     //四级联动点完后的事件
@@ -502,7 +695,7 @@ export default {
         page: this.current_page,
       }
       try {
-        this.loading=true
+        this.loading = true
         let result = await this.$api({
           type: "getTypecontrol",
           data: data
@@ -513,16 +706,16 @@ export default {
           this.menudata = result.data;
           this.menudata_t = result.data;
           this.filterTreeDate(result.data)//联动后方无内容
-          
+
         } else {
           this.$message.error({ message: result.msg })
         }
       } catch (error) {
         console.error(error)
-      }finally {
-        this.loading=false
+      } finally {
+        this.loading = false
       }
-      
+
     },
 
     //操作
@@ -597,8 +790,9 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
       }).then(({ value }) => {
-        console.log(value)
-       
+        this.options_tw.push({ typecontrol_id: value, label: value, value: value })
+        this.formNew.first_level = value
+        this.first_levelFn(value)
       });
     },
     visibleChange(visible, refName) {
@@ -621,6 +815,120 @@ export default {
           popper.appendChild(el);
           el.onclick = () => {
             this.showShipTemplate(null, false);
+          };
+        }
+      }
+    },
+
+
+    // 下拉添加分类按钮1
+    showShipTemplate1() {
+      this.$prompt("请输入新的分类名称", "新增分类", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+      }).then(({ value }) => {
+        this.searchEquipmentList_second_level.push({ typecontrol_id: value, label: value, value: value })
+        this.formNew.second_level = value
+        this.second_levelFn(value)
+
+      });
+    },
+    visibleChange1(visible, refName) {
+      if (visible) {
+        const ref = this.$refs[refName];
+        let popper = ref.$refs.popper;
+        if (popper.$el) popper = popper.$el;
+        if (
+          !Array.from(popper.children).some(
+            (v) => v.className === "el-template-menu__list"
+          )
+        ) {
+          const el = document.createElement("ul");
+          el.className = "el-template-menu__list";
+          el.style =
+            "border-top:2px solid rgb(219 225 241); padding:0; color:rgb(64 158 255);font-size: 13px";
+          el.innerHTML = `<li class="el-cascader-node text-center" style="height:37px;line-height: 50px;margin-left:10px;">
+            <span class="el-cascader-node__label"><i class="font-blue el-icon-plus"></i>添加分类</span>
+            </li>`;
+          popper.appendChild(el);
+          el.onclick = () => {
+            this.showShipTemplate1(null, false);
+          };
+        }
+      }
+    },
+
+
+    // 下拉添加分类按钮2
+    showShipTemplate2() {
+      this.$prompt("请输入新的分类名称", "新增分类", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+      }).then(({ value }) => {
+        this.searchEquipmentList_three_level.push({ typecontrol_id: value, label: value, value: value })
+        this.formNew.three_level = value
+        this.three_levelFn(value)
+
+      });
+    },
+    visibleChange2(visible, refName) {
+      if (visible) {
+        const ref = this.$refs[refName];
+        let popper = ref.$refs.popper;
+        if (popper.$el) popper = popper.$el;
+        if (
+          !Array.from(popper.children).some(
+            (v) => v.className === "el-template-menu__list"
+          )
+        ) {
+          const el = document.createElement("ul");
+          el.className = "el-template-menu__list";
+          el.style =
+            "border-top:2px solid rgb(219 225 241); padding:0; color:rgb(64 158 255);font-size: 13px";
+          el.innerHTML = `<li class="el-cascader-node text-center" style="height:37px;line-height: 50px;margin-left:10px;">
+            <span class="el-cascader-node__label"><i class="font-blue el-icon-plus"></i>添加分类</span>
+            </li>`;
+          popper.appendChild(el);
+          el.onclick = () => {
+            this.showShipTemplate2(null, false);
+          };
+        }
+      }
+    },
+
+
+    // 下拉添加分类按钮3
+    showShipTemplate3() {
+      this.$prompt("请输入新的分类名称", "新增分类", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+      }).then(({ value }) => {
+        this.searchEquipmentList_four_level.push({ typecontrol_id: value, label: value, value: value })
+        this.formNew.four_level = value
+        this.four_levelFn(value)
+
+      });
+    },
+    visibleChange3(visible, refName) {
+      if (visible) {
+        const ref = this.$refs[refName];
+        let popper = ref.$refs.popper;
+        if (popper.$el) popper = popper.$el;
+        if (
+          !Array.from(popper.children).some(
+            (v) => v.className === "el-template-menu__list"
+          )
+        ) {
+          const el = document.createElement("ul");
+          el.className = "el-template-menu__list";
+          el.style =
+            "border-top:2px solid rgb(219 225 241); padding:0; color:rgb(64 158 255);font-size: 13px";
+          el.innerHTML = `<li class="el-cascader-node text-center" style="height:37px;line-height: 50px;margin-left:10px;">
+            <span class="el-cascader-node__label"><i class="font-blue el-icon-plus"></i>添加分类</span>
+            </li>`;
+          popper.appendChild(el);
+          el.onclick = () => {
+            this.showShipTemplate3(null, false);
           };
         }
       }
