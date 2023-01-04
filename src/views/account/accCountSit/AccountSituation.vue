@@ -48,12 +48,15 @@
         </el-select>
       </div>
 
-      <!--       <div class="mr-15">
-        <el-select clearable v-model="ascription" placeholder="账号归属">
-          <el-option v-for="item in ascription_option" :value="item.value" :label="item.label"
-            :key="item.label"></el-option>
-        </el-select>
-      </div> -->
+      <el-input
+        style="width: 12%"
+        size="medium"
+        clearable
+        class="search-uid--input mr-30"
+        v-model="accUid"
+        placeholder="请输入账号UID"
+      ></el-input>
+
       <el-button
         size="medium"
         class="base-btn search-btn"
@@ -63,10 +66,7 @@
       <el-button size="medium" class="base-btn search-btn" @click="RestQuery"
         >重置</el-button
       >
-      <!-- <el-button class="base-btn">账号分配</el-button> -->
-      <!--       <el-button @click="handleFollow" class="base-btn">{{
-        followBtnText
-      }}</el-button> -->
+
       <el-button
         size="medium"
         class="base-btn"
@@ -74,11 +74,13 @@
         @click="showBatchEditorDialog"
         >编辑选中账号信息</el-button
       >
-      <!-- <el-button class="base-btn">一键监控选中账号</el-button> -->
     </div>
 
     <div class="tt-accsituation-main">
-      <div style="height: 40px" class="flex-jus-spacebet pad-0-20">
+      <div
+        style="height: 35px; margin-bottom: 16px"
+        class="flex-jus-spacebet pad-0-20"
+      >
         <div class="flex-jus-spacebet">
           <p class="mr-30 fz-14">共{{ total }}个账号</p>
           <p class="mr-30 fz-14" style="color: #ff411f">
@@ -86,59 +88,41 @@
           </p>
         </div>
 
-        <div style="width: 50%" class="flex-jus-spacebet">
-          <div class="search-input-wrap flex-jus-spacebet">
-            <el-input
-              size="medium"
-              clearable
-              class="search-uid--input mr-30"
-              v-model="accUid"
-              placeholder="请输入账号UID"
-            ></el-input>
-            <el-button size="medium" @click="searchUid">搜索</el-button>
-          </div>
-
-          <div>
-            <el-select
-              size="medium"
-              style="width: 110px"
-              v-model="sortQuery"
-              clearable
-              placeholder="粉丝"
+        <div style="width: 27%" class="flex-jus-spacebet">
+          <el-select
+            size="medium"
+            style="width: 110px"
+            v-model="sortQuery"
+            clearable
+            placeholder="粉丝"
+          >
+            <el-option
+              v-for="item in sortQueryOption"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
             >
-              <el-option
-                v-for="item in sortQueryOption"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
-
-            <el-select
-              size="medium"
-              clearable
-              style="width: 100px"
-              class="ml-15"
-              placeholder="升序"
-              v-model="sortWay"
+            </el-option>
+          </el-select>
+          <el-select
+            size="medium"
+            clearable
+            style="width: 100px"
+            placeholder="升序"
+            v-model="sortWay"
+          >
+            <el-option
+              v-for="item in sortOption"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
             >
-              <el-option
-                v-for="item in sortOption"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
-
-            <el-button size="medium" @click="handleSort" class="ml-15"
-              >查 看</el-button
-            >
-          </div>
+            </el-option>
+          </el-select>
+          <el-button size="medium" @click="handleSort">查 看</el-button>
+          <el-button size="medium">刷新账号</el-button>
         </div>
       </div>
-
       <table-custom
         ref="multipleTable"
         class="tt-accsituation--tabel"
@@ -147,6 +131,7 @@
         :loading="loading"
         :tableData="memberList"
         :columns="columns"
+        height="640"
       ></table-custom>
     </div>
 
@@ -207,7 +192,7 @@
 <script>
 import store from "store";
 import MINXIN from "@/core/minxin";
-import configureMap from '@/config/accountConfig/configureMap.config'
+import configureMap from "@/config/accountConfig/configureMap.config";
 import tableCustom from "@/components/myComponent/table/tableCustom";
 import Pagination from "@/components/myComponent/table/pagination";
 import EditorDialog from "./editoDialog/editorDialog";
@@ -218,7 +203,14 @@ import ViewerTabel from "./ViewerLabel/viewerTabel";
 import BatchEditor from "./taskDialog/batchEditor";
 import TableOperation from "./tableOperation/operationSelect";
 import ConfrimDelDialog from "./confrimDelDialog/confrimDelDialog";
-const {fansMap,fansOption,operationMap,accStatusMap,operationOption,sortQueryOption} = configureMap
+const {
+  fansMap,
+  fansOption,
+  operationMap,
+  accStatusMap,
+  operationOption,
+  sortQueryOption,
+} = configureMap;
 export default {
   name: "AccountSituation",
   components: {
@@ -281,6 +273,7 @@ export default {
         type: "getTypecontrol",
         data: searchTypeData,
       });
+      console.log("更新分类", result.data);
       this.typeList = this.getTreeData(result.data);
     },
   },
@@ -295,7 +288,6 @@ export default {
       showBatchEiDialog: false, //是否展示批量编辑按钮界面
       shwoVideoTabel: false, //是否展示视频播放弹窗
       showViewerTabel: false, //是否展示访问列表表格
-      isFollow: false, //是否开启一键回关
       sortQuery: "", //排序字段
       sortWay: "", //排序方式
       searchForm: {
@@ -307,11 +299,11 @@ export default {
       },
       sortOption: [
         {
-          value: "0",
+          value: "desc",
           label: "升序",
         },
         {
-          value: "1",
+          value: "asc",
           label: "降序",
         },
       ],
@@ -568,12 +560,10 @@ export default {
         },
       ],
       acc_id: "", //查询框的账号ID
-      ascription: "",
       fansMap: fansMap,
       fans_option: fansOption,
       fans: "", //粉丝量查询框对应 model
       page: 1, //页码
-      taskConfig: "", //对应设置任务下拉框 model
       memberList: [], //渲染表格的数据    和后端对接的  对应获取函数为getMemberList
       accConfigCloumn: [
         //任务下拉框的options
@@ -588,7 +578,6 @@ export default {
       groupString: "",
       group: "", //设置分组
       limit: 10, //每页请求数据条数
-      user_video_num: 0, //视频数量
       videoList: [], //用户视频列表数据
       vistList: [], //访问列表数据
       member_id: "", //用户ID，获取数据用的
@@ -616,6 +605,27 @@ export default {
   },
 
   methods: {
+    /*
+            function: getTreeData
+            params: data | 需要进行递归处理的数组
+            desc: 递归函数，对数组进行处理，设置dhilren长度为0的字段为undefined
+            return: 处理后的数据
+        */
+    getTreeData(data) {
+      data.forEach((item) => {
+        if (!item.children.length) {
+          item.children = undefined;
+        } else {
+          this.getTreeData(item.children);
+        }
+      });
+      return data;
+    },
+
+    formatTypeId(param) {
+      return param[param.length - 1] ?? "";
+    },
+
     /* 
         function: initInterface
         params: null
@@ -676,7 +686,7 @@ export default {
         desc: 本地存储 typecontrol_id 字段（分类）
     */
     setLocalType() {
-      let typecontrol_id = this.fformatTypeId(classiFication);
+      let typecontrol_id = this.formatTypeId(this.classiFication);
       store.set("typecontrol_id", typecontrol_id);
     },
 
@@ -704,19 +714,30 @@ export default {
         params: null
         desc: 排序回调
     */
-    handleSort() {
-      if (this.sortQuery === "" || this.sortWay === "") {
-        this.$message.error("排序字段或排序方式未选");
-        return;
+    async handleSort() {
+      try {
+        if (this.sortQuery === "" || this.sortWay === "") {
+          this.$message.error("排序字段或排序方式未选");
+          return;
+        }
+        let typecontrol_id = this.formatTypeId(this.classiFication);
+        let data = {
+          typecontrol_id: typecontrol_id ?? "",
+          grouping_id: this.group ?? "",
+          order: this.sortQuery,
+          sort: this.sortWay,
+        };
+        let result = await this.getMemberList(data);
+        console.log(result);
+        if (result.status == 200) {
+          this.$message.success("查询成功");
+          return;
+        }
+        this.$message.error(result.msg ?? "查询错误");
+      } catch (error) {
+        this.$message.error();
       }
-      this.$message.success("查询成功");
-      let data = {
-        sortQuery: this.sortQuery,
-        sortWay: this.sortWay,
-      };
-      console.log("查看", data);
     },
-
 
     /* 
         function: confrimDel
@@ -768,7 +789,6 @@ export default {
     scrollHandle(e) {
       console.log(e, 1111);
     },
-
 
     /* 
         function: handleFollow
@@ -855,18 +875,17 @@ export default {
       this.getMemberList();
     },
 
-
     /* 
         function: removeLocal
         params: null
         desc: 清空缓存字段
     */
-    removeLocal(){
-      store.remove('page')
-      store.remove('limit')
-      store.remove('group')
-      store.remove('typecontrol_id')
-      store.remove('fans')
+    removeLocal() {
+      store.remove("page");
+      store.remove("limit");
+      store.remove("group");
+      store.remove("typecontrol_id");
+      store.remove("fans");
     },
 
     /* 
@@ -880,7 +899,9 @@ export default {
       this.fans = "";
       this.searchForm.grouping_id = "";
       this.group = "";
-      this.removeLocal()
+      this.limit = 20;
+      this.page = 1;
+      this.removeLocal();
       this.getMemberList();
       this.$message.success("重置成功");
     },
@@ -972,12 +993,12 @@ export default {
       try {
         this.loading = true;
         let data = {
-          typecontrol_id: this.formatTypeId(),
-          uid: this.acc_id ?? "",
+          typecontrol_id: this.formatTypeId(this.classiFication) ?? "",
+          uid: this.accUid ?? "",
           min: this.fans[0] ?? "",
           max: this.fans[1] ?? "",
-          limit: this.limit ?? 10,
-          page: this.page ?? 1,
+          limit: this.limit ?? "",
+          page: this.page ?? "",
           grouping_id: this.group ?? "",
         };
         let result = await this.$api({
@@ -1007,8 +1028,9 @@ export default {
     handlePagination(val) {
       this.limit = val.limit;
       this.page = val.page;
+      let typecontrol_id = this.formatTypeId(this.classiFication);
       let data = {
-        typecontrol_id: this.formatTypeId(),
+        typecontrol_id: typecontrol_id,
         grouping_id: this.group ?? "",
         limit: this.limit ?? 10,
         page: this.page ?? 1,
@@ -1036,7 +1058,7 @@ export default {
           return false;
         }
         let data = {
-          typecontrol_id: this.formatTypeId(),
+          typecontrol_id: this.formatTypeId(this.classiFication),
         };
         let result = await this.$api({ type: "getProjectNum", data: data });
         this.materialTotal = result.data.num ?? 0;
@@ -1090,46 +1112,6 @@ export default {
     },
 
     /* 
-        function: closeFollowTask
-        params: null
-        desc: 关闭关注任务配置
-    */
-    closeFollowTask() {
-      this.showFollowDialog = false;
-      this.taskConfig = "";
-    },
-
-    /* 
-        function: closeLetterTask
-        params: null
-        desc: 关闭私信任务配置
-    */
-    closeLetterTask() {
-      this.showLetterTask = false;
-      this.taskConfig = "";
-    },
-
-    /* 
-        function: closeLikeCommentTask
-        params: null
-        desc: 关闭点赞任务任务配置
-    */
-    closeLikeCommentTask() {
-      this.showLikeCommentTask = false;
-      this.taskConfig = "";
-    },
-
-    /* 
-        function: closeVideoTask
-        params: null
-        desc: 关闭视频任务配置
-    */
-    closeVideoTask() {
-      this.showVideoTask = false;
-      this.taskConfig = "";
-    },
-
-    /* 
         function: handleSelectChange
         params: val | 默认值为对象，里面是选中账号信息
         desc: 表格多选框改变时的回调
@@ -1155,7 +1137,7 @@ export default {
         desc: 递归函数，对数组进行处理，设置dhilren长度为0的字段为undefined
         return: 处理后的数据
     */
-    getTreeData(data) {
+    /*     getTreeData(data) {
       data.forEach((item) => {
         if (!item.children.length) {
           item.children = undefined;
@@ -1164,7 +1146,7 @@ export default {
         }
       });
       return data;
-    },
+    }, */
 
     /*
         function: getTypeControlList
@@ -1192,10 +1174,10 @@ export default {
           type: "getMember",
           data: data,
         });
-        console.log(result);
         this.memberList = result.data.list;
         this.total = result.data.count;
         this.loading = false;
+        return result;
       } catch (error) {
         console.error(error);
       }
@@ -1399,5 +1381,6 @@ export default {
   left: 10px;
   top: 10px;
 }
-.table-avatar {}
+.table-avatar {
+}
 </style>
