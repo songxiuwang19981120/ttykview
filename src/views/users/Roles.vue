@@ -15,7 +15,9 @@
 			@pagination="pageChange"
 		></pagination>
 		<!-- 新增角色弹层 -->
-		<addRole :showdialog.sync="showAddDialog" :ruleForm.sync="editData"></addRole>
+		<addRole :showdialog.sync="showAddDialog"></addRole>
+		<!-- 更改名称弹层 -->
+		<editRole :showdialog.sync="showEditDialog" :ruleForm.sync="editData"></editRole>
 		<!-- 权限配置弹层 -->
 		<setRole :showdialog.sync="showSetDialog"></setRole>
 	</div>
@@ -26,6 +28,7 @@
 	import pagination from '@/components/myComponent/table/pagination.vue';
 	import addRole from './components/addRoleDialog.vue';
 	import setRole from './components/setRoleDialog.vue';
+	import editRole from './components/editRoleDialog.vue'
 
 	export default {
 		name: 'Roles',
@@ -35,6 +38,7 @@
 			pagination,
 			addRole,
 			setRole,
+			editRole
 		},
 
 		data() {
@@ -48,7 +52,7 @@
 						align: 'center',
 					},
 					{
-						prop: '',
+						prop: 'use_num',
 						label: '人数',
 						align: 'center',
 					},
@@ -90,6 +94,7 @@
 				},
 				total: 0,
 				showAddDialog: false, // 新增弹层
+				showEditDialog: false, // 编辑弹层
 				editData: {},
 				showSetDialog: false, // 配置弹层
 			};
@@ -134,7 +139,7 @@
 
 			// 点击修改按钮
 			toEditRole(obj) {
-				this.showAddDialog = true;
+				this.showEditDialog = true;
 				this.editData = JSON.parse(JSON.stringify(obj));
 			},
 
