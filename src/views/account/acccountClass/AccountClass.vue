@@ -41,8 +41,9 @@
           </el-select>
         </el-form-item>
         <el-form-item label="选择账号分类:" prop="group">
-          <!-- <el-cascader :disabled="disabled" :options="options_tw" :props="defaultPropsa" v-model="formNew.group"
-            @change="menuchange" style="width:200px"><template slot-scope="{ node, data }">
+          <!-- <el-cascader  :options="options_tw"  v-model="formNew.group"
+            @change="menuchange" style="width:200px">
+            <template slot-scope="{ node, data }">
               <span>
                 <span>{{ data.label }}</span>
                 <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
@@ -54,34 +55,36 @@
           </span> -->
 
           <el-select
-            v-model="formNew.group"
+          :disabled="disabledacc.first_level"
+            v-model="formNew.first_level"
             placeholder="一级"
             ref="template"
+            @change="second_levelFn"
             @visible-change="(v) => visibleChange(v, 'template')"
-            style="width:120px"
+            style="width:120px;margin-right: 10px;"
           >
             <el-option
-              v-for="item in options_tww"
+              v-for="item in options_tw"
               :key="item.typecontrol_id"
               :label="item.label"
               :value="item.value"
             >
               <span style="float: left" class="span-style">{{ item.label }}</span>
           
-
             </el-option>
           </el-select>
 
 
           <el-select
-            v-model="formNew.group"
+          :disabled="disabledacc.second_level"
+            v-model="formNew.second_level"
             placeholder="二级"
             ref="template1"
             @visible-change="(v) => visibleChange(v, 'template1')"
-            style="width:120px"
+            style="width:120px;margin-right: 10px;"
           >
             <el-option
-              v-for="item in searchEquipmentList"
+              v-for="item in searchEquipmentList_second_level"
               :key="item.grouping_id"
               :label="item.grouping_name"
               :value="item.grouping_id"
@@ -94,11 +97,12 @@
 
 
           <el-select
-            v-model="formNew.group"
+          :disabled="disabledacc.three_level"
+            v-model="formNew.three_level"
             placeholder="三级"
             ref="template2"
             @visible-change="(v) => visibleChange(v, 'template2')"
-            style="width:120px"
+            style="width:120px;margin-right: 10px;"
           >
             <el-option
               v-for="item in searchEquipmentList"
@@ -114,7 +118,8 @@
 
 
           <el-select
-            v-model="formNew.group"
+          :disabled="disabledacc.four_level"
+            v-model="formNew.four_level"
             placeholder="四级"
             ref="template3"
             @visible-change="(v) => visibleChange(v, 'template3')"
@@ -218,10 +223,7 @@ export default {
       equipmentLoading: false,
       searchTableData: {
         equipment: ""
-      },//账号分组选择
-      searchTableData1: {
-        equipment: ""
-      },
+      },//账号分组选
       checked: false,//是否添加根目录
       disabled: false,//新增下拉是否禁用
       defaultPropsa: {
@@ -251,10 +253,21 @@ export default {
       },
       formNew: {
         name: '',
+        first_level:"",//一级分类
+        second_level:"",//二级分类
+        three_level:"",
+        four_level:"",
       },//新增分组名称
       options_tw: [],
-
-
+      //下拉是否显示
+      disabledacc:{
+        first_level:true,//一级分类
+        second_level:true,//二级分类
+        three_level:true,
+        four_level:true,
+      },
+      //下拉数据
+      searchEquipmentList_second_level:[],
     }
   },
   mounted() {
@@ -291,25 +304,24 @@ export default {
     },
     //分类
     async getEquipmentGroupAdd() {
-      
+      this.formNew.first_level=""
+      this. disabledacc={
+        first_level:true,//一级分类
+        second_level:true,//二级分类
+        three_level:true,
+        four_level:true,
+      };
       try {
         let result = await this.$api({
           type: "getTypecontrol",
           data: {
-            grouping_id: this.searchTableData1.equipment,
+            grouping_id:this.formNew.equipment
           }
         });
         if (result.status == 200) {
           this.options_tw = result.data;
-          console.log(this.options_tw)
-          
-          this.options_tw.forEach(item => {
-            if(item.grouping_name==this.searchTableData1.equipment){
-              this.options_tww.push(item)
-            }
-            
-          });
-          console.log(this.searchTableData.equipment)
+          console.log(this.options_tw,"123")
+          this.disabledacc.first_level=false
           this.$nextTick(() => {
             this.filterTreeDate(result.data)//联动后方无内容
           })
@@ -319,6 +331,14 @@ export default {
       } catch (error) {
         console.error(error)
       }
+    },
+    //第一个下拉分类
+    second_levelFn(val){
+    console.log(val)
+    if(this.formNew.first_level){
+      console.log(this.formNew.first_level)
+    }
+
     },
     // 获取账号分组数据
     async getEquipmentGroup() {
@@ -424,13 +444,22 @@ export default {
       this.rules.group= [{ required: true, message: '请选择账号分类', trigger: 'blur' }]
       this.options_tw = []
       this.dialogNewVisible = false
-      this.searchTableData1.equipment = ""
       this.checked = false;
       this.disabled = false;
       this.formNew.equipment = ""
       this.formNew.group = ""
       this.formNew.name = ""
       this.pid = ""
+      this.formNew.first_level=""
+      this.formNew.second_level=""
+      this.formNew.three_level=""
+      this.formNew.four_level=""
+      this. disabledacc={
+        first_level:true,//一级分类
+        second_level:true,//二级分类
+        three_level:true,
+        four_level:true,
+      }
     },
     //四级联动点完后的事件
     getCascaderObj2(val_Tw, opt2) {
@@ -562,9 +591,9 @@ export default {
     },
 
 
-    // 添加分类标签
+    // 下拉添加分类按钮
     showShipTemplate() {
-      this.$prompt("请输入新的分类名称", "提示", {
+      this.$prompt("请输入新的分类名称", "新增分类", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
       }).then(({ value }) => {
