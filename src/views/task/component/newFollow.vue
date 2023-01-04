@@ -137,12 +137,6 @@ export default {
         ],
       },
       blackList: ["无昵称", "无作品", "无头像", "历史已操作用户"],
-      blackListMap: {
-        无头像: "no_avatar",
-        无作品: "no_aweme",
-        历史已操作用户: "historical_users",
-        无昵称: "no_nickname",
-      },
       typeList: [],
       groupList: [],
       sourceData: [],
