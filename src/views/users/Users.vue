@@ -221,6 +221,7 @@
 			// 获取用户列表
 			async getApiuser(data) {
 				try {
+					this.loading = true
 					const res = await this.$api({
 						type: 'getApiuser',
 						data,
