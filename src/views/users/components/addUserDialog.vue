@@ -86,7 +86,7 @@
 				<el-form-item>
 					<el-button @click="btnCancel" size="medium">取消</el-button>
 					<el-button type="primary" size="medium" :loading="btnloading" @click="btnOK">{{
-						btnloading ? '上传中...' : '确定'
+						btnloading ? '添加中...' : '确定'
 					}}</el-button>
 				</el-form-item>
 			</el-row>
@@ -161,6 +161,7 @@
 			// 新增角色
 			async addApiuser(data) {
 				try {
+					this.btnloading = true
 					const res = await this.$api({
 						type: 'addApiuser',
 						data,
@@ -172,6 +173,8 @@
 					}
 				} catch (error) {
 					console.error(error);
+				} finally {
+					this.btnloading = false
 				}
 			},
 
