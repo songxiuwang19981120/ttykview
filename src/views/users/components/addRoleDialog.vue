@@ -24,10 +24,10 @@
 			</el-form-item>
 			<el-row type="flex" justify="end">
 				<el-form-item>
+					<el-button @click="btnCancel" size="medium">取消</el-button>
 					<el-button type="primary" size="medium" :loading="btnloading" @click="btnOK">{{
 						btnloading ? '上传中...' : '确定'
 					}}</el-button>
-					<el-button @click="btnCancel" size="medium">取消</el-button>
 				</el-form-item>
 			</el-row>
 		</el-form>

@@ -12,6 +12,7 @@ export default async function Http({ type, data }) {
   let { url, method,setToken = false } = API_LIST[type]
   try {
     method = method.toLowerCase()
+    data = method === 'get' ? { params: data } : data
     let result = await service[method](url, data)
      if (setToken) {
       console.log(result)

@@ -1,5 +1,5 @@
 <template>
-	<el-dialog :visible="showdialog" title="权限配置" @close="btnCancel">
+	<el-dialog :visible="showdialog" title="权限配置" @close="btnCancel" width="40%">
 		<el-tree
 			:data="treeData"
 			show-checkbox
@@ -14,8 +14,8 @@
 		>
 		</el-tree>
 		<el-row type="flex" justify="end" style="margin-top: 20px;">
-			<el-button type="primary" size="medium" @click="btnOK">确定</el-button>
 			<el-button @click="btnCancel" size="medium">取消</el-button>
+			<el-button type="primary" size="medium" @click="btnOK">确定</el-button>
 		</el-row>
 	</el-dialog>
 </template>

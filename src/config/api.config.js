@@ -624,13 +624,35 @@ export default {
     url: '/Apiusergroup/set_rule',
     method: 'POST',
   },
-  //Apiusergroup  API end
-
   'getRouteTree': {
     url: '/Apiuser/get_rule_tree',
     method: 'GET',
   },
+  //Apiusergroup  API end
 
+
+  //Apiuser  API start
+  'getApiuser': {
+    url: '/Apiuser/index',
+    method: 'GET',
+  },
+  'addApiuser': {
+    url: '/Apiuser/add',
+    method: 'POST',
+  },
+  'updateApiuser': {
+    url: '/Apiuser/update',
+    method: 'POST',
+  },
+  'deleteApiuser': {
+    url: '/Apiuser/delete',
+    method: 'POST',
+  },
+  'updatePwd': {
+    url: '/Apiuser/UpPass',
+    method: 'POST',
+  },
+  //Apiuser  API end
 }
 
 
