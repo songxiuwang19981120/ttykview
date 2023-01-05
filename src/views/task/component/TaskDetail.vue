@@ -1,9 +1,9 @@
 <template>
   <div>
-    <el-dialog width="60%" :visible="showTaskDetail" :before-close="handlerClose" title="评论点赞任务详情">
+    <el-dialog width="70%" :visible="showTaskDetail" :before-close="handlerClose" title="评论点赞任务详情">
       <table-custom :loading="loading" :tableData="tableData" :columns="columns" height="700"></table-custom>
       <pagination :total="total" :page="page" :limit="limit" @pagination="pageChange"></pagination>
-      <span slot="footer" class="dialog-footer">
+      <span slot="footer">
         <el-button @click="handlerClose" size="medium">取 消</el-button>
       </span>
       <el-dialog width="55%" :visible="showJournal" :before-close="journalClose" title="评论点赞任务日志"  append-to-body>

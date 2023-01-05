@@ -15,15 +15,17 @@
             v-model="likeCommentTaskForm.typecontrol_id" size="medium" @change="getMemberList"></el-cascader>
         </el-form-item>
         <el-form-item label="">
-          <p style="font-size:12px">当前已选中<span style="color:red">{{accCount}}</span>个账号</p>
+          <p style="font-size:12px">当前已选中<span style="color:red">{{ accCount }}</span>个账号</p>
         </el-form-item>
         <el-form-item prop="remarks" label="任务名称">
           <el-input type="text" size="medium" v-model="likeCommentTaskForm.remarks" placeholder="任务名称"
             style="width: 50%"></el-input>
         </el-form-item>
         <el-form-item label="选择国家 ：" prop="account_region" v-model="likeCommentTaskForm.account_region">
-          <el-select style="width: 50%" clearable multiple filterable  v-model="likeCommentTaskForm.account_region" placeholder="选择国家" size="medium">
-            <el-option v-for="(item,index) in countryOptions" :key="index" :label="item" :value="item">{{ item }}</el-option>
+          <el-select style="width: 50%" clearable multiple filterable v-model="likeCommentTaskForm.account_region"
+            placeholder="选择国家" size="medium">
+            <el-option v-for="(item, index) in countryOptions" :key="index" :label="item" :value="item">{{ item
+}}</el-option>
           </el-select>
         </el-form-item>
         <el-form-item prop="tasklist_id_list" label="选择数据来源 ：" v-model="likeCommentTaskForm.tasklist_id_list">
@@ -92,7 +94,7 @@ export default {
   },
   data() {
     return {
-      accCount:0,
+      accCount: 0,
       subLoading: false,
       rules: {
         group: [
@@ -211,15 +213,15 @@ export default {
     },
     async getCountry() {
       try {
-					let result = await this.$api({ type: 'getCountry'});
-					if (result.status == '200') {
-						this.countryOptions = result.data;
-					} else {
-						this.$message.error({ message: result.msg });
-					}
-				} catch (error) {
-          this.$message.error({ message: error.msg });
+        let result = await this.$api({ type: 'getCountry' });
+        if (result.status == '200') {
+          this.countryOptions = result.data;
+        } else {
+          this.$message.error({ message: result.msg });
         }
+      } catch (error) {
+        this.$message.error({ message: error.msg });
+      }
     },
 
     /* 
@@ -246,22 +248,11 @@ export default {
         desc: 关闭表单
     */
     handlerClose() {
+      this.accCount = 0
+      this.groupList = []
+      this.typeList = []
       this.$refs["likeCommentForm"].resetFields();
-      this.likeCommentTaskForm = {
-        account_region: "", //选择国家
-        tasklist_id_list: "", //数据来源
-        user_digg_upper_limit: "1000", //单号点赞上限
-        comment_digg_count_lower_limit: "5", //评论获赞小于
-        can_fail_num: "3", //连续失败执行下一个号
-        black_list: ['historical_users'], //黑名单
-        port: [], //执行端协议
-        typecontrol_id: "",
-        uid_list: "",
-        group: '',
-        remarks: '' //备注任务名称
-      }
       this.$emit("closeLikeCommentTask");
-
     },
 
     /* 
@@ -278,11 +269,11 @@ export default {
             //   return item.uid;
             // });
             // this.likeCommentTaskForm.uid_list = userList;
-            this.likeCommentTaskForm.typecontrol_id = this.typecontrol_id;
-            this.likeCommentTaskForm.black_list =
-              this.likeCommentTaskForm.black_list.map((item) => {
-                return this.blackListMap[item];
-              });
+            // this.likeCommentTaskForm.typecontrol_id = this.typecontrol_id;
+            // this.likeCommentTaskForm.black_list =  
+              // this.likeCommentTaskForm.black_list.map((item) => {
+              //   return this.blackListMap[item];
+              // }).join(',');
             this.pushCommentTask(this.likeCommentTaskForm)
           }
         });
@@ -299,8 +290,7 @@ export default {
         });
         if (res.status == 200) {
           this.$message.success(res.msg ?? "操作成功");
-        this.resetForm();
-        this.handlerClose();
+          this.handlerClose();
         } else {
           this.$message.error(res.msg ?? "操作失败");
         }
@@ -310,44 +300,33 @@ export default {
       }
     },
     // 获取账号
-		async getMemberList() {
-      if(this.likeCommentTaskForm.typecontrol_id!=''){
+    async getMemberList() {
+      if (this.likeCommentTaskForm.typecontrol_id != '') {
         try {
-					const res = await this.$api({
-						type: 'getMember',
-						data: {
-							grouping_id: this.likeCommentTaskForm.grouping_id,
-							typecontrol_id: this.likeCommentTaskForm.typecontrol_id,
-						},
-					});
-					if (res.status == 200) {
-						this.accCount = res.data.count;
-					} else {
-						this.$message.error(res.msg);
-					}
-				} catch (error) {
-				}
-      }else{
-        this.accCount=0
+          const res = await this.$api({
+            type: 'getMember',
+            data: {
+              grouping_id: this.likeCommentTaskForm.grouping_id,
+              typecontrol_id: this.likeCommentTaskForm.typecontrol_id,
+            },
+          });
+          if (res.status == 200) {
+            this.accCount = res.data.count;
+          } else {
+            this.$message.error(res.msg);
+          }
+        } catch (error) {
+        }
+      } else {
+        this.accCount = 0
       }
-		},
+    },
 
     resetForm() {
+      this.accCount = 0
+      this.typeList = []
       this.$refs["likeCommentForm"].resetFields();
       this.getList()
-      this.likeCommentTaskForm = {
-        account_region: "", //选择国家
-        tasklist_id_list: "", //数据来源
-        user_digg_upper_limit: "1000", //单号点赞上限
-        comment_digg_count_lower_limit: "5", //评论获赞小于
-        can_fail_num: "3", //连续失败执行下一个号
-        black_list: ['historical_users'], //黑名单
-        port: [], //执行端协议
-        typecontrol_id: "",
-        uid_list: "",
-        group: '',
-        remarks: '' //备注任务名称
-      }
     },
   },
 };

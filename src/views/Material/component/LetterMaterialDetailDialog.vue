@@ -1,21 +1,18 @@
 <template>
 	<el-dialog title="私信列表" :visible="outerVisible" @close="btnCancel" width="60%">
-		<div class="tt-accsituation">
-			<div class="tt-accsituation--operation">
-				<span>私信类型：</span>
-				<el-select v-model="searchTableData.type" placeholder="私信类型选择" style="margin-right: 20px" size="medium">
-					<el-option v-for="item in searchTypeList" :key="item.value" :label="item.label" :value="item.value">
-					</el-option>
-				</el-select>
-				<div>
-					<!-- 查询 -->
-					<el-button type="primary" size="medium" :loading="btnloading" @click="searchNickName"
-						style="margin-right: 10px">{{ btnloading ? '加载中...' : '搜索' }}</el-button>
-					<el-button type="primary" size="medium" @click="btnReset">重置</el-button>
-					<el-button @click="batchDelete" type="primary" size="medium" :loading="deleteing">{{ deleteing ? '删除中 ...': '批量删除'}}</el-button>
-				</div>
-			</div>
+
+		<div style="margin-bottom:20px">
+			<el-select class="mr-36 video-select" style="width: 150px;margin-right: 10px;" v-model="searchForm.usage_count" placeholder="使用次数"	clearable>
+				<el-option v-for="item in fansOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+			</el-select>
+			<el-select class="mr-36 video-select" style="width: 150px;margin-right: 10px;" v-model="searchForm.sort" placeholder="次数排序"	clearable>
+				<el-option v-for="item in sortOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+			</el-select>
+			<el-button type="primary" size="medium" :loading="submitting" @click="searchTable">{{submitting? "搜索中 ...": "查看"}}</el-button>
+			<el-button type="primary" size="medium" @click="resetTable">重置</el-button>
+			<el-button @click="batchDelete" type="primary" size="medium" :loading="deleteing">{{ deleteing ? '删除中 ...': '批量删除'}}</el-button>
 		</div>
+
 		<!-- 详情页面内容 -->
 		<!-- 表格 -->
 		<table-custom  height="700" :mutiSelect="true" @handleSelectionChange="selectionChange" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
@@ -67,6 +64,25 @@ export default {
 			}
 		};
 		return {
+			submitting: false,
+			searchForm: {
+				sort: '',  //排序
+				usage_count: '',  //次数
+			},
+			sortOptions: [
+				{ label: "升序", value: 'desc' },
+				{ label: "降序", value: 'asc' },
+			],
+			fansOptions: [
+				{ label: "0", value: 0 },
+				{ label: "1", value: 1 },
+				{ label: "2", value: 2 },
+				{ label: "3", value: 3 },
+				{ label: "4", value: 4 },
+				{ label: "5", value: 5 },
+				{ label: ">5", value: '>5' },
+				{ label: "全部", value: '100' },
+			],
 			tableSelsectList: [],
 			deleteing:false,
 			searchTypeList: [
@@ -87,9 +103,6 @@ export default {
 					value: '3',
 				},
 			], //私信类型
-			searchTableData: {
-				type: '',
-			},
 			btnloading: false,
 			innerVisible: false,
 			loading: false, // 表格-分页组件相关
@@ -98,6 +111,11 @@ export default {
 				{
 					prop: 'content',
 					label: '私信',
+					align: 'center',
+				},
+				{
+					prop: 'usage_count',
+					label: '使用次数',
 					align: 'center',
 				},
 				{
@@ -149,6 +167,31 @@ export default {
 		};
 	},
 	methods: {
+		searchTable() {
+			let usage_count = ''
+			if(this.searchForm.usage_count=='100'){
+				usage_count=''
+			}else{
+				usage_count=this.searchForm.usage_count
+			}
+			this.getPrivateLetter({
+				page: 1,
+				limit: this.nickNameData.limit,
+				typecontrol_id: this.upParameter.typecontrol_id,
+				grouping_id: this.upParameter.grouping_id,
+				sort: this.searchForm.sort,
+				usage_count: usage_count,
+				order:'usage_count',
+			});
+		},
+		resetTable(){
+			this.searchForm= {
+				sort: '',  //排序
+				usage_count: '',  //次数
+			}
+			this.nickNameData.page=1
+			this.updatePageData()
+		},
 		// 批量删除
 		batchDelete() {
 			if (this.tableSelsectList.length > 0) {
@@ -230,7 +273,6 @@ export default {
 				limit: this.nickNameData.limit,
 				typecontrol_id: this.upParameter.typecontrol_id,
 				grouping_id: this.upParameter.grouping_id,
-				type: this.searchTableData.type
 			});
 		},
 		// 点击查询按钮
@@ -241,9 +283,6 @@ export default {
 		// 点击重置按钮
 		btnReset() {
 			this.resetloading = true
-			this.searchTableData = {
-				type: '',
-			};
 			this.updatePageData()
 		},
 		// 点击编辑按钮
@@ -269,18 +308,12 @@ export default {
 		// 点击取消按钮
 		btnCancel() {
 			this.$emit('update:outerVisible', false);
-			this.searchTableData = {
-				type: ''
-			};
 			this.$parent.searchNickName();
 		},
 		// 点击编辑页面取消按钮
 		btnCancel2() {
 			this.innerVisible = false;
 			this.$refs.ruleForm.resetFields();
-			this.searchTableData = {
-				type: '',
-			}
 		},
 		// 点击编辑页面确定按钮
 		async btnOK2() {

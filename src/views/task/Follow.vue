@@ -26,7 +26,7 @@
     <!-- 弹层 -->
     <followDetail ref="followDialog" :showDialog.sync="showTaskDetail" :curId="curId"></followDetail>
     <!-- 关注任务 -->
-    <newFollow @closeLetterTask="closeLetterTask" :showLetterTask="showLetterTask" />
+    <newFollow ref="newfollowDialog" @closeLetterTask="closeLetterTask" :showLetterTask="showLetterTask" />
   </div>
 </template>
 <script>
@@ -184,6 +184,7 @@ export default {
 
     shownewFollow() {
       this.showLetterTask = true;
+      this.$refs.newfollowDialog.getList()
     },
     // 获取关注任务列表
     async getVideoTasks(data) {

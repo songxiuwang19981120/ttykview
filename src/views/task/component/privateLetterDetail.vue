@@ -1,17 +1,17 @@
 <template>
 	<div>
-		<el-dialog :visible="showDialog" title="关注任务详情" @close="btnCancel" width="70%">
+		<el-dialog :visible="showDialog" title="私信详情" @close="btnCancel" width="70%">
 			<!-- 表格 -->
 			<table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
 				height="700"></table-custom>
 			<!-- 分页 -->
-			<pagination :total="total" :page="page" :limit="limit" @pagination="pageChange"></pagination>
+			<pagination :total="total" :page="page.page" :limit="page.limit" @pagination="pageChange"></pagination>
 			<!-- 按钮 -->
 			<span slot="footer">
 				<el-button @click="btnCancel" size="medium">取 消</el-button>
 			</span>
-			<el-dialog width="55%" :visible="showfollow" :before-close="followClose" title="关注任务日志" append-to-body>
-				<table-custom :loading="followLoading" :tableData="followtableData" :columns="followColumns"
+			<el-dialog width="55%" :visible="showJournal" :before-close="journalClose" title="评论点赞任务日志" append-to-body>
+				<table-custom :loading="journalLoading" :tableData="journaltableData" :columns="journalColumns"
 					height="700"></table-custom>
 			</el-dialog>
 		</el-dialog>
@@ -38,17 +38,22 @@ export default {
 	},
 	data() {
 		return {
-			showfollow: false,
-			followLoading: false,
-			followtableData: [],
-			followColumns: [
+			showJournal:false,
+			journalLoading: false,
+			journaltableData: [],
+			journalColumns: [
 				{
 					label: '目标uid',
 					prop: 'task_type',
 					align: 'center',
 				},
 				{
-					label: '数据来源',
+					label: '私信类型',
+					prop: 'task_type',
+					align: 'center',
+				},
+				{
+					label: '私信内容',
 					prop: 'task_type',
 					align: 'center',
 				},
@@ -58,26 +63,52 @@ export default {
 					align: 'center',
 				},
 				{
-					label: '状态',
-					prop: 'task_type',
-					align: 'center',
-				},
-				{
 					label: '耗时',
 					prop: 'task_type',
 					align: 'center',
 				},
 				{
-					label: '失败原因',
-					prop: 'task_type',
+					label: '状态',
+					prop: 'status',
 					align: 'center',
+					render(h, { row }) {
+						const { status } = row;
+						let state;
+						if (status == 0) {
+							state = '成功';
+						} else if (status == 1) {
+							state = '未开始';
+						} else if (status == 2) {
+							state = '失败';
+						} else if (status == 3) {
+							state = '领取中';
+						}
+						return <div>{state}</div>;
+					},
+				},
+				{
+					label: '失败原因',
+					prop: 'reason',
+					align: 'center',
+					render(h, { row }) {
+						if (
+							row.reason &&
+							row.reason !== 'null'
+						) {
+							return <div>{row.reason}</div>;
+						} else if (row.status == 2) {
+							return <div>暂无失败原因</div>;
+						} else {
+							return <div style="color: grey; font-size: 12px;">(非失败状态)</div>;
+						}
+					},
 				},
 			],
-			loading: false,
 			btnloading: false,
+			loading: false,
 			tableData: [],
 			columns: [
-				{
+			{
 					prop: "avatar_thumb",
 					label: "基础信息",
 					align: "left",
@@ -133,7 +164,7 @@ export default {
 					width: '100',
 				},
 				{
-					label: '已关注数量',
+					label: '已执行数量',
 					prop: 'task_type',
 					align: 'center',
 					width: '100',
@@ -141,18 +172,6 @@ export default {
 
 				{
 					label: '失败次数',
-					prop: 'task_type',
-					align: 'center',
-					width: '100',
-				},
-				{
-					label: '回关数量',
-					prop: 'task_type',
-					align: 'center',
-					width: '100',
-				},
-				{
-					label: '回关率',
 					prop: 'task_type',
 					align: 'center',
 					width: '100',
@@ -184,15 +203,15 @@ export default {
 				{
 					label: "操作",
 					align: "center",
-					width: '150',
 					fixed: 'right',
+					width:'150',
 					render: (h, { row }) => {
 						return (
 							<div>
 								<el-button
 									type="success"
 									size="mini"
-									onClick={this.followClick.bind(this, row.id)}
+									onClick={this.journalClick.bind(this, row.id)}
 									style="margin-right:10px"
 								>
 									日志
@@ -213,22 +232,27 @@ export default {
 				},
 			],
 			logsDialog: false,
-			page: 1,
-			limit: 10,
+			page: {
+				page: 1,
+				limit: 20,
+				tasklist_id: '',
+				status: '',
+				task_type: '',
+			},
 			total: 0,
 			resetloading: false
 		};
 	},
 	methods: {
 		// 日志取消
-		followClose() {
-			this.followtableData = []
-			this.showfollow = false;
+		journalClose() {
+			this.journaltableData = []
+			this.showJournal = false;
 		},
 		// 日志
-		followClick(id) {
-			this.showfollow = true
-			this.followtableData = [
+		journalClick(id) {
+			this.showJournal = true
+			this.journaltableData = [
 				{
 					task_type: 1
 				}
@@ -238,7 +262,7 @@ export default {
 		deleteClick(id) {
 			this.$message.success('删除成功');
 		},
-		// 获取关注详情
+		// 获取数据
 		getTaskListDetail(id) {
 			this.tableData = [
 				{
@@ -251,24 +275,66 @@ export default {
 					uid: '7171638067815220230'
 				}
 			]
+
 		},
+		// 获取私信任务详情
+		// async getTaskListDetail(data) {
+		// 	try {
+		// 		this.loading = true
+		// 		const res = await this.$api({
+		// 			type: 'getTaskListDetail',
+		// 			data,
+		// 		});
+		// 		this.tableData = res.data.list;
+		// 		this.total = res.data.count;
+		// 	} catch (error) {
+		// 		console.error(error);
+		// 	} finally {
+		// 		this.loading = false
+		// 		this.btnloading = false
+		// 	}
+		// },
 		// 当前页数据条数/页码改变
 		pageChange(obj) {
-			this.page = obj.page
-			this.limit = obj.limit;
-			this.getTaskListDetail();
+			(this.page.page = obj.page), (this.page.limit = obj.limit);
+			this.page.tasklist_id = this.curId;
+			this.getTaskListDetail(this.page);
 		},
 		// 关闭弹层
 		btnCancel() {
 			this.$emit('update:showDialog', false);
-			this.page = 1
-			this.limit = 10;
+			this.page = {
+				page: 1,
+				limit: 20,
+				tasklist_id: '',
+				status: '',
+				task_type: ''
+			};
+		},
+		// 点击查询按钮
+		searchTasks() {
+			this.btnloading = true;
+			this.page.page = 1;
+			this.page.tasklist_id = this.curId;
+			this.getTaskListDetail(this.page);
+		},
+		// 点击重置
+		btnReset() {
+			this.resetloading = true
+			this.page = {
+				page: 1,
+				limit: 20,
+				tasklist_id: this.curId,
+				status: '',
+				task_type: '',
+			}
+			this.getTaskListDetail(this.page)
 		},
 	},
 };
 </script>
 
-<style scoped lang="stylus">
+<style lang="stylus" scoped>
 	.tt-accsituation{
 		background-color #fff
 		margin-bottom  20px

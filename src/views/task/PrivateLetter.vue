@@ -3,103 +3,53 @@
     <div class="tt-accsituation">
       <div class="tt-accsituation--operation">
         <div style="margin-right: 20px">
-          <el-select v-model="page.status" placeholder="请选择任务状态" size="medium"> 
-            <el-option
-              v-for="item in searchStateList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
+          <el-select v-model="page.status" placeholder="请选择任务状态" size="medium">
+            <el-option v-for="item in searchStateList" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
 
-          <el-date-picker
-            class="date-picker"
-            v-model="date"
-            type="daterange"
-            align="right"
-            unlink-panels
-            range-separator="——"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            :picker-options="pickerOptions"
-            size="medium"
-          >
+          <el-date-picker class="date-picker" v-model="date" type="daterange" align="right" unlink-panels
+            range-separator="——" start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="pickerOptions"
+            size="medium">
           </el-date-picker>
         </div>
         <!-- 查询 -->
-        <el-button
-          type="primary"
-          size="medium"
-          class="seachbut"
-          :loading="btnloading"
-          @click="searchTasks"
-          >{{ btnloading ? "加载中..." : "搜索" }}</el-button
-        >
-        <el-button type="primary" size="medium" class="seachbut" @click="btnReset"
-          >重置</el-button
-        >
-        <el-button type="primary" size="medium" class="seachbut" @click="showFollowTaskDialog"
-          >私信任务</el-button
-        >
-		<!-- <i class="el-icon-refresh-left"></i> -->
+        <el-button type="primary" size="medium" class="seachbut" :loading="btnloading" @click="searchTasks">{{
+          btnloading? "加载中...": "搜索"
+        }}</el-button>
+        <el-button type="primary" size="medium" class="seachbut" @click="btnReset">重置</el-button>
+        <el-button type="primary" size="medium" class="seachbut" @click="showPrivateTaskDialog">私信任务</el-button>
       </div>
     </div>
     <!-- 表格 -->
-    <table-custom
-      height="700"
-      :loading="loading"
-      :tableData="tableData"
-      :columns="columns"
-    ></table-custom>
+    <table-custom height="700" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
     <!-- 分页 -->
-    <pagination
-      :total="total"
-      :page="page.page"
-      :limit="page.limit"
-      @pagination="pageChange"
-    ></pagination>
+    <pagination :total="total" :page="page.page" :limit="page.limit" @pagination="pageChange"></pagination>
     <!-- 弹层 -->
-    <PrivateLetterDialogComponent
-      ref="dialog"
-      :showDialog.sync="dialog"
-      :curId="curId"
-    >
-    </PrivateLetterDialogComponent>
-    <LetterTaskDialog
-      @closeFollowTask="closeFollowTask"
-      :showFollowDialog="showFollowDialog"
-    />
-    <TaskDetail
-      @closeTaskDetail="closeTaskDetail"
-      :showTaskDetail="showTaskDetail"
-      :taskDesc="title"
-      :tableData="tableData"
-      :title="title"
-    />
+    <privateLetterDetail ref="taskDialog" :showDialog.sync="dialog" :curId="curId">
+    </privateLetterDetail>
+    <newPrivate ref="newPrivateDialog" @closePrivateTask="closePrivateTask" :showPrivateDialog="showPrivateDialog" />
   </div>
 </template>
 <script>
 import tableCustom from "@/components/myComponent/table/tableCustom.vue";
-import PrivateLetterDialogComponent from "./component/PrivateLetterDialogComponent.vue";
 import pagination from "@/components/myComponent/table/pagination.vue";
-import LetterTaskDialog from "@/views/account/accCountSit/taskDialog/followDialog.vue";
-import TaskDetail from "./component/TaskDetail.vue";
+import privateLetterDetail from "./component/privateLetterDetail.vue";
+import newPrivate from "./component/newPrivate.vue";
 export default {
   name: "TtPrivateLetter",
   components: {
     tableCustom,
-    PrivateLetterDialogComponent,
+    privateLetterDetail,
     pagination,
-    LetterTaskDialog,
-    TaskDetail,
+    newPrivate,
   },
   data() {
     return {
-		date:'',
-    title:'',
-    showTaskDetail:false,
-      showFollowDialog: false,
+      date: '',
+      title: '',
+      showTaskDetail: false,
+      showPrivateDialog: false,
       // 下拉选择数据
       searchStateList: [
         {
@@ -113,7 +63,12 @@ export default {
       ],
       loading: false,
       btnloading: false,
-      tableData: [],
+      tableData: [
+        {
+          tasklist_id: '11',
+          task_name: '11'
+        }
+      ],
       columns: [
         {
           prop: "create_time",
@@ -159,26 +114,34 @@ export default {
             return (
               <div>
                 <el-button
-                  type="primary"
+                  type="success"
                   size="mini"
                   onClick={this.toDetail.bind(this, row.tasklist_id)}
                 >
                   查看详情
                 </el-button>
                 <el-button
-                  type="primary"
-                  size="mini"
-                  onClick={this.delete.bind(this, row.tasklist_id)}
-                >
-                  删除
-                </el-button>
-                <el-button
-                  type="primary"
+                  type="warning"
                   size="mini"
                   onClick={this.suspend.bind(this, row.tasklist_id)}
                 >
                   暂停
                 </el-button>
+                <el-popconfirm
+                  confirm-button-text="删除"
+                  cancel-button-text="取消"
+                  title="确认删除该任务吗？"
+                  onConfirm={this.delete.bind(this, row.tasklist_id)}
+                >
+                  <el-button
+                    slot="reference"
+                    type="danger"
+                    size="mini"
+                    style="margin-left: 10px;"
+                  >
+                    删除
+                  </el-button>
+                </el-popconfirm>
               </div>
             );
           },
@@ -229,10 +192,10 @@ export default {
 
   created() {
     // 获取私信任务列表
-    this.getVideoTasks(this.page);
+    // this.getVideoTasks(this.page);
   },
 
-  mounted() {},
+  mounted() { },
 
   methods: {
     closeTaskDetail() {
@@ -245,12 +208,13 @@ export default {
     suspend() {
       console.log("暂停");
     },
-    closeFollowTask() {
-      this.showFollowDialog = false;
+    closePrivateTask() {
+      this.showPrivateDialog = false;
     },
 
-    showFollowTaskDialog() {
-      this.showFollowDialog = true;
+    showPrivateTaskDialog() {
+      this.showPrivateDialog = true;
+      this.$refs.newPrivateDialog.getList()
     },
     // 获取私信任务列表
     async getVideoTasks(data) {
@@ -260,7 +224,6 @@ export default {
           type: "getTasklist",
           data,
         });
-        console.log(res, "私信列表数据");
         if (res.status == 200) {
           this.tableData = res.data.list;
           this.total = res.data.count;
@@ -277,12 +240,8 @@ export default {
     // 查看详情
     toDetail(id) {
       this.dialog = true;
-      this.curId = id;
-      this.$refs.dialog.getTaskListDetail({
-        page: 1,
-        limit: 10,
-        tasklist_id: id,
-      });
+      this.$refs.taskDialog.getTaskListDetail(id);
+
     },
     // 当前页数据条数/页码改变
     pageChange(obj) {
@@ -309,16 +268,16 @@ export default {
 };
 </script>
 <style  lang="scss" scoped>
-	@import '@/assets/base/_color_variables.scss';
+@import '@/assets/base/_color_variables.scss';
 
 .date-picker {
-	margin-left: 16px;
+  margin-left: 16px;
 }
 
 .el-icon-refresh-left {
-	margin: 5px 0 0 50px;
-	font-size: 30px;
-	color: $button-back-color;
-	cursor: pointer;
+  margin: 5px 0 0 50px;
+  font-size: 30px;
+  color: $button-back-color;
+  cursor: pointer;
 }
 </style>

@@ -2,10 +2,18 @@
 	<el-dialog title="签名列表" :visible="outerVisible" @close="btnCancel" width="60%">
 		<!-- 详情页面内容 -->
 		<!-- 表格 -->
-		<el-button @click="batchDelete" type="primary" :loading="deleteing">{{ deleteing ? '删除中 ...'
-		: '批量删除'
-}}</el-button>
-		<table-custom  height="700" :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
+		<div style="margin-bottom:20px">
+			<el-select class="mr-36 video-select" style="width: 150px;margin-right: 10px;" v-model="searchForm.usage_count" placeholder="使用次数"	clearable>
+				<el-option v-for="item in fansOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+			</el-select>
+			<el-select class="mr-36 video-select" style="width: 150px;margin-right: 10px;" v-model="searchForm.sort" placeholder="次数排序"	clearable>
+				<el-option v-for="item in sortOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+			</el-select>
+			<el-button type="primary" size="medium" :loading="submitting" @click="searchTable">{{submitting? "搜索中 ...": "查看"}}</el-button>
+			<el-button type="primary" size="medium" @click="resetTable">重置</el-button>
+			<el-button @click="batchDelete" type="primary" size="medium" :loading="deleteing">{{ deleteing ? '删除中 ...': '批量删除'}}</el-button>		
+		</div>
+		<table-custom  height="500" :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
 			@handleSelectionChange="selectionChange"></table-custom>
 		<!-- 分页 -->
 		<pagination :total="total" :page="nickNameData.page" :limit="nickNameData.limit" @pagination="pageChange">
@@ -55,6 +63,25 @@ export default {
 			}
 		};
 		return {
+			submitting: false,
+			searchForm: {
+				sort: '',  //排序
+				usage_count: '',  //次数
+			},
+			sortOptions: [
+				{ label: "升序", value: 'desc' },
+				{ label: "降序", value: 'asc' },
+			],
+			fansOptions: [
+				{ label: "0", value: 0 },
+				{ label: "1", value: 1 },
+				{ label: "2", value: 2 },
+				{ label: "3", value: 3 },
+				{ label: "4", value: 4 },
+				{ label: "5", value: 5 },
+				{ label: ">5", value: '>5' },
+				{ label: "全部", value: '100' },
+			],
 			innerVisible: false,
 			loading: false, // 表格-分页组件相关
 			tableData: [],
@@ -62,6 +89,11 @@ export default {
 				{
 					prop: 'autograph',
 					label: '签名',
+					align: 'center',
+				},
+				{
+					prop: 'usage_count',
+					label: '使用次数',
 					align: 'center',
 				},
 				{
@@ -114,6 +146,31 @@ export default {
 		};
 	},
 	methods: {
+		searchTable() {
+			let usage_count = ''
+			if(this.searchForm.usage_count=='100'){
+				usage_count=''
+			}else{
+				usage_count=this.searchForm.usage_count
+			}
+			this.getAutograph({
+				page: 1,
+				limit: this.nickNameData.limit,
+				typecontrol_id: this.upParameter.typecontrol_id,
+				grouping_id: this.upParameter.grouping_id,
+				sort: this.searchForm.sort,
+				usage_count: usage_count,
+				order:'usage_count',
+			})
+		},
+		resetTable(){
+			this.searchForm= {
+				sort: '',  //排序
+				usage_count: '',  //次数
+			}
+			this.nickNameData.page=1
+			this.updatePageData()
+		},
 		// 批量删除
 		batchDelete() {
 			if (this.tableSelsectList.length > 0) {

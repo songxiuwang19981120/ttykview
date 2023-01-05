@@ -12,11 +12,11 @@
         </el-form-item>
         <el-form-item prop="typecontrol_id" label="账号分类 ：">
           <el-cascader style="width: 50%" clearable :props="{ checkStrictly: true, value: 'value' }" :options="typeList"
-            v-model="followTaskForm.typecontrol_id" size="medium"></el-cascader>
+            v-model="followTaskForm.typecontrol_id" size="medium" @change="getMemberList"></el-cascader>
         </el-form-item>
 
         <el-form-item label="">
-          <p style="font-size:12px">当前已选中<span style="color:red">0</span>个账号</p>
+          <p style="font-size:12px">当前已选中<span style="color:red">{{ accCount }}</span>个账号</p>
         </el-form-item>
 
         <el-form-item label="备注任务名称 ：" prop="remarks">
@@ -24,8 +24,8 @@
         </el-form-item>
         <el-form-item label="选择国家 ：" prop="account_region">
           <el-select style="width: 50%" clearable multiple v-model="followTaskForm.account_region" placeholder="选择国家">
-            <el-option v-for="item in countryOptions" :key="item.value" :label="item.label"
-              :value="item.value"></el-option>
+            <el-option v-for="(item, index) in countryOptions" :key="index" :label="item"
+              :value="item">{{ item }}</el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="选择数据来源 ：" prop="tasklist_id_list">
@@ -42,7 +42,7 @@
         </el-form-item>
 
         <div class="between-input">
-          <el-form-item label="关注频率 ：" prop="rate_min">
+          <el-form-item label="关注频率(秒) ：" prop="rate_min">
             <el-input class="lettertask-input--between" type="number" v-model="followTaskForm.rate_min"
               placeholder="最小"></el-input>
           </el-form-item>
@@ -69,19 +69,20 @@
 
         <el-form-item label="黑名单" prop="black_list">
           <el-checkbox-group v-model="followTaskForm.black_list">
-            <el-checkbox v-for="item in blackList" :key="item" :label="item"></el-checkbox>
+            <el-checkbox v-for="item in blackList" :key="item.value" :label="item.value">{{ item.label }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
 
       </el-form>
-      <p  style="font-size:12px;text-align: center;">当前筛选条件可关注用户数量为<span style="color:red">0</span>条</p>
+      <p style="font-size:12px;text-align: center;">当前筛选条件可关注用户数量为<span style="color:red">0</span>个</p>
 
       <span slot="footer" class="dialog-footer">
-        <el-button @click="handleReset">重 置</el-button>
+        <el-button @click="resetForm">重 置</el-button>
         <el-button @click="handlerClose">取 消</el-button>
-        <el-button type="primary" @click="handlerConfrim" size="medium" :loading="subLoading">{{ subLoading ? "提交中..." :
-    "确定"
-}}</el-button>
+        <el-button type="primary" @click="handlerConfrim" size="medium" :loading="subLoading">{{
+          subLoading? "提交中...":
+            "确定"
+        }}</el-button>
       </span>
     </el-dialog>
   </div>
@@ -106,6 +107,7 @@ export default {
   },
   data() {
     return {
+      accCount: 0,
       subLoading: false,
       rules: {
         remarks: [
@@ -136,72 +138,44 @@ export default {
           { required: true, message: "请设置连续失败次数", trigger: "blur" },
         ],
       },
-      blackList: ["无昵称", "无作品", "无头像", "历史已操作用户"],
+      blackList: [
+        {
+          label: '无头像',
+          value: 'no_avatar',
+        },
+        {
+          label: '无作品',
+          value: 'no_aweme',
+        },
+        {
+          label: '无昵称',
+          value: 'no_nickname',
+        },
+        {
+          label: '历史已操作用户',
+          value: 'historical_users',
+        },
+      ],
       typeList: [],
       groupList: [],
       sourceData: [],
       page: 1,
       limit: 20,
       // TODO 国家options
-      countryOptions: [
-        {
-          value: "法国",
-          label: "法国",
-        },
-        {
-          value: "美国",
-          label: "美国",
-        },
-        {
-          value: "英国",
-          label: "英国",
-        },
-        {
-          value: "俄国",
-          label: "俄国",
-        },
-        {
-          value: "新加坡",
-          label: "新加坡",
-        },
-        {
-          value: "泰国",
-          label: "泰国",
-        },
-        {
-          value: "菲律宾",
-          label: "菲律宾",
-        },
-        {
-          value: "印度尼西亚",
-          label: "印度尼西亚",
-        },
-        {
-          value: "越南",
-          label: "越南",
-        },
-        {
-          value: "马来西亚",
-          label: "马来西亚",
-        },
-        {
-          value: "巴西",
-          label: "巴西",
-        },
-      ],
+      countryOptions: [],
       //关注发布任务 提交表单
       followTaskForm: {
         account_region: [], //国家
         user_follow_upper_limit: "150", //单号关注上限
-        rate_min: "", //关注频率最小值
-        rate_max: "", //关注频率最大值
+        rate_min: "3", //关注频率最小值
+        rate_max: "5", //关注频率最大值
         sourceCount: "",
         follower_status: "100", //粉丝量小于
         tasklist_id_list: [], //数据来源
         following_count: "200", //关注数量小于
         typecontrol_id: "",
         can_fail_num: "3", //连续失败次数
-        black_list: ["历史已操作用户"],
+        black_list: ["historical_users"],
         uid_list: "",
         remarks: '',//备注任务名称
         group: ''
@@ -210,12 +184,26 @@ export default {
   },
 
   mounted() {
-    this.getTasklist();
-    this.followTaskForm.typecontrol_id = this.typecontrol_id;
-    this.getGroupList()
   },
 
   methods: {
+    getList() {
+      this.getTasklist();
+      this.getGroupList();
+      this.getCountry();
+    },
+    async getCountry() {
+      try {
+        let result = await this.$api({ type: 'getCountry' });
+        if (result.status == '200') {
+          this.countryOptions = result.data;
+        } else {
+          this.$message.error({ message: result.msg });
+        }
+      } catch (error) {
+        this.$message.error({ message: error.msg });
+      }
+    },
     async sourceLoadMore() {
       this.page = ++this.page;
       let data = {
@@ -233,9 +221,6 @@ export default {
       }
     },
 
-    handleReset() {
-      this.resetForm()
-    },
     /*
         function: getTreeData
         params: data | 需要进行递归处理的数组
@@ -283,9 +268,12 @@ export default {
 
     handlerClose() {
       this.page = 1;
-      this.limit = 10;
+      this.limit = 20;
+      this.accCount = 0
+      this.groupList=[]
+      this.typeList=[]
       this.$emit("closeLetterTask");
-      this.resetForm();
+      this.$refs["followTaskForm"].resetFields();
     },
     /* 
         function: handlerConfrim
@@ -295,63 +283,64 @@ export default {
     handlerConfrim() {
       this.$refs["followTaskForm"].validate((valid) => {
         if (valid) {
-          if(this.followTaskForm.rate_min>this.followTaskForm.rate_max){
+          if (this.followTaskForm.rate_min > this.followTaskForm.rate_max) {
             this.$message.warning("请输入正确的关注频率");
 
-          }else{
+          } else {
             this.$message.success("操作成功,任务正在发布中");
             this.handlerClose()
+            // this.confrimTask(data);
+
           }
         }
       });
-      return
-       this.$refs["followTaskForm"].validate((valid) => {
-        if (valid) {
-          let userList = this.batchEditorList.map((item) => {
-            return item.uid;
-          });
-          this.followTaskForm.uid_list = userList;
-          this.followTaskForm.typecontrol_id = this.typecontrol_id;
-          this.followTaskForm.black_list = this.followTaskForm.black_list.map(
-            (item) => {
-              return this.blackListMap[item];
-            }
-          );
-
-          let data = this.followTaskForm;
-
-          this.confrimTask(data);
-        }
-      });
     },
+    // 发布任务
     async confrimTask(data) {
       let result = await this.$api({ type: "pushFollowTask", data: data });
       console.log(result.status)
       if (result.status == 200) {
         this.$message.success("操作成功,任务正在发布中");
-        this.resetForm();
-        this.followTaskForm.black_list = []
         this.handlerClose();
       } else {
         this.$message.warning(result.msg);
-        this.followTaskForm.black_list = []
       }
     },
-
+    // 获取数据来源
     async getTasklist() {
       let data = { task_type: "CollectionUser" };
       let result = await this.$api({ type: "getTasklist", data });
-      console.log("数据来源", result);
       this.sourceData = result.data.list;
       this.sourceCount = result.data.count;
     },
+    // 获取账号
+    async getMemberList() {
+      if (this.followTaskForm.typecontrol_id != '') {
+        try {
+          const res = await this.$api({
+            type: 'getMember',
+            data: {
+              grouping_id: this.followTaskForm.grouping_id,
+              typecontrol_id: this.followTaskForm.typecontrol_id,
+            },
+          });
+          if (res.status == 200) {
+            this.accCount = res.data.count;
+          } else {
+            this.$message.error(res.msg);
+          }
+        } catch (error) {
+        }
+      } else {
+        this.accCount = 0
+      }
+    },
 
-    /* 
-        function: resetForm
-        params: null
-        desc: 重置表单字段
-    */
+    // 重置表单字段
     resetForm() {
+      this.accCount = 0
+      this.typeList=[]
+      this.getList()
       this.$refs["followTaskForm"].resetFields();
     },
   },
