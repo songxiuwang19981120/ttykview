@@ -32,5 +32,16 @@ export default {
         typecontrol_id: [
           { required: true, message: "请选择分类", trigger: "change" },
         ],
+        grouping_id:[
+          { required: true, message: "请选择分组", trigger: "change" },
+        ]
       },
+      'BatchEditor':{
+        groupId:[
+          { required: true, message: "请选择分类", trigger: "change" },
+        ],
+        typeId:[
+          { required: true, message: "请选择分组", trigger: "change" },
+        ]
+      }
 }

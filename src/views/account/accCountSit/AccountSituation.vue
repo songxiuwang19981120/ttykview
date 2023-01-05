@@ -49,7 +49,7 @@
       </div>
 
       <el-input
-        style="width: 12%"
+        style="width: 15%"
         size="medium"
         clearable
         class="search-uid--input mr-30"
@@ -58,16 +58,18 @@
       ></el-input>
 
       <el-button
+        type="primary"
         size="medium"
         class="base-btn search-btn"
         @click="handlerSearch"
-        >搜索</el-button
+        >搜 索</el-button
       >
-      <el-button size="medium" class="base-btn search-btn" @click="RestQuery"
-        >重置</el-button
+      <el-button type="primary" size="medium" class="base-btn search-btn" @click="RestQuery"
+        >重 置</el-button
       >
 
       <el-button
+      type="primary"
         size="medium"
         class="base-btn"
         style="width: 150px"
@@ -105,6 +107,7 @@
             </el-option>
           </el-select>
           <el-select
+            class="ml-15"
             size="medium"
             clearable
             style="width: 100px"
@@ -119,10 +122,13 @@
             >
             </el-option>
           </el-select>
-          <el-button size="medium" @click="handleSort">查 看</el-button>
-          <el-button size="medium">刷新账号</el-button>
+          <el-button size="medium" type="primary" class="ml-15" @click="handleSort"
+            >查 看</el-button
+          >
+          <el-button size="medium" type="primary">刷新账号</el-button>
         </div>
       </div>
+      <keep-alive>
       <table-custom
         ref="multipleTable"
         class="tt-accsituation--tabel"
@@ -133,6 +139,7 @@
         :columns="columns"
         height="640"
       ></table-custom>
+      </keep-alive>
     </div>
 
     <Pagination
@@ -157,6 +164,7 @@
       :user_id="user_id"
       :groupList="groupList"
       :userIdList="userIdList"
+      :accInfo="accInfo"
     />
 
     <VideoTabel
@@ -176,11 +184,12 @@
       :user_id="user_id"
     />
     <BatchEditor
+      :typecontrol_id="classiFication"
+      :grouping_id="group"
       :member_ids="member_ids"
       :showBatchEditor="showBatchEditor"
       :editorTota="editorTota"
       :groupName="groupString"
-      :typeName="classiFication"
     />
     <ReleaseVideoDialog
       :showReleaseVideoDialog="showReleaseVideoDialog"
@@ -191,7 +200,6 @@
 
 <script>
 import store from "store";
-import MINXIN from "@/core/minxin";
 import configureMap from "@/config/accountConfig/configureMap.config";
 import tableCustom from "@/components/myComponent/table/tableCustom";
 import Pagination from "@/components/myComponent/table/pagination";
@@ -234,52 +242,39 @@ export default {
     },
   },
   watch: {
+
     page(newVal) {
       store.set("page", newVal);
     },
+
     limit(newVal) {
       store.set("limit", newVal);
     },
-    /*     classiFication() {
-      let data = {
-        typecontrol_id: this.formatTypeId(),
-        limit: this.limit,
-        page: this.page,
-        grouping_id: this.group ?? "",
-      };
-      let arr = Object.entries(this.typeList);  .find((item) => {
-        return item?.[1]?.grouping_id === newVal;
-      }); 
-      console.log(arr);
-      this.getMemberList(data);
-    },
- */
+
     async group(newVal) {
+      if (this.group === "") {
+        this.typeList = []
+        this.classiFication = []
+        store.set('typecontrol_id','')
+        return false;
+      }
       let arr = Object.entries(this.groupList).find((item) => {
         return item?.[1]?.grouping_id === newVal;
       });
       this.groupString = arr?.[1]?.grouping_name;
-      /*       let data = {
-        typecontrol_id: this.formatTypeId(),
-        grouping_id: this.group ?? "",
-        limit: this.limit ?? 10,
-        page: this.page ?? 1,
-      }; */
       let searchTypeData = {
         grouping_id: this.group,
       };
-      //this.getMemberList(data);
       let result = await this.$api({
         type: "getTypecontrol",
         data: searchTypeData,
       });
-      console.log("更新分类", result.data);
       this.typeList = this.getTreeData(result.data);
     },
   },
   data() {
     return {
-      mixins: [MINXIN],
+      accInfo:{},
       accUid: "", //账号UID
       showConfrimDel: false,
       showReleaseVideoDialog: false, //控制发布视频dialog展示
@@ -299,11 +294,11 @@ export default {
       },
       sortOption: [
         {
-          value: "desc",
+          value: "asc",
           label: "升序",
         },
         {
-          value: "asc",
+          value: "desc",
           label: "降序",
         },
       ],
@@ -329,6 +324,7 @@ export default {
                   href={"https://www.tiktok.com/@" + row.unique_id}
                 >
                   <el-image
+                    lazy
                     class="table-avatar mr-15"
                     src={row.avatar_thumb}
                     style="width: 60px; height: 60px; border-radius: 50%;margin-right: 16px"
@@ -336,7 +332,7 @@ export default {
                 </a>
                 <div>
                   <p style="font-size: 14px;">{row.nickname}</p>
-                  <p style="font-size: 12px">ID ：{row.uid}</p>
+                  <p style="font-size: 12px">UID ：{row.uid}</p>
                   <el-tooltip content="Top center" placement="right-start">
                     <div slot="content">
                       账号归属：
@@ -356,6 +352,12 @@ export default {
               </div>
             );
           },
+        },
+        {
+          prop: "updata_time",
+          label: "更新时间",
+          width: "132",
+          align: "center",
         },
         {
           prop: "status",
@@ -483,23 +485,10 @@ export default {
             return <span style="font-size: 12px">{row.play_num} / 0 / 0</span>;
           },
         },
-        /*         {
-          prop: "following_status,following_count,play_num",
-          label: "关注/粉丝/获赞",
-          align: "center",
-          render: (h, { row }) => {
-            return (
-              <div>
-                {row.following_count} / {row.follower_status} /{" "}
-                {row.total_favorited}
-              </div>
-            );
-          },
-        }, */
         {
           prop: "operation",
           label: "操作",
-          width: "200",
+          width: "150",
           align: "center",
           fixed: "right",
           render: (h, { row }) => {
@@ -509,54 +498,14 @@ export default {
                   style="margin-right:10px"
                   onsetOperation={this.setOperation.bind(this, row)}
                 />
-                <el-image
+              </div>
+            );
+          },
+/*                            <el-image
                   style="width: 40px;height: 30px"
                   src={require("../../../assets/video.png")}
                   onClick={this.handleMonitor.bind(this, row)}
-                ></el-image>
-              </div>
-
-              /* <div>
-                <el-button
-                  size="mini"
-                  type="primary"
-                  onClick={this.handleEdit.bind(this, row)}
-                >
-                  编辑
-                </el-button>
-                <el-button
-                  size="mini"
-                  type="primary"
-                  onClick={this.handleDelete.bind(this, row)}
-                >
-                  删除
-                </el-button>
-                <el-button
-                  size="mini"
-                  type="primary"
-                  onClick={this.handleMonitor.bind(this, row)}
-                >
-                  监控
-                </el-button>
-
-                <el-button
-                  size="mini"
-                  type="primary"
-                  onClick={this.handleAnalysis.bind(this, row)}
-                >
-                  分析
-                </el-button>
-
-                <el-button
-                  size="mini"
-                  type="primary"
-                  onClick={this.handleRelease.bind(this, row)}
-                >
-                  发布视频
-                </el-button>
-              </div>  */
-            );
-          },
+                ></el-image>  */
         },
       ],
       acc_id: "", //查询框的账号ID
@@ -577,7 +526,7 @@ export default {
       fans_total: 0, //粉丝总量
       groupString: "",
       group: "", //设置分组
-      limit: 10, //每页请求数据条数
+      limit: 20, //每页请求数据条数
       videoList: [], //用户视频列表数据
       vistList: [], //访问列表数据
       member_id: "", //用户ID，获取数据用的
@@ -594,12 +543,12 @@ export default {
       operationMap: operationMap, //表格下拉框相应
       min: "",
       max: "",
+      typeText:""
     };
   },
 
   mounted() {
-    // this.getMemberList();
-    /*     this.getTypeControlList(); */
+
     this.getGroupList();
     this.initInterface();
   },
@@ -612,6 +561,9 @@ export default {
             return: 处理后的数据
         */
     getTreeData(data) {
+      if(!data){
+        return false
+      }
       data.forEach((item) => {
         if (!item.children.length) {
           item.children = undefined;
@@ -636,19 +588,20 @@ export default {
       this.limit = store.get("limit") ?? 10;
       let group = store.get("group") ?? "";
       let typecontrol_id = store.get("typecontrol_id") ?? "";
+
       let fans = store.get("fans") ?? "";
       if (fans !== "") {
         this.fans = fans;
-        fans = Object.entries(this.fansMap)
-          .find((item) => {
-            return item[1] == fans;
-          })[0]
-          .split(",");
+        fans = Object.entries(this.fansMap).find((item) => {
+          return item[1] == fans;
+        })[0].split(",");
         this.min = fans[0] ?? "";
         this.max = fans[1] ?? "";
       }
+
       this.group = group;
       this.classiFication = typecontrol_id;
+
       let data = {
         min: this.min ?? "",
         max: this.max ?? "",
@@ -658,7 +611,32 @@ export default {
         page: this.page ?? 1,
       };
       let result = await this.getMemberList(data);
-      console.log(result, "初始化");
+    },
+
+
+    /* 
+        function: setGroupText
+        params: grouping_id
+        desc: 存储分组input text
+    */
+    setGroupText(grouping_id){
+      let arr = Object.entries(this.groupList).find((item) => {
+        return item?.[1]?.grouping_id === grouping_id;
+      });
+      this.groupString = arr?.[1]?.grouping_name;
+    },
+
+
+    /* 
+        function: setTypeText
+        params: typecontrol_id
+        desc: 存储分类input text
+    */
+    setTypeText(typecontrol_id){
+      let arr = Object.entries(this.typeList).find((item) => {
+        return item?.[1]?.typecontrol_id === typecontrol_id;
+      });
+      this.typeText = arr?.[1]?.label
     },
 
     /* 
@@ -667,7 +645,10 @@ export default {
         desc: 本地存储 group 字段（分组）
     */
     setLocalGroup() {
+      this.setGroupText(this.group)
       store.set("group", this.group);
+      store.set("groupText",this.groupString)
+
     },
 
     /* 
@@ -683,30 +664,13 @@ export default {
     /* 
         function: setLocalType
         params: null
-        desc: 本地存储 typecontrol_id 字段（分类）
+        desc: 本地存储 typecontrol_id 字段（分类）同时获取分类input文本
     */
     setLocalType() {
       let typecontrol_id = this.formatTypeId(this.classiFication);
+      this.setTypeText(typecontrol_id)
       store.set("typecontrol_id", typecontrol_id);
-    },
-
-    async searchUid() {
-      if (this.accUid === "") {
-        this.$message.error("请先填写UID");
-        return;
-      }
-      let data = { uid: this.accUid };
-      let result = await this.$api({
-        type: "getMember",
-        data: data,
-      });
-      if (result.status == 200) {
-        this.$message.success("查询成功");
-        this.memberList = result?.data?.list ?? [];
-        this.total = result?.data?.count ?? 0;
-        return;
-      }
-      this.$message.error(result?.msg ?? "查询失败");
+      store.set('typeText',this.typeText)
     },
 
     /* 
@@ -780,25 +744,14 @@ export default {
         desc: 打开相应操作界面
     */
     setOperation(row, e) {
+    console.log(row);
       if (e === "") {
         return false;
       }
+      this.accInfo = row
       this[this.operationMap[e]](row) && this[this.operationMap[e]](row);
     },
 
-    scrollHandle(e) {
-      console.log(e, 1111);
-    },
-
-    /* 
-        function: handleFollow
-        params: null
-        desc: 一键回关回调
-    */
-    handleFollow() {
-      this.isFollow = !this.isFollow;
-      console.log("一键回关");
-    },
 
     /* 
         function: handleAnalysis
@@ -813,6 +766,8 @@ export default {
         query: { id: unique_id, userInfo: JSON.stringify(userInfo) },
       });
     },
+
+
     /* 
         function: closeReleaseVideoDialog
         params: null
@@ -821,6 +776,8 @@ export default {
     closeReleaseVideoDialog() {
       this.showReleaseVideoDialog = false;
     },
+
+
     /* 
         function: handleRelease
         params: null
@@ -830,6 +787,8 @@ export default {
       this.showReleaseVideoDialog = true;
       console.log("发布视频");
     },
+
+
     /* 
         function: handleMonitor
         params: e   |   event
@@ -839,6 +798,7 @@ export default {
     handleMonitor(e, row) {
       row.path[0].src = require("../../../assets/video-red.png");
     },
+
 
     /* 
         function: showBatchEditorDialog
@@ -857,6 +817,7 @@ export default {
       this.showBatchEditor = true;
     },
 
+
     /* 
         function: closeBatchEditor
         params: null
@@ -866,13 +827,27 @@ export default {
       this.showBatchEditor = false;
       this.member_ids = "";
     },
+
+
     /* 
         function: updateMemberList
         params: null
         desc: 刷新界面，用于更新操作之后
     */
     updateMemberList() {
-      this.getMemberList();
+      console.log(3);
+      let data = {
+                min: this.min ?? "",
+        max: this.max ?? "",
+        typecontrol_id: this.classiFication ?? "",
+        grouping_id: this.group ?? "",
+        limit: this.limit ?? 10,
+        page: this.page ?? 1,
+        uid:this.accUid ?? ''
+      }
+
+
+      this.getMemberList(data);
     },
 
     /* 
@@ -886,6 +861,8 @@ export default {
       store.remove("group");
       store.remove("typecontrol_id");
       store.remove("fans");
+      store.remove("groupText")
+      store.remove("typeText")
     },
 
     /* 
@@ -899,6 +876,8 @@ export default {
       this.fans = "";
       this.searchForm.grouping_id = "";
       this.group = "";
+      this.sortQuery = "", 
+      this.sortWay = "",
       this.limit = 20;
       this.page = 1;
       this.removeLocal();
@@ -991,6 +970,7 @@ export default {
     */
     async handlerSearch() {
       try {
+        this.page = 1
         this.loading = true;
         let data = {
           typecontrol_id: this.formatTypeId(this.classiFication) ?? "",
@@ -1030,7 +1010,9 @@ export default {
       this.page = val.page;
       let typecontrol_id = this.formatTypeId(this.classiFication);
       let data = {
-        typecontrol_id: typecontrol_id,
+        order: this.sortQuery ?? "",
+        sort: this.sortWay ?? "",
+        typecontrol_id: typecontrol_id ?? "",
         grouping_id: this.group ?? "",
         limit: this.limit ?? 10,
         page: this.page ?? 1,

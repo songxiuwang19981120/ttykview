@@ -9,9 +9,9 @@
         <h1 class="tt-acccountsit--title">账号编辑</h1>
       </span>
       <el-form ref="editorForm" :rules="rules" :model="accUpdateForm">
-        <el-form-item class="ml-8" label="选择分组 :" prop="class">
+        <el-form-item label="选择分组 :" prop="grouping_id">
           <el-select
-            style="width: 42%"
+            style="width: 60%"
             clearable
             v-model="accUpdateForm.grouping_id"
             placeholder="选择分组"
@@ -27,7 +27,7 @@
 
         <el-form-item label="选择分类 :" prop="typecontrol_id">
           <el-cascader
-            style="width: 42%"
+            style="width: 60%"
             clearable
             :props="{ checkStrictly: true, value: 'value' }"
             :options="typeList"
@@ -38,7 +38,7 @@
 
         <el-form-item class="ml-8" label="编辑昵称 :" prop="nickname">
           <el-input
-            style="width: 42%"
+            style="width: 60%"
             type="text"
             v-model="accUpdateForm.nickname"
           ></el-input>
@@ -62,8 +62,8 @@
 
         <el-form-item class="ml-8" label="编辑签名 :" prop="signature">
           <el-input
-            style="width: 42%"
-            type="text"
+            style="width: 60%"
+            type="textarea"
             v-model="accUpdateForm.signature"
           ></el-input>
           <el-button
@@ -147,16 +147,36 @@ export default {
     showEditorDialog: {
       type: Boolean,
     },
-    typeList: {
-      type: Array,
+    accInfo:{
+      type:Object
     },
     user_id: {
       type: String,
     },
-    groupList: {
-      type: Array,
+  },
+
+  watch: {
+    "accUpdateForm.grouping_id": {
+      async handler(newVal) {
+        console.log(newVal);
+        if (this.accUpdateForm.grouping_id === "") {
+          this.typeList = [];
+          this.accUpdateForm.typecontrol_id = "";
+          return false;
+        }
+
+        let searchTypeData = {
+          grouping_id: this.accUpdateForm.grouping_id,
+        };
+        let result = await this.$api({
+          type: "getTypecontrol",
+          data: searchTypeData,
+        });
+        this.typeList = this.getTreeData(result.data);
+      },
     },
   },
+
   computed: {
     actionUrl() {
       return `${BASE_URL}Base/upload`;
@@ -172,6 +192,8 @@ export default {
       avatarLoading: false,
       nickNameLoading: false,
       signatureLoading: false,
+      groupList: [],
+      typeList: [],
       grouping_id: "", //分组ID
       typecontrol_id: "", //分类ID
       accUpdateForm: {
@@ -180,7 +202,7 @@ export default {
         signature: "",
         avatar_uri: "",
         typecontrol_id: "",
-        grouping_id:''
+        grouping_id: "",
       },
       destroyInfo: {
         //编辑时随机获取的信息
@@ -196,9 +218,40 @@ export default {
     };
   },
 
-  mounted() {},
+  mounted() {
+    console.log(111111,this.accInfo);
+    this.grouping_id = this.accInfo.grouping_name
+    this.typecontrol_id = this.accInfo.type_title
+    this.getGroupList();
+  },
 
   methods: {
+    /*
+            function: getTreeData
+            params: data | 需要进行递归处理的数组
+            desc: 递归函数，对数组进行处理，设置dhilren长度为0的字段为undefined
+            return: 处理后的数据
+        */
+    getTreeData(data) {
+      if (!data) {
+        return false;
+      }
+      data.forEach((item) => {
+        if (!item.children.length) {
+          item.children = undefined;
+        } else {
+          this.getTreeData(item.children);
+        }
+      });
+      return data;
+    },
+
+    async getGroupList() {
+      let result = await this.$api({ type: "getGrouping" });
+      console.log(result);
+      this.groupList = result.data.list;
+    },
+
     /* 
         function: handleAvatarError
         params: null
@@ -250,7 +303,7 @@ export default {
     handlerClose() {
       this.$emit("closeEditorDialog");
       this.resetForm();
-      this.grouping_id = ''
+      this.grouping_id = "";
     },
 
     /* 
@@ -260,7 +313,6 @@ export default {
     */
     async updateInfo(data = {}) {
       try {
-        
         await Promise.all(
           Object.entries(data).map((item) => {
             let type = this.userTypeMap[item[0]];
@@ -285,12 +337,12 @@ export default {
         params: nu;;
         desc: 重置需要摧毁素材数据
     */
-    resetDestroyInfo(){
+    resetDestroyInfo() {
       this.destroyInfo = {
         nickname_id: "",
         autograph_id: "",
         headimage_id: "",
-      }
+      };
     },
 
     /* 
@@ -335,7 +387,11 @@ export default {
         });
         let accUpdateForm = Object.entries(this.accUpdateForm).filter(
           (item) => {
-            return item[1] !== "" && item[0] !== "typecontrol_id"  && item[0] !== "grouping_id";
+            return (
+              item[1] !== "" &&
+              item[0] !== "typecontrol_id" &&
+              item[0] !== "grouping_id"
+            );
           }
         );
         let memberInfo = {
@@ -343,17 +399,16 @@ export default {
           grouping_id: this.accUpdateForm.grouping_id,
           typecontrol_id: typecontrol_id,
         };
-          await this.updateInfo(Object.fromEntries(accUpdateForm)),
+        await this.updateInfo(Object.fromEntries(accUpdateForm)),
           await this.delInfo(Object.fromEntries(destroyInfo)),
-          await this.$api({ type: "setMemberId", data: memberInfo })
-          this.$message.success('操作成功')
-          this.handlerClose()
-          this.resetDestroyInfo()
-          this.accUpdateForm.avatar_uri = ''
-          this.$nextTick(()=>{
-            this.$parent.updateMemberList()
-          })
-          
+          await this.$api({ type: "setMemberId", data: memberInfo });
+        this.$message.success("操作成功");
+        this.handlerClose();
+        this.resetDestroyInfo();
+        this.accUpdateForm.avatar_uri = "";
+         
+          this.$parent.updateMemberList();
+         
       } catch (error) {
         this.$message.error("未知错误");
       }
@@ -412,7 +467,7 @@ export default {
     */
     resetForm() {
       this.$refs["editorForm"].resetFields();
-      this.accUpdateForm.grouping_id = ''
+      this.accUpdateForm.grouping_id = "";
     },
   },
 };
@@ -435,7 +490,12 @@ export default {
 }
 
 .avatar-uploader {
+  border-radius: 50%;
   border: 1px dashed #d9d9d9;
+
+  img {
+    border-radius: 50%;
+  }
 }
 
 .avatar-uploader .el-upload {
