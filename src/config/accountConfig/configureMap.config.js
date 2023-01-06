@@ -48,19 +48,19 @@ export default {
       ],
       sortQueryOption: [
         {
-          value: "0",
+          value: "follower_status",
           label: "粉丝",
         },
         {
-          value: "1",
+          value: "unread_viewer_count",
           label: "访问人数",
         },
         {
-          value: "2",
+          value: "following_count",
           label: "关注",
         },
         {
-          value: "3",
+          value: "total_favorited",
           label: "获赞",
         },
       ],

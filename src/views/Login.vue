@@ -12,6 +12,7 @@
         >
           <el-form-item prop="username" label="输入用户名 ：">
             <el-input
+              clearable
               style="width: 70%"
               v-model="loginForm.username"
               placeholder="请输入用户名"
@@ -19,6 +20,7 @@
           </el-form-item>
           <el-form-item prop="password" label="输入密码 ：">
             <el-input
+              clearable
               type="password"
               style="width: 70%"
               v-model="loginForm.password"
@@ -28,6 +30,7 @@
           <el-form-item prop="captcha" label="输入验证码 ：">
             <div class="login-authitem">
               <el-input
+                clearable
                 class="mr-15"
                 style="width: 40%"
                 v-model="loginForm.captcha"
@@ -73,7 +76,7 @@ export default {
   },
   data() {
     return {
-      baseUrl: BASE_URL, // 基地址
+      baseUrl: BASE_URL, 
       rules: rules,
       loginForm: {
         username: "",
