@@ -1,6 +1,9 @@
 <template>
   <div class="tt-header">
-    <h1>基础信息</h1>
+    <div>
+      <i :class="curIcon"></i>
+      <span style="font-size: 20px; font-weight: 700;">{{ curTitle }}</span>
+    </div>
     <div class="tt-header--login">
       <i class="el-icon-bell fz-20"></i>
       <el-image class="ml-12 tt-avatar-img" :src="src" fit="cover"></el-image>
@@ -34,6 +37,8 @@ export default {
   data() {
     return {
       src: require("../../assets/logo.jpg"),
+      curTitle: '',
+      curIcon: ''
     };
   },
 
@@ -50,10 +55,21 @@ export default {
       this.$router.push('/login')
     },
   },
+
+  watch: {
+			$route: {
+				handler(val) {
+          this.curTitle = val.meta.title,
+          this.curIcon = val.meta.icon
+				},
+				deep: true,
+        immediate:true
+			},
+		},
 };
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .fz-14
   font-size 14px
 
@@ -63,8 +79,10 @@ export default {
 .ml-12 
   margin-left 12px
 
-.el-icon-bell
+.el-icon-bell {
   cursor pointer
+  color black !important
+}
 
 .tt-header {
   z-index:2
@@ -73,6 +91,12 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+[class*=" el-icon-"], [class^=el-icon-]{
+  color: red;
+  margin-right: 6px;
+  font-size : 22px;
 }
 
 .tt-header-name
