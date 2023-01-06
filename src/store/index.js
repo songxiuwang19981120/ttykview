@@ -92,7 +92,8 @@ export default new Vuex.Store({
         }
         Vue.prototype.$notify.error({
           title: '登录失败',
-          message: msg
+          message: msg,
+          position: 'top-left'
         });
       } catch (error) {
         Vue.prototype.$notify.error({

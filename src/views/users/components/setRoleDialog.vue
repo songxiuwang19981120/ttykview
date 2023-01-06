@@ -1,5 +1,5 @@
 <template>
-	<el-dialog :visible="showdialog" title="权限配置" @close="btnCancel">
+	<el-dialog :visible="showdialog" title="权限配置" @close="btnCancel" width="40%">
 		<el-tree
 			:data="treeData"
 			show-checkbox
@@ -9,11 +9,13 @@
 			highlight-current
 			check-strictly
 			:props="defaultProps"
+			:default-checked-keys="defaultCheck"
+			:check-strictly="true"
 		>
 		</el-tree>
 		<el-row type="flex" justify="end" style="margin-top: 20px;">
-			<el-button type="primary" size="medium" @click="btnOK">确定</el-button>
 			<el-button @click="btnCancel" size="medium">取消</el-button>
+			<el-button type="primary" size="medium" @click="btnOK">确定</el-button>
 		</el-row>
 	</el-dialog>
 </template>
@@ -25,70 +27,79 @@
 				type: Boolean,
 				default: false,
 			},
+			setRoleData: {
+				type: Object,
+			},
+			defaultCheck: {
+				type: Array,
+				default: []
+			}
 		},
 
 		data() {
 			return {
-				treeData: [
-					{
-						id: 1,
-						label: '一级 1',
-						children: [
-							{
-								id: 4,
-								label: '二级 1-1',
-								children: [
-									{
-										id: 9,
-										label: '三级 1-1-1',
-									},
-									{
-										id: 10,
-										label: '三级 1-1-2',
-									},
-								],
-							},
-						],
-					},
-					{
-						id: 2,
-						label: '一级 2',
-						children: [
-							{
-								id: 5,
-								label: '二级 2-1',
-							},
-							{
-								id: 6,
-								label: '二级 2-2',
-							},
-						],
-					},
-					{
-						id: 3,
-						label: '一级 3',
-						children: [
-							{
-								id: 7,
-								label: '二级 3-1',
-							},
-							{
-								id: 8,
-								label: '二级 3-2',
-							},
-						],
-					},
-				],
+				treeData: [],
 				defaultProps: {
-					// label: 'title',
+					label: 'title',
 				},
+				rules: []
 			};
 		},
 
 		methods: {
+			// 获取树形
+			async getRouteTree() {
+				try {
+					const res = await this.$api({
+						type: 'getRouteTree'
+					});
+					console.log(res, '树形');
+					if (res.status == 200) {
+						this.treeData = res.data
+					} else {
+						this.$message.error(res.msg);
+					}
+				} catch (error) {
+					console.error(error);
+				} finally {
+				}
+			},
+
+			// 配置权限
+			async setRole(data) {
+				try {
+					const res = await this.$api({
+						type: 'setRole',
+						data,
+					});
+					if (res.status == 200) {
+						this.$message.success(res.msg);
+					} else {
+						this.$message.error(res.msg);
+					}
+				} catch (error) {
+					console.error(error);
+				} finally {
+				}
+			},
+
+			// 获取选中的权限id
+			getCheckedKeys() {
+				return this.$refs.tree.getCheckedKeys()
+			},
+
 			// 点击确定按钮
-			btnOK() {
-				console.log(this.$refs.tree.getCheckedKeys());
+			async btnOK() {
+				this.rules = this.$refs.tree.getCheckedKeys()
+				await this.setRole({
+					group_id: this.setRoleData.id,
+					rules: this.rules
+				})
+				this.$parent.getApiusergroup({
+						page: 1,
+						limit: 10,
+					});
+				this.$emit('update:showdialog', false);
 			},
 
 			// 点击取消按钮

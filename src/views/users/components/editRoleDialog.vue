@@ -11,8 +11,8 @@
 			</el-form-item>
 			<el-row type="flex" justify="end">
 				<el-form-item>
-					<el-button type="primary" size="medium" @click="btnOK">确定</el-button>
 					<el-button @click="btnCancel" size="medium">取消</el-button>
+					<el-button type="primary" size="medium" @click="btnOK">确定</el-button>
 				</el-form-item>
 			</el-row>
 		</el-form>
@@ -44,10 +44,10 @@
 
 		methods: {
 			// 编辑角色
-			async updateRole(data) {
+			async updateApiusergroup(data) {
 				try {
 					const res = await this.$api({
-						type: 'updateRole',
+						type: 'updateApiusergroup',
 						data,
 					});
 					if (res.status == 200) {
@@ -58,7 +58,6 @@
 				} catch (error) {
 					console.error(error);
 				} finally {
-					this.btnloading = false;
 				}
 			},
 
@@ -66,8 +65,8 @@
 			async btnOK() {
 				try {
 					await this.$refs.ruleForm.validate();
-					await this.updateRole(this.ruleForm);
-					this.$parent.getRole({
+					await this.updateApiusergroup(this.ruleForm);
+					this.$parent.getApiusergroup({
 						page: 1,
 						limit: 10,
 					});

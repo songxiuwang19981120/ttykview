@@ -18,15 +18,16 @@
 					ref="tree"
 					highlight-current
 					:props="defaultProps"
+					check-strictly
 				>
 				</el-tree>
 			</el-form-item>
 			<el-row type="flex" justify="end">
 				<el-form-item>
+					<el-button @click="btnCancel" size="medium">取消</el-button>
 					<el-button type="primary" size="medium" :loading="btnloading" @click="btnOK">{{
 						btnloading ? '上传中...' : '确定'
 					}}</el-button>
-					<el-button @click="btnCancel" size="medium">取消</el-button>
 				</el-form-item>
 			</el-row>
 		</el-form>
@@ -52,68 +53,38 @@
 					name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
 				},
 				btnloading: false,
-				data: [
-					{
-						id: 1,
-						label: '一级 1',
-						children: [
-							{
-								id: 4,
-								label: '二级 1-1',
-								children: [
-									{
-										id: 9,
-										label: '三级 1-1-1',
-									},
-									{
-										id: 10,
-										label: '三级 1-1-2',
-									},
-								],
-							},
-						],
-					},
-					{
-						id: 2,
-						label: '一级 2',
-						children: [
-							{
-								id: 5,
-								label: '二级 2-1',
-							},
-							{
-								id: 6,
-								label: '二级 2-2',
-							},
-						],
-					},
-					{
-						id: 3,
-						label: '一级 3',
-						children: [
-							{
-								id: 7,
-								label: '二级 3-1',
-							},
-							{
-								id: 8,
-								label: '二级 3-2',
-							},
-						],
-					},
-				],
+				data: [],
 				defaultProps: {
-					// label: 'title',
+					label: 'title',
 				},
 			};
 		},
 
 		methods: {
-			// 新增角色
-			async addRole(data) {
+			// 获取树形
+			async getRouteTree() {
 				try {
 					const res = await this.$api({
-						type: 'addRole',
+						type: 'getRouteTree'
+					});
+					console.log(res, '树形');
+					if (res.status == 200) {
+						this.data = res.data
+					} else {
+						this.$message.error(res.msg);
+					}
+				} catch (error) {
+					console.error(error);
+				} finally {
+				}
+			},
+
+			// 新增角色
+			async addApiusergroup(data) {
+				try {
+					this.btnloading = true
+					const res = await this.$api({
+						type: 'addApiusergroup',
 						data,
 					});
 					if (res.status == 200) {
@@ -132,10 +103,10 @@
 			async btnOK() {
 				try {
 					await this.$refs.ruleForm.validate();
-					this.ruleForm.rules = this.getCheckedKeys();
+					this.ruleForm.rules = this.getCheckedKeys().join(',');
 					this.btnloading = true;
-					await this.addRole(this.ruleForm);
-					this.$parent.getRole({
+					await this.addApiusergroup(this.ruleForm);
+					this.$parent.getApiusergroup({
 						page: 1,
 						limit: 10,
 					});
@@ -155,7 +126,7 @@
 
 			// 获取选中的权限id
 			getCheckedKeys() {
-				console.log(this.$refs.tree.getCheckedKeys());
+				return this.$refs.tree.getCheckedKeys()
 			},
 		},
 	};
