@@ -31,15 +31,6 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item label="输入需要@的ID：">
-          <el-input
-            v-model="releaseVideoForm.id"
-            style="width: 70%"
-            type="textarea"
-            placeholder="请输入需@ID(可输入多个)"
-          ></el-input>
-        </el-form-item>
-
         <el-form-item label="输入任务名称：">
           <el-input
             v-model="releaseVideoForm.task_name"
@@ -121,8 +112,8 @@ export default {
     // 校验视频大小
     videoBefore(file) {
       let { size } = file || {};
-      if (size > 3 * 1024 * 1024) {
-        this.$message.error("视频大小请不要超过2M");
+      if (size > 6 * 1024 * 1024) {
+        this.$message.error("视频大小请不要超过6M");
         return false;
       }
     },

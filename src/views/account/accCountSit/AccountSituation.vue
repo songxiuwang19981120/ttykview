@@ -128,6 +128,9 @@
           <el-button size="medium" type="primary">刷新账号</el-button>
         </div>
       </div>
+      <div class="pad-0-20">
+        <p class="fz-14 ">总关注次数 ：{{total_fans}}次&nbsp;&nbsp;&nbsp;&nbsp;  总粉丝量 ：{{total_follow}}个</p>
+      </div>
       <keep-alive>
       <table-custom
         ref="multipleTable"
@@ -146,8 +149,8 @@
       :total="total"
       :page="page"
       :limit="limit"
-      :size="limit"
       @pagination="handlePagination"
+      @current-change="handleCurrentChange"
     />
 
     <ConfrimDelDialog
@@ -174,6 +177,7 @@
       :videoCount="videoCount"
       :member_id="member_id"
     />
+
     <ViewerTabel
       @updateVisitorList="updateVisitorList(arguments)"
       @toogleViewerTabel="toogleViewerTabel"
@@ -183,6 +187,7 @@
       :visterTotal="visterTotal"
       :user_id="user_id"
     />
+
     <BatchEditor
       :typecontrol_id="classiFication"
       :grouping_id="group"
@@ -191,6 +196,7 @@
       :editorTota="editorTota"
       :groupName="groupString"
     />
+
     <ReleaseVideoDialog
       :showReleaseVideoDialog="showReleaseVideoDialog"
       @closeReleaseVideoDialog="closeReleaseVideoDialog"
@@ -274,6 +280,8 @@ export default {
   },
   data() {
     return {
+      total_fans:0, //总关注次数
+      total_follow:0, //总粉丝量
       accInfo:{},
       accUid: "", //账号UID
       showConfrimDel: false,
@@ -495,6 +503,7 @@ export default {
             return (
               <div style="display:flex">
                 <TableOperation
+                  ref="tableOperation"
                   style="margin-right:10px"
                   onsetOperation={this.setOperation.bind(this, row)}
                 />
@@ -554,6 +563,10 @@ export default {
   },
 
   methods: {
+
+    handleCurrentChange(currentPage){
+      this.page = currentPage
+    },
     /*
             function: getTreeData
             params: data | 需要进行递归处理的数组
@@ -585,11 +598,14 @@ export default {
     */
     async initInterface() {
       this.page = store.get("page") ?? 1;
-      this.limit = store.get("limit") ?? 10;
+      this.limit = store.get("limit") ?? 20;
       let group = store.get("group") ?? "";
       let typecontrol_id = store.get("typecontrol_id") ?? "";
-
       let fans = store.get("fans") ?? "";
+      this.total_fans = store.get('total_fans') ?? 0
+      this.total_follow = store.get('total_follow') ?? 0
+      this.fo
+      this.handleCurrentChange(this.page)
       if (fans !== "") {
         this.fans = fans;
         fans = Object.entries(this.fansMap).find((item) => {
@@ -598,10 +614,8 @@ export default {
         this.min = fans[0] ?? "";
         this.max = fans[1] ?? "";
       }
-
       this.group = group;
       this.classiFication = typecontrol_id;
-
       let data = {
         min: this.min ?? "",
         max: this.max ?? "",
@@ -625,7 +639,6 @@ export default {
       });
       this.groupString = arr?.[1]?.grouping_name;
     },
-
 
     /* 
         function: setTypeText
@@ -703,6 +716,25 @@ export default {
       }
     },
 
+    async delAcc(){
+      try {
+       let result = await this.$api({
+          type: "deleteMember",
+          data: { member_ids: this.delId },
+        });
+        if(result?.status == 200){
+          this.$message.success('删除成功')
+          return
+        }        
+        this.$message.error(result?.msg ?? '删除失败')
+      } catch (error) {
+        this.$message.error('删除失败')
+        console.error(error);
+      }
+
+    },
+
+
     /* 
         function: confrimDel
         params: null
@@ -710,18 +742,9 @@ export default {
     */
     async confrimDel() {
       try {
-        this.$message.success("操作成功");
+        await this.delAcc()
         this.closeConfrimDel();
-        /*         let result = await this.$api({
-          type: "deleteMember",
-          data: { member_ids: this.delId },
-        });
-        if (result.status == 200) {
-          this.$message.success(result.msg ?? "操作成功");
-          this.closeConfrimDel();
-          return;
-        }
-        this.$message.error(result.msg ?? "操作失败"); */
+        this.updateMemberList()
       } catch (error) {
         console.error(error);
         this.$message.error("操作失败");
@@ -744,7 +767,7 @@ export default {
         desc: 打开相应操作界面
     */
     setOperation(row, e) {
-    console.log(row);
+    console.log(this.$children);
       if (e === "") {
         return false;
       }
@@ -785,7 +808,6 @@ export default {
     */
     handleRelease() {
       this.showReleaseVideoDialog = true;
-      console.log("发布视频");
     },
 
 
@@ -835,18 +857,15 @@ export default {
         desc: 刷新界面，用于更新操作之后
     */
     updateMemberList() {
-      console.log(3);
       let data = {
-                min: this.min ?? "",
+        min: this.min ?? "",
         max: this.max ?? "",
         typecontrol_id: this.classiFication ?? "",
         grouping_id: this.group ?? "",
-        limit: this.limit ?? 10,
+        limit: this.limit ?? 20,
         page: this.page ?? 1,
         uid:this.accUid ?? ''
       }
-
-
       this.getMemberList(data);
     },
 
@@ -863,6 +882,8 @@ export default {
       store.remove("fans");
       store.remove("groupText")
       store.remove("typeText")
+      store.remove('total_follow')
+      store.remove('total_fans')
     },
 
     /* 
@@ -880,6 +901,8 @@ export default {
       this.sortWay = "",
       this.limit = 20;
       this.page = 1;
+      this.total_fans = 0
+      this.total_follow = 0
       this.removeLocal();
       this.getMemberList();
       this.$message.success("重置成功");
@@ -988,6 +1011,10 @@ export default {
         if (result.status == 200) {
           this.memberList = result?.data?.list ?? [];
           this.total = result?.data?.count ?? 0;
+          this.total_fans = result?.data?.total_fans ?? 0
+          this.total_follow = result?.data?.total_follow ?? 0
+          store.set('total_fans',this.total_fans)
+          store.set('total_follow',this.total_follow)
           this.loading = false;
           this.$message.success("搜索成功");
           return;
@@ -1113,22 +1140,6 @@ export default {
       this.editorTota = this.batchEditorList.length;
     },
 
-    /*
-        function: getTreeData
-        params: data | 需要进行递归处理的数组
-        desc: 递归函数，对数组进行处理，设置dhilren长度为0的字段为undefined
-        return: 处理后的数据
-    */
-    /*     getTreeData(data) {
-      data.forEach((item) => {
-        if (!item.children.length) {
-          item.children = undefined;
-        } else {
-          this.getTreeData(item.children);
-        }
-      });
-      return data;
-    }, */
 
     /*
         function: getTypeControlList
@@ -1161,6 +1172,7 @@ export default {
         this.loading = false;
         return result;
       } catch (error) {
+        this.loading = false
         console.error(error);
       }
     },

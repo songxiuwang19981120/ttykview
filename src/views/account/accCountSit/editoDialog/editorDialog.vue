@@ -385,32 +385,26 @@ export default {
         let destroyInfo = Object.entries(this.destroyInfo).filter((item) => {
           return item[1] !== "";
         });
-        let accUpdateForm = Object.entries(this.accUpdateForm).filter(
-          (item) => {
-            return (
-              item[1] !== "" &&
-              item[0] !== "typecontrol_id" &&
-              item[0] !== "grouping_id"
-            );
-          }
-        );
+        let accUpdateForm = Object.entries(this.accUpdateForm).filter((item) => {
+          return (
+            item[1] !== "" && item[0] !== "typecontrol_id" && item[0] !== "grouping_id"
+          );
+        });
         let memberInfo = {
           user_id: this.user_id,
           grouping_id: this.accUpdateForm.grouping_id,
           typecontrol_id: typecontrol_id,
         };
         await this.updateInfo(Object.fromEntries(accUpdateForm)),
-          await this.delInfo(Object.fromEntries(destroyInfo)),
-          await this.$api({ type: "setMemberId", data: memberInfo });
+        await this.delInfo(Object.fromEntries(destroyInfo)),
+        await this.$api({ type: "setMemberId", data: memberInfo });
         this.$message.success("操作成功");
         this.handlerClose();
         this.resetDestroyInfo();
-        this.accUpdateForm.avatar_uri = "";
-         
-          this.$parent.updateMemberList();
-         
+        this.accUpdateForm.avatar_uri = ""; 
+        this.$parent.updateMemberList();
       } catch (error) {
-        this.$message.error("未知错误");
+        this.$message.error("提交失败");
       }
     },
 
@@ -447,7 +441,7 @@ export default {
         };
         let result = await this.$api({ type: "getUserRandomInfo", data: data });
         if (result.data?.[0]?.[resAccParams]) {
-          this.accUpdateForm[accParams] = result.data[0][resAccParams];
+          this.accUpdateForm[accParams] = result.data[0]?.[resAccParams];
           this.destroyInfo[desParams] = result.data[0]?.[resDesParams];
           this.$message.success("获取成功");
           this[loading] = false;

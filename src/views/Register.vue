@@ -12,6 +12,7 @@
         >
           <el-form-item prop="username" label="设置用户名 ：">
             <el-input
+              clearable
               style="width: 70%"
               v-model="registerForm.username"
               placeholder="设置用户名"
@@ -26,6 +27,7 @@
           </el-form-item>
           <el-form-item prop="password" label="设置密码 ：">
             <el-input
+              clearable
               type="password"
               style="width: 70%"
               v-model="registerForm.password"
@@ -34,6 +36,7 @@
           </el-form-item>
           <el-form-item prop="isSamePwd" label="确认密码 ：">
             <el-input
+              clearable
               type="password"
               style="width: 70%"
               v-model="registerForm.isSamePwd"
@@ -77,30 +80,18 @@ export default {
   mounted() {},
 
   methods: {
+    
     async register() {
       try {
         if (this.registerForm.password !== this.registerForm.isSamePwd) {
           this.$message.error("两次密码输入不一致，请重新输入");
           return false;
         }
-
         let data = {
           username: this.registerForm.username,
           password: this.registerForm.password,
         };
         this.$store.dispatch("register", { data });
-        /*  let result = await this.$api({ type: "register", registerData });
-        console.log(result);
-        if (result.status == 200) {
-          this.$notify.success({
-            title: "注册成功",
-          });
-          this.$store.dispatch("login", { loginData }); */
-
-        /*           let userInfo = JSON.stringify(result.data);
-          this.$store.dispatch("login", { userInfo });
-          this.$router.push("/index"); */
-        return;
       } catch (error) {
         this.$notify.errorerror({
           title: "登录失败",
