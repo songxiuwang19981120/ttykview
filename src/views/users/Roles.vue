@@ -15,9 +15,11 @@
 			@pagination="pageChange"
 		></pagination>
 		<!-- 新增角色弹层 -->
-		<addRole :showdialog.sync="showAddDialog" :ruleForm.sync="editData"></addRole>
+		<addRole :showdialog.sync="showAddDialog" ref="addrole"></addRole>
+		<!-- 更改名称弹层 -->
+		<editRole :showdialog.sync="showEditDialog" :ruleForm.sync="editData"></editRole>
 		<!-- 权限配置弹层 -->
-		<setRole :showdialog.sync="showSetDialog"></setRole>
+		<setRole :showdialog.sync="showSetDialog" :setRoleData.sync="setData" :defaultCheck="defaultCheck" ref="setrole"></setRole>
 	</div>
 </template>
 
@@ -26,6 +28,7 @@
 	import pagination from '@/components/myComponent/table/pagination.vue';
 	import addRole from './components/addRoleDialog.vue';
 	import setRole from './components/setRoleDialog.vue';
+	import editRole from './components/editRoleDialog.vue'
 
 	export default {
 		name: 'Roles',
@@ -35,6 +38,7 @@
 			pagination,
 			addRole,
 			setRole,
+			editRole
 		},
 
 		data() {
@@ -48,7 +52,7 @@
 						align: 'center',
 					},
 					{
-						prop: '',
+						prop: 'use_num',
 						label: '人数',
 						align: 'center',
 					},
@@ -73,7 +77,7 @@
 										confirm-button-text="删除"
 										cancel-button-text="取消"
 										title="确认删除该角色吗？"
-										onConfirm={this.toDelRole.bind(this, row)}
+										onConfirm={this.toDelRole.bind(this, row.id)}
 									>
 										<el-button slot="reference" type="danger" size="mini">
 											删除
@@ -90,22 +94,25 @@
 				},
 				total: 0,
 				showAddDialog: false, // 新增弹层
+				showEditDialog: false, // 编辑弹层
 				editData: {},
 				showSetDialog: false, // 配置弹层
+				setData: {},
+				defaultCheck: []
 			};
 		},
 
 		created() {
-			this.getRole(this.page);
+			this.getApiusergroup(this.page);
 		},
 
 		methods: {
 			// 获取角色列表
-			async getRole(data) {
+			async getApiusergroup(data) {
 				try {
 					this.loading = true;
 					const res = await this.$api({
-						type: 'getRole',
+						type: 'getApiusergroup',
 						data,
 					});
 					console.log(res, '角色列表');
@@ -122,9 +129,30 @@
 				}
 			},
 
+			// 删除角色
+			async deleteApiusergroup(ids) {
+				try {
+					this.btnloading = true
+					const res = await this.$api({
+						type: 'deleteApiusergroup',
+						data: {
+							ids
+						},
+					});
+					if (res.status == 200) {
+						this.$message.success(res.msg);
+					} else {
+						this.$message.error(res.msg);
+					}
+				} catch (error) {
+					console.error(error);
+				}
+			},
+
 			// 点击新增按钮
 			addRole() {
 				this.showAddDialog = true;
+				this.$refs.addrole.getRouteTree()
 			},
 
 			// 数据条数/页码改变
@@ -134,17 +162,23 @@
 
 			// 点击修改按钮
 			toEditRole(obj) {
-				this.showAddDialog = true;
+				this.showEditDialog = true;
 				this.editData = JSON.parse(JSON.stringify(obj));
 			},
 
 			// 点击权限配置按钮
-			toSetRole() {
+			toSetRole(obj) {
 				this.showSetDialog = true;
+				this.setData = obj
+				this.defaultCheck = obj.rules.split('')
+				this.$refs.setrole.getRouteTree()
 			},
 
 			// 点击删除按钮
-			toDelRole() {},
+			async toDelRole(id) {
+				await this.deleteApiusergroup(id)
+				this.getApiusergroup(this.page)
+			},
 		},
 	};
 </script>

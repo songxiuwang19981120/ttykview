@@ -9,25 +9,10 @@
 					style="width: 60%"
 				></el-input>
 			</el-form-item>
-			<el-form-item label="权限选择：" prop="rules">
-				<el-tree
-					:data="data"
-					show-checkbox
-					default-expand-all
-					node-key="id"
-					ref="tree"
-					highlight-current
-					:props="defaultProps"
-					check-strictly
-				>
-				</el-tree>
-			</el-form-item>
 			<el-row type="flex" justify="end">
 				<el-form-item>
 					<el-button @click="btnCancel" size="medium">取消</el-button>
-					<el-button type="primary" size="medium" :loading="btnloading" @click="btnOK">{{
-						btnloading ? '上传中...' : '确定'
-					}}</el-button>
+					<el-button type="primary" size="medium" @click="btnOK">确定</el-button>
 				</el-form-item>
 			</el-row>
 		</el-form>
@@ -41,50 +26,28 @@
 				type: Boolean,
 				default: false,
 			},
+			ruleForm: {
+				type: Object,
+				default: {
+					name: '',
+				},
+			},
 		},
 
 		data() {
 			return {
-				ruleForm: {
-					name: '',
-					rules: '',
-				},
 				rules: {
 					name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
-				},
-				btnloading: false,
-				data: [],
-				defaultProps: {
-					label: 'title',
 				},
 			};
 		},
 
 		methods: {
-			// 获取树形
-			async getRouteTree() {
+			// 编辑角色
+			async updateApiusergroup(data) {
 				try {
 					const res = await this.$api({
-						type: 'getRouteTree'
-					});
-					console.log(res, '树形');
-					if (res.status == 200) {
-						this.data = res.data
-					} else {
-						this.$message.error(res.msg);
-					}
-				} catch (error) {
-					console.error(error);
-				} finally {
-				}
-			},
-
-			// 新增角色
-			async addApiusergroup(data) {
-				try {
-					this.btnloading = true
-					const res = await this.$api({
-						type: 'addApiusergroup',
+						type: 'updateApiusergroup',
 						data,
 					});
 					if (res.status == 200) {
@@ -95,7 +58,6 @@
 				} catch (error) {
 					console.error(error);
 				} finally {
-					this.btnloading = false;
 				}
 			},
 
@@ -103,9 +65,7 @@
 			async btnOK() {
 				try {
 					await this.$refs.ruleForm.validate();
-					this.ruleForm.rules = this.getCheckedKeys().join(',');
-					this.btnloading = true;
-					await this.addApiusergroup(this.ruleForm);
+					await this.updateApiusergroup(this.ruleForm);
 					this.$parent.getApiusergroup({
 						page: 1,
 						limit: 10,
@@ -118,15 +78,10 @@
 			btnCancel() {
 				this.$refs.ruleForm.resetFields();
 				this.$emit('update:showdialog', false);
-				this.ruleForm = {
+				this.$emit('update:ruleForm', {
 					name: '',
 					rules: '',
-				};
-			},
-
-			// 获取选中的权限id
-			getCheckedKeys() {
-				return this.$refs.tree.getCheckedKeys()
+				});
 			},
 		},
 	};

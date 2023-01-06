@@ -4,96 +4,49 @@
       <div class="tt-accsituation--operation">
         <div style="margin-right: 20px">
           <el-select v-model="page.status" placeholder="请选择任务状态" size="medium">
-            <el-option
-              v-for="item in searchStateList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
+            <el-option v-for="item in searchStateList" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
-          <el-date-picker
-            size="medium"
-            class="date-picker"
-            v-model="date"
-            type="daterange"
-            align="right"
-            unlink-panels
-            range-separator="——"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            :picker-options="pickerOptions"
-          >
+          <el-date-picker size="medium" class="date-picker" v-model="date" type="daterange" align="right" unlink-panels
+            range-separator="——" start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="pickerOptions">
           </el-date-picker>
         </div>
-        <el-button
-          type="primary"
-          size="medium"
-          class="seachbut"
-          :loading="btnloading"
-          @click="searchTasks"
-          >{{ btnloading ? "加载中..." : "搜索" }}</el-button
-        >
-        <el-button type="primary" size="medium" class="seachbut" @click="btnReset"
-          >重置</el-button
-        >
-        <el-button type="primary" size="medium" class="seachbut" @click="showFollowTaskDialog"
-          >关注任务</el-button
-        >
-		<!-- <i class="el-icon-refresh-left"></i> -->
+        <el-button type="primary" size="medium" class="seachbut" :loading="btnloading" @click="searchTasks">{{
+    btnloading ? "加载中..." : "搜索"
+}}</el-button>
+        <el-button type="primary" size="medium" class="seachbut" @click="btnReset">重置</el-button>
+        <el-button type="primary" size="medium" class="seachbut" @click="shownewFollow">关注任务</el-button>
+        <!-- <i class="el-icon-refresh-left"></i> -->
       </div>
     </div>
     <!-- 表格 -->
-    <table-custom
-      :loading="loading"
-      :tableData="tableData"
-      :columns="columns"
-      height="700"
-    ></table-custom>
+    <table-custom :loading="loading" :tableData="tableData" :columns="columns" height="700"></table-custom>
     <!-- 分页 -->
-    <pagination
-      :total="total"
-      :page="page.page"
-      :limit="page.limit"
-      @pagination="pageChange"
-    ></pagination>
+    <pagination :total="total" :page="page.page" :limit="page.limit" @pagination="pageChange"></pagination>
     <!-- 弹层 -->
-    <FollowDailogComponent
-      ref="dialog"
-      :showDialog.sync="dialog"
-      :curId="curId"
-    ></FollowDailogComponent>
-    <FollowTaskDialog
-      @closeLetterTask="closeLetterTask"
-      :showLetterTask="showLetterTask"
-    />
-	    <TaskDetail
-      @closeTaskDetail="closeTaskDetail"
-      :showTaskDetail="showTaskDetail"
-      :tableData="tableData"
-      :title="title"
-    />
+    <followDetail ref="followDialog" :showDialog.sync="showTaskDetail" :curId="curId"></followDetail>
+    <!-- 关注任务 -->
+    <newFollow ref="newfollowDialog" @closeLetterTask="closeLetterTask" :showLetterTask="showLetterTask" />
   </div>
 </template>
 <script>
 import tableCustom from "@/components/myComponent/table/tableCustom.vue";
-import FollowDailogComponent from "./component/FollowDailogComponent.vue";
 import pagination from "@/components/myComponent/table/pagination.vue";
-import FollowTaskDialog from "@/views/account/accCountSit/taskDialog/letterDialog.vue";
-import TaskDetail from "./component/TaskDetail.vue";
+import followDetail from "./component/followDetail.vue";
+import newFollow from "./component/newFollow.vue";
 export default {
   name: "TtFollow",
   components: {
     tableCustom,
-    FollowDailogComponent,
+    followDetail,
     pagination,
-    FollowTaskDialog,
-	TaskDetail
+    newFollow,
   },
   data() {
     return {
-		title:'关注任务详情',
-		showTaskDetail:false,
+      date:'',
+      title: '关注任务详情',
+      showTaskDetail: false,
       showLetterTask: false,
       // 下拉选择数据
       searchStateList: [
@@ -153,27 +106,13 @@ export default {
           render: (h, { row }) => {
             return (
               <div>
-     <el-button
-                  type="primary"
-                  size="mini"
-                  onClick={this.toDetail.bind(this, row.tasklist_id)}
-                >
-                  查看详情
-                </el-button>
-                <el-button
-                  type="primary"
-                  size="mini"
-                  onClick={this.delete.bind(this, row.tasklist_id)}
-                >
-                  删除
-                </el-button>
-                <el-button
-                  type="primary"
-                  size="mini"
-                  onClick={this.suspend.bind(this, row.tasklist_id)}
-                >
-                  暂停
-                </el-button>
+                <el-button type="success" size="mini" onClick={this.toDetail.bind(this, row.tasklist_id)}>查看详情</el-button>
+                <el-button type="warning" size="mini" onClick={this.suspend.bind(this, row.tasklist_id)} style="margin-right:10px">暂停</el-button>
+                <el-popconfirm confirm-button-text="删除" cancel-button-text="取消" title="确认删除该任务吗？" onConfirm={this.delete.bind(this, row.subjectcontent_id)}>
+                  <el-button slot="reference" type="danger" size="mini">
+                    删除
+                  </el-button>
+                </el-popconfirm>
               </div>
             );
           },
@@ -227,24 +166,25 @@ export default {
     this.getVideoTasks(this.page);
   },
 
-  mounted() {},
+  mounted() { },
 
   methods: {
-	closeTaskDetail(){
-		this.showTaskDetail = false;
-	},
-	delete(){
-		console.log('删除')
-	},
-	suspend(){
-		console.log('暂停')
-	},
+    closeTaskDetail() {
+      this.showTaskDetail = false;
+    },
+    delete() {
+      this.$message.success('删除成功');
+    },
+    suspend() {
+      this.$message.success('暂停成功');
+    },
     closeLetterTask() {
       this.showLetterTask = false;
     },
 
-    showFollowTaskDialog() {
+    shownewFollow() {
       this.showLetterTask = true;
+      this.$refs.newfollowDialog.getList()
     },
     // 获取关注任务列表
     async getVideoTasks(data) {
@@ -271,12 +211,7 @@ export default {
     // 查看详情
     toDetail(id) {
       this.showTaskDetail = true;
-      this.curId = id;
-      this.$refs.dialog.getTaskListDetail({
-        page: 1,
-        limit: 10,
-        tasklist_id: id,
-      });
+      this.$refs.followDialog.getTaskListDetail(id);
     },
     // 当前页数据条数/页码改变
     pageChange(obj) {
@@ -304,16 +239,16 @@ export default {
 </script>
 
 <style  lang="scss" scoped>
-	@import '@/assets/base/_color_variables.scss';
+@import '@/assets/base/_color_variables.scss';
 
 .date-picker {
-	margin-left: 16px;
+  margin-left: 16px;
 }
 
 .el-icon-refresh-left {
-	margin: 5px 0 0 50px;
-	font-size: 30px;
-	color: $button-back-color;
-	cursor: pointer;
+  margin: 5px 0 0 50px;
+  font-size: 30px;
+  color: $button-back-color;
+  cursor: pointer;
 }
 </style>

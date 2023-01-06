@@ -69,16 +69,16 @@ export default {
                     to: '/private',
                     icon: '',
                 },
-                {
-                    title: '账号创建',
-                    to: '/accountcreation',
-                    icon: '',
-                },
-                {
-                    title: '养号任务',
-                    to: '/cultivatetask',
-                    icon: '',
-                },
+                // {
+                //     title: '账号创建',
+                //     to: '/accountcreation',
+                //     icon: '',
+                // },
+                // {
+                //     title: '养号任务',
+                //     to: '/cultivatetask',
+                //     icon: '',
+                // },
                 {
                     title: '视频采集',
                     to: '/videocapture',
@@ -97,32 +97,32 @@ export default {
             icon: 'el-icon-magic-stick',
             children: [
                 {
-                    title: '视频',
+                    title: '视频素材',
                     to: '/video',
                     icon: '',
                 },
                 {
-                    title: '头像',
+                    title: '头像素材',
                     to: '/avartar',
                     icon: '',
                 },
                 {
-                    title: '昵称',
+                    title: '账号昵称',
                     to: '/nikname',
                     icon: '',
                 },
                 {
-                    title: '签名',
+                    title: '个人简介素材',
                     to: '/autograph',
                     icon: '',
                 },
                 {
-                    title: '标签',
+                    title: '话题标签素材',
                     to: '/label',
                     icon: '',
                 },
                 {
-                    title: '需关注ID',
+                    title: '需关注ID素材',
                     to: '/fllow',
                     icon: '',
                 },
@@ -132,7 +132,7 @@ export default {
                     icon: '',
                 },
                 {
-                    title: '主题内容',
+                    title: '作品文案',
                     to: '/theme',
                     icon: '',
                 },

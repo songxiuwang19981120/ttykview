@@ -2,12 +2,20 @@
 	<el-dialog title="昵称列表" :visible="outerVisible" @close="btnCancel" width="60%">
 		<!-- 详情页面内容 -->
 		<!-- 表格 -->
-		<el-button @click="batchDelete" type="primary" :loading="deleteing">{{deleteing ? '删除中 ...' :'批量删除'}}</el-button>
-		<table-custom  height="700" :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
-			@handleSelectionChange="selectionChange"></table-custom>
+		<div style="margin-bottom:20px">
+			<el-select class="mr-36 video-select" style="width: 150px;margin-right: 10px;" v-model="searchForm.usage_count" placeholder="使用次数"	clearable>
+				<el-option v-for="item in fansOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+			</el-select>
+			<el-select class="mr-36 video-select" style="width: 150px;margin-right: 10px;" v-model="searchForm.sort" placeholder="次数排序"	clearable>
+				<el-option v-for="item in sortOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+			</el-select>
+			<el-button type="primary" size="medium" :loading="submitting" @click="searchTable">{{submitting? "搜索中 ...": "查看"}}</el-button>
+			<el-button type="primary" size="medium" @click="resetTable">重置</el-button>
+			<el-button @click="batchDelete" type="primary" size="medium" :loading="deleteing">{{deleteing? '删除中 ...':'批量删除'}}</el-button>
+		</div>
+		<table-custom height="500" :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns" @handleSelectionChange="selectionChange"></table-custom>
 		<!-- 分页 -->
-		<pagination :total="total" :page="nickNameData.page" :limit="nickNameData.limit" @pagination="pageChange">
-		</pagination>
+		<pagination :total="total" :page="nickNameData.page" :limit="nickNameData.limit" @pagination="pageChange"></pagination>
 		<!-- 编辑弹层 -->
 		<el-dialog width="30%" title="昵称编辑" :visible.sync="innerVisible" append-to-body @close="btnCancel2">
 			<el-form label-width="70px" :model="ruleForm" :rules="rules" ref="ruleForm">
@@ -22,7 +30,7 @@
 			</el-row>
 		</el-dialog>
 		<div slot="footer" class="dialog-footer">
-			<el-button  @click="btnCancel" size="medium">取 消</el-button>
+			<el-button @click="btnCancel" size="medium">取 消</el-button>
 		</div>
 	</el-dialog>
 </template>
@@ -53,7 +61,26 @@ export default {
 			}
 		};
 		return {
-			deleteing:false,
+			submitting: false,
+			searchForm: {
+				sort: '',  //排序
+				usage_count: '',  //次数
+			},
+			sortOptions: [
+				{ label: "升序", value: 'desc' },
+				{ label: "降序", value: 'asc' },
+			],
+			fansOptions: [
+				{ label: "0", value: 0 },
+				{ label: "1", value: 1 },
+				{ label: "2", value: 2 },
+				{ label: "3", value: 3 },
+				{ label: "4", value: 4 },
+				{ label: "5", value: 5 },
+				{ label: ">5", value: '>5' },
+				{ label: "全部", value: '100' },
+			],
+			deleteing: false,
 			innerVisible: false,
 			loading: false, // 表格-分页组件相关
 			tableData: [],
@@ -61,6 +88,11 @@ export default {
 				{
 					prop: 'nickname',
 					label: '昵称',
+					align: 'center',
+				},
+				{
+					prop: 'usage_count',
+					label: '使用次数',
 					align: 'center',
 				},
 				{
@@ -108,26 +140,43 @@ export default {
 				],
 			},
 			curNickName: '', // 点击当前编辑按钮的id
-			tableSelsectList:[],  //表格已选择数据
+			tableSelsectList: [],  //表格已选择数据
 		};
 	},
 	methods: {
-		// 批量删除
-		batchDelete(){
-			if(this.tableSelsectList.length>0){
-				let id = this.tableSelsectList.map((item) => {
-                        return item.nickname_id;
-                }).join(",");
-				this.deleteing=true
-				this.delBtn(id)
+		searchTable() {
+			let usage_count = ''
+			if(this.searchForm.usage_count=='100'){
+				usage_count=''
 			}else{
+				usage_count=this.searchForm.usage_count
+			}
+			this.getNickName({
+				page: 1,
+				limit: this.nickNameData.limit,
+				typecontrol_id: this.upParameter.typecontrol_id,
+				grouping_id: this.upParameter.grouping_id,
+				sort: this.searchForm.sort,
+				usage_count: usage_count,
+				order:'usage_count',
+			})
+		},
+		// 批量删除
+		batchDelete() {
+			if (this.tableSelsectList.length > 0) {
+				let id = this.tableSelsectList.map((item) => {
+					return item.nickname_id;
+				}).join(",");
+				this.deleteing = true
+				this.delBtn(id)
+			} else {
 				this.$message.warning('请选择需要删除的数据');
 
 			}
 		},
 		//选择框
 		selectionChange(val) {
-			this.tableSelsectList=val
+			this.tableSelsectList = val
 		},
 		// 获取昵称
 		async getNickName(data) {
@@ -174,14 +223,14 @@ export default {
 						nickname_ids: id,
 					},
 				});
-				this.deleteing=false
+				this.deleteing = false
 				if (res.status == 200) {
 					this.$message.success(res.msg);
 				} else {
 					this.$message.error(res.msg);
 				}
 			} catch (error) {
-				this.deleteing=false
+				this.deleteing = false
 				console.error(error);
 			}
 		},
@@ -217,8 +266,20 @@ export default {
 		},
 		// 点击取消按钮
 		btnCancel() {
+			this.searchForm= {
+				sort: '',  //排序
+				usage_count: '',  //次数
+			},
 			this.$emit('update:outerVisible', false);
 			this.$parent.searchNickName();
+		},
+		resetTable(){
+			this.searchForm= {
+				sort: '',  //排序
+				usage_count: '',  //次数
+			}
+			this.nickNameData.page=1
+			this.updatePageData()
 		},
 		// 点击编辑页面取消按钮
 		btnCancel2() {

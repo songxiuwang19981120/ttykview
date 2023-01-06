@@ -3,80 +3,83 @@
         <div class="tt-accsituation">
             <div class="tt-accsituation--operation">
                 <el-input class="blogger" size="medium" type="textarea" :rows="3" v-model="bloggerLink"
-                    placeholder="请输入博主主页链接（一行一个）,每条链接请求时间大概为20秒，请耐心等待"></el-input>
-                <el-button type="primary" size="medium" :loading="collectioning" @click="configureParameter">{{ collectioning ?
-        '采集参数中...' : '配置采集参数'
-}}</el-button>
+                    placeholder="请输入博主UID或主页链接（一行一个）,每条链接请求时间大概为20秒，请耐心等待"></el-input>
+                <el-button type="primary" size="medium" :loading="collectioning" @click="configureParameter">{{
+                    collectioning?'采集参数中...': '配置采集参数'
+                }}</el-button>
             </div>
-            <div class="tt-accsituation--operation">
+            <!-- <div class="tt-accsituation--operation">
                 <div>
-                    <!-- <span style="padding-right:10px;font-size:13px">昵称:</span> -->
-                    <el-input size="medium" v-model="searchData.nickname" placeholder="请输入昵称"
-                        style="width:140px;margin-right: 20px;"></el-input>
+                    <el-input size="medium" v-model="searchData.nickname" placeholder="请输入昵称" style="width:140px;margin-right: 20px;"></el-input>
                 </div>
                 <div>
-                    <!-- <span style="padding-right:10px;font-size:13px">uid:</span> -->
-                    <el-input size="medium" v-model="searchData.uid" placeholder="请输入uid"
-                        style="width:140px;margin-right: 20px;"></el-input>
+                    <el-input size="medium" v-model="searchData.uid" placeholder="请输入uid" style="width:140px;margin-right: 20px;"></el-input>
                 </div>
                 <div>
-                    <!-- <span style="padding-right:10px;font-size:13px">数据来源:</span> -->
                     <el-select size="medium" v-model="searchData.sources" placeholder="请选择数据来源"
                         style="width:140px;margin-right: 20px;">
-                        <el-option v-for="item in collectionContentlist" :key="item.value" :label="item.label"
-                            :value="item.value"></el-option>
+                        <el-option v-for="item in collectionContentlist" :key="item.value" :label="item.label" :value="item.value"></el-option>
                     </el-select>
-
                 </div>
                 <div>
-                    <!-- <span style="padding-right:10px;font-size:13px">数据标签:</span> -->
-                    <el-input size="medium" v-model="searchData.label" placeholder="请输入数据标签"
-                        style="width:140px;margin-right: 20px;"></el-input>
+                    <el-input size="medium" v-model="searchData.label" placeholder="请输入数据标签" style="width:140px;margin-right: 20px;"></el-input>
                 </div>
-                <el-button type="primary" size="medium" :loading="searching" @click="searchTable">{{ searching ? '查询中 ...' : '查 询'
-}}</el-button>
+                <el-button type="primary" size="medium" :loading="searching" @click="searchTable">{{searching? '查询中...' : '查 询'}}</el-button>
                 <el-button type="primary" size="medium" :loading="searching" @click="resetClick">重 置</el-button>
-            </div>
+            </div> -->
         </div>
         <el-dialog title="采集配置" :visible.sync="configureVisible" width="40%" :before-close="configureClose">
             <el-form ref="form" :rules="rules" :model="configureForm" label-width="140px">
                 <el-form-item label="任务名:" prop="task_name">
-                    <el-input size="medium" v-model="configureForm.task_name" placeholder="请输入任务名" style="width:60%"></el-input>
+                    <el-input size="medium" v-model="configureForm.task_name" placeholder="请输入任务名"
+                        style="width:60%"></el-input>
                 </el-form-item>
                 <el-form-item label="采集的数据标签:" prop="label">
-                    <el-input size="medium" v-model="configureForm.label" placeholder="请输入活动名称" style="width:60%"></el-input>
+                    <el-input size="medium" v-model="configureForm.label" placeholder="请输入活动名称"
+                        style="width:60%"></el-input>
                 </el-form-item>
                 <el-form-item label="采集内容:" prop="type_list">
                     <el-checkbox-group v-model="configureForm.type_list" size="medium">
-                        <el-checkbox v-for="(item, index) in collectionContentlist" :label="item.value" :key="index">{{item.label}}</el-checkbox>
+                        <el-checkbox v-for="(item, index) in collectionContentlist" :label="item.value" :key="index">{{
+                            item.label
+                        }}</el-checkbox>
                     </el-checkbox-group>
                 </el-form-item>
                 <el-form-item label="单博主采集上限:" prop="upper_limit">
-                    <el-input type="number" size="medium" placeholder="请输入采集上限" v-model="configureForm.upper_limit" min="0">
+                    <el-input type="number" size="medium" placeholder="请输入采集上限" v-model="configureForm.upper_limit"
+                        min="0">
                     </el-input>
-                    <!-- <el-input-number v-model="configureForm.upper_limit" :min="1"></el-input-number> -->
                 </el-form-item>
                 <el-form-item label="黑名单:">
                     <el-checkbox-group v-model="configureForm.black_list" size="medium">
                         <el-checkbox v-for="(item, index) in collectionBlacklistlist" :label="item.value"
-                            :key="index">{{
-        item.label
-}}</el-checkbox>
+                            :key="index">{{ item.label }}</el-checkbox>
                     </el-checkbox-group>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="configureClose" size="medium">取 消</el-button>
-                <el-button type="primary" size="medium" :loading="submitting" @click="submitForm">{{ submitting ? '提交中 ...' : '确 定'
-}}</el-button>
+                <el-button type="primary" size="medium" :loading="submitting" @click="submitForm">{{
+                    submitting? '提交中...'
+                        : '确 定'
+                }}</el-button>
             </span>
         </el-dialog>
         <div>
-            <table-custom  height="700" :loading="loading" :tableData="tableData" :columns="columns" :mutiSelect="true"
-                @handleSelectionChange="selectionChange"></table-custom>
+            <table-custom height="700" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
             <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination">
             </pagination>
         </div>
+
+        <el-dialog title="用户采集任务详情" :visible.sync="userDetailVisible" width="70%" :before-close="userDetailClose">
+            <table-custom height="700" :loading="detailLoading" :tableData="detailTableData" :columns="detailColumns"
+                :mutiSelect="true" @handleSelectionChange="detailSelectionChange"></table-custom>
+            <pagination :total="detailTotal" :page="detailCurrent_page" :limit="detailCurrent_limit"
+                @pagination="detailHandlePagination"></pagination>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="userDetailClose" size="medium">取 消</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -91,17 +94,13 @@ export default {
     },
     data() {
         return {
-            searchData: {
-                nickname: '',
-                uid: '',
-                sources: '',
-                label: '',
-            },
-            searching: false,
-            collectioning: false,
-            loading: false, //表格加载loading
-            tableData: [],  //表格数据
-            columns: [
+            userDetailVisible: false,
+            detailLoading: false,
+            detailTableData: [],
+            detailTotal: 0,
+            detailCurrent_page: 1,
+            detailCurrent_limit: 10,
+            detailColumns: [
                 {
                     prop: 'country',
                     label: '国家',
@@ -110,55 +109,49 @@ export default {
                     align: 'center',
                 },
                 {
-                    prop: 'uid',
-                    label: 'uid',
-                    minWidth: 200,
-                    fixed: true,
-                    align: 'center',
-                },
-                {
-                    prop: 'nickname',
-                    label: '昵称',
-                    minWidth: 160,
-                    align: 'center',
-                },
-                {
-                    prop: 'avatar_thumb',
-                    label: '头像',
-                    minWidth: 150,
-                    align: 'center',
-                    render: (h, { row }) => {
-                        let imgList = []
-                        imgList[0] = row.avatar_thumb
-                        return (
-                            <div>
-                                <el-image style="width: 50px; height: 50px" src={row.avatar_thumb} preview-src-list={imgList}></el-image>
-                            </div>
-                        );
-                    },
-                },
+					prop: "avatar_thumb",
+					label: "头像",
+					align: "left",
+					width: "200",
+					render: (h, { row }) => {
+						return (
+							<div style="display: flex;max-width: 260px">
+								<el-image
+									class="table-avatar mr-15"
+									src={row.avatar_thumb}
+									style="width: 50px; height: 50px; border-radius: 50%;margin-right: 16px"
+								></el-image>
+								<div>
+									<p style="font-size: 14px;">{row.nickname}</p>
+									<p style="font-size: 12px;">ID ：{row.uid}</p>
+								</div>
+							</div>
+						);
+					},
+				},
+               
                 {
                     prop: 'signature',
                     label: '签名',
-                    minWidth: 180,
+                    minWidth: 150,
                     align: 'center',
                 },
                 {
                     prop: 'sources',
                     label: '数据来源',
-                    minWidth: 180,
+                    minWidth: 150,
                     align: 'center',
                 },
                 {
                     prop: 'label',
                     label: '数据标签',
-                    minWidth: 180,
+                    minWidth: 150,
                     align: 'center',
                 },
                 {
                     prop: 'following_count',
                     label: '关注/粉丝/获赞',
-                    minWidth: 160,
+                    minWidth: 150,
                     align: 'center',
                     render: (h, { row }) => {
                         return (
@@ -177,29 +170,102 @@ export default {
                 {
                     prop: 'addtime',
                     label: '采集时间',
-                    minWidth: 180,
+                    minWidth: 150,
                     align: 'center',
+                },
+            ],  //详情表格
+            searchData: {
+                nickname: '',
+                uid: '',
+                sources: '',
+                label: '',
+            },
+            searching: false,
+            collectioning: false,
+            loading: false, //表格加载loading
+            tableData: [
+                {
+                    create_time: '2023-01-05 12:00'
+                }
+            ],  //表格数据
+            columns: [
+                {
+                    prop: "create_time",
+                    label: "创建时间",
+                    align: "center",
                 },
                 {
-                    prop: 'updata_time',
-                    label: '上次使用时间',
-                    minWidth: 180,
-                    align: 'center',
+                    prop: "task_name",
+                    label: "任务名称",
+                    align: "center",
                 },
-                // {
-                //     prop: 'status',
-                //     label: '操作',
-                //     width: 150,
-                //     fixed: 'right',
-                //     render: (h, { row }) => {
-                //         return (
-                //             <div>
-                //                 <a onClick={this.removeHandler.bind(this, row.id)}>编辑</a>
-                //             </div>
-                //         );
-                //     },
-                // },
-            ],  //表格
+                {
+                    prop: "status",
+                    label: "任务状态",
+                    align: "center",
+                    render: (h, { row }) => {
+                        return <div>{row.status == 0 ? "已完成" : "未完成"}</div>;
+                    },
+                },
+                {
+                    label: "任务进度",
+                    align: "center",
+                    render(h, { row }) {
+                        const { complete_num, fail_num } = row;
+                        let percent;
+                        if (Number(complete_num) + Number(fail_num) == 0) {
+                            percent = "0.00%";
+                        } else {
+                            percent =
+                                (
+                                    (Number(complete_num) /
+                                        (Number(complete_num) + Number(fail_num))) *
+                                    100
+                                ).toFixed(2) + "%";
+                        }
+                        return <div>{percent}</div>;
+                    },
+                },
+                {
+                    label: "操作",
+                    align: "center",
+                    render: (h, { row }) => {
+                        return (
+                            <div>
+                                <el-button
+                                    type="success"
+                                    size="mini"
+                                    onClick={this.toDetail.bind(this, row.tasklist_id)}
+                                >
+                                    查看详情
+                                </el-button>
+                                <el-button
+                                    type="warning"
+                                    size="mini"
+                                    onClick={this.suspend.bind(this, row.tasklist_id)}
+                                >
+                                    暂停
+                                </el-button>
+                                <el-popconfirm
+                                    confirm-button-text="删除"
+                                    cancel-button-text="取消"
+                                    title="确认删除该任务吗？"
+                                    onConfirm={this.delete.bind(this, row.tasklist_id)}
+                                >
+                                    <el-button
+                                        slot="reference"
+                                        type="danger"
+                                        size="mini"
+                                        style="margin-left: 10px;"
+                                    >
+                                        删除
+                                    </el-button>
+                                </el-popconfirm>
+                            </div>
+                        );
+                    },
+                },
+            ],
             total: 0,  //数据总量
             current_page: 1, //当前页
             current_limit: 10, //每页条数
@@ -251,43 +317,41 @@ export default {
                 },
             ],//黑名单
             submitting: false,  //配置采集参数提交确定
-            countryList: [
-                {
-                    value: '1',
-                    label: '中国'
-                },
-                {
-                    value: '2',
-                    label: '美国'
-                },
-                {
-                    value: '3',
-                    label: '英国'
-                },
-            ],  //国家
-            searchCountry: '',  //国家搜索
             allSearchList: [],
             userList: '',  //暂存搜索到的数据
         };
     },
 
     mounted() {
-        this.externalmemberIndex()
+        // this.externalmemberIndex()
 
     },
 
     methods: {
+        // 删除
+        delete() {
+            this.$message.success({ message: '删除成功' })
+        },
+        // 暂停/开始
+        suspend() {
+            this.$message.success({ message: '操作成功' })
+        },
+        // 查看详情
+        toDetail() {
+            this.userDetailVisible = true
+            this.externalmemberIndex()
+        },
         // 查询表格
         searchTable() {
-            this.current_page = 1;  //页数
+            this.detailCurrent_page = 1;  //页数
             this.searching = true
             this.externalmemberIndex()
         },
         // 获取表格数据
         async externalmemberIndex() {
             let data = {
-                limit: this.current_limit,
-                page: this.current_page,
+                limit: this.detailCurrent_limit,
+                page: this.detailCurrent_page,
                 uid: this.searchData.uid,
                 nickname: this.searchData.nickname,   //昵称
                 status: '',  //状态1-正常-封禁2-登出
@@ -296,18 +360,18 @@ export default {
                 if_collection: '', //1=未用，@=以用
             }
             try {
-                this.loading = true
+                this.detailLoading = true
                 let result = await this.$api({ type: "externalmemberIndex", data: data });
                 this.searching = false
-                this.loading = false
+                this.detailLoading = false
                 if (result.status == '200') {
-                    this.tableData = result.data.list
-                    this.total = result.data.count
+                    this.detailTableData = result.data.list
+                    this.detailTotal = result.data.count
                 } else {
                     this.$message.error({ message: result.msg })
                 }
             } catch (error) {
-                this.loading = false
+                this.detailLoading = false
                 this.searching = false
                 console.error(error);
             }
@@ -316,7 +380,7 @@ export default {
         /*
            获取表格已选择的数据
         */
-        selectionChange(val) {
+        detailSelectionChange(val) {
             console.log(val);
         },
         /*
@@ -364,25 +428,27 @@ export default {
             } else {
                 let listLink = []
                 this.bloggerLink.split('\n').forEach((item) => {
-                    if(item!=''){
-                        listLink.push(item)
+                    if (item != '') {
+                        listLink.push(item.replace(/(^\s*)|(\s*$)/g, ""))
                     }
                 });
                 this.$nextTick(() => {
-                    let type = 1
-                    listLink.forEach((item) => {
-                        if (item.indexOf('https://www.tiktok.com/@') == -1) {
-                            type = 2
-                            this.$message({ message: '请检查链接是否全部正确，以https://www.tiktok.com/@开头', type: 'warning' });
-                        }
-                    })
-                    this.$nextTick(() => {
-                        if (type == 1) {
-                            // this.getRestByKeys(listLink)
-                            this.allSearchList = []
-                            this.getRestByKeys(listLink)
-                        }
-                    });
+                    this.allSearchList = []
+                    this.getRestByKeys(listLink)
+                    // let type = 1
+                    // listLink.forEach((item) => {
+                    //     if (item.indexOf('https://www.tiktok.com/@') == -1) {
+                    //         type = 2
+                    //         this.$message({ message: '请检查链接是否全部正确，以https://www.tiktok.com/@开头', type: 'warning' });
+                    //     }
+                    // })
+                    // this.$nextTick(() => {
+                    //     if (type == 1) {
+                    //         this.getRestByKeys(listLink)
+                    //         this.allSearchList = []
+                    //         this.getRestByKeys(listLink)
+                    //     }
+                    // });
                 });
             }
         },
@@ -443,10 +509,9 @@ export default {
         /*
            翻页回调
         */
-        handlePagination(val) {
-            console.log(val);
-            this.current_page = val.page;  //页数
-            this.current_limit = val.limit  //条数
+        detailHandlePagination(val) {
+            this.detailCurrent_page = val.page;  //页数
+            this.detailCurrent_limit = val.limit  //条数
             this.externalmemberIndex()
         },
         // 重置表格
@@ -457,9 +522,21 @@ export default {
                 sources: '',
                 label: '',
             }
-            this.current_page = 1  //当前页
-            this.current_limit = 10 //每页条数
+            this.detailCurrent_page = 1  //当前页
+            this.detailCurrent_limit = 10 //每页条数
             this.externalmemberIndex()
+        },
+        userDetailClose() {
+            this.userDetailVisible = false;
+            this.detailTableData = [];
+            this.detailTotal = 0
+            this.detailCurrent_page = 1
+            this.detailCurrent_limit = 10
+        },
+        handlePagination(val) {
+            this.current_page = val.page;  //页数
+            this.current_limit = val.limit  //条数
+            // this.externalmemberIndex()
         },
     },
 };

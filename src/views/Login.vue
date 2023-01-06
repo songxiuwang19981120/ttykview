@@ -12,6 +12,7 @@
         >
           <el-form-item prop="username" label="输入用户名 ：">
             <el-input
+              clearable
               style="width: 70%"
               v-model="loginForm.username"
               placeholder="请输入用户名"
@@ -19,17 +20,20 @@
           </el-form-item>
           <el-form-item prop="password" label="输入密码 ：">
             <el-input
+              clearable
+              type="password"
               style="width: 70%"
               v-model="loginForm.password"
               placeholder="请输入密码"
             ></el-input>
           </el-form-item>
-          <el-form-item prop="authCode" label="输入验证码 ：">
+          <el-form-item prop="captcha" label="输入验证码 ：">
             <div class="login-authitem">
               <el-input
+                clearable
                 class="mr-15"
                 style="width: 40%"
-                v-model="loginForm.authCode"
+                v-model="loginForm.captcha"
                 placeholder="请输入验证码"
               ></el-input>
               <img
@@ -52,7 +56,7 @@
         </div>
 
         <div class="login-bottom">
-          <el-button @click="login" class="login-btn">登录</el-button>
+          <el-button @click="confrim" class="login-btn">登录</el-button>
         </div>
       </el-card>
     </div>
@@ -72,12 +76,12 @@ export default {
   },
   data() {
     return {
-      baseUrl: BASE_URL, // 基地址
+      baseUrl: BASE_URL, 
       rules: rules,
       loginForm: {
         username: "",
         password: "",
-        authCode: "",
+        captcha: "",
       },
     };
   },
@@ -85,17 +89,13 @@ export default {
   mounted() {},
 
   methods: {
-    async login() {
-      try {
-        this.$refs["loginForm"].validate((valid) => {
-          if (valid) {
-            console.log("登录", this.loginForm);
-          }
-        });
-      } catch (error) {
-        console.error(error)
-        this.$message.error('登陆失败')
-      }
+    async confrim() {
+      this.$refs["loginForm"].validate((valid) => {
+        if (valid) {
+          let data = this.loginForm
+          this.$store.dispatch("login", { data });
+        }
+      });
     },
   },
 };
