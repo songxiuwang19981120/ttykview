@@ -1,27 +1,27 @@
 export default {
     ASIDE_LIST: [
-        {
-            title: '首页',
-            to: '/index',
-            icon: 'el-icon-s-home',
-        },
-        {
-            title: '设备管理',
-            to: '',
-            icon: 'el-icon-mobile-phone',
-            children: [
-                {
-                    title: '设备情况',
-                    to: '/equsituation',
-                    icon: '',
-                },
-                // {
-                //     title: '账号分组',
-                //     to: '/equgroup',
-                //     icon: '',
-                // },
-            ]
-        },
+        // {
+        //     title: '首页',
+        //     to: '/index',
+        //     icon: 'el-icon-s-home',
+        // },
+        // {
+        //     title: '设备管理',
+        //     to: '',
+        //     icon: 'el-icon-mobile-phone',
+        //     children: [
+        //         {
+        //             title: '设备情况',
+        //             to: '/equsituation',
+        //             icon: '',
+        //         },
+        //         // {
+        //         //     title: '账号分组',
+        //         //     to: '/equgroup',
+        //         //     icon: '',
+        //         // },
+        //     ]
+        // },
         {
             title: '账号管理',
             to: '',

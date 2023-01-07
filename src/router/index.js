@@ -27,7 +27,7 @@ const routes = [
     path: '/',
     name: 'layout',
     component: () => import(/* webpackChunkName: "layout" */ '@/views/LayOut.vue'),
-    redirect: '/index',
+    redirect: '/accsituation',
     children: [
       {
         path: '/index',
