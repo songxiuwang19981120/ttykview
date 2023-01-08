@@ -14,7 +14,7 @@
             style="width: 60%"
             clearable
             v-model="accUpdateForm.grouping_id"
-            placeholder="选择分组"
+            :placeholder="groupTitle"
           >
             <el-option
               v-for="item in groupList"
@@ -32,7 +32,7 @@
             :props="{ checkStrictly: true, value: 'value' }"
             :options="typeList"
             v-model="accUpdateForm.typecontrol_id"
-            placeholder="选择分类"
+            :placeholder="typeTitle"
           ></el-cascader>
         </el-form-item>
 
@@ -88,7 +88,7 @@
           <el-upload
             ref="upload"
             class="avatar-uploader"
-            :action="actionUrl"
+            :action="`${BASE_URL}Base/upload`"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
@@ -158,7 +158,6 @@ export default {
   watch: {
     "accUpdateForm.grouping_id": {
       async handler(newVal) {
-        console.log(newVal);
         if (this.accUpdateForm.grouping_id === "") {
           this.typeList = [];
           this.accUpdateForm.typecontrol_id = "";
@@ -219,12 +218,18 @@ export default {
   },
 
   mounted() {
-    console.log(111111,this.accInfo);
     this.grouping_id = this.accInfo.grouping_name
     this.typecontrol_id = this.accInfo.type_title
     this.getGroupList();
   },
-
+  computed:{
+    groupTitle(){
+      return this.$parent.$data?.accInfo?.grouping_name || '暂无分组'
+    },
+    typeTitle(){
+      return this.$parent.$data?.accInfo?.type_title || '暂无分类'
+    }
+  },
   methods: {
     /*
             function: getTreeData

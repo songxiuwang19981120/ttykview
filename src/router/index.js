@@ -272,7 +272,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   NProgress.start()
-  if (to.path === '/login' || to.path === '/register') {
+   if (to.path === '/login' || to.path === '/register') {
     NProgress.done()
     return next()
   }
@@ -280,7 +280,7 @@ router.beforeEach((to, from, next) => {
   if (!token) {
     NProgress.done()
     return next('/login')
-  }
+  } 
   NProgress.done()
   next()
 })

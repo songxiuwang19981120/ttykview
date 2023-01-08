@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog :visible="shwoVideoTabel" :before-close="handlerClose">
+    <el-dialog width="80%" :visible="shwoVideoTabel" :before-close="handlerClose">
       <table-custom
         :loading="loading"
         :tableData="videoList"

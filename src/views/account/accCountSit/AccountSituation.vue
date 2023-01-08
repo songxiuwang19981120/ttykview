@@ -33,6 +33,7 @@
 
       <div class="mr-15">
         <el-select
+          
           size="medium"
           @change="setLocalFans"
           clearable
@@ -71,11 +72,21 @@
         @click="RestQuery"
         >重 置</el-button
       >
+<div class="ml-15">
+<span class="fz-14" style="color: rgba(16, 16, 16, 1);">开启回关：</span> 
+<el-switch
+  @click="toogleFollow"
+  style="width:30px;height:30px"
+  v-model="openFollow"
+  active-color="#ff4949"
+ >
+</el-switch>
+</div>
 
       <el-button
         type="primary"
         size="medium"
-        class="base-btn"
+        class="base-btn ml-15"
         style="width: 150px"
         @click="showBatchEditorDialog"
         >编辑选中账号信息</el-button
@@ -83,15 +94,37 @@
     </div>
 
     <div class="tt-accsituation-main">
-      <div
-        style="height: 35px; margin-bottom: 16px"
-        class="flex-jus-spacebet pad-0-20"
-      >
+      <div style="height: 35px; margin-bottom: 10px" class="flex-jus-spacebet pad-0-20">
+        
         <div class="flex-jus-spacebet">
-          <p class="mr-30 fz-14">共{{ total }}个账号</p>
-          <p class="mr-30 fz-14" style="color: #ff411f">
-            已选择{{ accTotal }}个账号
-          </p>
+          <div class="flex-jus-spacebet">
+            <p class="mr-30 fz-14">共{{ total }}个账号</p>
+            <p class="mr-30 fz-14" style="color: #ff411f">
+              已选择{{ accTotal }}个账号
+            </p>
+          </div>
+
+          <div class="height-20 ml-20">
+            <p class="fz-14">
+              总关注次数 ：{{ total_fans }}次&nbsp;&nbsp; 总粉丝量
+              ：{{ total_follow }}个
+            </p>
+          </div>
+
+          <div class="pad-0-20 flex ml-20">
+            <p v-show="startRefresh === true" class=" fz-14">
+              <span></span>
+              总刷新进度 ：{{ busThread }} / {{ subThread }}
+
+            </p>
+              <img
+                v-show="endRefresh === true"
+                class="sucess-icon ml-15"
+                src="../../../assets/sucess.png"
+                alt="成功"
+              />
+          </div>
+
         </div>
 
         <div style="width: 27%" class="flex-jus-spacebet">
@@ -139,26 +172,6 @@
         </div>
       </div>
 
-      <div class="pad-0-20 mb-10">
-        <p class="fz-14">
-          总关注次数 ：{{ total_fans }}次&nbsp;&nbsp;&nbsp;&nbsp; 总粉丝量 ：{{
-            total_follow
-          }}个
-        </p>
-      </div>
-
-      <div class="pad-0-20 flex height-26">
-        <p v-show="startRefresh === false" class="flex-center fz-14">
-          <span></span>
-          总刷新进度 ：{{ busThread }} / {{ subThread }}
-          <img
-            v-show="endRefresh === true"
-            class="sucess-icon ml-15"
-            src="../../../assets/sucess.png"
-            alt="成功"
-          />
-        </p>
-      </div>
       <keep-alive>
         <table-custom
           ref="multipleTable"
@@ -168,7 +181,7 @@
           :loading="loading"
           :tableData="memberList"
           :columns="columns"
-          height="580"
+          height="670"
         ></table-custom>
       </keep-alive>
     </div>
@@ -318,6 +331,7 @@ export default {
   },
   data() {
     return {
+      openFollow:false,
       total_fans: 0, //总关注次数
       total_follow: 0, //总粉丝量
       accInfo: {},
@@ -361,11 +375,12 @@ export default {
           prop: "avatar_thumb",
           label: "基础信息",
           align: "left",
-          width: "300",
+          width: "270",
           render: (h, { row }) => {
             return (
-              <div style="display: flex;align-items:center;min-width: 300px">
+              <div style="display: flex;align-items:center;min-width: 270px">
                 <a
+                  style="display: flex;align-items:center;"
                   target="three"
                   href={"https://www.tiktok.com/@" + row.unique_id}
                 >
@@ -374,7 +389,7 @@ export default {
                     scroll-container=".el-table__body-wrapper"
                     class="table-avatar mr-15"
                     src={row.avatar_thumb}
-                    style="width: 60px; height: 60px; border-radius: 50%;margin-right: 16px"
+                    style="width: 50px; height: 50px; border-radius: 50%;margin-right: 16px"
                   ></el-image>
                 </a>
                 <div>
@@ -422,10 +437,12 @@ export default {
           label: "个人简介",
           align: "center",
           render: (h, { row }) => {
+            let text
+            row.signature.length > 0 ? text = row.signature.substring(0, 10) + "..." : text = '暂无简介'
             return (
               <el-tooltip content={row.signature} placement="top">
                 <p style="font-size: 12px">
-                  {row.signature.substring(0, 10) + "..."}
+                  {text}
                 </p>
               </el-tooltip>
             );
@@ -613,13 +630,68 @@ export default {
   },
 
   methods: {
-    handleRefresh() {
-      if (this.batchEditorList.length === 0) {
-        this.$message.error("请选择需要刷新的账号");
+
+    /*
+        function: autoFollow
+        params: data | 需要传递给后端的数据
+        desc: 开启自动回关
+        return: 后端返回的结果
+    */
+    async autoFollow(data){
+      try {
+        let result = await this.$api({type:'',data})
+        return result
+      } catch (error) {
+        console.error(error);
+      }
+      
+    },
+
+
+    /*
+        function: toogleFollow
+        params: null
+        desc: 切换自动回关的回调
+    */
+    async toogleFollow(){
+      try {
+        if(this.openFollow === true) {
+          //let result = this.autoFollow()
+          this.$message.success('已开启自动回关')
+          return
+        }
+        this.$message.error('已关闭自动回关')
+      } catch (error) {
+        console.error(error);
+      }
+      
+    },
+
+
+    async refreshAcc(data){
+      try {
+        let result = await this.$api({type:'refreshAcc',data})
+        return result
+      } catch (error) {
+        console.error(error);
+      }
+      
+    },
+
+    async handleRefresh() {
+      if (this.classiFication.length === 0 || this.group === "") {
+        this.$message.error("请选择需要刷新的分组与分类");
         return false;
       }
       this.startRefresh = true;
-      console.log(this.member_ids);
+      store.set('startRefresh',true)
+      console.log(this.classiFication[this.classiFication.length - 1]);
+      let data = {
+        grouping_id:this.group,
+        typecontrol_id:this.classiFication[this.classiFication.length - 1]
+      }
+      let result = await this.refreshAcc(data)
+      console.log(result);
     },
 
     updateProgress() {
@@ -668,10 +740,12 @@ export default {
     async initInterface() {
       this.page = store.get("page") ?? 1;
       this.limit = store.get("limit") ?? 20;
+      let isRefreshEnd = store.get('startRefresh') ?? false
       let group = store.get("group") ?? "";
       let typecontrol_id = store.get("typecontrol_id") ?? "";
       let fans = store.get("fans") ?? "";
       this.handleCurrentChange(this.page);
+      isRefreshEnd === true ? this.startRefresh = true : this.startRefresh = false
       if (group !== "" && typecontrol_id !== "") {
         this.isSearch = true;
         this.total_fans = store.get("total_fans") ?? 0;
@@ -688,7 +762,7 @@ export default {
         this.max = fans[1] ?? "";
       }
       this.group = group;
-      this.classiFication = typecontrol_id;
+      this.classiFication.push(typecontrol_id);
       let data = {
         min: this.min ?? "",
         max: this.max ?? "",
@@ -843,11 +917,10 @@ export default {
         desc: 打开相应操作界面
     */
     setOperation(row, e) {
+      this.accInfo = row;
       if (e === "") {
         return false;
       }
-      let editorDialog = this.$refs["editor"];
-      console.log(editorDialog.$refs["editorDialog"]);
       this.acc_id = row.uid;
       this[this.operationMap[e]](row) && this[this.operationMap[e]](row);
     },
@@ -979,7 +1052,9 @@ export default {
       this.fans = "";
       this.searchForm.grouping_id = "";
       this.group = "";
-      (this.sortQuery = ""), (this.sortWay = ""), (this.limit = 20);
+      this.sortQuery = "";
+      this.sortWay = "";
+      this.limit = 20;
       this.page = 1;
       this.total_fans = 0;
       this.total_follow = 0;
@@ -1173,7 +1248,12 @@ export default {
         desc: 关闭编辑弹窗
     */
     closeEditorDialog() {
+      let tabel = this.$refs["multipleTable"];
+
+      console.log(tabel.$refs["tableOperation"].$data["operation"]);
+      tabel.$refs["tableOperation"].$data.operation = "";
       this.showEditorDialog = false;
+      this.accInfo = {};
     },
 
     /* 
@@ -1338,7 +1418,7 @@ export default {
   display: flex;
   align-items: center;
   padding: 0 20px;
-  margin-bottom: 10px;
+
   width: 100%;
   height: 60px;
 }
@@ -1389,8 +1469,8 @@ export default {
   align-items: center;
 }
 
-.height-26 {
-  height: 26px;
+.height-20 {
+  height: 20px;
 }
 
 .pad-0-20 {
@@ -1403,6 +1483,10 @@ export default {
 
 .ml-15 {
   margin-left: 15px;
+}
+
+.ml-20 {
+  margin-left: 20px;
 }
 
 .mr-15 {
@@ -1451,7 +1535,7 @@ export default {
 }
 
 .tt-accsituation-main {
-  padding-top: 30px;
+  padding-top: 20px;
   background-color: #fff;
 }
 
@@ -1484,5 +1568,9 @@ export default {
 .sucess-icon {
   height: 24px;
   width: 24px;
+}
+
+::v-deep .el-table__cell {
+  padding: 6px 0;
 }
 </style>

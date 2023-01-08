@@ -50,7 +50,7 @@ export default {
 
 .tt-header--wrap {
   z-index: 9
-  height: 70px !important;
+  height: 56px !important;
   padding: 10px 20px 10px;
   box-shadow: 7px 6px 15px #c1c1c9
 }

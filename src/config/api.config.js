@@ -607,6 +607,20 @@ export default {
     method: 'POST'
   },
 
+  'pushFollowTask':{  //发布关注任务
+    url:'/Push/follow',
+    method:'POST'
+  },
+
+  'getFollowTaskFilterUser':{ //获取关注页面筛选后的账号
+    url:'/Push/screen_follow',
+    method:'GET'
+  },
+
+  'refreshAcc':{    //刷新账号
+    url:"/Member/refresh_update",
+    method:'POST'
+  },
 
   //Apiusergroup  API start
   'getApiusergroup': {
