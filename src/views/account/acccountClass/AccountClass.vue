@@ -147,49 +147,50 @@
 
       <!-- 确认删除 -->
       <el-dialog
- :title="'确认删除'+'-'+deleteclass.label+'-'+'分类?'"
+ title="提示"
   :visible.sync="centerdeleteDialogVisible"
   width="20%"
   >
-  <div style="margin-left:30%"></div>
+  <div><i style="color: #E01C28;margin-right: 5px;" class="el-icon-info"></i>此操作将永久删除分类"{{deleteclass.label}}", 是否继续?</div>
   <span slot="footer" class="dialog-footer">
-    <el-button @click="centerdeleteDialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="removeHandlerOK()">确 定</el-button>
+    <el-button size="medium" @click="centerdeleteDialogVisible = false">取 消</el-button>
+    <el-button type="primary" size="medium" @click="removeHandlerOK()">确 定</el-button>
   </span>
 </el-dialog>
       <!-- 确认删除 -->
       <el-dialog
- :title="'确认删除'+'-'+deleteclass.label+'-'+'分类?'"
+      title="提示"
   :visible.sync="centerdeleteDialogVisible1"
   width="20%">
-  <div style="margin-left:30%"></div>
+  <div><i style="color: #E01C28;margin-right: 5px;" class="el-icon-info"></i>此操作将永久删除分类"{{deleteclass.label}}", 是否继续?</div>
   <span slot="footer" class="dialog-footer">
     <el-button @click="centerdeleteDialogVisible1 = false">取 消</el-button>
     <el-button type="primary" @click="removeHandlerOK2()">确 定</el-button>
   </span>
 </el-dialog>
-      <!-- 确认删除 -->
+    
       <el-dialog
- :title="'确认删除'+'-'+deleteclass.label+'-'+'分类?'"
+      title="提示"
   :visible.sync="centerdeleteDialogVisible2"
   width="20%">
-  <div style="margin-left:30%"></div>
+  <div><i style="color: #E01C28;margin-right: 5px;" class="el-icon-info"></i>此操作将永久删除分类"{{deleteclass.label}}", 是否继续?</div>
   <span slot="footer" class="dialog-footer">
     <el-button @click="centerdeleteDialogVisible2 = false">取 消</el-button>
     <el-button type="primary" @click="removeHandlerOK3()">确 定</el-button>
   </span>
 </el-dialog>
-      <!-- 确认删除 -->
+    
       <el-dialog
- :title="'确认删除'+'-'+deleteclass.label+'-'+'分类?'"
+      title="提示"
   :visible.sync="centerdeleteDialogVisible3"
   width="20%">
-  <div style="margin-left:30%"></div>
+  <div><i style="color: #E01C28;margin-right: 5px;" class="el-icon-info"></i>此操作将永久删除分类"{{deleteclass.label}}", 是否继续?</div>
   <span slot="footer" class="dialog-footer">
     <el-button @click="centerdeleteDialogVisible3 = false">取 消</el-button>
     <el-button type="primary" @click="removeHandlerOK4()">确 定</el-button>
   </span>
 </el-dialog>
+    
     <!-- 分页 -->
     <!-- <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination">
     </pagination> -->
