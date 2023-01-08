@@ -35,7 +35,7 @@
 import tableCustom from '@/components/myComponent/table/tableCustom.vue';
 import VideoReleaseDialogComponent from './component/VideoReleaseDialogComponent.vue';
 import pagination from '@/components/myComponent/table/pagination.vue';
-import VideoTaskDialog from '@/views/account/accCountSit/taskDialog/videoDialog.vue';
+import VideoTaskDialog from './component/videoDialog.vue';
 import detail from './component/detail.vue'
 export default {
 	name: 'TtVideoRelease',
