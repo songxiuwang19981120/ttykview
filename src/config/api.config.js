@@ -492,7 +492,7 @@ export default {
     method: 'POST'
   },
   'pushCommentTask': {  //用户评论点赞任务
-    url: 'Push/commentDigg',
+    url: 'Push/comment_digg',
     method: 'POST'
   },
 
@@ -658,6 +658,19 @@ export default {
     method: 'POST',
   },
   //Apiuser  API end
+
+  'commentlistscreenCommentDigg': {
+    url: '/push/screen_comment_digg',
+    method: 'GET',
+  },
+  'tasklistDelete': {
+    url: '/Tasklist/delete',
+    method: 'POST',
+  },
+  'tasklistPause': {
+    url: '/Tasklist/pause',
+    method: 'POST',
+  },
 }
 
 

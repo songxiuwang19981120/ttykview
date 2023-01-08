@@ -30,6 +30,7 @@ export default {
 	},
 	data() {
 		return {
+			task_id: '',
 			journalLoading: false,
 			journaltableData: [],
 			journalColumns: [
@@ -171,7 +172,7 @@ export default {
 				{
 					label: "操作",
 					align: "center",
-					width:'150',
+					width: '150',
 					fixed: 'right',
 					render: (h, { row }) => {
 						return (
@@ -226,17 +227,20 @@ export default {
 		// 获取数据
 		getTaskListDetail(id) {
 			console.log(id);
-			this.tableData = [
-				{
-					id: 1,
-					status: 0,
-					img: 'http://192.168.4.30/uploads/uploadfiles/202212/63abccf6d52b5.jpg',
-					task_type: '1',
-					create_time: '2023 01-03 01:00:00',
-					nickname: 'aaaaaa',
-					uid: '7171638067815220230',
-				}
-			]
+			this.task_id = id
+			this.viewCommenList()
+		},
+		// 获取详情数据
+		async viewCommenList() {
+			let data = {
+				comment_list_id: this.task_id
+			}
+			try {
+				let result = await this.$api({ type: "viewCommenList", data });
+				console.log(result);
+			} catch (error) {
+				console.error(error);
+			}
 
 		},
 		// 当前页数据条数/页码改变

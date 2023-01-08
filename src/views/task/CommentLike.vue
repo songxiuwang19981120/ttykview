@@ -3,17 +3,18 @@
     <div class="tt-accsituation">
       <div class="tt-accsituation--operation">
         <div style="margin-right: 20px">
-          <el-select v-model="page.status" placeholder="请选择任务状态" size="medium">
+          <el-select v-model="searchData.status" placeholder="请选择任务状态" size="medium">
             <el-option v-for="item in searchStateList" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
-          <el-date-picker size="medium" class="date-picker" v-model="date" type="daterange" align="right" unlink-panels
-            range-separator="——" start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="pickerOptions">
+          <el-date-picker size="medium" class="date-picker" v-model="searchData.date" type="daterange" align="right"
+            unlink-panels range-separator="——" start-placeholder="开始日期" end-placeholder="结束日期"
+            :picker-options="pickerOptions">
           </el-date-picker>
         </div>
         <el-button size="medium" type="primary" class="seachbut" :loading="btnloading" @click="searchTasks">{{
-    btnloading ? "加载中..." : "搜索"
-}}</el-button>
+          btnloading? "加载中...": "搜索"
+        }}</el-button>
         <el-button type="primary" size="medium" class="seachbut" @click="btnReset">重置</el-button>
         <el-button type="primary" size="medium" class="seachbut" @click="showLikeCommentDialog">点赞任务</el-button>
         <!-- <i class="el-icon-refresh-left"></i> -->
@@ -22,10 +23,12 @@
     <!-- 表格 -->
     <table-custom :loading="loading" :tableData="tableData" :columns="columns" height="700"></table-custom>
     <!-- 分页 -->
-    <pagination :total="total" :page="page.page" :limit="page.limit" @pagination="pageChange"></pagination>
+    <pagination :total="total" :page="page" :limit="limit" @pagination="pageChange"></pagination>
     <!-- 弹层 -->
-    <commentLikeDetail ref="taskDialog" @closeTaskDetail="closeTaskDetail" :showTaskDetail="showTaskDetail" :tableData="tableData"></commentLikeDetail>
-    <newCommentLike ref="likecommment" @closeLikeCommentTask="closeLikeCommentTask" :showLikeCommentTask="showLikeCommentTask" />
+    <commentLikeDetail ref="taskDialog" @closeTaskDetail="closeTaskDetail" :showTaskDetail="showTaskDetail"
+      :tableData="tableData"></commentLikeDetail>
+    <newCommentLike ref="likecommment" @closeLikeCommentTask="closeLikeCommentTask"
+      :showLikeCommentTask="showLikeCommentTask" />
   </div>
 </template>
 <script>
@@ -43,7 +46,6 @@ export default {
   },
   data() {
     return {
-      date: '',
       showTaskDetail: false,
       showLikeCommentTask: false,
       // 下拉选择数据
@@ -123,7 +125,7 @@ export default {
                   confirm-button-text="删除"
                   cancel-button-text="取消"
                   title="确认删除该任务吗？"
-                  onConfirm={this.delete.bind(this, row.subjectcontent_id)}
+                  onConfirm={this.delete.bind(this, row.tasklist_id)}
                 >
                   <el-button slot="reference" type="danger" size="mini">
                     删除
@@ -135,11 +137,12 @@ export default {
         },
       ],
       dialog: false, // 弹层
-      page: {
-        page: 1,
-        limit: 10,
+      page: 1,
+      limit: 10,
+      searchData: {
         task_type: "CommentDigg",
         status: "",
+        date: '',
       },
       total: 0,
       curId: null,
@@ -181,24 +184,63 @@ export default {
   },
 
   mounted() {
-    this.getVideoTasks(this.page);
+    this.getVideoTasks();
   },
 
   methods: {
-    delete(id) {
-      this.$message.success('删除成功');
-
+    // 删除
+    async delete(id) {
+      let data = {
+        tasklist_ids: id
+      }
+      try {
+        const res = await this.$api({
+          type: "tasklistDelete",
+          data,
+        });
+        if (res.status == 200) {
+          this.$message.success(res.msg);
+          this.getVideoTasks()
+        } else {
+          this.$message.error(res.msg);
+        }
+      } catch (error) {
+        console.error(error);
+      }
     },
     // 暂停
-    suspend(id) {
-      this.$message.success('操作成功');
+    async suspend(id) {
+      let data = {
+        tasklist_id: id
+      }
+      try {
+        const res = await this.$api({
+          type: "tasklistPause",
+          data,
+        });
+        if (res.status == 200) {
+          this.$message.success(res.msg);
+          this.getVideoTasks()
+        } else {
+          this.$message.error(res.msg);
+        }
+      } catch (error) {
+        console.error(error);
+      }
     },
     // 隐藏评论点赞任务详情
     closeTaskDetail() {
       this.showTaskDetail = false
     },
     // 获取评论区点赞任务列表
-    async getVideoTasks(data) {
+    async getVideoTasks() {
+      let data = {
+        page: this.page,
+        limit: this.limit,
+        task_type: this.searchData.task_type,
+        status: this.searchData.status,
+        // date: this.searchData.date,
+      }
       try {
         this.loading = true;
         const res = await this.$api({
@@ -226,25 +268,23 @@ export default {
     },
     // 当前页数据条数/页码改变
     pageChange(obj) {
-      this.page.page = obj.page
-      this.page.limit = obj.limit;
-      this.getVideoTasks(this.page);
+      this.page = obj.page
+      this.limit = obj.limit;
+      this.getVideoTasks();
     },
     // 点击查询按钮
     searchTasks() {
       this.btnloading = true;
-      this.page.page = 1;
-      this.getVideoTasks(this.page);
+      this.page = 1;
+      this.getVideoTasks();
     },
     // 点击重置按钮
     btnReset() {
-      this.page = {
-        page: 1,
-        limit: 10,
-        task_type: "CommentDigg",
-        status: "",
-      };
-      this.getVideoTasks(this.page);
+      this.page = 1
+      this.limit = 10
+      this.searchData.status = ""
+      this.searchData.date = ""
+      this.getVideoTasks();
     },
     /* 
         function: closeLikeCommentTask
