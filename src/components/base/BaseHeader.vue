@@ -2,7 +2,7 @@
   <div class="tt-header">
     <div>
       <i :class="curIcon"></i>
-      <span style="font-size: 20px; font-weight: 700;">{{ curTitle }}</span>
+      <span class="fz-20">{{ curTitle }}</span>
     </div>
     <div class="tt-header--login">
       <i class="el-icon-bell fz-20"></i>
@@ -74,7 +74,7 @@ export default {
   font-size 14px
 
 .fz-20
-  font-size 22px
+  font-size 20px
 
 .ml-12 
   margin-left 12px

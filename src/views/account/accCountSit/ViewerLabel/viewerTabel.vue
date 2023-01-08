@@ -139,7 +139,7 @@ export default {
     },
 
     handleClose() {
-      this.$emit("toogleViewerTabel");
+      this.$emit("closeViewerTabel");
     },
 
     async handleFollow(val) {

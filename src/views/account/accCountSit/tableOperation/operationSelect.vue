@@ -28,10 +28,10 @@ export default {
           value: "删除",
           label: "删除",
         },
-        {
+/*         {
           value: "分析",
           label: "分析",
-        },
+        }, */
         {
           value: "发布视频",
           label: "发布视频",
@@ -45,7 +45,6 @@ export default {
   methods: {
     hanldChange(operation) {
       this.$emit("setOperation", operation);
-      console.log(this.operation);
     },
   },
 };

@@ -64,12 +64,16 @@
         @click="handlerSearch"
         >搜 索</el-button
       >
-      <el-button type="primary" size="medium" class="base-btn search-btn" @click="RestQuery"
+      <el-button
+        type="primary"
+        size="medium"
+        class="base-btn search-btn"
+        @click="RestQuery"
         >重 置</el-button
       >
 
       <el-button
-      type="primary"
+        type="primary"
         size="medium"
         class="base-btn"
         style="width: 150px"
@@ -122,26 +126,50 @@
             >
             </el-option>
           </el-select>
-          <el-button size="medium" type="primary" class="ml-15" @click="handleSort"
+          <el-button
+            size="medium"
+            type="primary"
+            class="ml-15"
+            @click="handleSort"
             >查 看</el-button
           >
-          <el-button size="medium" type="primary">刷新账号</el-button>
+          <el-button @click="handleRefresh" size="medium" type="primary"
+            >刷新账号</el-button
+          >
         </div>
       </div>
-      <div class="pad-0-20">
-        <p class="fz-14 ">总关注次数 ：{{total_fans}}次&nbsp;&nbsp;&nbsp;&nbsp;  总粉丝量 ：{{total_follow}}个</p>
+
+      <div class="pad-0-20 mb-10">
+        <p class="fz-14">
+          总关注次数 ：{{ total_fans }}次&nbsp;&nbsp;&nbsp;&nbsp; 总粉丝量 ：{{
+            total_follow
+          }}个
+        </p>
+      </div>
+
+      <div class="pad-0-20 flex height-26">
+        <p v-show="startRefresh === false" class="flex-center fz-14">
+          <span></span>
+          总刷新进度 ：{{ busThread }} / {{ subThread }}
+          <img
+            v-show="endRefresh === true"
+            class="sucess-icon ml-15"
+            src="../../../assets/sucess.png"
+            alt="成功"
+          />
+        </p>
       </div>
       <keep-alive>
-      <table-custom
-        ref="multipleTable"
-        class="tt-accsituation--tabel"
-        :mutiSelect="true"
-        @handleSelectionChange="handleSelectChange"
-        :loading="loading"
-        :tableData="memberList"
-        :columns="columns"
-        height="640"
-      ></table-custom>
+        <table-custom
+          ref="multipleTable"
+          class="tt-accsituation--tabel"
+          :mutiSelect="true"
+          @handleSelectionChange="handleSelectChange"
+          :loading="loading"
+          :tableData="memberList"
+          :columns="columns"
+          height="580"
+        ></table-custom>
       </keep-alive>
     </div>
 
@@ -160,6 +188,7 @@
     />
 
     <EditorDialog
+      ref="editor"
       @closeEditorDialog="closeEditorDialog"
       @updateMemberList="updateMemberList"
       :showEditorDialog="showEditorDialog"
@@ -180,7 +209,7 @@
 
     <ViewerTabel
       @updateVisitorList="updateVisitorList(arguments)"
-      @toogleViewerTabel="toogleViewerTabel"
+      @closeViewerTabel="closeViewerTabel"
       :showViewerTabel="showViewerTabel"
       :vistList="vistList"
       :member_id="member_id"
@@ -200,6 +229,7 @@
     <ReleaseVideoDialog
       :showReleaseVideoDialog="showReleaseVideoDialog"
       @closeReleaseVideoDialog="closeReleaseVideoDialog"
+      :acc_id="acc_id"
     />
   </div>
 </template>
@@ -248,7 +278,6 @@ export default {
     },
   },
   watch: {
-
     page(newVal) {
       store.set("page", newVal);
     },
@@ -257,13 +286,22 @@ export default {
       store.set("limit", newVal);
     },
 
+    classiFication(newVal) {
+      if (newVal === "") {
+        this.checkType = false;
+      }
+      this.checkType = true;
+    },
+
     async group(newVal) {
       if (this.group === "") {
-        this.typeList = []
-        this.classiFication = []
-        store.set('typecontrol_id','')
+        this.checkGroup = false;
+        this.typeList = [];
+        this.classiFication = [];
+        store.set("typecontrol_id", "");
         return false;
       }
+      this.checkGroup = true;
       let arr = Object.entries(this.groupList).find((item) => {
         return item?.[1]?.grouping_id === newVal;
       });
@@ -280,9 +318,9 @@ export default {
   },
   data() {
     return {
-      total_fans:0, //总关注次数
-      total_follow:0, //总粉丝量
-      accInfo:{},
+      total_fans: 0, //总关注次数
+      total_follow: 0, //总粉丝量
+      accInfo: {},
       accUid: "", //账号UID
       showConfrimDel: false,
       showReleaseVideoDialog: false, //控制发布视频dialog展示
@@ -326,13 +364,14 @@ export default {
           width: "300",
           render: (h, { row }) => {
             return (
-              <div style="display: flex;min-width: 300px">
+              <div style="display: flex;align-items:center;min-width: 300px">
                 <a
                   target="three"
                   href={"https://www.tiktok.com/@" + row.unique_id}
                 >
                   <el-image
                     lazy
+                    scroll-container=".el-table__body-wrapper"
                     class="table-avatar mr-15"
                     src={row.avatar_thumb}
                     style="width: 60px; height: 60px; border-radius: 50%;margin-right: 16px"
@@ -343,17 +382,17 @@ export default {
                   <p style="font-size: 12px">UID ：{row.uid}</p>
                   <el-tooltip content="Top center" placement="right-start">
                     <div slot="content">
-                      账号归属：
+                      账号分组：{row?.grouping_name || "账号暂无分组"}
                       <br />
-                      设备分类：
+                      账号分类：{row?.type_title || "账号暂无分类"}
                       <br />
-                      设备编号：
+                      设备分类：{row?.phone_number || "暂无设备分类"}
                       <br />
-                      备份名称：
+                      设备编号：{row?.backups_name || "暂无设备编号"}
                       <br />
                     </div>
-                    <span style="display: inline-block; background-color: #FFDDA5; font-size:12px; border-radius: 4px">
-                      设备信息
+                    <span style="cursor: pointer;display: inline-block; background-color: #FFDDA5; font-size:12px; border-radius: 4px">
+                      账号信息
                     </span>
                   </el-tooltip>
                 </div>
@@ -415,7 +454,7 @@ export default {
           width: "120",
           render: (h, { row }) => {
             let colorRed = "";
-            if (this.sortQuery == 1) {
+            if (this.sortQuery == "unread_viewer_count") {
               colorRed = ";color:red";
             } else {
               colorRed = "";
@@ -423,7 +462,7 @@ export default {
             return (
               <span
                 style={"font-size: 12px" + colorRed}
-                onClick={this.toogleViewerTabel.bind(this, row)}
+                onClick={this.showviewerTabel.bind(this, row)}
               >
                 {row.unread_viewer_count}
               </span>
@@ -436,7 +475,7 @@ export default {
           align: "center",
           render: (h, { row }) => {
             let colorRed = "";
-            if (this.sortQuery == 2) {
+            if (this.sortQuery == "following_count") {
               colorRed = ";color:red";
             } else {
               colorRed = "";
@@ -454,7 +493,7 @@ export default {
           align: "center",
           render: (h, { row }) => {
             let colorRed = "";
-            if (this.sortQuery === "0") {
+            if (this.sortQuery === "follower_status") {
               colorRed = ";color:red";
             } else {
               colorRed = "";
@@ -472,7 +511,7 @@ export default {
           align: "center",
           render: (h, { row }) => {
             let colorRed = "";
-            if (this.sortQuery == 3) {
+            if (this.sortQuery == "total_favorited") {
               colorRed = ";color:red";
             } else {
               colorRed = "";
@@ -490,7 +529,12 @@ export default {
           width: "150",
           align: "center",
           render: (h, { row }) => {
-            return <span style="font-size: 12px">{row.play_num} / 0 / 0</span>;
+            return (
+              <span style="font-size: 12px">
+                {row?.play_count || 0} / {row?.collect_count || 0} /{" "}
+                {row?.share_count || 0}
+              </span>
+            );
           },
         },
         {
@@ -510,7 +554,7 @@ export default {
               </div>
             );
           },
-/*                            <el-image
+          /*                            <el-image
                   style="width: 40px;height: 30px"
                   src={require("../../../assets/video.png")}
                   onClick={this.handleMonitor.bind(this, row)}
@@ -552,30 +596,55 @@ export default {
       operationMap: operationMap, //表格下拉框相应
       min: "",
       max: "",
-      typeText:""
+      typeText: "",
+      subThread: 0, //当前刷新了多少
+      busThread: 0, //总共需要刷新多少
+      startRefresh: false, //刷新账号任务开始
+      endRefresh: false, //刷新账号任务结束
+      checkGroup: false, //是否选择了分组
+      checkType: false, //是否选择了分类
+      isSearch: false, //选择分组分类之后是否搜索
     };
   },
 
   mounted() {
-
     this.getGroupList();
     this.initInterface();
   },
 
   methods: {
-
-    handleCurrentChange(currentPage){
-      this.page = currentPage
+    handleRefresh() {
+      if (this.batchEditorList.length === 0) {
+        this.$message.error("请选择需要刷新的账号");
+        return false;
+      }
+      this.startRefresh = true;
+      console.log(this.member_ids);
     },
+
+    updateProgress() {
+      let update = setInterval(() => {
+        if (this.subThread === this.busThread) {
+          clearInterval(update);
+          return false;
+        }
+        this.$api();
+      }, 3000);
+    },
+
+    handleCurrentChange(currentPage) {
+      this.page = currentPage;
+    },
+
     /*
-            function: getTreeData
-            params: data | 需要进行递归处理的数组
-            desc: 递归函数，对数组进行处理，设置dhilren长度为0的字段为undefined
-            return: 处理后的数据
-        */
+        function: getTreeData
+        params: data | 需要进行递归处理的数组
+        desc: 递归函数，对数组进行处理，设置dhilren长度为0的字段为undefined
+        return: 处理后的数据
+    */
     getTreeData(data) {
-      if(!data){
-        return false
+      if (!data) {
+        return false;
       }
       data.forEach((item) => {
         if (!item.children.length) {
@@ -602,15 +671,19 @@ export default {
       let group = store.get("group") ?? "";
       let typecontrol_id = store.get("typecontrol_id") ?? "";
       let fans = store.get("fans") ?? "";
-      this.total_fans = store.get('total_fans') ?? 0
-      this.total_follow = store.get('total_follow') ?? 0
-      this.fo
-      this.handleCurrentChange(this.page)
+      this.handleCurrentChange(this.page);
+      if (group !== "" && typecontrol_id !== "") {
+        this.isSearch = true;
+        this.total_fans = store.get("total_fans") ?? 0;
+        this.total_follow = store.get("total_follow") ?? 0;
+      }
       if (fans !== "") {
         this.fans = fans;
-        fans = Object.entries(this.fansMap).find((item) => {
-          return item[1] == fans;
-        })[0].split(",");
+        fans = Object.entries(this.fansMap)
+          .find((item) => {
+            return item[1] == fans;
+          })[0]
+          .split(",");
         this.min = fans[0] ?? "";
         this.max = fans[1] ?? "";
       }
@@ -627,13 +700,12 @@ export default {
       let result = await this.getMemberList(data);
     },
 
-
     /* 
         function: setGroupText
         params: grouping_id
         desc: 存储分组input text
     */
-    setGroupText(grouping_id){
+    setGroupText(grouping_id) {
       let arr = Object.entries(this.groupList).find((item) => {
         return item?.[1]?.grouping_id === grouping_id;
       });
@@ -645,11 +717,11 @@ export default {
         params: typecontrol_id
         desc: 存储分类input text
     */
-    setTypeText(typecontrol_id){
+    setTypeText(typecontrol_id) {
       let arr = Object.entries(this.typeList).find((item) => {
         return item?.[1]?.typecontrol_id === typecontrol_id;
       });
-      this.typeText = arr?.[1]?.label
+      this.typeText = arr?.[1]?.label;
     },
 
     /* 
@@ -658,10 +730,10 @@ export default {
         desc: 本地存储 group 字段（分组）
     */
     setLocalGroup() {
-      this.setGroupText(this.group)
+      this.isSearch = false;
+      this.setGroupText(this.group);
       store.set("group", this.group);
-      store.set("groupText",this.groupString)
-
+      store.set("groupText", this.groupString);
     },
 
     /* 
@@ -680,10 +752,11 @@ export default {
         desc: 本地存储 typecontrol_id 字段（分类）同时获取分类input文本
     */
     setLocalType() {
+      this.isSearch = false;
       let typecontrol_id = this.formatTypeId(this.classiFication);
-      this.setTypeText(typecontrol_id)
+      this.setTypeText(typecontrol_id);
       store.set("typecontrol_id", typecontrol_id);
-      store.set('typeText',this.typeText)
+      store.set("typeText", this.typeText);
     },
 
     /* 
@@ -694,46 +767,49 @@ export default {
     async handleSort() {
       try {
         if (this.sortQuery === "" || this.sortWay === "") {
-          this.$message.error("排序字段或排序方式未选");
-          return;
+          this.$message.error("请选择排序字段和排序方式");
+          return false;
         }
         let typecontrol_id = this.formatTypeId(this.classiFication);
         let data = {
+          uid: this.acc_id,
           typecontrol_id: typecontrol_id ?? "",
           grouping_id: this.group ?? "",
           order: this.sortQuery,
           sort: this.sortWay,
         };
         let result = await this.getMemberList(data);
-        console.log(result);
         if (result.status == 200) {
           this.$message.success("查询成功");
           return;
         }
-        this.$message.error(result.msg ?? "查询错误");
+        this.$message.error(result.msg ?? "查询失败");
       } catch (error) {
         this.$message.error();
       }
     },
 
-    async delAcc(){
+    /* 
+        function: delAcc
+        params: null
+        desc: 删除账号
+    */
+    async delAcc() {
       try {
-       let result = await this.$api({
+        let result = await this.$api({
           type: "deleteMember",
           data: { member_ids: this.delId },
         });
-        if(result?.status == 200){
-          this.$message.success('删除成功')
-          return
-        }        
-        this.$message.error(result?.msg ?? '删除失败')
+        if (result?.status == 200) {
+          this.$message.success("删除成功");
+          return;
+        }
+        this.$message.error(result?.msg ?? "删除失败");
       } catch (error) {
-        this.$message.error('删除失败')
+        this.$message.error("删除失败");
         console.error(error);
       }
-
     },
-
 
     /* 
         function: confrimDel
@@ -742,9 +818,9 @@ export default {
     */
     async confrimDel() {
       try {
-        await this.delAcc()
+        await this.delAcc();
         this.closeConfrimDel();
-        this.updateMemberList()
+        this.updateMemberList();
       } catch (error) {
         console.error(error);
         this.$message.error("操作失败");
@@ -767,14 +843,14 @@ export default {
         desc: 打开相应操作界面
     */
     setOperation(row, e) {
-    console.log(this.$children);
       if (e === "") {
         return false;
       }
-      this.accInfo = row
+      let editorDialog = this.$refs["editor"];
+      console.log(editorDialog.$refs["editorDialog"]);
+      this.acc_id = row.uid;
       this[this.operationMap[e]](row) && this[this.operationMap[e]](row);
     },
-
 
     /* 
         function: handleAnalysis
@@ -790,7 +866,6 @@ export default {
       });
     },
 
-
     /* 
         function: closeReleaseVideoDialog
         params: null
@@ -798,8 +873,8 @@ export default {
     */
     closeReleaseVideoDialog() {
       this.showReleaseVideoDialog = false;
+      this.acc_id = "";
     },
-
 
     /* 
         function: handleRelease
@@ -810,7 +885,6 @@ export default {
       this.showReleaseVideoDialog = true;
     },
 
-
     /* 
         function: handleMonitor
         params: e   |   event
@@ -820,7 +894,6 @@ export default {
     handleMonitor(e, row) {
       row.path[0].src = require("../../../assets/video-red.png");
     },
-
 
     /* 
         function: showBatchEditorDialog
@@ -833,12 +906,22 @@ export default {
         this.classiFication.length === 0 ||
         this.batchEditorList.length === 0
       ) {
-        this.$message.error("请先选择分组、分类、账号");
+        this.$message.error("请先选择分组，分类和账号");
+        return false;
+      }
+      if (
+        (this.checkGroup === true &&
+          this.checkType === true &&
+          this.isSearch === false) ||
+        (this.group !== "" &&
+          this.classiFication.length !== 0 &&
+          this.isSearch === false)
+      ) {
+        this.$message.error("请对所选分类下的账号进行操作");
         return false;
       }
       this.showBatchEditor = true;
     },
-
 
     /* 
         function: closeBatchEditor
@@ -849,7 +932,6 @@ export default {
       this.showBatchEditor = false;
       this.member_ids = "";
     },
-
 
     /* 
         function: updateMemberList
@@ -864,8 +946,8 @@ export default {
         grouping_id: this.group ?? "",
         limit: this.limit ?? 20,
         page: this.page ?? 1,
-        uid:this.accUid ?? ''
-      }
+        uid: this.accUid ?? "",
+      };
       this.getMemberList(data);
     },
 
@@ -880,10 +962,10 @@ export default {
       store.remove("group");
       store.remove("typecontrol_id");
       store.remove("fans");
-      store.remove("groupText")
-      store.remove("typeText")
-      store.remove('total_follow')
-      store.remove('total_fans')
+      store.remove("groupText");
+      store.remove("typeText");
+      store.remove("total_follow");
+      store.remove("total_fans");
     },
 
     /* 
@@ -897,12 +979,10 @@ export default {
       this.fans = "";
       this.searchForm.grouping_id = "";
       this.group = "";
-      this.sortQuery = "", 
-      this.sortWay = "",
-      this.limit = 20;
+      (this.sortQuery = ""), (this.sortWay = ""), (this.limit = 20);
       this.page = 1;
-      this.total_fans = 0
-      this.total_follow = 0
+      this.total_fans = 0;
+      this.total_follow = 0;
       this.removeLocal();
       this.getMemberList();
       this.$message.success("重置成功");
@@ -914,27 +994,40 @@ export default {
         desc: 用来更新访问人数dialog的数据更新
     */
     async updateVisitorList(params) {
-      let result = await this.getVisitorList({
+      let data = {
         member_id: params[0],
         page: params[1],
-      });
-      this.vistList = result.list;
+        limit: 10,
+      };
+      let result = await this.getVisitorList(data);
+      this.vistList = result.data.list;
     },
 
-    /* 
-        function: toogleViewerTabel
-        params: null
-        desc: 切换访问列表表格显示状态
-    */
-    toogleViewerTabel(val) {
-      this.showViewerTabel = !this.showViewerTabel;
-      this.member_id = val?.member_id;
-      this.user_id = val?.uid;
-      this.getVisitorList({ member_id: this.member_id }).then((res) => {
-        this.vistList = res.list;
-        this.visterTotal = res.count;
-      });
-      this.member_id = "";
+    async showviewerTabel(row) {
+      try {
+        this.showViewerTabel = true;
+        let data = {
+          member_id: row.member_id,
+          page: 1,
+          limit: 10,
+        };
+        let result = await this.getVisitorList(data);
+        console.log(result);
+        if (result?.status == 200) {
+          this.vistList = result.data.list;
+          this.visterTotal = result.data.count;
+          return;
+        }
+        this.$message.error(result?.msg ?? "获取访问人数失败");
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    closeViewerTabel() {
+      this.showViewerTabel = false;
+      this.vistList = [];
+      this.visterTotal = 0;
     },
 
     /* 
@@ -943,18 +1036,13 @@ export default {
         desc: 获取访问列表
         return: 访问列表
     */
-    async getVisitorList({
-      member_id = "",
-      page = this.page,
-      limit = 10, //TODO  后期可能需要变更字段
-    }) {
-      let data = {
-        member_id: member_id ?? "",
-        limit: limit,
-        page: page,
-      };
-      let result = await this.$api({ type: "getVistorList", data: data });
-      return result.data;
+    async getVisitorList(data) {
+      try {
+        let result = await this.$api({ type: "getVistorList", data });
+        return result;
+      } catch (error) {
+        console.error(error);
+      }
     },
 
     /* 
@@ -976,6 +1064,7 @@ export default {
       console.log(result);
       this.groupList = result.data.list;
     },
+
     /* 
         function: closeBatchEidialog
         params: null
@@ -993,7 +1082,8 @@ export default {
     */
     async handlerSearch() {
       try {
-        this.page = 1
+        this.isSearch = true;
+        this.page = 1;
         this.loading = true;
         let data = {
           typecontrol_id: this.formatTypeId(this.classiFication) ?? "",
@@ -1011,10 +1101,10 @@ export default {
         if (result.status == 200) {
           this.memberList = result?.data?.list ?? [];
           this.total = result?.data?.count ?? 0;
-          this.total_fans = result?.data?.total_fans ?? 0
-          this.total_follow = result?.data?.total_follow ?? 0
-          store.set('total_fans',this.total_fans)
-          store.set('total_follow',this.total_follow)
+          this.total_fans = result?.data?.total_fans ?? 0;
+          this.total_follow = result?.data?.total_follow ?? 0;
+          store.set("total_fans", this.total_fans);
+          store.set("total_follow", this.total_follow);
           this.loading = false;
           this.$message.success("搜索成功");
           return;
@@ -1091,7 +1181,7 @@ export default {
         params: null
         desc: 获取用户视频列表
     */
-    async getVideoList(data = { member_id: "", page: this.page, limit: 10 }) {
+    async getVideoList(data = { member_id: "", page: 1, limit: 10 }) {
       let result = await this.$api({ type: "getMemberList", data: data });
       this.videoList = result.data.list ?? [];
       this.videoCount = result.data.count ?? 0;
@@ -1116,7 +1206,7 @@ export default {
     async showVideoTabel(val) {
       this.member_id = val.member_id;
       this.shwoVideoTabel = true;
-      let data = { member_id: val.member_id, page: this.page, limit: 10 };
+      let data = { member_id: val.member_id, page: 1, limit: 10 };
       await this.getVideoList(data);
     },
 
@@ -1139,7 +1229,6 @@ export default {
       });
       this.editorTota = this.batchEditorList.length;
     },
-
 
     /*
         function: getTypeControlList
@@ -1172,7 +1261,7 @@ export default {
         this.loading = false;
         return result;
       } catch (error) {
-        this.loading = false
+        this.loading = false;
         console.error(error);
       }
     },
@@ -1295,8 +1384,21 @@ export default {
   justify-content: space-between;
 }
 
+.flex-center {
+  display: flex;
+  align-items: center;
+}
+
+.height-26 {
+  height: 26px;
+}
+
 .pad-0-20 {
   padding: 0 20px;
+}
+
+.flex {
+  display: flex;
 }
 
 .ml-15 {
@@ -1313,6 +1415,10 @@ export default {
 
 .ml-50 {
   margin-left: 50px;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
 }
 
 .fz-12 {
@@ -1371,10 +1477,12 @@ export default {
 
 .el-icon-search {
   z-index: 1;
-
   left: 10px;
   top: 10px;
 }
-.table-avatar {
+
+.sucess-icon {
+  height: 24px;
+  width: 24px;
 }
 </style>

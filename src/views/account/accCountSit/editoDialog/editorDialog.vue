@@ -302,6 +302,7 @@ export default {
     */
     handlerClose() {
       this.$emit("closeEditorDialog");
+      console.log(this.$parent);
       this.resetForm();
       this.grouping_id = "";
     },

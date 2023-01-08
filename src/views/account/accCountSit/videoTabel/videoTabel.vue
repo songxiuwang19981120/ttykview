@@ -18,7 +18,7 @@
           <video autoplay width="40%" :src="videoSrc" controls="controls"></video>
         </div>
       </el-dialog>
-          <Pagination 
+    <Pagination 
       :total="videoCount"
       :page="page"
       :size="limit"
@@ -133,6 +133,7 @@ export default {
         desc: 关闭窗口
     */
     handlerClose() {
+      this.page = 1
       this.$emit("closeVideoTabel");
     },
     handlerPlayer(row) {

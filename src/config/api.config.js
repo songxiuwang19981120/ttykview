@@ -602,6 +602,11 @@ export default {
     method: 'POST'
   },
 
+  'confrimVideo':{  //单用户上传视频
+    url:'member/UserPushVideo',
+    method: 'POST'
+  },
+
 
   //Apiusergroup  API start
   'getApiusergroup': {

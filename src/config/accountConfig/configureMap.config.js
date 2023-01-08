@@ -9,11 +9,11 @@ export default {
       },
       fansOption: [
         //粉丝量下拉框options  
-        { value: [1000], label: "小于1K" },
+        { value: [0,1000], label: "小于1K" },
         { value: [1000, 5000], label: "1k-5k" },
         { value: [5000, 10000], label: "5k-10k" },
         { value: [10000, 50000], label: "10k-50k" },
-        { value: [0, 50000], label: "大于50k" },
+        { value: [50000, 50000000000000], label: "大于50k" },
       ],
       operationMap: {
         '编辑': "handleEdit",
