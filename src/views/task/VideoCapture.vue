@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        <table-custom  height="700" :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
+        <table-custom  :height="tableHeight" :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
             @handleSelectionChange="selectionChange"></table-custom>
         <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination">
         </pagination>
@@ -97,9 +97,10 @@ export default {
 
     data() {
         return {
+            tableHeight:window.innerHeight-280,
             searching: false, //获取TT视频ing
             videoUrl: '',  //播放视频路径
-            // videoPlayDialog: false,  //播放视频弹框
+            //videoPlayDialog: false,//播放视频弹框
 
             getCommentListstoo: {},
             activeNames: [],

@@ -233,10 +233,10 @@ export default {
 		// 获取详情数据
 		async viewCommenList() {
 			let data = {
-				comment_list_id: this.task_id
+				tasklistdetail_id: this.task_id
 			}
 			try {
-				let result = await this.$api({ type: "viewCommenList", data });
+				let result = await this.$api({ type: "taskListDetailView", data });
 				console.log(result);
 			} catch (error) {
 				console.error(error);

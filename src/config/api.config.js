@@ -671,6 +671,20 @@ export default {
     url: '/Tasklist/pause',
     method: 'POST',
   },
+  'taskListDetailView': {
+    url: '/TaskListDetail/view',
+    method: 'GET',
+  },
+  // 发布私信任务筛选数据两量
+  'pushScreenChat': {
+    url: '/push/screen_chat',
+    method: 'GET',
+  },
+  // 发布私信任务
+  'pushChat': {
+    url: '/Push/chat',
+    method: 'POST',
+  },
 }
 
 
