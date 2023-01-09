@@ -535,6 +535,21 @@ export default {
     method: 'POST'
   },
 
+  'delTaskListDetail': { // 删除任务详情
+    url: '/TaskListDetail/delete',
+    method: 'POST'
+  },
+
+  'pauseTask': { // 暂停任务
+    url: '/Tasklist/pause',
+    method: 'POST'
+  },
+
+  'deleteTask': { // 删除任务
+    url: '/Tasklist/delete',
+    method: 'POST'
+  },
+
   // Tasklist API end
 
   //PrivateLetter   API start
