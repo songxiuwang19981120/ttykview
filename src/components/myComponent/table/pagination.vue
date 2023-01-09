@@ -6,7 +6,7 @@ handleCurrentChange 当前显示页码改变后的回调 * */
 	<div :class="{ hidden: hidden }" class="pagination-container">
 		<el-row type="flex" justify="space-between">
 			<el-col>
-				<span>显示第 {{ (currentPage - 1) * 10 + 1 }} 到第 {{ currentPage * 10 }} 条记录，总共 {{ total }} 条记录，每页显示 {{ pageSize }} 条记录</span>
+				<span style="font-size: 14px;">显示第 {{ (currentPage - 1) * 10 + 1 }} 到第 {{ currentPage * 10 }} 条记录，总共 {{ total }} 条记录，每页显示 {{ pageSize }} 条记录</span>
 			</el-col>
 			<el-col>
 				<el-row type="flex" justify="end">

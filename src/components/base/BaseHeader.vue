@@ -1,24 +1,9 @@
 <template>
   <div class="tt-header">
-    <h1>基础信息</h1>
+    <span class="tt-header--title">海王管理系统</span>
     <div class="tt-header--admin">
       管理员：admin
-      <el-dropdown  trigger="click">
-        <span class="el-dropdown-link">
-          下拉菜单<i class="el-icon-arrow-down el-icon--right"></i>
-        </span>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item icon="el-icon-plus">黄金糕</el-dropdown-item>
-          <el-dropdown-item icon="el-icon-circle-plus">狮子头</el-dropdown-item>
-          <el-dropdown-item icon="el-icon-circle-plus-outline"
-            >螺蛳粉</el-dropdown-item
-          >
-          <el-dropdown-item icon="el-icon-check">双皮奶</el-dropdown-item>
-          <el-dropdown-item icon="el-icon-circle-check"
-            >蚵仔煎</el-dropdown-item
-          >
-        </el-dropdown-menu>
-      </el-dropdown>
+      <el-button type="info" round size="mini" @click="loginOut">退出</el-button>
     </div>
   </div>
 </template>
@@ -34,12 +19,21 @@ export default {
   mounted() {},
 
   methods: {
-
+    // 退出
+    loginOut() {
+      this.$notify.success({
+        title: '退出成功',
+        message: `再见，尊敬的admin`,
+        position: 'top-left'
+      })
+      this.$router.push('/login')
+    }
   },
 };
 </script>
 
-<style lang="stylus">
+<style lang="scss" scoped>
+
 .tt-header {
   height: 100%;
   display: flex;
@@ -47,7 +41,18 @@ export default {
   align-items: center;
 }
 
+.tt-header--title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+
 .tt-header--admin {
   cursor: pointer;
+}
+
+::v-deep .el-button{
+  background-color: #fff !important;
+  color: black;
 }
 </style>

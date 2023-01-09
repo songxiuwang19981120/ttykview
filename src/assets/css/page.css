@@ -14,23 +14,23 @@
 
 
 .el-button--primary { 
-  background: #FF3E1E !important;
-  border-color: #FF3E1E !important;
+  background: #1890FF !important;
+  border-color: #1890FF !important;
 }
 .el-button--primary:hover {
-  background: #ff654b !important;
-  border-color: #ff654b !important;
+  background: #1890FF !important;
+  border-color: #1890FF !important;
   color: #FFF !important;
   opacity: 0.8;
 }
 .el-button--default { 
   background: #fff !important;
-  border-color: #FF3E1E !important;
-  color: #FF3E1E !important;
+  border-color: #1890FF !important;
+  color: #1890FF !important;
 }
 .el-button--default:hover {
   background: #fff !important;
-  border-color: #FF3E1E !important;
-  color: #FF3E1E !important;
+  border-color: #1890FF !important;
+  color: #1890FF !important;
   opacity: 0.8;
 }
