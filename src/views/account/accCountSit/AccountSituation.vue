@@ -106,8 +106,8 @@
 
           <div class="height-20 ml-20">
             <p class="fz-14">
-              总关注次数 ：{{ total_fans }}次&nbsp;&nbsp; 总粉丝量
-              ：{{ total_follow }}个
+              总关注次数 ：{{ total_follow }}次&nbsp;&nbsp; 
+              总粉丝量 ：{{ total_fans }}个
             </p>
           </div>
 
@@ -181,7 +181,7 @@
           :loading="loading"
           :tableData="memberList"
           :columns="columns"
-          height="670"
+          :height="tabelHeight"
         ></table-custom>
       </keep-alive>
     </div>
@@ -237,6 +237,9 @@
       :showBatchEditor="showBatchEditor"
       :editorTota="editorTota"
       :groupName="groupString"
+      :nicknameCanUseNum="nicknameCanUseNum"
+      :autographCanUseNum="autographCanUseNum"
+      :headimageCanUseNum="headimageCanUseNum"
     />
 
     <ReleaseVideoDialog
@@ -291,6 +294,13 @@ export default {
     },
   },
   watch: {
+
+    startRefresh(newVal){
+      if(newVal === true){
+        this.updateProgress()
+      }
+    },
+
     page(newVal) {
       store.set("page", newVal);
     },
@@ -299,11 +309,18 @@ export default {
       store.set("limit", newVal);
     },
 
-    classiFication(newVal) {
-      if (newVal === "") {
+    async classiFication(newVal) {
+      console.log(newVal);
+      if (newVal.length === 0) {
         this.checkType = false;
+        return false
       }
       this.checkType = true;
+      let data = {
+        typecontrol_id:this.classiFication[this.classiFication.length - 1]
+      }
+      let result = await this.getProjectNum(data)
+      console.log(result);
     },
 
     async group(newVal) {
@@ -331,6 +348,7 @@ export default {
   },
   data() {
     return {
+      tabelHeight:(window.innerHeight-250).toString(),
       openFollow:false,
       total_fans: 0, //总关注次数
       total_follow: 0, //总粉丝量
@@ -440,7 +458,7 @@ export default {
             let text
             row.signature.length > 0 ? text = row.signature.substring(0, 10) + "..." : text = '暂无简介'
             return (
-              <el-tooltip content={row.signature} placement="top">
+              <el-tooltip content={text} placement="top">
                 <p style="font-size: 12px">
                   {text}
                 </p>
@@ -621,6 +639,11 @@ export default {
       checkGroup: false, //是否选择了分组
       checkType: false, //是否选择了分类
       isSearch: false, //选择分组分类之后是否搜索
+      countDown:"",
+      maxTime:"",
+      nicknameCanUseNum:0,
+      autographCanUseNum:0,
+      headimageCanUseNum:0,
     };
   },
 
@@ -678,31 +701,67 @@ export default {
       
     },
 
+
     async handleRefresh() {
+      try {
       if (this.classiFication.length === 0 || this.group === "") {
         this.$message.error("请选择需要刷新的分组与分类");
         return false;
       }
-      this.startRefresh = true;
-      store.set('startRefresh',true)
-      console.log(this.classiFication[this.classiFication.length - 1]);
       let data = {
         grouping_id:this.group,
         typecontrol_id:this.classiFication[this.classiFication.length - 1]
       }
       let result = await this.refreshAcc(data)
+      if(result?.status == 200){
+        this.startRefresh = true;
+        store.set('startRefresh','0')
+        
+        this.$message.success('刷新成功')
+        return
+      }
       console.log(result);
+      this.$message.error(result?.msg ?? '刷新失败')
+      
+      } catch (error) {
+        console.error(error);
+      }
     },
 
-    updateProgress() {
-      let update = setInterval(() => {
-        if (this.subThread === this.busThread) {
-          clearInterval(update);
-          return false;
-        }
-        this.$api();
-      }, 3000);
+
+    async getRefreshDetail(){
+      try {
+            let result = await this.$api({type:'getRefreshDetail'})
+            return result
+      } catch (error) {
+        console.error(error);
+      }
     },
+
+      updateProgress() {
+     
+          let update =  setInterval(() => {
+            let date = Date.now()
+            this.getRefreshDetail().then((res)=>{
+              console.log(res,'=====================updateProgress');
+              let createTime = res.data.create_time
+              if(createTime - date === 0){
+              this.$message.success('刷新任务已完成')
+              this.startRefresh = false
+              this.endRefresh = true
+              clearInterval(update)
+              return 
+            }
+            })
+            
+            
+
+          }, 3000);          
+        
+
+    }, 
+
+
 
     handleCurrentChange(currentPage) {
       this.page = currentPage;
@@ -740,12 +799,14 @@ export default {
     async initInterface() {
       this.page = store.get("page") ?? 1;
       this.limit = store.get("limit") ?? 20;
-      let isRefreshEnd = store.get('startRefresh') ?? false
+      
+      let isRefreshEnd = store.get('startRefresh')
+      console.log(isRefreshEnd);
       let group = store.get("group") ?? "";
       let typecontrol_id = store.get("typecontrol_id") ?? "";
       let fans = store.get("fans") ?? "";
       this.handleCurrentChange(this.page);
-      isRefreshEnd === true ? this.startRefresh = true : this.startRefresh = false
+      isRefreshEnd === '0' ? this.startRefresh = true : this.startRefresh = false
       if (group !== "" && typecontrol_id !== "") {
         this.isSearch = true;
         this.total_fans = store.get("total_fans") ?? 0;
@@ -753,11 +814,9 @@ export default {
       }
       if (fans !== "") {
         this.fans = fans;
-        fans = Object.entries(this.fansMap)
-          .find((item) => {
-            return item[1] == fans;
-          })[0]
-          .split(",");
+        fans = Object.entries(this.fansMap).find((item) => {
+          return item[1] == fans;
+        })[0].split(",");
         this.min = fans[0] ?? "";
         this.max = fans[1] ?? "";
       }
@@ -840,8 +899,8 @@ export default {
     */
     async handleSort() {
       try {
-        if (this.sortQuery === "" || this.sortWay === "") {
-          this.$message.error("请选择排序字段和排序方式");
+        if (this.sortQuery === "") {
+          this.$message.error("请选择排序字段");
           return false;
         }
         let typecontrol_id = this.formatTypeId(this.classiFication);
@@ -850,7 +909,7 @@ export default {
           typecontrol_id: typecontrol_id ?? "",
           grouping_id: this.group ?? "",
           order: this.sortQuery,
-          sort: this.sortWay,
+          sort: this.sortWay || "asc",
         };
         let result = await this.getMemberList(data);
         if (result.status == 200) {
@@ -896,8 +955,9 @@ export default {
         this.closeConfrimDel();
         this.updateMemberList();
       } catch (error) {
-        console.error(error);
         this.$message.error("操作失败");
+        console.error(error);
+        
       }
     },
 
@@ -973,7 +1033,7 @@ export default {
         params: null
         desc: 打开批量编辑弹窗
     */
-    showBatchEditorDialog() {
+    async showBatchEditorDialog() {
       if (
         this.group === "" ||
         this.classiFication.length === 0 ||
@@ -994,6 +1054,11 @@ export default {
         return false;
       }
       this.showBatchEditor = true;
+      let data = {
+        typecontrol_id:this.classiFication[this.classiFication.length - 1]
+      }
+      let result = await this.getProjectNum(data)
+
     },
 
     /* 
@@ -1243,6 +1308,24 @@ export default {
     },
 
     /* 
+        function: getProjectNum
+        params: data | 请求接口携带的数据
+        desc: 关闭编辑弹窗
+    */
+      async getProjectNum(data){
+      try {
+        let result = await this.$api({ type: "getProjectNum", data });
+        this.nicknameCanUseNum = result?.data?.nickname ?? 0
+        this.autographCanUseNum = result?.data?.autograph ?? 0
+        this.headimageCanUseNum = result?.data?.headimage ?? 0
+        return result
+      } catch (error) {
+        console.error(error);
+      }
+
+    },
+
+    /* 
         function: closeEditorDialog
         params: null
         desc: 关闭编辑弹窗
@@ -1262,9 +1345,13 @@ export default {
         desc: 获取用户视频列表
     */
     async getVideoList(data = { member_id: "", page: 1, limit: 10 }) {
-      let result = await this.$api({ type: "getMemberList", data: data });
-      this.videoList = result.data.list ?? [];
-      this.videoCount = result.data.count ?? 0;
+      try {
+        let result = await this.$api({ type: "getMemberList", data: data });
+        this.videoList = result.data.list ?? [];
+        this.videoCount = result.data.count ?? 0;        
+      } catch (error) {
+        console.error(error);
+      }
     },
 
     /* 
@@ -1376,23 +1463,37 @@ export default {
       //this.$message.error(result.msg ?? "操作失败");
     },
 
-    /*
-        function: handlerCurrentChange
-        params: val | default
-        desc: 分页的回调，设置page为val，当val改变时发起请求，获取数据重新渲染页面
-    */
-    /*     async handlerCurrentChange(val) {
-      try {
-        this.page = val;
-        let result = await this.$api({
-          type: "getMember",
-          data: { page: this.page },
-        });
-        this.memberList = result.data.list;
-      } catch (error) {
-        console.error(error);
-      }
+
+/* begin() {
+      this.countDown = '20分00秒';
+      this.maxTime = 20 * 60;
+      this.handleCountDown();
+    },
+handleCountDown() {
+      this.interval = setInterval(() => {
+        this.maxTime--;
+        let minutes = Math.floor(this.maxTime / 60);
+        let seconds = Math.floor(this.maxTime % 60);
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+        this.countDown = minutes + "分" + seconds + "秒";
+        if (this.maxTime === 0) {
+          clearInterval(this.interval)
+        }
+      }, 1000)
     }, */
+
+
+    /* 
+      刷新账号逻辑：
+        开始：startRefresh
+              发起刷新账号请求
+              如果任务创建成功的话 设置字段为true
+        结束：endRefresh
+    
+    
+    */
+
   },
 };
 </script>
@@ -1574,3 +1675,7 @@ export default {
   padding: 6px 0;
 }
 </style>
+
+ 
+
+ 

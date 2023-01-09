@@ -622,6 +622,16 @@ export default {
     method:'POST'
   },
 
+  'batchEditorAcc':{   //批量编辑账号
+    url:'/Member/BatchUpdateUserDatas',
+    method:'POST'
+  },
+
+  'getRefreshDetail':{   //实时获取账号刷新进度
+    url:'/Member/MemberSaveNew',
+    method:'POST'
+  },
+
   //Apiusergroup  API start
   'getApiusergroup': {
     url: '/Apiusergroup/index',

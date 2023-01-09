@@ -50,7 +50,6 @@
             :before-upload="videoBefore"
             accept=".mp4"
             :on-success="handleSucess"
-            :on-error="handleError"
             :on-remove="handleRemove"
             :on-change="handleChangePic"
           >
@@ -143,10 +142,6 @@ export default {
     handleRemove(file, fileList) {
       this.fileList = fileList;
     },
-    // 视频上传失败回调
-    handleError(err, file, fileList) {
-      this.$message.error(err.msg);
-    },
     // 视频上传成功回调
     handleSucess(response, file, fileList) {
       this.releaseVideoForm.video_url = response?.imageurl;
@@ -177,6 +172,9 @@ export default {
 
     async handlerConfrim() {
       try {
+        if(this.releaseVideoForm.video_url === ""){
+          this.$message.error('请选择需上传视频')
+        }
         if (this.flag.test(this.releaseVideoForm.label)) {
           //snsArr=str.split(/[(\r\n)\r\n]+/);
           this.$message.error("标签中不允许包含特殊字符和空格");

@@ -1,22 +1,37 @@
 <template>
   <div>
     <el-dialog
-      width="40%"
+      width="30%"
       :visible="showBatchEditor"
       :before-close="handlerClose"
     >
       <span slot="title">
         <h1 class="tt-acccountsit--title">批量编辑账号</h1>
-        <p>此次共编辑{{ editorTota }}个账号</p>
+        <p>此次共编辑{{ accTotal }}个账号</p>
       </span>
 
       <el-form
-        :rules="rules"
         label-position="left"
         label-width="170px"
         ref="editorForm"
         :model="eidtorForm"
       >
+        <el-form-item label="选择账号 ：">
+          <el-select
+            clearable
+            size="medium"
+            v-model="checkAcc"
+            :placeholder="checkAccText"
+          >
+            <el-option
+              v-for="item in checkAccList"
+              :value="item.value"
+              :label="item.label"
+              :key="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
         <el-form-item label="修改分组 ：" prop="groupId">
           <el-select
             class="mr-15"
@@ -35,14 +50,14 @@
               :key="item.grouping_id"
             ></el-option>
           </el-select>
-          <el-checkbox v-model="modifyGroup"></el-checkbox>
+          <el-checkbox v-model="modifyGroup" @change="handleChangeGroup"></el-checkbox>
         </el-form-item>
 
         <el-form-item label="修改分类 ：" prop="typeId">
           <el-cascader
             class="mr-15"
             size="medium"
-            :disabled="isTypeDis"
+            :disabled="isGroupDis"
             clearable
             :props="{ checkStrictly: true, value: 'value' }"
             :options="typeList"
@@ -50,23 +65,24 @@
             placeholder="设置分类"
           ></el-cascader>
 
-          <el-checkbox v-model="modifyType"></el-checkbox>
+         <!--  <el-checkbox :disabled="ischeckTypeDis" v-model="modifyType"></el-checkbox> -->
         </el-form-item>
+
         <el-form-item label="修改昵称 ：">
-          <p style="width: 42%">当前可用12222个</p>
+          <p style="width: 42%">当前可用{{nicknameCanUseNum ?? 0}}个</p>
           <el-checkbox v-model="eidtorForm.modify_nickname"></el-checkbox>
         </el-form-item>
         <el-form-item label="修改个人简介 ：">
-          <p style="width: 42%">当前可用12222个</p>
+          <p style="width: 42%">当前可用{{autographCanUseNum ?? 0}}个</p>
           <el-checkbox v-model="eidtorForm.modify_userdesc"></el-checkbox>
         </el-form-item>
         <el-form-item label="修改头像 ：">
-          <p style="width: 42%">当前可用1222个</p>
+          <p style="width: 42%">当前可用{{headimageCanUseNum ?? 0}}个</p>
           <el-checkbox v-model="eidtorForm.modify_avatar"></el-checkbox>
         </el-form-item>
-        <el-form-item label="选择当前分类所有账号 ：">
+<!--         <el-form-item label="选择当前分类所有账号 ：">
           <el-checkbox v-model="eidtorForm.check_all"></el-checkbox>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handlerClose">取 消</el-button>
@@ -98,24 +114,84 @@ export default {
     editorTota: {
       type: Number,
     },
+    typecontrol_id:{
+      type: Array
+    },
+    grouping_id:{
+      type: String
+    },
+    nicknameCanUseNum:{
+      type:Number
+    },
+    autographCanUseNum:{
+      type:Number
+    },
+    headimageCanUseNum:{
+      type:Number
+    }
   },
   computed: {
+    accTotal(){
+      return this.checkAcc === 'all' ? this.checkAccTotal : this.editorTota
+    },
+    checkAccText(){
+      return `当前已选中${this.editorTota}个账号`
+    },
+    ischeckTypeDis(){
+      return !(this.modifyGroup === true)
+    },
     isGroupDis() {
       return !(this.modifyGroup === true);
     },
     isTypeDis() {
-      return !(this.modifyType === true);
+      return !(this.modifyType === true && this.modifyGroup === true);
     },
   },
-  watch: {},
+  watch: {
+    async checkAcc(newVal){
+      if(newVal === 'all'){
+        let data = {
+          typecontrol_id: this.typecontrol_id[this.typecontrol_id.length - 1],
+          grouping_id: this.grouping_id
+        }
+        let result = await this.$api({
+          type: "getMember",
+          data,
+        })
+        this.checkAccTotal = result?.data?.count ?? 0
+      }
+    },
+    async typeId(newVal){
+      try {
+        if(newVal.length === 0){
+          return false
+        }
+        let data = {
+          typecontrol_id: this.typeId[this.typeId.length - 1]
+        }
+        await this.$parent.getProjectNum(data)
+      } catch (error) {
+        console.error(error);
+      }
+
+    }
+  },
 
   data() {
     return {
+      checkAccTotal:'',
+      checkAcc:'',
       rules: BatchEditor,
       modifyType: "",
       modifyGroup: "",
       typeList: [],
       groupList: [],
+      checkAccList:[
+        {
+          value:'all',
+          label:'当前分组、分类所有账号'
+        }
+      ],
       groupId: "",
       typeId: "",
       eidtorForm: {
@@ -129,7 +205,6 @@ export default {
       },
     };
   },
-  watch: {},
   mounted() {
     this.getGroupList();
     /*  this.getGroupList(); */
@@ -142,6 +217,18 @@ export default {
     this.groupList = [];
   },
   methods: {
+
+    resetAccTotal(){
+      this.$emit('resetAccTotal')
+    },
+
+    handleChangeGroup(){
+      console.log(11111,this.modifyGroup);
+      if(this.modifyGroup === false){
+        this.modifyType = false
+        console.log(this.modifyType);
+      }
+    },
     /*
             function: getTreeData
             params: data | 需要进行递归处理的数组
@@ -222,12 +309,19 @@ export default {
     },
     handlerClose() {
       this.$parent.closeBatchEditor();
+      this.checkAcc = ""
     },
     async handlerConfrim() {
       this.eidtorForm.member_ids = this.member_ids
       this.eidtorForm.grouping_id = this.groupId
       this.eidtorForm.typecontrol_id = this.typeId[this.typeId.length - 1]
       console.log(this.eidtorForm);
+      let data = {
+        uid_list: this.member_ids ?? '',
+        old_typecontrol_id: this.typecontrol_id[this.typecontrol_id.length - 1] ?? '',
+        old_grouping_id: this.grouping_id ?? '',
+
+      }
 /*       try {
         let typeId = this.eidtorForm.typecontrol_id;
         this.eidtorForm.typecontrol_id = this.formatTypeId(typeId);
