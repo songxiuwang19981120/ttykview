@@ -13,7 +13,15 @@
             :value="item.value">
           </el-option>
         </el-select>
-        <el-button size="mini" type="danger" @click="deleteAccount">批量删除</el-button>
+         <!-- 批量删除 -->
+      <el-popconfirm
+      style="margin-left:10px"
+        title="确定删除？"
+        @confirm="deleteAccount"
+      >
+        <el-button  size="mini" type="danger" slot="reference">批量删除</el-button>
+      </el-popconfirm>
+    
       </el-row>
     </div>
 
@@ -60,6 +68,18 @@
         </el-upload>
       </el-col>
     </el-row>
+    
+    <el-row>
+      <el-col :span="6"><div style="margin-top:15px">发布视频:</div></el-col>
+      <el-col :span="18">
+        <el-input 
+        v-model="releaseVideos" 
+        size="mini" 
+        style="margin-top:10px;width:200px">
+        </el-input>
+      </el-col>
+    </el-row>
+
     
     <el-row>
       <el-col :span="6"><div style="margin-top:15px">修改昵称:</div></el-col>
@@ -176,6 +196,9 @@
 		:before-close="redactClose"
 		>
     <el-form :model="batchHeadRuleForm" :rules="batchHeadRules" ref="batchHeadRules" label-width="180px">
+      <el-form-item label="选中批量发布视频" prop="batchVideo" >
+        <el-switch v-model="batchHeadRuleForm.batchVideo"></el-switch>
+      </el-form-item>
       <el-form-item label="选中批量修改头像" prop="batchHead" >
         <el-switch v-model="batchHeadRuleForm.batchHead"></el-switch>
       </el-form-item>
@@ -208,6 +231,7 @@ export default {
   components: { pagination, tableCustom },
   data() {
     return {
+      releaseVideos:"",//发布视频
       selectionId:"",//获取唯一ID值用来删除
       selectionVal:"",//表格多选框选中的数据
       grouping:"",//账号分组选择
@@ -226,6 +250,7 @@ export default {
         },
       ],
       batchHeadRuleForm:{
+        batchVideo:false,
         batchHead:false,//编辑弹窗中的按钮
         batchNikeName:false,
         batchDeleteBlock:false,
@@ -356,6 +381,12 @@ export default {
         },
         {
           prop: 'e',
+          label: '动态',
+          align: 'center',
+
+        },
+        {
+          prop: 'e',
           label: '关注',
           align: 'center',
 
@@ -406,8 +437,19 @@ export default {
           render: (h, { row }) => {
             return (
               <div>
-                <el-button size="mini" type="warning" onClick={this.handleEdit.bind(this, row)}>管理</el-button>
-                <el-button size="mini" type="danger" onClick={this.handleDelete.bind(this, row)}>删除</el-button>
+                <el-button size="mini" type="primary" onClick={this.handleEdit.bind(this, row)}>管理</el-button>
+                <el-popconfirm
+                style="margin-left:10px"
+										confirm-button-text="删除"
+										cancel-button-text="取消"
+										title="确认删除？"
+										onConfirm={this.handleDelete.bind(this, row, '1')}
+									>
+										<el-button slot="reference" type="danger" size="mini">
+											删除
+										</el-button>
+									</el-popconfirm>
+              
               </div>
             );
           },
@@ -473,17 +515,19 @@ export default {
     /* 
         function: SubmitImgUpload
         params: null
-        desc: 确认执行showEditorDialog弹窗
+        desc: 确认执行showEditorDialog弹窗管理弹窗
     */
     SubmitImgUpload(){
-      if(!this.nickeName){
-        this.$message.error('昵称不能为空');
-      }else{
+      if(this.nickeName || this.imageUrl ||  this.releaseVideos){
         this.showEditorDialog=false
         console.log(this.nickeName,this.imageUrl)
         this.$message.success('修改成功');
         this.nickeName=""
         this.imageUrl=""
+        this.releaseVideos=""
+       
+      }else{
+        this.$message.error('请选择需要执行的操作');
       }
       
     },
@@ -608,6 +652,7 @@ export default {
       this.batchHeadRuleForm.batchHead=false,//批量修改头像
       this.batchHeadRuleForm.batchNikeName=false,//批量修改昵称
       this.batchHeadRuleForm.batchDeleteBlock=false//批量删除被封账号
+      this.batchHeadRuleForm.batchVideo=false//批量删除被封账号
       },
 
 
@@ -617,7 +662,7 @@ export default {
         desc: 提交账号编辑弹窗
     */
     SubmitRedact(){
-      if(this.batchHeadRuleForm.batchHead || this.batchHeadRuleForm.batchNikeName || this.batchHeadRuleForm.batchDeleteBlock){
+      if(this.batchHeadRuleForm.batchHead || this.batchHeadRuleForm.batchNikeName || this.batchHeadRuleForm.batchDeleteBlock || this.batchHeadRuleForm.batchVideo){
         this.redactClose()
         return this.$message.success('操作成功');
       }else{
@@ -633,10 +678,15 @@ export default {
     */
     deleteAccount(){
       this.selectionId=""
-      this.selectionVal.forEach(element => {
+      if(this.selectionVal){
+        this.selectionVal.forEach(element => {
         this.selectionId= this.selectionId+element.a+","
       });
       console.log(this.selectionId)
+      }else{
+        this.$message.error("请选择需要删除的数据")
+      }
+      
       },
 
     

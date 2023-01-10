@@ -1,15 +1,18 @@
 <template>
   <div>
       流量查询
+
   </div>
 </template>
 
 <script>
+
 export default {
   name: 'Trafficquery',
 
   data() {
       return {
+  
           
       };
   },
@@ -19,7 +22,6 @@ export default {
   },
 
   methods: {
-      
   },
 };
 </script>

@@ -51,8 +51,25 @@ export default {
         },
         {
             title: '素材库',
-            to: '/matlibrary',
-            icon: 'el-icon-s-platform'
+            to: '',
+            icon: 'el-icon-s-platform',
+            children: [
+                {
+                    title: '头像素材',
+                    to: '/headportrait',
+                    icon: '',
+                },
+                {
+                    title: '视频素材',
+                    to: '/videomaterial',
+                    icon: '',
+                },
+                {
+                    title: '昵称素材',
+                    to: '/nickmaterial',
+                    icon: '',
+                },
+            ]
         },
         {
             title: '采集库',

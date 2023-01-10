@@ -5,7 +5,7 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path:'/login',
+    path:'/',
     name:'login',
     component:() => import(/* webpackChunkName: "login" */ '@/views/Login.vue')
   },
@@ -59,9 +59,19 @@ const routes = [
       //任务管理 end
 
       {
-        path:'/matlibrary',
-        name:'matlibrary',
-        component:() => import(/* webpackChunkName: "matlibrary" */ '@/views/Matlibrary.vue')
+        path:'/headportrait',
+        name:'headportrait',
+        component:() => import(/* webpackChunkName: "matlibrary" */ '@/views/matlibrary/HeadPortrait')
+      },
+      {
+        path:'/videomaterial',
+        name:'videomaterial',
+        component:() => import(/* webpackChunkName: "matlibrary" */ '@/views/matlibrary/VideoMaterial')
+      },
+      {
+        path:'/nickmaterial',
+        name:'nickmaterial',
+        component:() => import(/* webpackChunkName: "matlibrary" */ '@/views/matlibrary/NickMaterial')
       },
       {
         path:'/collibrary',
