@@ -25,10 +25,7 @@
 					/>
 				</el-form-item>
 				<el-form-item label="">
-					<p style="font-size: 12px">
-						当前已选中<span style="color: red">{{ accCount }}</span
-						>个账号
-					</p>
+					<p style="font-size: 12px">当前已选中<span style="color: red">{{ accCount }}</span>个账号</p>
 				</el-form-item>
 				<el-form-item label="任务名称：" prop="task_name">
 					<el-input
@@ -74,7 +71,6 @@
 						placeholder="选择日期"
 						format="yyyy - MM - dd"
 						value-format="yyyy-MM-dd"
-						:picker-options="pickerOptions"
 					>
 					</el-date-picker>
 				</el-form-item>
@@ -254,6 +250,8 @@
 						data,
 					});
 					if (res.status == 200) {
+						this.$parent.getVideoTasks();
+						this.handlerClose()
 						this.$message.success(res.msg);
 					} else {
 						this.$message.error(res.msg);
@@ -265,11 +263,11 @@
 			},
 
 			// 限制日期选择范围
-			pickerOptions: {
-				disabledDate(v) {
-					return v.getTime() < new Date().getTime() - 86400000; //  - 86400000是否包括当天
-				},
-			},
+			// pickerOptions: {
+			// 	disabledDate(v) {
+			// 		return v.getTime() < new Date().getTime() - 86400000; //  - 86400000是否包括当天
+			// 	},
+			// },
 
 			/*
 		function: getTreeData
@@ -355,7 +353,6 @@
 				)
 					.then(async () => {
 						await this.uploadVideoTask(this.vieoTaskForm);
-						this.$parent.getVideoTasks();
 					})
 					.catch(() => {});
 			},

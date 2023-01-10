@@ -45,9 +45,9 @@
 		<!-- 分页 -->
 		<pagination :total="total" :page="page" :limit="limit" @pagination="pageChange"></pagination>
 		<!-- 弹层 -->
-		<!-- <VideoReleaseDialogComponent ref="dialog" :showDialog.sync="dialog" :curId="curId">
+		<!-- <VideoReleaseDialogComponent ref="dialog" :showDialog.sync="dialog">
 		</VideoReleaseDialogComponent> -->
-		<detail ref="detailDialog" :showdialog.sync="showDetailDialog" :curId="curId"></detail>
+		<videoDetail ref="detailDialog" :showdialog.sync="showDetailDialog"></videoDetail>
 		<VideoTaskDialog :showVideoDialog="showVideoDialog" @closeVideoTask="closeVideoTask" />
 	</div>
 </template>
@@ -56,7 +56,7 @@
 	import VideoReleaseDialogComponent from './component/VideoReleaseDialogComponent.vue';
 	import pagination from '@/components/myComponent/table/pagination.vue';
 	import VideoTaskDialog from './component/videoDialog.vue';
-	import detail from './component/detail.vue';
+	import videoDetail from './component/videoDetail.vue';
 	export default {
 		name: 'TtVideoRelease',
 		components: {
@@ -64,7 +64,7 @@
 			VideoReleaseDialogComponent,
 			pagination,
 			VideoTaskDialog,
-			detail,
+			videoDetail,
 		},
 		data() {
 			return {
@@ -170,7 +170,6 @@
 				page: 1,
 				limit: 10,
 				total: 0,
-				curId: null,
 				pickerOptions: {
 					shortcuts: [
 						{
@@ -315,12 +314,7 @@
 			// 查看详情
 			toDetail(id) {
 				this.showDetailDialog = true;
-				this.curId = id;
-				this.$refs.detailDialog.getTaskListDetail({
-					page: 1,
-					limit: 10,
-					tasklist_id: id,
-				});
+				this.$refs.detailDialog.getTaskListDetail(id);
 			},
 			// 当前页数据条数/页码改变
 			pageChange(obj) {
