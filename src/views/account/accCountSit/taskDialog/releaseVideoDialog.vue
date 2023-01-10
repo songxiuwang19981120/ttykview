@@ -178,6 +178,7 @@ handleError(error){
       try {
         if(this.releaseVideoForm.video_url === ""){
           this.$message.error('请选择需上传视频')
+          return false
         }
         if (this.flag.test(this.releaseVideoForm.label)) {
           //snsArr=str.split(/[(\r\n)\r\n]+/);
@@ -191,20 +192,17 @@ handleError(error){
             return this.trimAll(item);
         }).join("\n");
         let result = await this.confrimVideo(this.releaseVideoForm);
-        console.log(result);
         if (result?.status == 200) {
           this.$message.success("上传成功");
-          this.resetForm();
           this.loading = false;
+          this.resetForm();
+          this.handlerClose()
           return;
         }
         this.$message.error(result?.msg ?? "上传失败");
-
         this.loading = false;
-        //this.resetForm()
-        //this.handlerClose()
-
-        console.log("提交", this.releaseVideoForm);
+        this.resetForm()
+        this.handlerClose()
       } catch (error) {
         this.loading = false;
         this.$message.error;

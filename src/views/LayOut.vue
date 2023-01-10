@@ -56,10 +56,33 @@ export default {
 }
 
 .tt-main {
+  padding: 0 10px
   width: 100% !important;
-  height: calc(100vh - 70px);
+
   box-sizing: border-box;
-  background-color: #EFEFEF;
-  padding: 10px 20px 10px;
+
 }
+
+
+/* .el-cascader-panel .el-radio {
+  100%;
+  height: 100%;
+  z-index: 10;
+  position: absolute;
+  top: 0px;
+  right: 10px;
+}
+
+.el-cascader-node__label {
+  157px;
+}
+
+.el-cascader-panel .el-radio__input {
+  visibility: hidden;
+}
+
+.el-cascader-panel .el-cascader-node__postfix {
+  top: 10px;
+} */
+
 </style>

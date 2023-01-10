@@ -70,15 +70,15 @@
 
         <el-form-item label="修改昵称 ：">
           <p style="width: 42%">当前可用{{nicknameCanUseNum ?? 0}}个</p>
-          <el-checkbox v-model="eidtorForm.modify_nickname"></el-checkbox>
+          <el-checkbox v-model="nickname"></el-checkbox>
         </el-form-item>
         <el-form-item label="修改个人简介 ：">
           <p style="width: 42%">当前可用{{autographCanUseNum ?? 0}}个</p>
-          <el-checkbox v-model="eidtorForm.modify_userdesc"></el-checkbox>
+          <el-checkbox v-model="signature"></el-checkbox>
         </el-form-item>
         <el-form-item label="修改头像 ：">
           <p style="width: 42%">当前可用{{headimageCanUseNum ?? 0}}个</p>
-          <el-checkbox v-model="eidtorForm.modify_avatar"></el-checkbox>
+          <el-checkbox v-model="avatar_thumb"></el-checkbox>
         </el-form-item>
 <!--         <el-form-item label="选择当前分类所有账号 ：">
           <el-checkbox v-model="eidtorForm.check_all"></el-checkbox>
@@ -106,13 +106,13 @@ export default {
   components: { GroupSelect, TypeSelect },
   props: {
     showBatchEditor: {
-      type: Boolean,
+      type: Boolean
     },
     member_ids: {
-      type: String,
+      type: String
     },
     editorTota: {
-      type: Number,
+      type: Number
     },
     typecontrol_id:{
       type: Array
@@ -194,6 +194,9 @@ export default {
       ],
       groupId: "",
       typeId: "",
+      nickname:false,
+      avatar_thumb:false,
+      signature:false,
       eidtorForm: {
         grouping_id: "",
         typecontrol_id: "",
@@ -311,17 +314,57 @@ export default {
       this.$parent.closeBatchEditor();
       this.checkAcc = ""
     },
-    async handlerConfrim() {
-      this.eidtorForm.member_ids = this.member_ids
-      this.eidtorForm.grouping_id = this.groupId
-      this.eidtorForm.typecontrol_id = this.typeId[this.typeId.length - 1]
-      console.log(this.eidtorForm);
-      let data = {
-        uid_list: this.member_ids ?? '',
-        old_typecontrol_id: this.typecontrol_id[this.typecontrol_id.length - 1] ?? '',
-        old_grouping_id: this.grouping_id ?? '',
 
+    /*
+        function: getTypeControlList
+        params: null
+        desc: 表单提交回调
+    */
+    async handlerConfrim() {
+      try {
+        let uid_list = this.typecontrol_id.length !== 0 ? this.member_ids.split(',').filter(item=>{
+          return item !== ''
+        }) : ''
+      let old_typecontrol_id = uid_list.length === 0 ? this.typecontrol_id[this.typecontrol_id.length - 1] : ''
+      let old_grouping_id =  uid_list.length === 0 ? this.grouping_id : ''
+      let data = {
+        uid_list: uid_list,
+        old_typecontrol_id: old_typecontrol_id ?? '',
+        old_grouping_id: old_grouping_id ?? '',
+        typecontrol_id: this.typeId[this.typeId.length - 1] ?? '',
+        grouping_id: this.groupId,
+        nickname: this.nickname === false ? '' : 1,
+        avatar_thumb: this.avatar_thumb === false ? '' : 1,
+        signature: this.signature === false ? '' : 1,
       }
+      if(this.nickname === true && this.nicknameCanUseNum < this.accTotal){
+        this.$message.warning('昵称素材不足，请前往素材库添加')
+        return false
+      }
+      if(this.signature === true && this.autographCanUseNum < this.accTotal){
+        this.$message.warning('个人简介素材不足，请前往素材库添加')
+        return false
+      }
+      if(this.avatar_thumb === true && this.headimageCanUseNum < this.accTotal){
+        this.$message.warning('头像素材不足，请前往素材库添加')
+        return false
+      }
+      let result = await this.$api({type:'batchEditorAcc',data})
+      if(result?.status == 200){
+        this.$message.success('操作成功')
+        this.handlerClose();
+        this.resetForm();
+        return
+      }
+      this.$message.error(result.msg ?? "操作失败");
+      this.handlerClose();
+      this.resetForm();
+      } catch (error) {
+        this.$message.error('操作失败')
+        console.error(error);
+      }
+
+      
 /*       try {
         let typeId = this.eidtorForm.typecontrol_id;
         this.eidtorForm.typecontrol_id = this.formatTypeId(typeId);

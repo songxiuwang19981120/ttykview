@@ -102,6 +102,10 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+
+.el-card__body, .el-main
+  padding: 0 !important
+
 .login-authitem {
   display: flex;
 }
@@ -138,7 +142,7 @@ export default {
 
 .login-card {
   width: 30%;
-  height: 40%;
+  height: 5 0%;
   margin: 0 auto;
 }
 

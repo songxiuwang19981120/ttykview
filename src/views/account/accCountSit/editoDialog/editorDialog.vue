@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog
-      width="30%"
+      width="45%"
       :visible="showEditorDialog"
       :before-close="handlerClose"
     >
@@ -102,7 +102,7 @@
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
           <div>
-            <el-button
+            <el-button           
               class="avatar-random--btn ml-52"
               type="primary"
               @click="
@@ -153,6 +153,12 @@ export default {
     user_id: {
       type: String,
     },
+    page:{
+      type:Number
+    },
+    limit:{
+      type:Number
+    }
   },
 
   watch: {
@@ -200,8 +206,8 @@ export default {
         nickname: "",
         signature: "",
         avatar_uri: "",
-        typecontrol_id: "",
-        grouping_id: "",
+        typecontrol_id: this.$parent.$data.accInfo.typecontrol_id,
+        grouping_id: this.$parent.$data.accInfo.grouping_id,
       },
       destroyInfo: {
         //编辑时随机获取的信息
@@ -249,10 +255,31 @@ export default {
       return data;
     },
 
+    async initTypeList(){
+      try {
+        let searchTypeData = {
+          grouping_id: this.accInfo.grouping_id,
+        };
+        let result = await this.$api({
+          type: "getTypecontrol",
+          data: searchTypeData,
+        });
+        this.typeList = this.getTreeData(result.data);
+      } catch (error) {
+        console.error(error);
+      }
+
+    },
+
     async getGroupList() {
-      let result = await this.$api({ type: "getGrouping" });
-      console.log(result);
-      this.groupList = result.data.list;
+      try {
+        let result = await this.$api({ type: "getGrouping" });
+        this.groupList = result.data.list;
+        this.initTypeList()
+      } catch (error) {
+        console.error(error);
+      }
+
     },
 
     /* 
@@ -398,9 +425,7 @@ export default {
         let memberInfo = {
           user_id: this.user_id,
           grouping_id: this.accUpdateForm.grouping_id,
-          typecontrol_id: this.accUpdateForm.typecontrol_id[
-            this.accUpdateForm.typecontrol_id.length - 1
-          ]
+          typecontrol_id: typecontrol_id
         };
         await this.updateInfo(Object.fromEntries(accUpdateForm)),
         await this.delInfo(Object.fromEntries(destroyInfo)),
@@ -436,7 +461,7 @@ export default {
     }) {
       try {
         this[loading] = true;
-        let typeId = this.accUpdateForm.typecontrol_id;
+        let typeId = this.accUpdateForm.typecontrol_id || this.accInfo.typecontrol_id;
         if (typeId.length === 0) {
           this.$message.error("请先选择分类");
           this[loading] = false;
@@ -446,7 +471,7 @@ export default {
           typecontrol_id: typeId[typeId.length - 1],
           type: type,
         };
-        let result = await this.$api({ type: "getUserRandomInfo", data: data });
+        let result = await this.$api({ type: "getUserRandomInfo", data });
         if (result.data?.[0]?.[resAccParams]) {
           this.accUpdateForm[accParams] = result.data[0]?.[resAccParams];
           this.destroyInfo[desParams] = result.data[0]?.[resDesParams];

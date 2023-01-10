@@ -1,98 +1,108 @@
 <template>
   <div class="tt-accsituation" ref="accsituation">
     <div class="tt-accsituation--top">
-      <div class="mr-15">
-        <el-select
+      <div class="flex-jus-spacebet">
+        <div class="mr-30">
+          <el-select
+            style="width: 150px"
+            size="medium"
+            ref="gropuSelect"
+            clearable
+            v-model="group"
+            placeholder="设置分组"
+            @change="setLocalGroup"
+          >
+            <el-option
+              v-for="item in groupList"
+              :value="item.grouping_id"
+              :label="item.grouping_name"
+              :key="item.grouping_id"
+            ></el-option>
+          </el-select>
+        </div>
+
+        <div class="mr-30">
+          <el-cascader
+            style="width: 150px"
+            size="medium"
+            @change="setLocalType"
+            clearable
+            :props="{ checkStrictly: true, value: 'value' }"
+            :options="typeList"
+            v-model="classiFication"
+            placeholder="设置分类"
+          ></el-cascader>
+        </div>
+
+        <div class="mr-30">
+          <el-select
+            style="width: 100px"
+            size="medium"
+            @change="setLocalFans"
+            clearable
+            v-model="fans"
+            placeholder="粉丝量"
+          >
+            <el-option
+              v-for="item in fans_option"
+              :value="item.value"
+              :label="item.label"
+              :key="item.label"
+            ></el-option>
+          </el-select>
+        </div>
+
+        <el-input
+          style="width: 150px"
           size="medium"
-          ref="gropuSelect"
           clearable
-          v-model="group"
-          placeholder="设置分组"
-          @change="setLocalGroup"
-        >
-          <el-option
-            v-for="item in groupList"
-            :value="item.grouping_id"
-            :label="item.grouping_name"
-            :key="item.grouping_id"
-          ></el-option>
-        </el-select>
-      </div>
+          class="search-uid search-uid--input mr-30"
+          v-model="accUid"
+          placeholder="请输入账号UID"
+        ></el-input>
 
-      <div class="mr-15">
-        <el-cascader
+        <el-button
+          type="primary"
           size="medium"
-          @change="setLocalType"
-          clearable
-          :props="{ checkStrictly: true, value: 'value' }"
-          :options="typeList"
-          v-model="classiFication"
-          placeholder="设置分类"
-        ></el-cascader>
-      </div>
-
-      <div class="mr-15">
-        <el-select
+          class="base-btn search-btn"
+          @click="handlerSearch"
+          >搜 索</el-button
+        >
+        <el-button
+          type="primary"
           size="medium"
-          @change="setLocalFans"
-          clearable
-          v-model="fans"
-          placeholder="粉丝量"
+          class="base-btn search-btn"
+          @click="RestQuery"
+          >重 置</el-button
         >
-          <el-option
-            v-for="item in fans_option"
-            :value="item.value"
-            :label="item.label"
-            :key="item.label"
-          ></el-option>
-        </el-select>
       </div>
 
-      <el-input
-        style="width: 15%"
-        size="medium"
-        clearable
-        class="search-uid--input mr-30"
-        v-model="accUid"
-        placeholder="请输入账号UID"
-      ></el-input>
+      <div class="flex-jus-spacebet">
+        <div class="ml-15">
+          <span class="fz-14" style="color: rgba(16, 16, 16, 1)"
+            >开启回关：</span
+          >
+          <el-switch
+            @click="toogleFollow"
+            style="width: 30px; height: 30px"
+            v-model="openFollow"
+            active-color="#ff4949"
+          >
+          </el-switch>
+        </div>
 
-      <el-button
-        type="primary"
-        size="medium"
-        class="base-btn search-btn"
-        @click="handlerSearch"
-        >搜 索</el-button
-      >
-      <el-button
-        type="primary"
-        size="medium"
-        class="base-btn search-btn"
-        @click="RestQuery"
-        >重 置</el-button
-      >
-      <div class="ml-15">
-        <span class="fz-14" style="color: rgba(16, 16, 16, 1)">开启回关：</span>
-        <el-switch
-          @click="toogleFollow"
-          style="width: 30px; height: 30px"
-          v-model="openFollow"
-          active-color="#ff4949"
+        <el-button
+          type="primary"
+          size="medium"
+          class="base-btn ml-15"
+          style="width: 150px"
+          @click="showBatchEditorDialog"
+          >编辑选中账号信息</el-button
         >
-        </el-switch>
       </div>
-
-      <el-button
-        type="primary"
-        size="medium"
-        class="base-btn ml-15"
-        style="width: 150px"
-        @click="showBatchEditorDialog"
-        >编辑选中账号信息</el-button
-      >
     </div>
 
-    <div class="tt-accsituation-main">
+    <div class="tt-accsituation-main" style="border: 1px solid #BBBBBB ; border-radius: 8px">
       <div
         style="height: 35px; margin-bottom: 10px"
         class="flex-jus-spacebet pad-0-20"
@@ -131,7 +141,7 @@
           </div>
         </div>
 
-        <div style="width: 27%" class="flex-jus-spacebet">
+        <div  class="flex-jus-spacebet">
           <el-select
             size="medium"
             style="width: 110px"
@@ -178,6 +188,7 @@
 
       <keep-alive>
         <table-custom
+          style="margin-bottom: 10px;"
           ref="multipleTable"
           class="tt-accsituation--tabel"
           :mutiSelect="true"
@@ -188,14 +199,15 @@
           :height="tabelHeight"
         ></table-custom>
       </keep-alive>
-    </div>
 
     <Pagination
+      style="padding: 4px"
       :total="total"
       :page="page"
       :limit="limit"
       @pagination="handlePagination"
     />
+    </div>
 
     <ConfrimDelDialog
       :showConfrimDel="showConfrimDel"
@@ -213,6 +225,8 @@
       :groupList="groupList"
       :userIdList="userIdList"
       :accInfo="accInfo"
+      :page="page"
+      :limit="limit"
     />
 
     <VideoTabel
@@ -319,6 +333,7 @@ export default {
       }
       this.checkType = true;
       let data = {
+        grouping_id:this.group,
         typecontrol_id: this.classiFication[this.classiFication.length - 1],
       };
       let result = await this.getProjectNum(data);
@@ -395,7 +410,7 @@ export default {
           prop: "avatar_thumb",
           label: "基础信息",
           align: "left",
-          width: "270",
+         
           render: (h, { row }) => {
             return (
               <div style="display: flex;align-items:center;min-width: 270px">
@@ -435,16 +450,11 @@ export default {
             );
           },
         },
-        {
-          prop: "updata_time",
-          label: "更新时间",
-          width: "132",
-          align: "center",
-        },
+
         {
           prop: "status",
           label: "状态",
-          width: "100",
+          
           align: "center",
           render: (h, { row }) => {
             return (
@@ -457,13 +467,17 @@ export default {
           label: "个人简介",
           align: "center",
           render: (h, { row }) => {
-            let text;
+            let showText;
+            let tipText
             row.signature.length > 0
-              ? (text = row.signature.substring(0, 10) + "...")
-              : (text = "暂无简介");
+              ? (showText = row.signature.substring(0, 10) + "...")
+              : (showText = "暂无简介");
+            row.signature.length > 0
+              ? (tipText = row.signature)
+              : (tipText = "暂无简介");
             return (
-              <el-tooltip content={text} placement="top">
-                <p style="font-size: 12px">{text}</p>
+              <el-tooltip content={tipText} placement="top">
+                <p style="font-size: 12px">{showText}</p>
               </el-tooltip>
             );
           },
@@ -471,8 +485,8 @@ export default {
         {
           prop: "aweme_count",
           label: "视频数量",
-          width: "100",
           align: "center",
+          
           render: (h, { row }) => {
             return (
               <span
@@ -488,7 +502,7 @@ export default {
           prop: "unread_viewer_count",
           label: "主页访问人数",
           align: "center",
-          width: "120",
+          
           render: (h, { row }) => {
             let colorRed = "";
             if (this.sortQuery == "unread_viewer_count") {
@@ -510,6 +524,7 @@ export default {
           prop: "following_status",
           label: "关注",
           align: "center",
+          
           render: (h, { row }) => {
             let colorRed = "";
             if (this.sortQuery == "following_count") {
@@ -527,6 +542,7 @@ export default {
         {
           prop: "follower_status",
           label: "粉丝",
+          
           align: "center",
           render: (h, { row }) => {
             let colorRed = "";
@@ -545,6 +561,7 @@ export default {
         {
           prop: "total_favorited",
           label: "获赞",
+          
           align: "center",
           render: (h, { row }) => {
             let colorRed = "";
@@ -575,9 +592,15 @@ export default {
           },
         },
         {
+          prop: "updata_time",
+          label: "更新时间",
+          width: "134",
+          align: "center",
+        },
+        {
           prop: "operation",
           label: "操作",
-          width: "150",
+          width: "127",
           align: "center",
           fixed: "right",
           render: (h, { row }) => {
@@ -755,7 +778,7 @@ export default {
         params: null
         desc: 创建刷新账号任务后执行，实时更新刷新进度
     */
-    updateProgress() {
+/*     updateProgress() {
       let update = setInterval(() => {
         this.getRefreshDetail().then((res) => {
           console.log(res, "=====================updateProgress");
@@ -776,7 +799,7 @@ export default {
           }
         });
       }, 5000);
-    },
+    }, */
 
     /*
         function: getTreeData
@@ -837,7 +860,7 @@ export default {
       let data = {
         min: this.min ?? "",
         max: this.max ?? "",
-        typecontrol_id: this.classiFication ?? "",
+        typecontrol_id: this.classiFication[this.classiFication.length - 1] ?? "",
         grouping_id: this.group ?? "",
         limit: this.limit ?? 10,
         page: this.page ?? 1,
@@ -1086,18 +1109,18 @@ export default {
         params: null
         desc: 刷新界面，用于更新操作之后
     */
-    updateMemberList(e) {
-      console.log(e);
+    updateMemberList() {
       let data = {
         min: this.min ?? "",
         max: this.max ?? "",
-        typecontrol_id: this.classiFication[this.classiFication.length - 1] ?? "",
+        typecontrol_id:
+          this.classiFication[this.classiFication.length - 1] ?? "",
         grouping_id: this.group ?? "",
         limit: this.limit ?? 20,
         page: this.page ?? 1,
         uid: this.accUid ?? "",
       };
-      //this.getMemberList(data);
+      this.getMemberList(data);
     },
 
     /* 
@@ -1308,7 +1331,8 @@ export default {
           return false;
         }
         let data = {
-          typecontrol_id: this.formatTypeId(this.classiFication),
+          grouping_id: this.group ?? '',
+          typecontrol_id: this.formatTypeId(this.classiFication) ?? '',
         };
         let result = await this.$api({ type: "getProjectNum", data: data });
         this.materialTotal = result.data.num ?? 0;
@@ -1366,7 +1390,7 @@ export default {
         desc: 更新可用素材，由子组件触发的自定义事件
     */
     async updateProjectNum(params) {
-      let data = { typecontrol_id: params[0] };
+      let data = { typecontrol_id: params[0],grouping_id:params[1] };
       let result = await this.$api({ type: "getProjectNum", data: data });
       this.materialTotal = result.data.num ?? 0;
     },
@@ -1520,9 +1544,8 @@ handleCountDown() {
 
 .tt-accsituation--top {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
-
   width: 100%;
   height: 60px;
 }
@@ -1639,7 +1662,7 @@ handleCountDown() {
 }
 
 .tt-accsituation-main {
-  padding-top: 20px;
+  padding-top: 10px;
   background-color: #fff;
 }
 
@@ -1676,6 +1699,10 @@ handleCountDown() {
 
 ::v-deep .el-table__cell {
   padding: 6px 0;
+}
+
+::v-deep .search-uid {
+  padding-left: 0;
 }
 </style>
 
