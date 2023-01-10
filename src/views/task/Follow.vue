@@ -3,66 +3,31 @@
     <div class="tt-accsituation">
       <div class="tt-accsituation--operation">
         <div style="margin-right: 20px">
-          <el-select
-            v-model="search.status"
-            placeholder="请选择任务状态"
-            size="medium"
-          >
-            <el-option
-              v-for="item in searchStateList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
+          <el-select v-model="search.status" placeholder="请选择任务状态" size="medium">
+            <el-option v-for="item in searchStateList" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
-          <el-date-picker
-            value-format="yyyy-MM-dd"
-            size="medium"
-            class="date-picker"
-            v-model="search.date"
-            type="daterange"
-            align="right"
-            unlink-panels
-            range-separator="——"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            :picker-options="pickerOptions"
-          >
+          <el-date-picker value-format="yyyy-MM-dd" size="medium" class="date-picker" v-model="search.date"
+            type="daterange" align="right" unlink-panels range-separator="——" start-placeholder="开始日期"
+            end-placeholder="结束日期" :picker-options="pickerOptions">
           </el-date-picker>
         </div>
-        <el-button type="primary" size="medium" class="seachbut" :loading="btnloading" @click="searchTasks">{{ btnloading ? "加载中..." : "搜索"}}</el-button>
+        <el-button type="primary" size="medium" class="seachbut" :loading="btnloading" @click="searchTasks">{{
+          btnloading? "加载中...": "搜索"
+        }}</el-button>
         <el-button type="primary" size="medium" class="seachbut" @click="btnReset">重置</el-button>
         <el-button type="primary" size="medium" class="seachbut" @click="shownewFollow">关注任务</el-button>
         <!-- <i class="el-icon-refresh-left"></i> -->
       </div>
     </div>
     <!-- 表格 -->
-    <table-custom
-      :loading="loading"
-      :tableData="tableData"
-      :columns="columns"
-      height="700"
-    ></table-custom>
+    <table-custom :loading="loading" :tableData="tableData" :columns="columns" height="700"></table-custom>
     <!-- 分页 -->
-    <pagination
-      :total="total"
-      :page="page.page"
-      :limit="page.limit"
-      @pagination="pageChange"
-    ></pagination>
+    <pagination :total="total" :page="page" :limit="limit" @pagination="pageChange"></pagination>
     <!-- 弹层 -->
-    <followDetail
-      ref="followDialog"
-      :showDialog.sync="showTaskDetail"
-      :curId="curId"
-    ></followDetail>
+    <followDetail ref="followDialog" :showDialog.sync="showTaskDetail" :curId="curId"></followDetail>
     <!-- 关注任务 -->
-    <newFollow
-      ref="newfollowDialog"
-      @closeLetterTask="closeLetterTask"
-      :showLetterTask="showLetterTask"
-    />
+    <newFollow ref="newfollowDialog" @closeLetterTask="closeLetterTask" :showLetterTask="showLetterTask" />
   </div>
 </template>
 <script>
@@ -173,16 +138,14 @@ export default {
         },
       ],
       dialog: false, // 弹层
-      page: {
-        page: 1,
-        limit: 10,
-        task_type: "Follow",
+      page: 1,
+      limit: 10,
+      task_type: "Follow",
+      search: {
+        status: "",
+        date: ""
       },
-      search:{
-        status:"",
-        date:""
-      },
-      
+
       total: 0,
       curId: null,
       pickerOptions: {
@@ -221,17 +184,17 @@ export default {
 
   created() {
     // 获取关注列表
-    this.getVideoTasks(this.page);
+    this.getVideoTasks();
   },
 
-  mounted() {},
+  mounted() { },
 
 
 
   methods: {
 
-    
-    async getMember(data){
+
+    async getMember(data) {
       try {
         let result = await this.$api({
           type: "getMember",
@@ -241,24 +204,6 @@ export default {
       } catch (error) {
         console.error(error);
       }
-    },
-
-    async searchAccTotal(){
-      try {
-        let data = {
-          typecontrol_id: "",
-          uid: this.accUid ?? "",
-          min: this.fans[0] ?? "",
-          max: this.fans[1] ?? "",
-          limit: this.limit ?? "",
-          page: this.page ?? "",
-          grouping_id: this.group ?? "",
-        };
-      } catch (error) {
-        
-      }
-
-
     },
 
 
@@ -281,7 +226,13 @@ export default {
       this.$refs.newfollowDialog.getList();
     },
     // 获取关注任务列表
-    async getVideoTasks(data) {
+    async getVideoTasks() {
+      let data = {
+        page: this.page,
+        limit: this.limit,
+        task_type: this.task_type,
+        status:this.status
+      }
       try {
         this.loading = true;
         const res = await this.$api({
@@ -309,23 +260,23 @@ export default {
     },
     // 当前页数据条数/页码改变
     pageChange(obj) {
-      (this.page.page = obj.page), (this.page.limit = obj.limit);
-      this.getVideoTasks(this.page);
+      this.page = obj.page
+      this.limit = obj.limit;
+      this.getVideoTasks();
     },
     // 点击查询按钮
     searchTasks() {
       //this.btnloading = true;
-      //this.page.page = 1;
-      console.log(this.search);
-      //this.getVideoTasks(this.page);
+      this.page = 1;
+      this.getVideoTasks();
     },
     // 点击重置按钮
     btnReset() {
       this.search = {
-        date : "",
-        status : ""
+        date: "",
+        status: ""
       }
-      //this.getVideoTasks(this.page);
+      this.getVideoTasks();
     },
   },
 };

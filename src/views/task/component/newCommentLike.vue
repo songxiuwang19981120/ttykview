@@ -31,7 +31,7 @@
         </el-form-item>
         <el-form-item prop="tasklist_id_list" label="选择数据来源 ：" v-model="likeCommentTaskForm.tasklist_id_list">
           <el-select style="width: 50%" clearable multiple v-model="likeCommentTaskForm.tasklist_id_list"
-            placeholder="选择数据来源" size="medium">
+            placeholder="选择数据来源" size="medium" v-loadMore="sourceLoadMore">
             <el-option v-for="item in sourceData" :key="item.tasklist_id" :label="item.task_name"
               :value="item.tasklist_id"></el-option>
           </el-select>
@@ -154,6 +154,8 @@ export default {
         grouping_id: '',
         task_name: '' //备注任务名称
       },
+      page: 1,
+      limit: 20,
     };
   },
   watch: {
@@ -279,9 +281,25 @@ export default {
 
 
     async getTasklist() {
-      let data = { task_type: "CollectionVideo" };
+      let data = { task_type: "CollectionUser" };
       let result = await this.$api({ type: "getTasklist", data });
       this.sourceData = result.data.list;
+    },
+    // 获取数据来源（拉到底部加载新的数据）
+    async sourceLoadMore() {
+      this.page = ++this.page;
+      let data = {
+        task_type: "CollectionUser",
+        page: this.page,
+        limit: this.limit,
+      };
+      let result = await this.$api({ type: "getTasklist", data });
+      result.data.list.forEach((item) => {
+        this.sourceData.push(item);
+      });
+      if (this.sourceData.length == this.sourceCount) {
+        this.$message.warning("刷到底了");
+      }
     },
 
     /* 
@@ -297,7 +315,6 @@ export default {
       this.countryOptions= []
       this.$refs["likeCommentForm"].resetFields();
       this.$emit("closeLikeCommentTask");
-      this.$emit("getVideoTasks");
     },
 
     /* 
@@ -311,10 +328,6 @@ export default {
           if (valid) {
             let data = JSON.parse(JSON.stringify(this.likeCommentTaskForm))
             data.typecronl_id = this.formatTypeId(this.likeCommentTaskForm.typecronl_id)
-            // data.country = data.country.map((item) => { return item;}).join(',');
-            // data.tasklist_id_list = data.tasklist_id_list.map((item) => { return item;}).join(',');
-            // data.black_list = data.black_list.map((item) => { return item;}).join(',');
-
             this.pushCommentTask(data)
           }
         });
@@ -331,6 +344,7 @@ export default {
         });
         if (res.status == 200) {
           this.$message.success(res.msg ?? "操作成功");
+          this.$parent.getVideoTasks()
           this.handlerClose();
         } else {
           this.$message.error(res.msg ?? "操作失败");

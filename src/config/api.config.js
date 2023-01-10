@@ -735,6 +735,21 @@ export default {
     url: '/push/screen_follow',
     method: 'GET',
   },
+  // 任务详情日志
+  'taskListDetailIndex': {
+    url: '/TaskListDetail/index',
+    method: 'POST',
+  },
+  // 上传视频
+  'materialUpload': {
+    url: '/Material/upload',
+    method: 'POST',
+  },
+  // 上传头像
+  'headimageUpload': {
+    url: '/Headimage/upload',
+    method: 'POST',
+  },
 }
 
 

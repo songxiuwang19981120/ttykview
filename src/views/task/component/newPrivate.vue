@@ -310,6 +310,7 @@ export default {
         let result = await this.$api({ type: 'pushChat',data });
         if (result.status == '200') {
           this.$message.success({ message: result.msg });
+          this.$parent.getVideoTasks()
           this.handlerClose();
         } else {
           this.$message.error({ message: result.msg });

@@ -3,7 +3,7 @@
     <div class="tt-accsituation">
       <div class="tt-accsituation--operation">
         <div style="margin-right: 20px">
-          <el-select v-model="page.status" placeholder="请选择任务状态" size="medium">
+          <el-select v-model="status" placeholder="请选择任务状态" size="medium">
             <el-option v-for="item in searchStateList" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
@@ -24,7 +24,7 @@
     <!-- 表格 -->
     <table-custom height="700" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
     <!-- 分页 -->
-    <pagination :total="total" :page="page.page" :limit="page.limit" @pagination="pageChange"></pagination>
+    <pagination :total="total" :page="page" :limit="limit" @pagination="pageChange"></pagination>
     <!-- 弹层 -->
     <privateLetterDetail ref="taskDialog" :showDialog.sync="dialog" :curId="curId">
     </privateLetterDetail>
@@ -143,12 +143,10 @@ export default {
         },
       ],
       dialog: false, // 弹层
-      page: {
-        page: 1,
-        limit: 10,
-        task_type: "Chat",
-        status: "",
-      },
+      page: 1,
+      limit: 10,
+      task_type: "Chat",
+      status: "",
       total: 0,
       curId: null,
       pickerOptions: {
@@ -187,7 +185,7 @@ export default {
 
   created() {
     // 获取私信任务列表
-    this.getVideoTasks(this.page);
+    this.getVideoTasks();
   },
 
   mounted() { },
@@ -212,7 +210,13 @@ export default {
       this.$refs.newPrivateDialog.getList()
     },
     // 获取私信任务列表
-    async getVideoTasks(data) {
+    async getVideoTasks() {
+      let data = {
+        page: this.page,
+        limit: this.limit,
+        task_type: "Chat",
+        status: this.status,
+      }
       try {
         this.loading = true;
         const res = await this.$api({
@@ -240,24 +244,23 @@ export default {
     },
     // 当前页数据条数/页码改变
     pageChange(obj) {
-      (this.page.page = obj.page), (this.page.limit = obj.limit);
-      this.getVideoTasks(this.page);
+      this.page = obj.page
+      this.limit = obj.limit;
+      this.getVideoTasks();
     },
     // 点击查询按钮
     searchTasks() {
       this.btnloading = true;
-      this.page.page = 1;
-      this.getVideoTasks(this.page);
+      this.page = 1;
+      this.getVideoTasks();
     },
     // 点击重置按钮
     btnReset() {
-      this.page = {
-        page: 1,
-        limit: 10,
-        task_type: "Chat",
-        status: "",
-      };
-      this.getVideoTasks(this.page);
+      this.page = 1,
+        this.limit = 10,
+        this.task_type = "Chat",
+        this.status = "",
+        this.getVideoTasks(e);
     },
   },
 };
