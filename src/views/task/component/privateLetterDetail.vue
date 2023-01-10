@@ -119,21 +119,21 @@ export default {
 							<div style="display: flex;max-width: 260px">
 								<el-image
 									class="table-avatar mr-15"
-									src={row.img}
+									src={row.member.avatar_thumb}
 									style="width: 60px; height: 60px; border-radius: 50%;margin-right: 16px"
 								></el-image>
 								<div>
-									<p style="font-size: 14px;">{row.nickname}</p>
+									<p style="font-size: 14px;margin-bottom:8px">{row.nickname}</p>
 									<p style="font-size: 12px;">ID ：{row.uid}</p>
 									<el-tooltip content="Top center" placement="right-start">
 										<div slot="content">
-											账号归属：
+											{/* 账号归属：
+											<br /> */}
+											设备分类：{row.member.type_parent_names_text}
 											<br />
-											设备分类：
+											设备编号：{row.member.phone_number}
 											<br />
-											设备编号：
-											<br />
-											备份名称：
+											备份名称：{row.member.backups_name}
 											<br />
 										</div>
 										<span style="display: inline-block; background-color: #FFDDA5; font-size:12px; border-radius: 4px">
@@ -147,55 +147,48 @@ export default {
 				},
 				{
 					label: '账号分类',
-					prop: 'task_type',
+					prop: 'type_parent_names_text',
 					align: 'center',
-					width: '150',
 				},
 				{
 					label: '任务批次',
-					prop: 'task_type',
+					prop: 'pici_num',
 					align: 'center',
-					width: '100',
 				},
 				{
 					label: '目标数量',
-					prop: 'task_type',
+					prop: 'num',
 					align: 'center',
-					width: '100',
 				},
 				{
 					label: '已执行数量',
-					prop: 'task_type',
+					prop: 'success_num',
 					align: 'center',
-					width: '100',
 				},
 
 				{
 					label: '失败次数',
-					prop: 'task_type',
+					prop: 'fail_num',
 					align: 'center',
-					width: '100',
 				},
 				{
 					label: '更新时间',
 					prop: 'create_time',
 					align: 'center',
-					width: '150',
 				},
 				{
 					label: '状态',
 					prop: 'status',
 					align: 'center',
-					width: '100',
 					render(h, { row }) {
 						const { status } = row;
 						let state;
 						if (status == 0) {
-							state = '成功';
-						} else if (status == 1) {
 							state = '未开始';
-						} else if (status == 2) {
-							state = '失败';
+						} else if (status == 1){
+							state = '执行中';
+						}else{
+							state = '完成';
 						}
 						return <div>{state}</div>;
 					},
@@ -204,7 +197,7 @@ export default {
 					label: "操作",
 					align: "center",
 					fixed: 'right',
-					width: '150',
+					width: "150",
 					render: (h, { row }) => {
 						return (
 							<div>
@@ -272,7 +265,8 @@ export default {
 			try {
 				let result = await this.$api({ type: "taskListTaskUids", data });
 				if (result.status == 200) {
-					this.tableData = result.data;
+					this.tableData = result.data.list;
+					this.total = result.data.count;
 				} else {
 					this.$message.error(result.msg);
 				}
@@ -290,6 +284,7 @@ export default {
 			this.$emit('update:showDialog', false);
 			this.page = 1;
 			this.limit = 20;
+			this.tableData=[];
 		},
 	},
 };

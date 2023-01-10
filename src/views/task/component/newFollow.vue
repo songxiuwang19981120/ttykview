@@ -409,6 +409,7 @@ export default {
       let result = await this.$api({ type: "pushFollow", data: data });
       if (result.status == 200) {
         this.$message.success(result.msg);
+        this.$parent.getVideoTasks()
         this.handlerClose();
       } else {
         this.$message.warning(result.msg);
