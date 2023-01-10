@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-checkbox-group v-model="checkedCities" class="img">
+    <div class="img">
 				<div v-for="(item, index) in tableData" :key="index" class="imgData">
 					<el-image :src="item.image" class="imgsize"></el-image>
 					<div :label="item.headimage_id" :key="item.headimage_id" class="imgNum"
@@ -8,7 +8,7 @@
 					>
 					<div class="imgNum">上传时间:{{ item.usage_time }}</div>
 				</div>
-			</el-checkbox-group>
+			</div>
       <pagination
 			:total="total"
 			:page="current_page"
@@ -30,7 +30,6 @@ export default {
         total: 0, //数据总量
 				current_page: 1, //当前页
 				current_limit: 50, //每页条数
-        checkedCities:"",//图片
         tableData: [
           {
           api_user_id:"2",
