@@ -13,7 +13,7 @@
             :value="item.value">
           </el-option>
         </el-select>
-        <el-button size="mini" type="danger">批量删除</el-button>
+        <el-button size="mini" type="danger" @click="deleteAccount">批量删除</el-button>
       </el-row>
     </div>
 
@@ -208,6 +208,8 @@ export default {
   components: { pagination, tableCustom },
   data() {
     return {
+      selectionId:"",//获取唯一ID值用来删除
+      selectionVal:"",//表格多选框选中的数据
       grouping:"",//账号分组选择
       options:[
       {
@@ -427,6 +429,7 @@ export default {
     */
     selectionChange(val) {
       console.log(val)
+      this.selectionVal=val
     },
 
     /* 
@@ -586,7 +589,7 @@ export default {
 					} else {
 						return this.$message.warning('添加账号内容不能为空');
 					}
-            console.log(AccountArr)//为一个数组,内容每次换行是一个字符串
+            console.log(AccountArr)//输入框中的内容为一个数组,内容每次换行是一个字符串
             this. AccountClose()
           } else {
             return this.$message.warning('添加账号内容不能为空');
@@ -623,15 +626,18 @@ export default {
      
       },
 
-
-
-
-
-
-
-
-
-
+    /* 
+        function: deleteAccount
+        params: null
+        desc: 批量删除选中
+    */
+    deleteAccount(){
+      this.selectionId=""
+      this.selectionVal.forEach(element => {
+        this.selectionId= this.selectionId+element.a+","
+      });
+      console.log(this.selectionId)
+      },
 
     
     /* 
