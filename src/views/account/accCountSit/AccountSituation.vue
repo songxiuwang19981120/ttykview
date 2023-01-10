@@ -410,7 +410,7 @@ export default {
           prop: "avatar_thumb",
           label: "基础信息",
           align: "left",
-         
+          width:'240',
           render: (h, { row }) => {
             return (
               <div style="display: flex;align-items:center;min-width: 270px">
@@ -561,7 +561,7 @@ export default {
         {
           prop: "total_favorited",
           label: "获赞",
-          
+         
           align: "center",
           render: (h, { row }) => {
             let colorRed = "";
@@ -580,7 +580,7 @@ export default {
         {
           prop: "follower_status",
           label: "播放/收藏/转发",
-          width: "150",
+          width: "130",
           align: "center",
           render: (h, { row }) => {
             return (
@@ -865,7 +865,12 @@ export default {
         limit: this.limit ?? 10,
         page: this.page ?? 1,
       };
+      let getProjectData = {
+        grouping_id:this.group,
+        typecontrol_id:this.classiFication[this.classiFication.length - 1] ?? "",
+      }
       await this.getMemberList(data);
+      await this.getProjectNum(getProjectData)
     },
 
     /* 
@@ -1089,6 +1094,7 @@ export default {
       }
       this.showBatchEditor = true;
       let data = {
+        grouping_id: this.group,
         typecontrol_id: this.classiFication[this.classiFication.length - 1],
       };
       let result = await this.getProjectNum(data);
@@ -1468,8 +1474,21 @@ export default {
         params: row | 该行的相应数据
         desc: 编辑操作时的回调
     */
-    handleEdit(row) {
+    async handleEdit(row) {
       this.user_id = row.uid;
+      console.log();
+      this.$refs['editor'].$data.accUpdateForm.grouping_id = this.accInfo.grouping_id
+      this.$refs['editor'].$data.accUpdateForm.typecontrol_id = this.accInfo.typecontrol_id
+      
+      let searchTypeData = {
+          grouping_id: this.accInfo.grouping_id,
+        };
+        let result = await this.$api({
+          type: "getTypecontrol",
+          data: searchTypeData,
+        });
+        this.typeList = this.getTreeData(result.data);
+        this.$refs['editor'].$data.typeList = this.typeList
       this.showEditorDialog = true;
     },
 

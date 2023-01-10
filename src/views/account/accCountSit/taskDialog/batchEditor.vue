@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog
-      width="30%"
+      width="40%"
       :visible="showBatchEditor"
       :before-close="handlerClose"
     >
@@ -167,6 +167,7 @@ export default {
           return false
         }
         let data = {
+          grouping_id :this.groupId,
           typecontrol_id: this.typeId[this.typeId.length - 1]
         }
         await this.$parent.getProjectNum(data)
