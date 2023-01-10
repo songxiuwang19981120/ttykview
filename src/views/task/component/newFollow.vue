@@ -1,47 +1,18 @@
 <template>
   <div>
-    <el-dialog
-      width="40%"
-      :visible="showLetterTask"
-      :before-close="handlerClose"
-      title="关注任务配置"
-    >
-      <el-form
-        ref="followTaskForm"
-        :rules="rules"
-        class="lettertask-form"
-        label-position="left"
-        label-width="220px"
-        :model="followTaskForm"
-      >
+    <el-dialog width="40%" :visible="showLetterTask" :before-close="handlerClose" title="关注任务配置">
+      <el-form ref="followTaskForm" :rules="rules" class="lettertask-form" label-position="left" label-width="220px"
+        :model="followTaskForm">
         <el-form-item prop="grouping_id" label="账号分组 ：">
-          <el-select
-            style="width: 50%"
-            ref="gropuSelect"
-            clearable
-            v-model="followTaskForm.grouping_id"
-            placeholder="选择分组"
-            size="medium"
-            @change="getTypeControlList"
-          >
-            <el-option
-              v-for="item in groupList"
-              :value="item.grouping_id"
-              :label="item.grouping_name"
-              :key="item.grouping_id"
-            ></el-option>
+          <el-select style="width: 50%" ref="gropuSelect" clearable v-model="followTaskForm.grouping_id" placeholder="选择分组"
+            size="medium" @change="getTypeControlList()">
+            <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
+              :key="item.grouping_id"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item prop="typecontrol_id" label="账号分类 ：">
-          <el-cascader
-            style="width: 50%"
-            clearable
-            :props="{ checkStrictly: true, value: 'value' }"
-            :options="typeList"
-            v-model="followTaskForm.typecontrol_id"
-            size="medium"
-            @change="getMemberList"
-          ></el-cascader>
+        <el-form-item prop="typecronl_id" label="账号分类 ：">
+          <el-cascader style="width: 50%" clearable :props="{ checkStrictly: true, value: 'value' }" :options="typeList"
+            v-model="followTaskForm.typecronl_id" size="medium" @change="getMemberList"></el-cascader>
         </el-form-item>
 
         <el-form-item label="">
@@ -52,28 +23,13 @@
         </el-form-item>
 
         <el-form-item label="备注任务名称 ：" prop="task_name">
-          <el-input
-            style="width: 50%"
-            type="text"
-            v-model="followTaskForm.task_name"
-            placeholder="请备注任务名称"
-          ></el-input>
+          <el-input style="width: 50%" type="text" v-model="followTaskForm.task_name" placeholder="请备注任务名称"></el-input>
         </el-form-item>
-        <el-form-item label="选择国家 ：" prop="account_region">
-          <el-select
-            style="width: 50%"
-            clearable
-            multiple
-            v-model="followTaskForm.account_region"
-            placeholder="选择国家"
-          >
-            <el-option
-              v-for="(item, index) in countryOptions"
-              :key="index"
-              :label="item"
-              :value="item"
-              >{{ item }}</el-option
-            >
+        <el-form-item label="选择国家 ：" prop="country_list">
+          <el-select style="width: 50%" clearable multiple v-model="followTaskForm.country_list" placeholder="选择国家">
+            <el-option v-for="(item, index) in countryOptions" :key="index" :label="item" :value="item">{{
+              item
+            }}</el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="选择数据来源 ：" prop="tasklist_id_list">
@@ -163,9 +119,7 @@
           </el-checkbox-group>
         </el-form-item>
       </el-form>
-      <p style="font-size: 12px; text-align: center">
-        当前筛选条件可关注用户数量为<span style="color: red">0</span>个
-      </p>
+      <p style="font-size:12px;text-align: center;">当前筛选条件可关注用户数量为<span style="color:red">{{ screenNumber }}</span>个</p>
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="resetForm">重 置</el-button>
@@ -189,18 +143,10 @@ export default {
     showLetterTask: {
       type: Boolean,
     },
-    typecontrol_id: {
-      type: Number,
-    },
-    userIdList: {
-      type: Array,
-    },
-    batchEditorList: {
-      type: Array,
-    },
   },
   data() {
     return {
+      screenNumber:0,
       accCount: 0,
       subLoading: false,
       rules: {
@@ -209,15 +155,19 @@ export default {
         ],
         rate_min: [
           { required: true, message: "请选择关注频率最小值", trigger: "blur" },
+          { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
         ],
         rate_max: [
           { required: true, message: "请选择关注频率最大值", trigger: "blur" },
+          { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
         ],
-        grouping_id: [{ required: true, message: "请选择账号分组", trigger: "blur" }],
-        typecontrol_id: [
+        grouping_id: [
+          { required: true, message: "请选择账号分组", trigger: "blur" },
+        ],
+        typecronl_id: [
           { required: true, message: "请选择账号分类", trigger: "blur" },
         ],
-        account_region: [
+        country_list: [
           { required: true, message: "请选择国家", trigger: "change" },
         ],
         tasklist_id_list: [
@@ -225,9 +175,11 @@ export default {
         ],
         user_follow_upper_limit: [
           { required: true, message: "请设置每日需关注上限", trigger: "blur" },
+          { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
         ],
         can_fail_num: [
           { required: true, message: "请设置连续失败次数", trigger: "blur" },
+          { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
         ],
       },
       blackList: [
@@ -257,7 +209,7 @@ export default {
       countryOptions: [],
       //关注发布任务 提交表单
       followTaskForm: {
-        account_region: [], //国家
+        country_list: [], //国家
         user_follow_upper_limit: "150", //单号关注上限
         rate_min: "3", //关注频率最小值
         rate_max: "5", //关注频率最大值
@@ -265,71 +217,52 @@ export default {
         follower_status: "100", //粉丝量小于
         tasklist_id_list: [], //数据来源
         following_count: "200", //关注数量小于
-        typecontrol_id: "",
+        typecronl_id: "",
         can_fail_num: "3", //连续失败次数
         black_list: ["historical_users"],
-        uid_list: "",
-        task_name: "", //备注任务名称
-        grouping_id: "",
+        task_name: '',//备注任务名称
+        grouping_id: ''
       },
     };
   },
-
-  mounted() {},
-  watch:{
-/*      'followTaskForm.typecontrol_id':{
-      async handler(newVal){
-        let data = {
-          typecontrol_id: this.followTaskForm.typecontrol_id[this.followTaskForm.typecontrol_id.length - 1] ?? "",
-          grouping_id: this.followTaskForm.grouping_id ?? "",
-        };
-        let result = await this.$api({
-          type: "getMember",
-          data,
-        });
-      },
-      deep:true
-    }, */
-    'followTaskForm.tasklist_id_list':{
-      async handler(){
-this.getFilterAcc()
-      }
-    },
-        'followTaskForm.task_name':{
-      async handler(){
-this.getFilterAcc()
-      }
-    },
-        'followTaskForm.typecontrol_id':{
-      async handler(){
-this.getFilterAcc()
-      }
-    },
-    'followTaskForm.account_region':{
-      async handler(){
-this.getFilterAcc()
-      }
-    },
-    'followTaskForm.grouping_id':{
-      async handler(newVal){
-        if(newVal === ""){
-          this.followTaskForm.typecontrol_id = ""
-          this.accCount = 0
-          return
+  watch: {
+    "followTaskForm.country_list": {
+      async handler(val) {
+        if (val != '') {
+          this.pushScreenFollow()
         }
-        
-/*       let searchTypeData = {
-        grouping_id: this.followTaskForm.grouping_id,
-      };
-      let result = await this.$api({
-        type: "getTypecontrol",
-        data: searchTypeData,
-      });
-      console.log('111111111',result.data);
-      this.typeList = this.getTreeData(result.data); */
       },
-      deep:true,
-    } 
+    },
+    "followTaskForm.tasklist_id_list": {
+      async handler(val) {
+        if (val != '') {
+          this.pushScreenFollow()
+        }
+      },
+    },
+    "followTaskForm.following_count": {
+      async handler(val) {
+        if (val != '') {
+          this.pushScreenFollow()
+        }
+      },
+    },
+    "followTaskForm.follower_status": {
+      async handler(val) {
+        if (val != '') {
+          this.pushScreenFollow()
+        }
+      },
+    },
+    "followTaskForm.black_list": {
+      async handler(val) {
+        if (val != '') {
+          this.pushScreenFollow()
+        }
+      },
+    },
+  },
+  mounted() {
   },
   methods: {
     getList() {
@@ -337,26 +270,32 @@ this.getFilterAcc()
       this.getGroupList();
       this.getCountry();
     },
-
-    //TODO
-    async getFilterAcc(){
-      let data = {
-        grouping_id:this.followTaskForm.grouping_id,
-        typecronl_id:this.followTaskForm.typecontrol_id[this.followTaskForm.typecontrol_id.length - 1],
-        country:this.followTaskForm.account_region,
-        tasklist_id_list:this.followTaskForm.tasklist_id_list,
-        user_follow_upper_limit:this.followTaskForm.user_follow_upper_limit
-      }
-      if((Object.entries(data).filter((item)=>{
-        return item[1].length === 0
-      })).length > 0){
-        return false
-      }
-      let result = await this.$api({type:'getFollowTaskFilterUser',data})
-      console.log(result);
+    formatTypeId(param) {
+      return param[param.length - 1] ?? "";
     },
-
-
+    // 筛选
+    async pushScreenFollow(){
+      if(this.followTaskForm.grouping_id==''||this.followTaskForm.typecronl_id.length==0){
+        return
+      }
+      let data = {
+        grouping_id: this.followTaskForm.grouping_id,
+        typecronl_id: this.formatTypeId(this.followTaskForm.typecronl_id),
+        country_list: this.followTaskForm.country_list,
+        tasklist_id_list: this.followTaskForm.tasklist_id_list,
+        following_count: this.followTaskForm.following_count,
+        follower_status: this.followTaskForm.follower_status,
+        black_list: this.followTaskForm.black_list,
+      }
+      try {
+        let result = await this.$api({ type: "commentlistscreenCommentDigg", data });
+        this.screenNumber = result.data
+        console.log(result);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    // 获取国家
     async getCountry() {
       try {
         let result = await this.$api({ type: "getCountry" });
@@ -413,8 +352,8 @@ this.getFilterAcc()
   */
     async getTypeControlList() {
       let data = {
-        grouping_id: this.followTaskForm.grouping_id,
-      };
+        grouping_id: this.followTaskForm.grouping_id
+      }
       try {
         let result = await this.$api({ type: "getTypecontrol", data });
         this.typeList = this.getTreeData(result?.data);
@@ -437,9 +376,9 @@ this.getFilterAcc()
     handlerClose() {
       this.page = 1;
       this.limit = 20;
-      this.accCount = 0;
-      this.groupList = [];
-      this.typeList = [];
+      this.accCount = 0
+      this.groupList = []
+      this.typeList = []
       this.$emit("closeLetterTask");
       this.$refs["followTaskForm"].resetFields();
     },
@@ -457,29 +396,23 @@ this.getFilterAcc()
         if (valid) {
           if (this.followTaskForm.rate_min > this.followTaskForm.rate_max) {
             this.$message.warning("请输入正确的关注频率");
-            return false
           } else {
-            console.log(this.followTaskForm);
-            let result =  this.confrimTask(this.followTaskForm);
-            console.log(result);
-            this.$message.success("操作成功,任务正在发布中");
-            //this.handlerClose();
-             
+            let data = JSON.parse(JSON.stringify(this.followTaskForm))
+            data.typecronl_id = this.formatTypeId(this.followTaskForm.typecronl_id)
+            this.confrimTask(data);
           }
         }
       });
     },
     // 发布任务
     async confrimTask(data) {
-
-       let result = await this.$api({ type: "pushFollowTask", data: data });
-       console.log(result);
-       if (result.status == 200) {
-         this.$message.success("操作成功,任务正在发布中");
-         //this.handlerClose();
-       } else {
-         this.$message.warning(result.msg);
-       }
+      let result = await this.$api({ type: "pushFollow", data: data });
+      if (result.status == 200) {
+        this.$message.success(result.msg);
+        this.handlerClose();
+      } else {
+        this.$message.warning(result.msg);
+      }
     },
     // 获取数据来源
     async getTasklist() {
@@ -490,31 +423,32 @@ this.getFilterAcc()
     },
     // 获取账号
     async getMemberList() {
-       if (this.followTaskForm.typecontrol_id != "") {
-         try {
-         const res = await this.$api({
-             type: "getMember",
-             data: {
-               grouping_id: this.followTaskForm.grouping_id,
-               typecontrol_id: this.followTaskForm.typecontrol_id[this.followTaskForm.typecontrol_id.length - 1],
-             },
-           });
-           if (res.status == 200) {
-             this.accCount = res.data.count;
-           } else {
-             this.$message.error(res.msg);
-           }
-         } catch (error) {}
-       } else {
-         this.accCount = 0;
-       }
+      if (this.followTaskForm.typecronl_id != '') {
+        try {
+          const res = await this.$api({
+            type: 'getMember',
+            data: {
+              grouping_id: this.followTaskForm.grouping_id,
+              typecontrol_id: this.formatTypeId(this.followTaskForm.typecronl_id),
+            },
+          });
+          if (res.status == 200) {
+            this.accCount = res.data.count;
+          } else {
+            this.$message.error(res.msg);
+          }
+        } catch (error) {
+        }
+      } else {
+        this.accCount = 0
+      }
     },
 
     // 重置表单字段
     resetForm() {
-      this.accCount = 0;
-      this.typeList = [];
-      this.getList();
+      this.accCount = 0
+      this.typeList = []
+      this.getList()
       this.$refs["followTaskForm"].resetFields();
     },
   },

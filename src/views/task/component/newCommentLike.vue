@@ -3,29 +3,30 @@
     <el-dialog width="40%" :visible="showLikeCommentTask" :before-close="handlerClose" title="评论区点赞任务配置">
       <el-form :rules="rules" ref="likeCommentForm" label-position="left" label-width="210px"
         :model="likeCommentTaskForm">
-        <el-form-item prop="group" label="账号分组 ：">
-          <el-select style="width: 50%" ref="gropuSelect" clearable v-model="likeCommentTaskForm.group"
+        <el-form-item prop="grouping_id" label="账号分组 ：">
+          <el-select style="width: 50%" ref="gropuSelect" clearable v-model="likeCommentTaskForm.grouping_id"
             placeholder="选择分组" size="medium" @change="getTypeControlList()">
             <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
               :key="item.grouping_id"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item prop="typecontrol_id" label="账号分类 ：">
+        <el-form-item prop="typecronl_id" label="账号分类 ：">
           <el-cascader style="width: 50%" clearable :props="{ checkStrictly: true, value: 'value' }" :options="typeList"
-            v-model="likeCommentTaskForm.typecontrol_id" size="medium" @change="getMemberList"></el-cascader>
+            v-model="likeCommentTaskForm.typecronl_id" size="medium" @change="getMemberList"></el-cascader>
         </el-form-item>
         <el-form-item label="">
           <p style="font-size:12px">当前已选中<span style="color:red">{{ accCount }}</span>个账号</p>
         </el-form-item>
-        <el-form-item prop="remarks" label="任务名称">
-          <el-input type="text" size="medium" v-model="likeCommentTaskForm.remarks" placeholder="任务名称"
+        <el-form-item prop="task_name" label="任务名称">
+          <el-input type="text" size="medium" v-model="likeCommentTaskForm.task_name" placeholder="任务名称"
             style="width: 50%"></el-input>
         </el-form-item>
-        <el-form-item label="选择国家 ：" prop="account_region" v-model="likeCommentTaskForm.account_region">
-          <el-select style="width: 50%" clearable multiple filterable v-model="likeCommentTaskForm.account_region"
+        <el-form-item label="选择国家 ：" prop="country_list" v-model="likeCommentTaskForm.country_list">
+          <el-select style="width: 50%" clearable multiple filterable v-model="likeCommentTaskForm.country_list"
             placeholder="选择国家" size="medium">
-            <el-option v-for="(item, index) in countryOptions" :key="index" :label="item" :value="item">{{ item
-}}</el-option>
+            <el-option v-for="(item, index) in countryOptions" :key="index" :label="item" :value="item">{{
+              item
+            }}</el-option>
           </el-select>
         </el-form-item>
         <el-form-item prop="tasklist_id_list" label="选择数据来源 ：" v-model="likeCommentTaskForm.tasklist_id_list">
@@ -53,15 +54,17 @@
             <el-checkbox v-for="item in blackList" :key="item.value" :label="item.value">{{ item.label }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-        <p style="font-size:12px;text-align: center;">当前筛选条件可执行数据数量为<span style="color:red">0</span>条</p>
+        <p style="font-size:12px;text-align: center;">当前筛选条件可执行数据数量为<span style="color:red">{{ screenNumber }}</span>条
+        </p>
 
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="resetForm" size="medium">重 置</el-button>
         <el-button @click="handlerClose" size="medium">取 消</el-button>
-        <el-button type="primary" @click="handlerConfrim" size="medium" :loading="subLoading">{{ subLoading ? "提交中..." :
-    "确定"
-          }}</el-button>
+        <el-button type="primary" @click="handlerConfrim" size="medium" :loading="subLoading">{{
+          subLoading? "提交中..."
+            : "确定"
+        }}</el-button>
       </span>
     </el-dialog>
   </div>
@@ -74,36 +77,22 @@ export default {
     showLikeCommentTask: {
       type: Boolean,
     },
-    typecontrol_id: {
-      type: Number,
-    },
-    userIdList: {
-      type: Array,
-    },
-    batchEditorList: {
-      type: Array,
-    },
   },
   computed: {
-    typeSelectPlaceholder() {
-      return this.group === "" ? "请先选择分组" : "选择分类";
-    },
-    isTypeSelectDis() {
-      return this.group === "";
-    },
   },
   data() {
     return {
+      screenNumber: 0,
       accCount: 0,
       subLoading: false,
       rules: {
-        group: [
+        grouping_id: [
           { required: true, message: "请选择账号分组", trigger: "blur" },
         ],
-        typecontrol_id: [
+        typecronl_id: [
           { required: true, message: "请选择账号分类", trigger: "blur" },
         ],
-        account_region: [
+        country_list: [
           { required: true, message: "请选择国家", trigger: "blur" },
         ],
         tasklist_id_list: [
@@ -113,7 +102,7 @@ export default {
           { required: true, message: "请填写点赞上限", trigger: "blur" },
           { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
         ],
-        remarks: [
+        task_name: [
           { required: true, message: "请输入任务名称", trigger: "change" },
         ],
         acc_likenum_max: [
@@ -155,21 +144,48 @@ export default {
       //新加坡，泰国，菲律宾，印度尼西亚，越南，马来西亚，巴西
       //TODO 字段名称要跟后端协商   视频发布任务 提交表单
       likeCommentTaskForm: {
-        account_region: "", //选择国家
-        tasklist_id_list: "", //数据来源
+        country_list: [], //选择国家
+        tasklist_id_list: [], //数据来源
         user_digg_upper_limit: "1000", //单号点赞上限
         comment_digg_count_lower_limit: "5", //评论获赞小于
         can_fail_num: "3", //连续失败执行下一个号
         black_list: ['historical_users'], //黑名单
-        port: [], //执行端协议
-        typecontrol_id: "",
-        uid_list: "",
-        group: '',
-        remarks: '' //备注任务名称
+        typecronl_id: "",
+        grouping_id: '',
+        task_name: '' //备注任务名称
       },
     };
   },
-
+  watch: {
+    "likeCommentTaskForm.country_list": {
+      async handler(val) {
+        if (val != '') {
+          this.commentlistscreenCommentDigg()
+        }
+      },
+    },
+    "likeCommentTaskForm.tasklist_id_list": {
+      async handler(val) {
+        if (val != '') {
+          this.commentlistscreenCommentDigg()
+        }
+      },
+    },
+    "likeCommentTaskForm.comment_digg_count_lower_limit": {
+      async handler(val) {
+        if (val != '') {
+          this.commentlistscreenCommentDigg()
+        }
+      },
+    },
+    "likeCommentTaskForm.black_list": {
+      async handler(val) {
+        if (val != '') {
+          this.commentlistscreenCommentDigg()
+        }
+      },
+    },
+  },
   mounted() {
   },
 
@@ -179,13 +195,35 @@ export default {
       this.getGroupList();
       this.getCountry();
     },
+
+    // 获取评论任务筛选后的评论数量
+    async commentlistscreenCommentDigg() {
+      // let country_list = this.likeCommentTaskForm.country_list.map((item) => { return item;}).join(',');
+      // let tasklist_id_list = this.likeCommentTaskForm.tasklist_id_list.map((item) => { return item;}).join(',');
+      let data = {
+        grouping_id: this.likeCommentTaskForm.grouping_id,
+        typecronl_id: this.formatTypeId(this.likeCommentTaskForm.typecronl_id),
+        country_list: this.likeCommentTaskForm.country_list,
+        tasklist_id_list: this.likeCommentTaskForm.tasklist_id_list,
+        comment_digg_count_lower_limit: this.likeCommentTaskForm.comment_digg_count_lower_limit,
+        black_list: this.likeCommentTaskForm.black_list,
+      }
+      console.log('data',data);
+      try {
+        let result = await this.$api({ type: "commentlistscreenCommentDigg", data });
+        this.screenNumber = result.data
+        console.log(result);
+      } catch (error) {
+        console.error(error);
+      }
+    },
     /*
-        function: getTreeData
-        params: data | 需要进行递归处理的数组
         desc: 递归函数，对数组进行处理，设置dhilren长度为0的字段为undefined
-        return: 处理后的数据
     */
     getTreeData(data) {
+      if (data.length == 0) {
+        return []
+      }
       data.forEach((item) => {
         if (!item.children.length) {
           item.children = undefined;
@@ -201,8 +239,12 @@ export default {
         desc: 异步获取TypeControlList，页面渲染时调用
     */
     async getTypeControlList() {
+      this.likeCommentTaskForm.typecronl_id = '';
+      if (this.likeCommentTaskForm.grouping_id == '') {
+        return this.typeList = [];
+      }
       let data = {
-        grouping_id: this.likeCommentTaskForm.group
+        grouping_id: this.likeCommentTaskForm.grouping_id
       }
       try {
         let result = await this.$api({ type: "getTypecontrol", data });
@@ -251,8 +293,11 @@ export default {
       this.accCount = 0
       this.groupList = []
       this.typeList = []
+      this.sourceData= []
+      this.countryOptions= []
       this.$refs["likeCommentForm"].resetFields();
       this.$emit("closeLikeCommentTask");
+      this.$emit("getVideoTasks");
     },
 
     /* 
@@ -261,20 +306,16 @@ export default {
         desc: 提交表单
     */
     handlerConfrim() {
-      console.log(this.likeCommentTaskForm);
       try {
         this.$refs["likeCommentForm"].validate((valid) => {
           if (valid) {
-            // let userList = this.batchEditorList.map((item) => {
-            //   return item.uid;
-            // });
-            // this.likeCommentTaskForm.uid_list = userList;
-            // this.likeCommentTaskForm.typecontrol_id = this.typecontrol_id;
-            // this.likeCommentTaskForm.black_list =  
-              // this.likeCommentTaskForm.black_list.map((item) => {
-              //   return this.blackListMap[item];
-              // }).join(',');
-            this.pushCommentTask(this.likeCommentTaskForm)
+            let data = JSON.parse(JSON.stringify(this.likeCommentTaskForm))
+            data.typecronl_id = this.formatTypeId(this.likeCommentTaskForm.typecronl_id)
+            // data.country = data.country.map((item) => { return item;}).join(',');
+            // data.tasklist_id_list = data.tasklist_id_list.map((item) => { return item;}).join(',');
+            // data.black_list = data.black_list.map((item) => { return item;}).join(',');
+
+            this.pushCommentTask(data)
           }
         });
       } catch (error) {
@@ -299,15 +340,18 @@ export default {
         this.subLoading = false;
       }
     },
+    formatTypeId(param) {
+      return param[param.length - 1] ?? "";
+    },
     // 获取账号
     async getMemberList() {
-      if (this.likeCommentTaskForm.typecontrol_id != '') {
+      if (this.likeCommentTaskForm.typecronl_id != '') {
         try {
           const res = await this.$api({
             type: 'getMember',
             data: {
               grouping_id: this.likeCommentTaskForm.grouping_id,
-              typecontrol_id: this.likeCommentTaskForm.typecontrol_id,
+              typecontrol_id: this.formatTypeId(this.likeCommentTaskForm.typecronl_id),
             },
           });
           if (res.status == 200) {

@@ -63,12 +63,7 @@ export default {
       ],
       loading: false,
       btnloading: false,
-      tableData: [
-        {
-          tasklist_id: '11',
-          task_name: '11'
-        }
-      ],
+      tableData: [],
       columns: [
         {
           prop: "create_time",
@@ -192,7 +187,7 @@ export default {
 
   created() {
     // 获取私信任务列表
-    // this.getVideoTasks(this.page);
+    this.getVideoTasks(this.page);
   },
 
   mounted() { },

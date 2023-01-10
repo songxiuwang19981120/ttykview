@@ -492,7 +492,7 @@ export default {
     method: 'POST'
   },
   'pushCommentTask': {  //用户评论点赞任务
-    url: 'Push/commentDigg',
+    url: 'Push/comment_digg',
     method: 'POST'
   },
 
@@ -697,6 +697,44 @@ export default {
     method: 'POST',
   },
   //Apiuser  API end
+
+  'commentlistscreenCommentDigg': {
+    url: '/push/screen_comment_digg',
+    method: 'GET',
+  },
+  'tasklistDelete': {
+    url: '/Tasklist/delete',
+    method: 'POST',
+  },
+  'tasklistPause': {
+    url: '/Tasklist/pause',
+    method: 'POST',
+  },
+  // 任务详情
+  'taskListTaskUids': {
+    url: '/Tasklist/task_uids',
+    method: 'GET',
+  },
+  // 发布私信任务筛选数据量
+  'pushScreenChat': {
+    url: '/push/screen_chat',
+    method: 'GET',
+  },
+  // 发布私信任务
+  'pushChat': {
+    url: '/Push/chat',
+    method: 'POST',
+  },
+  // 发布关注任务
+  'pushFollow': {
+    url: '/Push/follow',
+    method: 'POST',
+  },
+  // 发布关注任务筛选数据量
+  'pushScreenFollow': {
+    url: '/push/screen_follow',
+    method: 'GET',
+  },
 }
 
 

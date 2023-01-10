@@ -4,25 +4,25 @@
       <el-form ref="letterForm" :rules="rules" class="lettertask-form" label-position="left" label-width="220px"
         :model="letterTaskForm">
 
-        <el-form-item prop="group" label="账号分组 ：">
-          <el-select style="width: 50%" ref="gropuSelect" clearable v-model="letterTaskForm.group" placeholder="账号分组"
+        <el-form-item prop="grouping_id" label="账号分组 ：">
+          <el-select style="width: 50%" ref="gropuSelect" clearable v-model="letterTaskForm.grouping_id" placeholder="账号分组"
             @change="getTypeControlList()">
             <el-option v-for="item in groupList" :value="item.grouping_id" :label="item.grouping_name"
               :key="item.grouping_id"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item prop="typecontrol_id" label="账号分类 ：">
+        <el-form-item prop="typecronl_id" label="账号分类 ：">
           <el-cascader style="width: 50%" clearable :props="{ checkStrictly: true, value: 'value' }" :options="typeList"
-            v-model="letterTaskForm.typecontrol_id" @change="getMemberList"></el-cascader>
+            v-model="letterTaskForm.typecronl_id" @change="getMemberList"></el-cascader>
         </el-form-item>
         <el-form-item label="">
           <p style="font-size:12px">当前已选中<span style="color:red">{{ accCount }}</span>个账号</p>
         </el-form-item>
-        <el-form-item label="任务名称 ：" prop="remarks">
-          <el-input style="width: 50%" type="text" v-model="letterTaskForm.remarks" placeholder="请输入任务名称"></el-input>
+        <el-form-item label="任务名称 ：" prop="task_name">
+          <el-input style="width: 50%" type="text" v-model="letterTaskForm.task_name" placeholder="请输入任务名称"></el-input>
         </el-form-item>
-        <el-form-item label="国家 ：" v-model="letterTaskForm.account_region" prop="account_region">
-          <el-select style="width: 50%" clearable multiple v-model="letterTaskForm.account_region" placeholder="选择国家">
+        <el-form-item label="国家 ：" v-model="letterTaskForm.country_list" prop="country_list">
+          <el-select style="width: 50%" clearable multiple v-model="letterTaskForm.country_list" placeholder="选择国家">
             <el-option v-for="(item, index) in countryOptions" :key="index" :label="item" :value="item">{{
               item
             }}</el-option>
@@ -61,7 +61,7 @@
           <el-switch v-model="letterTaskForm.reset_status"></el-switch>
         </el-form-item>
       </el-form>
-      <p style="font-size:12px;text-align: center;">当前筛选条件可私信用户数量为<span style="color:red">0</span>个</p>
+      <p style="font-size:12px;text-align: center;">当前筛选条件可私信用户数量为<span style="color:red">{{ screenNumber }}</span>个</p>
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleReset">重 置</el-button>
@@ -82,6 +82,7 @@ export default {
   },
   data() {
     return {
+      screenNumber:0,
       accCount: 0,
       letterGroup: [
         {
@@ -109,22 +110,24 @@ export default {
         privateletter_id: [
           { required: true, message: "请输入私信素材", trigger: "blur" },
         ],
-        remarks: [
+        task_name: [
           { required: true, message: "请输入任务名称", trigger: "blur" },
         ],
         rate_min: [
           { required: true, message: "请选择关注频率最小值", trigger: "blur" },
+          { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
         ],
         rate_max: [
           { required: true, message: "请选择关注频率最大值", trigger: "blur" },
+          { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
         ],
-        group: [
+        grouping_id: [
           { required: true, message: "请选择账号分组", trigger: "blur" },
         ],
-        typecontrol_id: [
+        typecronl_id: [
           { required: true, message: "请选择账号分类", trigger: "blur" },
         ],
-        account_region: [
+        country_list: [
           { required: true, message: "请选择国家", trigger: "change" },
         ],
         tasklist_id_list: [
@@ -132,9 +135,11 @@ export default {
         ],
         user_follow_upper_limit: [
           { required: true, message: "请设置单号私信上限", trigger: "blur" },
+          { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
         ],
         can_fail_num: [
           { required: true, message: "请设置连续失败次数", trigger: "blur" },
+          { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
         ],
       },
       typeList: [],
@@ -146,10 +151,10 @@ export default {
       countryOptions: [],
       //关注发布任务 提交表单
       letterTaskForm: {
-        group: '',  //账号分组
-        typecontrol_id: "",  //账号分类
-        remarks: "", //任务备注
-        account_region: [], //国家
+        grouping_id: '',  //账号分组
+        typecronl_id: "",  //账号分类
+        task_name: "", //任务备注
+        country_list: [], //国家
         tasklist_id_list: [],  //数据来源
         user_chat_upper_limit: "100", //单号私信上限
         total_task_num: "", // 总私信上限
@@ -159,11 +164,48 @@ export default {
       },
     };
   },
+  watch: {
+    "letterTaskForm.country_list": {
+      async handler(val) {
+        if (val != '') {
+          this.pushScreenChat()
+        }
+      },
+    },
+    "letterTaskForm.tasklist_id_list": {
+      async handler(val) {
+        if (val != '') {
+          this.pushScreenChat()
+        }
+      },
+    },
+    "letterTaskForm.reset_status": {
+      async handler(val) {
+        if (val != '') {
+          this.pushScreenChat()
+        }
+      },
+    },
+  },
 
   mounted() {
   },
 
   methods: {
+    async pushScreenChat(){
+      let data = {
+        grouping_id: this.letterTaskForm.grouping_id,
+        typecronl_id: this.formatTypeId(this.letterTaskForm.typecronl_id),
+        country_list: this.letterTaskForm.country_list,
+        tasklist_id_list: this.letterTaskForm.tasklist_id_list,
+        reset_status: this.letterTaskForm.reset_status,
+      }
+      try {
+        let result = await this.$api({ type: "pushScreenChat", data });
+        this.screenNumber = result.data
+      } catch (error) {
+      }
+    },
     getList() {
       this.getTasklist();
       this.getGroupList();
@@ -226,7 +268,7 @@ export default {
   */
     async getTypeControlList() {
       let data = {
-        grouping_id: this.letterTaskForm.group
+        grouping_id: this.letterTaskForm.grouping_id
       }
       try {
         let result = await this.$api({ type: "getTypecontrol", data });
@@ -254,16 +296,20 @@ export default {
     async handlerConfrim() {
       await this.$refs["letterForm"].validate((valid) => {
         if (valid) {
-          this.pushLetter()
+          let data = JSON.parse(JSON.stringify(this.letterTaskForm))
+          data.typecronl_id = this.formatTypeId(this.letterTaskForm.typecronl_id)
+          data.user_chat_upper_limit = Number(this.letterTaskForm.user_chat_upper_limit)
+          data.total_task_num = Number(this.letterTaskForm.total_task_num)
+          this.pushLetter(data)
         }
       });
     },
     // 提交表单
-    async pushLetter() {
+    async pushLetter(data) {
       try {
-        let result = await this.$api({ type: 'pushLetter' });
+        let result = await this.$api({ type: 'pushChat',data });
         if (result.status == '200') {
-          this.$message.success("提交成功");
+          this.$message.success({ message: result.msg });
           this.handlerClose();
         } else {
           this.$message.error({ message: result.msg });
@@ -274,13 +320,13 @@ export default {
     },
     // 获取账号
     async getMemberList() {
-      if (this.letterTaskForm.typecontrol_id != '') {
+      if (this.letterTaskForm.typecronl_id != '') {
         try {
           const res = await this.$api({
             type: 'getMember',
             data: {
               grouping_id: this.letterTaskForm.grouping_id,
-              typecontrol_id: this.letterTaskForm.typecontrol_id,
+              typecontrol_id: this.formatTypeId(this.letterTaskForm.typecronl_id),
             },
           });
           if (res.status == 200) {
@@ -308,10 +354,14 @@ export default {
     // 关闭
     handlerClose() {
       this.accCount = 0
+      this.screenNumber = 0
       this.typeList = []
       this.groupList = []
       this.$emit("closePrivateTask");
       this.$refs["letterForm"].resetFields();
+    },
+    formatTypeId(param) {
+      return param[param.length - 1] ?? "";
     },
     /*
         function: getTreeData

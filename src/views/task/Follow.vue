@@ -31,28 +31,9 @@
           >
           </el-date-picker>
         </div>
-        <el-button
-          type="primary"
-          size="medium"
-          class="seachbut"
-          :loading="btnloading"
-          @click="searchTasks"
-          >{{ btnloading ? "加载中..." : "搜索" }}</el-button
-        >
-        <el-button
-          type="primary"
-          size="medium"
-          class="seachbut"
-          @click="btnReset"
-          >重置</el-button
-        >
-        <el-button
-          type="primary"
-          size="medium"
-          class="seachbut"
-          @click="shownewFollow"
-          >关注任务</el-button
-        >
+        <el-button type="primary" size="medium" class="seachbut" :loading="btnloading" @click="searchTasks">{{ btnloading ? "加载中..." : "搜索"}}</el-button>
+        <el-button type="primary" size="medium" class="seachbut" @click="btnReset">重置</el-button>
+        <el-button type="primary" size="medium" class="seachbut" @click="shownewFollow">关注任务</el-button>
         <!-- <i class="el-icon-refresh-left"></i> -->
       </div>
     </div>
