@@ -11,9 +11,7 @@
             range-separator="——" start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="pickerOptions">
           </el-date-picker>
         </div>
-        <el-button type="primary" size="medium" class="seachbut" :loading="btnloading" @click="searchTasks">{{
-    btnloading ? "加载中..." : "搜索"
-}}</el-button>
+        <el-button type="primary" size="medium" class="seachbut" :loading="btnloading" @click="searchTasks">{{ btnloading ? "加载中..." : "搜索"}}</el-button>
         <el-button type="primary" size="medium" class="seachbut" @click="btnReset">重置</el-button>
         <el-button type="primary" size="medium" class="seachbut" @click="shownewFollow">关注任务</el-button>
         <!-- <i class="el-icon-refresh-left"></i> -->

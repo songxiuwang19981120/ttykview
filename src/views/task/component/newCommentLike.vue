@@ -157,20 +157,6 @@ export default {
     };
   },
   watch: {
-    "likeCommentTaskForm.grouping_id": {
-      async handler(val) {
-        if (val != '') {
-          this.commentlistscreenCommentDigg()
-        }
-      },
-    },
-    "likeCommentTaskForm.typecronl_id": {
-      async handler(val) {
-        if (val != '') {
-          this.commentlistscreenCommentDigg()
-        }
-      },
-    },
     "likeCommentTaskForm.country_list": {
       async handler(val) {
         if (val != '') {

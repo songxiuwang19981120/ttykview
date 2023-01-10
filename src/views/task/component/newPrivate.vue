@@ -73,7 +73,6 @@
 </template>
 
 <script>
-import { number } from 'echarts';
 export default {
   name: "TtprojectVideoDialog",
   props: {
@@ -116,9 +115,11 @@ export default {
         ],
         rate_min: [
           { required: true, message: "请选择关注频率最小值", trigger: "blur" },
+          { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
         ],
         rate_max: [
           { required: true, message: "请选择关注频率最大值", trigger: "blur" },
+          { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
         ],
         grouping_id: [
           { required: true, message: "请选择账号分组", trigger: "blur" },
@@ -134,9 +135,11 @@ export default {
         ],
         user_follow_upper_limit: [
           { required: true, message: "请设置单号私信上限", trigger: "blur" },
+          { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
         ],
         can_fail_num: [
           { required: true, message: "请设置连续失败次数", trigger: "blur" },
+          { pattern: /^\d+$/, message: '格式 必须为正整数', trigger: 'blur' }
         ],
       },
       typeList: [],
@@ -162,21 +165,21 @@ export default {
     };
   },
   watch: {
-    "likeCommentTaskForm.country_list": {
+    "letterTaskForm.country_list": {
       async handler(val) {
         if (val != '') {
           this.pushScreenChat()
         }
       },
     },
-    "likeCommentTaskForm.tasklist_id_list": {
+    "letterTaskForm.tasklist_id_list": {
       async handler(val) {
         if (val != '') {
           this.pushScreenChat()
         }
       },
     },
-    "likeCommentTaskForm.reset_status": {
+    "letterTaskForm.reset_status": {
       async handler(val) {
         if (val != '') {
           this.pushScreenChat()
@@ -191,11 +194,11 @@ export default {
   methods: {
     async pushScreenChat(){
       let data = {
-        grouping_id: this.likeCommentTaskForm.grouping_id,
-        typecronl_id: this.formatTypeId(this.likeCommentTaskForm.typecronl_id),
-        country_list: this.likeCommentTaskForm.country_list,
-        tasklist_id_list: this.likeCommentTaskForm.tasklist_id_list,
-        reset_status: this.likeCommentTaskForm.reset_status,
+        grouping_id: this.letterTaskForm.grouping_id,
+        typecronl_id: this.formatTypeId(this.letterTaskForm.typecronl_id),
+        country_list: this.letterTaskForm.country_list,
+        tasklist_id_list: this.letterTaskForm.tasklist_id_list,
+        reset_status: this.letterTaskForm.reset_status,
       }
       try {
         let result = await this.$api({ type: "pushScreenChat", data });
@@ -323,7 +326,7 @@ export default {
             type: 'getMember',
             data: {
               grouping_id: this.letterTaskForm.grouping_id,
-              typecronl_id: this.letterTaskForm.typecronl_id,
+              typecontrol_id: this.formatTypeId(this.letterTaskForm.typecronl_id),
             },
           });
           if (res.status == 200) {

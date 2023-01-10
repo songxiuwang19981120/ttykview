@@ -671,11 +671,12 @@ export default {
     url: '/Tasklist/pause',
     method: 'POST',
   },
-  'taskListDetailView': {
-    url: '/TaskListDetail/view',
+  // 任务详情
+  'taskListTaskUids': {
+    url: '/Tasklist/task_uids',
     method: 'GET',
   },
-  // 发布私信任务筛选数据两量
+  // 发布私信任务筛选数据量
   'pushScreenChat': {
     url: '/push/screen_chat',
     method: 'GET',
@@ -684,6 +685,16 @@ export default {
   'pushChat': {
     url: '/Push/chat',
     method: 'POST',
+  },
+  // 发布关注任务
+  'pushFollow': {
+    url: '/Push/follow',
+    method: 'POST',
+  },
+  // 发布关注任务筛选数据量
+  'pushScreenFollow': {
+    url: '/push/screen_follow',
+    method: 'GET',
   },
 }
 

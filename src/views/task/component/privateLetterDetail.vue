@@ -38,7 +38,7 @@ export default {
 	},
 	data() {
 		return {
-			showJournal:false,
+			showJournal: false,
 			journalLoading: false,
 			journaltableData: [],
 			journalColumns: [
@@ -108,7 +108,7 @@ export default {
 			loading: false,
 			tableData: [],
 			columns: [
-			{
+				{
 					prop: "avatar_thumb",
 					label: "基础信息",
 					align: "left",
@@ -204,7 +204,7 @@ export default {
 					label: "操作",
 					align: "center",
 					fixed: 'right',
-					width:'150',
+					width: '150',
 					render: (h, { row }) => {
 						return (
 							<div>
@@ -232,13 +232,8 @@ export default {
 				},
 			],
 			logsDialog: false,
-			page: {
-				page: 1,
-				limit: 20,
-				tasklist_id: '',
-				status: '',
-				task_type: '',
-			},
+			page: 1,
+			limit: 20,
 			total: 0,
 			resetloading: false
 		};
@@ -264,71 +259,37 @@ export default {
 		},
 		// 获取数据
 		getTaskListDetail(id) {
-			this.tableData = [
-				{
-					id: 1,
-					status: 0,
-					img: 'http://192.168.4.30/uploads/uploadfiles/202212/63abccf6d52b5.jpg',
-					task_type: '1',
-					create_time: '2023 01-03 01:00:00',
-					nickname: '啊啊啊啊',
-					uid: '7171638067815220230'
-				}
-			]
-
+			this.task_id = id
+			this.viewFollowList()
 		},
-		// 获取私信任务详情
-		// async getTaskListDetail(data) {
-		// 	try {
-		// 		this.loading = true
-		// 		const res = await this.$api({
-		// 			type: 'getTaskListDetail',
-		// 			data,
-		// 		});
-		// 		this.tableData = res.data.list;
-		// 		this.total = res.data.count;
-		// 	} catch (error) {
-		// 		console.error(error);
-		// 	} finally {
-		// 		this.loading = false
-		// 		this.btnloading = false
-		// 	}
-		// },
+		// 获取详情数据
+		async viewFollowList() {
+			let data = {
+				tasklist_id: this.task_id,
+				page: this.page,
+				limit: this.limit,
+			}
+			try {
+				let result = await this.$api({ type: "taskListTaskUids", data });
+				if (result.status == 200) {
+					this.tableData = result.data;
+				} else {
+					this.$message.error(result.msg);
+				}
+			} catch (error) {
+				console.error(error);
+			}
+		},
 		// 当前页数据条数/页码改变
 		pageChange(obj) {
-			(this.page.page = obj.page), (this.page.limit = obj.limit);
-			this.page.tasklist_id = this.curId;
-			this.getTaskListDetail(this.page);
+			(this.page = obj.page), (this.limit = obj.limit);
+			this.viewFollowList();
 		},
 		// 关闭弹层
 		btnCancel() {
 			this.$emit('update:showDialog', false);
-			this.page = {
-				page: 1,
-				limit: 20,
-				tasklist_id: '',
-				status: '',
-				task_type: ''
-			};
-		},
-		// 点击查询按钮
-		searchTasks() {
-			this.btnloading = true;
-			this.page.page = 1;
-			this.page.tasklist_id = this.curId;
-			this.getTaskListDetail(this.page);
-		},
-		// 点击重置
-		btnReset() {
-			this.resetloading = true
-			this.page = {
-				page: 1,
-				limit: 20,
-				tasklist_id: this.curId,
-				status: '',
-				task_type: '',
-			}
-			this.getTaskListDetail(this.page)
+			this.page = 1;
+			this.limit = 20;
 		},
 	},
 };

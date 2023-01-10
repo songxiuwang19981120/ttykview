@@ -216,7 +216,8 @@ export default {
 			page: 1,
 			limit: 10,
 			total: 0,
-			resetloading: false
+			resetloading: false,
+			task_id:'',
 		};
 	},
 	methods: {
@@ -238,25 +239,34 @@ export default {
 		deleteClick(id) {
 			this.$message.success('删除成功');
 		},
-		// 获取关注详情
+		// 获取数据
 		getTaskListDetail(id) {
-			this.tableData = [
-				{
-					id: 1,
-					status: 0,
-					img: 'http://192.168.4.30/uploads/uploadfiles/202212/63abccf6d52b5.jpg',
-					task_type: '1',
-					create_time: '2023 01-03 01:00:00',
-					nickname: '啊啊啊啊',
-					uid: '7171638067815220230'
+			this.task_id = id
+			this.viewFollowList()
+		},
+		// 获取详情数据
+		async viewFollowList() {
+			let data = {
+				tasklist_id: this.task_id,
+				page: this.page,
+				limit: this.limit,
+			}
+			try {
+				let result = await this.$api({ type: "taskListTaskUids", data });
+				if (result.status == 200) {
+					this.tableData = result.data;
+				} else {
+					this.$message.error(result.msg);
 				}
-			]
+			} catch (error) {
+				console.error(error);
+			}
 		},
 		// 当前页数据条数/页码改变
 		pageChange(obj) {
 			this.page = obj.page
 			this.limit = obj.limit;
-			this.getTaskListDetail();
+			this.viewFollowList();
 		},
 		// 关闭弹层
 		btnCancel() {

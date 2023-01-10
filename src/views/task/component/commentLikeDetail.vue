@@ -226,22 +226,26 @@ export default {
 		},
 		// 获取数据
 		getTaskListDetail(id) {
-			console.log(id);
 			this.task_id = id
 			this.viewCommenList()
 		},
 		// 获取详情数据
 		async viewCommenList() {
 			let data = {
-				tasklistdetail_id: this.task_id
+				tasklist_id: this.task_id,
+				page: this.page,
+				limit: this.limit,
 			}
 			try {
-				let result = await this.$api({ type: "taskListDetailView", data });
-				console.log(result);
+				let result = await this.$api({ type: "taskListTaskUids", data });
+				if (result.status == 200) {
+					this.tableData = result.data;
+				} else {
+					this.$message.error(result.msg);
+				}
 			} catch (error) {
 				console.error(error);
 			}
-
 		},
 		// 当前页数据条数/页码改变
 		pageChange(obj) {
@@ -249,13 +253,12 @@ export default {
 			this.limit = obj.limit;
 			this.getTaskListDetail();
 		},
-		showLogDialog() {
-
-		},
 		handleDel() {
 			console.log('删除')
 		},
 		handlerClose() {
+			this.page = 1
+			this.limit = 20
 			this.tableData = []
 			this.$emit('closeTaskDetail')
 		}
