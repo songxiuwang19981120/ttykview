@@ -10,6 +10,7 @@ import '@/plugin/vuehappyscroll.plugin'
 
 
 import 'element-ui/lib/theme-chalk/index.css';
+import 'element-ui/lib/theme-chalk/base.css';
 import '@/assets/css/global.styl'
 import '@/assets/css/page.css';
 

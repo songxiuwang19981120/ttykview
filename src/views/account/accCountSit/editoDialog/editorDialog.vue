@@ -218,8 +218,6 @@ export default {
   },
 
   mounted() {
-    this.grouping_id = this.accInfo.grouping_name
-    this.typecontrol_id = this.accInfo.type_title
     this.getGroupList();
   },
   computed:{
@@ -272,6 +270,7 @@ export default {
         desc: upload之前回调，判断文件是否符合规则
     */
     beforeAvatarUpload(file) {
+      console.log(file);
       let { size, type } = file;
       let isPass = true;
       isPass = /(jpeg | png | jpg |image)/g.test(type);
@@ -281,7 +280,7 @@ export default {
           ? "文件不得大于5kb"
           : "请选择图片文件";
         this.$message.error(errMsg);
-        this.$refs.upload[0].abort(file);
+        this.$refs.upload[0]?.abort(file);
         return false;
       }
     },
@@ -307,9 +306,9 @@ export default {
     */
     handlerClose() {
       this.$emit("closeEditorDialog");
-      console.log(this.$parent);
       this.resetForm();
       this.grouping_id = "";
+      this.accUpdateForm.avatar_uri = ""
     },
 
     /* 
@@ -399,7 +398,9 @@ export default {
         let memberInfo = {
           user_id: this.user_id,
           grouping_id: this.accUpdateForm.grouping_id,
-          typecontrol_id: typecontrol_id,
+          typecontrol_id: this.accUpdateForm.typecontrol_id[
+            this.accUpdateForm.typecontrol_id.length - 1
+          ]
         };
         await this.updateInfo(Object.fromEntries(accUpdateForm)),
         await this.delInfo(Object.fromEntries(destroyInfo)),
@@ -408,7 +409,7 @@ export default {
         this.handlerClose();
         this.resetDestroyInfo();
         this.accUpdateForm.avatar_uri = ""; 
-        this.$parent.updateMemberList();
+        this.$parent.updateMemberList({a:1});
       } catch (error) {
         this.$message.error("提交失败");
       }

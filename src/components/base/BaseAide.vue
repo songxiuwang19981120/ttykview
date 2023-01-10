@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-menu
+    
       class="tt-aside"
       :default-active="activeIndex"
       :unique-opened="true"
@@ -79,4 +80,6 @@ export default {
     line-height 80px
     font-size 30px
     font-weight 600
+
+
 </style>

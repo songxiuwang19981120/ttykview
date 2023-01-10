@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-select v-model="operation" clearable @change="hanldChange(operation)">
+    <el-select class="operaition-select" v-model="operation" clearable @change="hanldChange(operation)">
       <el-option
         v-for="item in operationOption"
         :key="item.value"
@@ -50,4 +50,13 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped></style>
+<style lang="stylus" scoped>
+::v-deep .el-input__inner
+  color: white
+  background-color: #FF3E1E
+  &::placeholder
+    color: white
+
+::v-deep .el-input .el-input__inner
+  border-color: #FF3E1E !important
+</style>

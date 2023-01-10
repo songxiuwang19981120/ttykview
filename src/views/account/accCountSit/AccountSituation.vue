@@ -33,7 +33,6 @@
 
       <div class="mr-15">
         <el-select
-          
           size="medium"
           @change="setLocalFans"
           clearable
@@ -72,16 +71,16 @@
         @click="RestQuery"
         >重 置</el-button
       >
-<div class="ml-15">
-<span class="fz-14" style="color: rgba(16, 16, 16, 1);">开启回关：</span> 
-<el-switch
-  @click="toogleFollow"
-  style="width:30px;height:30px"
-  v-model="openFollow"
-  active-color="#ff4949"
- >
-</el-switch>
-</div>
+      <div class="ml-15">
+        <span class="fz-14" style="color: rgba(16, 16, 16, 1)">开启回关：</span>
+        <el-switch
+          @click="toogleFollow"
+          style="width: 30px; height: 30px"
+          v-model="openFollow"
+          active-color="#ff4949"
+        >
+        </el-switch>
+      </div>
 
       <el-button
         type="primary"
@@ -94,8 +93,10 @@
     </div>
 
     <div class="tt-accsituation-main">
-      <div style="height: 35px; margin-bottom: 10px" class="flex-jus-spacebet pad-0-20">
-        
+      <div
+        style="height: 35px; margin-bottom: 10px"
+        class="flex-jus-spacebet pad-0-20"
+      >
         <div class="flex-jus-spacebet">
           <div class="flex-jus-spacebet">
             <p class="mr-30 fz-14">共{{ total }}个账号</p>
@@ -106,25 +107,28 @@
 
           <div class="height-20 ml-20">
             <p class="fz-14">
-              总关注次数 ：{{ total_follow }}次&nbsp;&nbsp; 
-              总粉丝量 ：{{ total_fans }}个
+              总关注次数 ：{{ total_follow }}次&nbsp;&nbsp; 总粉丝量 ：{{
+                total_fans
+              }}个
             </p>
           </div>
 
           <div class="pad-0-20 flex ml-20">
-            <p v-show="startRefresh === true" class=" fz-14">
-              <span></span>
-              总刷新进度 ：{{ busThread }} / {{ subThread }}
-
-            </p>
+            <transition name="el-fade-in-linear">
+              <p v-show="startRefresh === true" class="fz-14">
+                <span></span>
+                总刷新进度 ：{{ busThread }} / {{ subThread }}
+              </p>
+            </transition>
+            <transition name="el-fade-in-linear">
               <img
                 v-show="endRefresh === true"
                 class="sucess-icon ml-15"
                 src="../../../assets/sucess.png"
                 alt="成功"
               />
+            </transition>
           </div>
-
         </div>
 
         <div style="width: 27%" class="flex-jus-spacebet">
@@ -191,7 +195,6 @@
       :page="page"
       :limit="limit"
       @pagination="handlePagination"
-      @current-change="handleCurrentChange"
     />
 
     <ConfrimDelDialog
@@ -294,10 +297,9 @@ export default {
     },
   },
   watch: {
-
-    startRefresh(newVal){
-      if(newVal === true){
-        this.updateProgress()
+    startRefresh(newVal) {
+      if (newVal === true) {
+        this.updateProgress();
       }
     },
 
@@ -313,13 +315,13 @@ export default {
       console.log(newVal);
       if (newVal.length === 0) {
         this.checkType = false;
-        return false
+        return false;
       }
       this.checkType = true;
       let data = {
-        typecontrol_id:this.classiFication[this.classiFication.length - 1]
-      }
-      let result = await this.getProjectNum(data)
+        typecontrol_id: this.classiFication[this.classiFication.length - 1],
+      };
+      let result = await this.getProjectNum(data);
       console.log(result);
     },
 
@@ -348,8 +350,8 @@ export default {
   },
   data() {
     return {
-      tabelHeight:(window.innerHeight-250).toString(),
-      openFollow:false,
+      tabelHeight: (window.innerHeight - 240).toString(),
+      openFollow: false,
       total_fans: 0, //总关注次数
       total_follow: 0, //总粉丝量
       accInfo: {},
@@ -455,13 +457,13 @@ export default {
           label: "个人简介",
           align: "center",
           render: (h, { row }) => {
-            let text
-            row.signature.length > 0 ? text = row.signature.substring(0, 10) + "..." : text = '暂无简介'
+            let text;
+            row.signature.length > 0
+              ? (text = row.signature.substring(0, 10) + "...")
+              : (text = "暂无简介");
             return (
               <el-tooltip content={text} placement="top">
-                <p style="font-size: 12px">
-                  {text}
-                </p>
+                <p style="font-size: 12px">{text}</p>
               </el-tooltip>
             );
           },
@@ -639,11 +641,11 @@ export default {
       checkGroup: false, //是否选择了分组
       checkType: false, //是否选择了分类
       isSearch: false, //选择分组分类之后是否搜索
-      countDown:"",
-      maxTime:"",
-      nicknameCanUseNum:0,
-      autographCanUseNum:0,
-      headimageCanUseNum:0,
+      countDown: "",
+      maxTime: "",
+      nicknameCanUseNum: 0,
+      autographCanUseNum: 0,
+      headimageCanUseNum: 0,
     };
   },
 
@@ -653,124 +655,133 @@ export default {
   },
 
   methods: {
-
     /*
         function: autoFollow
         params: data | 需要传递给后端的数据
         desc: 开启自动回关
         return: 后端返回的结果
     */
-    async autoFollow(data){
+    async autoFollow(data) {
       try {
-        let result = await this.$api({type:'',data})
-        return result
+        let result = await this.$api({ type: "", data });
+        return result;
       } catch (error) {
         console.error(error);
       }
-      
     },
-
 
     /*
         function: toogleFollow
         params: null
         desc: 切换自动回关的回调
     */
-    async toogleFollow(){
+    async toogleFollow() {
       try {
-        if(this.openFollow === true) {
+        if (this.openFollow === true) {
           //let result = this.autoFollow()
-          this.$message.success('已开启自动回关')
-          return
+          this.$message.success("已开启自动回关");
+          return;
         }
-        this.$message.error('已关闭自动回关')
+        this.$message.error("已关闭自动回关");
       } catch (error) {
         console.error(error);
       }
-      
     },
 
-
-    async refreshAcc(data){
+    /*
+        function: handleRefresh
+        params: null
+        desc: 发起刷新账号请求
+    */
+    async refreshAcc(data) {
       try {
-        let result = await this.$api({type:'refreshAcc',data})
-        return result
+        let result = await this.$api({ type: "refreshAcc", data });
+        return result;
       } catch (error) {
         console.error(error);
       }
-      
     },
 
-
+    /*
+        function: handleRefresh
+        params: null
+        desc: 点击刷新账号后的回调
+    */
     async handleRefresh() {
       try {
-      if (this.classiFication.length === 0 || this.group === "") {
-        this.$message.error("请选择需要刷新的分组与分类");
-        return false;
-      }
-      let data = {
-        grouping_id:this.group,
-        typecontrol_id:this.classiFication[this.classiFication.length - 1]
-      }
-      let result = await this.refreshAcc(data)
-      if(result?.status == 200){
-        this.startRefresh = true;
-        store.set('startRefresh','0')
-        
-        this.$message.success('刷新成功')
-        return
-      }
-      console.log(result);
-      this.$message.error(result?.msg ?? '刷新失败')
-      
+        if (this.classiFication.length === 0 || this.group === "") {
+          this.$message.error("请选择需要刷新的分组与分类");
+          return false;
+        }
+        if (this.startRefresh === true) {
+          this.$message.error(
+            "刷新账号过于频繁，请在已创建任务执行完毕后再进行操作"
+          );
+          return false;
+        }
+        let data = {
+          grouping_id: this.group,
+          typecontrol_id: this.classiFication[this.classiFication.length - 1],
+        };
+        let result = await this.refreshAcc(data);
+        if (result?.status == 200) {
+          this.startRefresh = true;
+          store.set("startRefresh", "0");
+          this.$message.success("刷新账号任务创建成功");
+          return;
+        }
+        this.$message.error(result?.msg ?? "刷新账号失败");
       } catch (error) {
         console.error(error);
       }
     },
 
-
-    async getRefreshDetail(){
+    /*
+        function: getRefreshDetail
+        params: null
+        desc: 获取刷新账号任务所需参数
+    */
+    async getRefreshDetail() {
       try {
-            let result = await this.$api({type:'getRefreshDetail'})
-            return result
+        let result = await this.$api({ type: "getRefreshDetail" });
+        return result;
       } catch (error) {
         console.error(error);
       }
     },
 
-      updateProgress() {
-     
-          let update =  setInterval(() => {
-            let date = Date.now()
-            this.getRefreshDetail().then((res)=>{
-              console.log(res,'=====================updateProgress');
-              let createTime = res.data.create_time
-              if(createTime - date === 0){
-              this.$message.success('刷新任务已完成')
-              this.startRefresh = false
-              this.endRefresh = true
-              clearInterval(update)
-              return 
-            }
-            })
-            
-            
+    /*
+        function: updateProgress
+        params: null
+        desc: 创建刷新账号任务后执行，实时更新刷新进度
+    */
+    updateProgress() {
+      let update = setInterval(() => {
+        this.getRefreshDetail().then((res) => {
+          console.log(res, "=====================updateProgress");
+          let date = Date.now();
+          let createTime = res.data.create_time;
+          let subTime = date - createTime;
+          this.subThread = res.data.complete_num + res.data.fail_num;
+          this.busThread = res.data.task_num;
+          if (subTime === 0) {
+            this.$message.success("刷新账号任务已完成");
 
-          }, 3000);          
-        
+            clearInterval(update);
+            this.startRefresh = false;
+            this.endRefresh = true;
+            store.remove("startRefresh");
 
-    }, 
-
-
-
-    handleCurrentChange(currentPage) {
-      this.page = currentPage;
+            return;
+          }
+        });
+      }, 5000);
     },
 
     /*
         function: getTreeData
         params: data | 需要进行递归处理的数组
-        desc: 递归函数，对数组进行处理，设置dhilren长度为0的字段为undefined
+        desc: 递归函数，对数组进行处理，设置长度为0的children为undefined
         return: 处理后的数据
     */
     getTreeData(data) {
@@ -799,14 +810,13 @@ export default {
     async initInterface() {
       this.page = store.get("page") ?? 1;
       this.limit = store.get("limit") ?? 20;
-      
-      let isRefreshEnd = store.get('startRefresh')
-      console.log(isRefreshEnd);
+      let isRefreshEnd = store.get("startRefresh");
       let group = store.get("group") ?? "";
       let typecontrol_id = store.get("typecontrol_id") ?? "";
       let fans = store.get("fans") ?? "";
-      this.handleCurrentChange(this.page);
-      isRefreshEnd === '0' ? this.startRefresh = true : this.startRefresh = false
+      isRefreshEnd === "0"
+        ? (this.startRefresh = true)
+        : (this.startRefresh = false);
       if (group !== "" && typecontrol_id !== "") {
         this.isSearch = true;
         this.total_fans = store.get("total_fans") ?? 0;
@@ -814,9 +824,11 @@ export default {
       }
       if (fans !== "") {
         this.fans = fans;
-        fans = Object.entries(this.fansMap).find((item) => {
-          return item[1] == fans;
-        })[0].split(",");
+        fans = Object.entries(this.fansMap)
+          .find((item) => {
+            return item[1] == fans;
+          })[0]
+          .split(",");
         this.min = fans[0] ?? "";
         this.max = fans[1] ?? "";
       }
@@ -830,7 +842,7 @@ export default {
         limit: this.limit ?? 10,
         page: this.page ?? 1,
       };
-      let result = await this.getMemberList(data);
+      await this.getMemberList(data);
     },
 
     /* 
@@ -957,7 +969,6 @@ export default {
       } catch (error) {
         this.$message.error("操作失败");
         console.error(error);
-        
       }
     },
 
@@ -1055,10 +1066,9 @@ export default {
       }
       this.showBatchEditor = true;
       let data = {
-        typecontrol_id:this.classiFication[this.classiFication.length - 1]
-      }
-      let result = await this.getProjectNum(data)
-
+        typecontrol_id: this.classiFication[this.classiFication.length - 1],
+      };
+      let result = await this.getProjectNum(data);
     },
 
     /* 
@@ -1076,17 +1086,18 @@ export default {
         params: null
         desc: 刷新界面，用于更新操作之后
     */
-    updateMemberList() {
+    updateMemberList(e) {
+      console.log(e);
       let data = {
         min: this.min ?? "",
         max: this.max ?? "",
-        typecontrol_id: this.classiFication ?? "",
+        typecontrol_id: this.classiFication[this.classiFication.length - 1] ?? "",
         grouping_id: this.group ?? "",
         limit: this.limit ?? 20,
         page: this.page ?? 1,
         uid: this.accUid ?? "",
       };
-      this.getMemberList(data);
+      //this.getMemberList(data);
     },
 
     /* 
@@ -1312,17 +1323,16 @@ export default {
         params: data | 请求接口携带的数据
         desc: 关闭编辑弹窗
     */
-      async getProjectNum(data){
+    async getProjectNum(data) {
       try {
         let result = await this.$api({ type: "getProjectNum", data });
-        this.nicknameCanUseNum = result?.data?.nickname ?? 0
-        this.autographCanUseNum = result?.data?.autograph ?? 0
-        this.headimageCanUseNum = result?.data?.headimage ?? 0
-        return result
+        this.nicknameCanUseNum = result?.data?.nickname ?? 0;
+        this.autographCanUseNum = result?.data?.autograph ?? 0;
+        this.headimageCanUseNum = result?.data?.headimage ?? 0;
+        return result;
       } catch (error) {
         console.error(error);
       }
-
     },
 
     /* 
@@ -1331,10 +1341,6 @@ export default {
         desc: 关闭编辑弹窗
     */
     closeEditorDialog() {
-      let tabel = this.$refs["multipleTable"];
-
-      console.log(tabel.$refs["tableOperation"].$data["operation"]);
-      tabel.$refs["tableOperation"].$data.operation = "";
       this.showEditorDialog = false;
       this.accInfo = {};
     },
@@ -1348,7 +1354,7 @@ export default {
       try {
         let result = await this.$api({ type: "getMemberList", data: data });
         this.videoList = result.data.list ?? [];
-        this.videoCount = result.data.count ?? 0;        
+        this.videoCount = result.data.count ?? 0;
       } catch (error) {
         console.error(error);
       }
@@ -1463,8 +1469,7 @@ export default {
       //this.$message.error(result.msg ?? "操作失败");
     },
 
-
-/* begin() {
+    /* begin() {
       this.countDown = '20分00秒';
       this.maxTime = 20 * 60;
       this.handleCountDown();
@@ -1483,7 +1488,6 @@ handleCountDown() {
       }, 1000)
     }, */
 
-
     /* 
       刷新账号逻辑：
         开始：startRefresh
@@ -1493,7 +1497,6 @@ handleCountDown() {
     
     
     */
-
   },
 };
 </script>

@@ -52,6 +52,7 @@
             :on-success="handleSucess"
             :on-remove="handleRemove"
             :on-change="handleChangePic"
+            :on-error="handleError"
           >
             <i class="el-icon-upload"></i>
             <div class="el-upload__text">
@@ -121,7 +122,9 @@ export default {
   },
 
   methods: {
-
+handleError(error){
+  console.log(error)
+},
     //清楚空格
     trimAll(ele) {
       if (!typeof ele === "string") {
@@ -144,6 +147,7 @@ export default {
     },
     // 视频上传成功回调
     handleSucess(response, file, fileList) {
+      //console.log(response);
       this.releaseVideoForm.video_url = response?.imageurl;
       console.log(this.releaseVideoForm.video_url);
     },
@@ -209,6 +213,9 @@ export default {
     },
     resetForm() {
       this.$refs["releaseVideoForm"].resetFields();
+      this.releaseVideoForm.video_url = "",
+      this.releaseVideoForm.text = "",
+      this.releaseVideoForm.label = ""
     },
   },
 };
