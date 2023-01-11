@@ -3,7 +3,7 @@
 		<el-dialog :visible="showDialog" title="私信详情" @close="btnCancel" width="70%">
 			<!-- 表格 -->
 			<table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
-				height="700"></table-custom>
+				:height="tableHeight"></table-custom>
 			<!-- 分页 -->
 			<pagination :total="total" :page="page.page" :limit="page.limit" @pagination="pageChange"></pagination>
 			<!-- 按钮 -->
@@ -12,7 +12,8 @@
 			</span>
 			<el-dialog width="55%" :visible="showJournal" :before-close="journalClose" title="评论点赞任务日志" append-to-body>
 				<table-custom :loading="journalLoading" :tableData="journaltableData" :columns="journalColumns"
-					height="700"></table-custom>
+					:height="tableHeight"></table-custom>
+					<pagination :total="journaltotal" :page="journalpage" :limit="journallimit" @pagination="journalpageChange"></pagination>
 			</el-dialog>
 		</el-dialog>
 	</div>
@@ -38,70 +39,83 @@ export default {
 	},
 	data() {
 		return {
+			tableHeight: String(window.innerHeight - 440),
+			journalDetailList:{},
+			journaltotal:0,
+			journalpage:1,
+			journallimit:10,
 			showJournal: false,
 			journalLoading: false,
 			journaltableData: [],
 			journalColumns: [
 				{
 					label: '目标uid',
-					prop: 'task_type',
+					prop: 'uid',
 					align: 'center',
 				},
-				{
-					label: '私信类型',
-					prop: 'task_type',
-					align: 'center',
-				},
-				{
-					label: '私信内容',
-					prop: 'task_type',
-					align: 'center',
-				},
+				// {
+				// 	label: '私信类型',
+				// 	prop: 'task_type',
+				// 	align: 'center',
+				// },
+				// {
+				// 	label: '私信内容',
+				// 	prop: 'task_type',
+				// 	align: 'center',
+				// },
 				{
 					label: '更新时间',
-					prop: 'task_type',
 					align: 'center',
-				},
-				{
-					label: '耗时',
-					prop: 'task_type',
-					align: 'center',
+					render: (h, { row }) => {
+						let time = ''
+						if (row.receive_times != '') {
+							time = row.receive_times
+						} else if (row.complete_times != '') {
+							time = row.complete_times
+						} else {
+							time = row.create_times
+						}
+						return (
+							<div>{time}</div>
+						);
+					}
 				},
 				{
 					label: '状态',
 					prop: 'status',
 					align: 'center',
-					render(h, { row }) {
-						const { status } = row;
-						let state;
-						if (status == 0) {
-							state = '成功';
-						} else if (status == 1) {
-							state = '未开始';
-						} else if (status == 2) {
-							state = '失败';
-						} else if (status == 3) {
-							state = '领取中';
+					render: (h, { row }) => {
+						let res;
+						if (row.status == 0) {
+							res = '完成';
+						} else if (row.status == 1) {
+							res = '未开始';
+						} else if (row.status == 2) {
+							res = '失败';
+						} else if (row.status == 3) {
+							res = '领取中';
 						}
-						return <div>{state}</div>;
+						return <div>{res}</div>;
+					},
+				},
+				{
+					label: '耗时',
+					// prop: 'complete_times',
+					align: 'center',
+					render: (h, { row }) => {
+						let time = '';
+						if (row.receive_times != '' && row.complete_times != '') {
+							time = this.calculateDiffTime(row.receive_time, row.complete_time)
+						} else if (row.complete_times != '' && row.create_times != '') {
+							time = this.calculateDiffTime(row.complete_time, row.create_time)
+						}
+						return <div>{time}</div>;
 					},
 				},
 				{
 					label: '失败原因',
 					prop: 'reason',
 					align: 'center',
-					render(h, { row }) {
-						if (
-							row.reason &&
-							row.reason !== 'null'
-						) {
-							return <div>{row.reason}</div>;
-						} else if (row.status == 2) {
-							return <div>暂无失败原因</div>;
-						} else {
-							return <div style="color: grey; font-size: 12px;">(非失败状态)</div>;
-						}
-					},
 				},
 			],
 			btnloading: false,
@@ -204,12 +218,12 @@ export default {
 								<el-button
 									type="success"
 									size="mini"
-									onClick={this.journalClick.bind(this, row.id)}
+									onClick={this.journalClick.bind(this, row)}
 									style="margin-right:10px"
 								>
 									日志
 								</el-button>
-								<el-popconfirm
+								{/* <el-popconfirm
 									confirm-button-text="删除"
 									cancel-button-text="取消"
 									title="确认删除该任务吗？"
@@ -218,7 +232,7 @@ export default {
 									<el-button slot="reference" type="danger" size="mini">
 										删除
 									</el-button>
-								</el-popconfirm>
+								</el-popconfirm> */}
 							</div>
 						);
 					},
@@ -232,19 +246,88 @@ export default {
 		};
 	},
 	methods: {
+		// JS 计算两个时间戳相差年月日时分秒
+		calculateDiffTime(endTime, startTime, type) {
+			var runTime = parseInt(endTime - startTime)
+			var year = Math.floor(runTime / 86400 / 365)
+			runTime = runTime % (86400 * 365)
+			var month = Math.floor(runTime / 86400 / 30)
+			runTime = runTime % (86400 * 30)
+			var day = Math.floor(runTime / 86400)
+			runTime = runTime % 86400
+			var hour = Math.floor(runTime / 3600)
+			runTime = runTime % 3600
+			var minute = Math.floor(runTime / 60)
+			runTime = runTime % 60
+			var second = runTime
+			if (type === 1) { // 返回相差年数
+				return year + '年'
+			} else if (type === 2) { // 返回相差年数月数
+				return year + '年' + month + '月'
+			} else if (type === 3) { // 返回相差年数月数天数
+				return year + '年' + month + '月' + day + '日'
+			} else { // 返回相差年数月数天数时分秒
+				if (year == 0 && month == 0 && day == 0 && hour == 0 && minute == 0 && second == 0) {
+					return 0
+				} else if (year == 0 && month == 0 && day == 0 && hour == 0 && minute == 0) {
+					return second + '秒'
+				} else if (year == 0 && month == 0 && day == 0 && hour == 0) {
+					return minute + '分' + second + '秒'
+				} else if (year == 0 && month == 0 && day == 0) {
+					return hour + '时' + minute + '分' + second + '秒'
+				} else if (year == 0 && month == 0) {
+					return day + '日' + hour + '时' + minute + '分' + second + '秒'
+				} else if (year == 0) {
+					return month + '月' + day + '日' + hour + '时' + minute + '分' + second + '秒'
+				} else {
+					return year + '年' + month + '月' + day + '日' + hour + '时' + minute + '分' + second + '秒'
+				}
+			}
+		},
+		// 日志翻页
+		journalpageChange(obj) {
+			this.journalpage = obj.page
+			this.journallimit = obj.limit;
+			this.taskListDetailIndex();
+		},
 		// 日志取消
 		journalClose() {
 			this.journaltableData = []
+			this.journalDetailList = {}
+			this.journallimit=10
+		    this.journalpage=1
+			this.journaltotal = 0
 			this.showJournal = false;
 		},
 		// 日志
-		journalClick(id) {
+		journalClick(row) {
 			this.showJournal = true
-			this.journaltableData = [
-				{
-					task_type: 1
+			this.journalDetailList = row
+			this.taskListDetailIndex()
+		},
+		// 获取日志数据
+		async taskListDetailIndex() {
+			try {
+				this.journalLoading = true
+				const res = await this.$api({
+					type: 'taskListDetailIndex',
+					data: {
+						uid: this.journalDetailList.uid,
+						tasklist_id: this.journalDetailList.tasklist_id,
+						limit: this.journallimit,
+						page: this.journalpage
+					},
+				});
+				this.journalLoading = false
+				if (res.status == 200) {
+					this.journaltableData = res.data.list;
+					this.journaltotal = res.data.count;
+				} else {
+					this.$message.error(res.msg);
 				}
-			]
+			} catch (error) {
+				console.error(error);
+			}
 		},
 		// 删除
 		deleteClick(id) {

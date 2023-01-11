@@ -30,7 +30,7 @@
           </el-select>
         </el-form-item>
         <el-form-item prop="tasklist_id_list" label="选择数据来源 ：" v-model="likeCommentTaskForm.tasklist_id_list">
-          <el-select style="width: 50%" clearable multiple v-model="likeCommentTaskForm.tasklist_id_list"
+          <el-select style="width: 50%" clearable multiple filterable v-model="likeCommentTaskForm.tasklist_id_list"
             placeholder="选择数据来源" size="medium" v-loadMore="sourceLoadMore">
             <el-option v-for="item in sourceData" :key="item.tasklist_id" :label="item.task_name"
               :value="item.tasklist_id"></el-option>

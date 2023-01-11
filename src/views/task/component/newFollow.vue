@@ -26,7 +26,7 @@
           <el-input style="width: 50%" type="text" v-model="followTaskForm.task_name" placeholder="请备注任务名称"></el-input>
         </el-form-item>
         <el-form-item label="选择国家 ：" prop="country_list">
-          <el-select style="width: 50%" clearable multiple v-model="followTaskForm.country_list" placeholder="选择国家">
+          <el-select style="width: 50%" clearable multiple filterable v-model="followTaskForm.country_list" placeholder="选择国家">
             <el-option v-for="(item, index) in countryOptions" :key="index" :label="item" :value="item">{{
               item
             }}</el-option>
@@ -37,6 +37,7 @@
             style="width: 50%"
             clearable
             multiple
+            filterable
             v-model="followTaskForm.tasklist_id_list"
             placeholder="选择数据来源"
             v-loadMore="sourceLoadMore"

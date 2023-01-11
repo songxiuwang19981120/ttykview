@@ -319,7 +319,6 @@
 						// 处理文本域数据
 						let themeList = [];
 						this.vieoTaskForm.text.split('\n').forEach((item) => {
-							console.log(item);
 							if (item != '') {
 								themeList.push(item);
 							}
@@ -332,9 +331,9 @@
 					}
 					if (this.accCount * this.vieoTaskForm.video_num > this.videoCount) {
 						return this.open();
+					}else{
+						this.uploadVideoTask(this.vieoTaskForm);
 					}
-					await this.uploadVideoTask(this.vieoTaskForm);
-					this.$parent.getVideoTasks();
 				} catch (error) {
 					console.error(error);
 				}
@@ -351,8 +350,8 @@
 						type: 'warning',
 					}
 				)
-					.then(async () => {
-						await this.uploadVideoTask(this.vieoTaskForm);
+					.then(() => {
+						 this.uploadVideoTask(this.vieoTaskForm);
 					})
 					.catch(() => {});
 			},

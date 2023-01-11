@@ -22,7 +22,7 @@
       </div>
     </div>
     <!-- 表格 -->
-    <table-custom height="700" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+    <table-custom :height="tableHeight" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
     <!-- 分页 -->
     <pagination :total="total" :page="page" :limit="limit" @pagination="pageChange"></pagination>
     <!-- 弹层 -->
@@ -46,6 +46,7 @@ export default {
   },
   data() {
     return {
+      tableHeight: String(window.innerHeight - 240),
       date: '',
       title: '',
       showTaskDetail: false,
@@ -116,12 +117,21 @@ export default {
                   查看详情
                 </el-button>
                 <el-button
-                  type="warning"
-                  size="mini"
-                  onClick={this.suspend.bind(this, row.tasklist_id)}
-                >
-                  暂停
-                </el-button>
+									v-show={row.status == 1}
+									type='warning'
+									size="mini"
+									onClick={this.suspend.bind(this, row.tasklist_id)}
+								>
+									暂停
+								</el-button>
+								<el-button
+									v-show={row.status == 2}
+									type='info'
+									size="mini"
+									onClick={this.continue.bind(this, row.tasklist_id)}
+								>
+									继续
+								</el-button>
                 <el-popconfirm
                   confirm-button-text="删除"
                   cancel-button-text="取消"
@@ -194,13 +204,64 @@ export default {
     closeTaskDetail() {
       this.showTaskDetail = false;
     },
-    delete() {
-      console.log("删除");
+    // 删除
+    async delete(id) {
+      let data = {
+        tasklist_ids: id
+      }
+      try {
+        const res = await this.$api({
+          type: "deleteTask",
+          data,
+        });
+        if (res.status == 200) {
+          this.$message.success(res.msg);
+          this.getVideoTasks()
+        } else {
+          this.$message.error(res.msg);
+        }
+      } catch (error) {
+        console.error(error);
+      }
     },
-
-    suspend() {
-      console.log("暂停");
+    //暂停
+    async suspend() {
+      try {
+				const res = await this.$api({
+					type: 'pauseTask',
+					data: {
+						tasklist_id:id,
+					},
+				});
+				if (res.status == 200) {
+					this.$message.success(res.msg);
+					this.getVideoTasks()
+				} else {
+					this.$message.error(res.msg);
+				}
+			} catch (error) {
+				console.error(error);
+			}
     },
+    // 继续
+		async continue(id) {
+			try {
+				const res = await this.$api({
+					type: 'continueTask',
+					data: {
+						tasklist_id:id,
+					},
+				});
+				if (res.status == 200) {
+					this.$message.success(res.msg);
+					this.getVideoTasks()
+				} else {
+					this.$message.error(res.msg);
+				}
+			} catch (error) {
+				console.error(error);
+			}
+		},
     closePrivateTask() {
       this.showPrivateDialog = false;
     },

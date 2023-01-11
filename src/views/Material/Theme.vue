@@ -6,7 +6,7 @@
 					<GroupSelect ref="groupselect" @handleChange="handleChange($event)" style="margin-right: 10px" />
 				</div>
 				<div>
-					<TypeSelect @handleTypeChange="handleTypeChange($event)" :typeList="searchTypecontrolList"
+					<TypeSelect ref="typeSelect" @handleTypeChange="handleTypeChange($event)" :typeList="searchTypecontrolList"
 						style="margin-right: 10px" />
 				</div>
 				<div>
@@ -19,7 +19,7 @@
 				</div>
 			</div>
 		</div>
-		<table-custom height="600" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+		<table-custom :height="tableHeight" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 
 		<el-dialog title="编辑" :visible="contentVisibleUpdate" @close="exitCancel" width="50%" style="margin-top: 20px">
 			<el-form :model="ruleForm" ref="ruleForm" :rules="exitRules" label-width="120px">
@@ -83,6 +83,7 @@ export default {
 	},
 	data() {
 		return {
+			tableHeight:(window.innerHeight - 200).toString(),
 			submitting: false,
 			searchForm: {
 				sort: '', //排序
@@ -180,6 +181,11 @@ export default {
 					align: 'center',
 				},
 				{
+					prop: "zs",
+					label: "素材数量",
+					align: "center",
+				},
+				{
 					label: '操作',
 					align: 'center',
 					render: (h, { row }) => {
@@ -223,7 +229,7 @@ export default {
 				limit: this.current_limit,
 				page: this.current_page,
 				typecontrol_id: this.classifytypecontrol_id, //点击账号分组的grouping_id
-				grouping: this.classifygrouping_id, //点击分类的typecontrol_id
+				grouping_id: this.classifygrouping_id, //点击分类的typecontrol_id
 				sort: this.searchForm.sort,
 				usage_count: usage_count,
 				order: 'usage_count',
@@ -291,7 +297,7 @@ export default {
 				limit: this.current_limit,
 				page: this.current_page,
 				typecontrol_id: this.classifytypecontrol_id, //点击账号分组的grouping_id
-				grouping: this.classifygrouping_id, //点击分类的typecontrol_id
+				grouping_id: this.classifygrouping_id, //点击分类的typecontrol_id
 			};
 			this.getNickNameClassify(data);
 		},
@@ -322,12 +328,12 @@ export default {
 		editBtn(row) {
 			this.contentVisible = true;
 			this.classifytypecontrol_id = row.typecontrol_id;
-			this.classifygrouping_id = row.classifygrouping_id;
+			this.classifygrouping_id = row.grouping_id;
 			let data = {
 				limit: this.current_limit,
 				page: this.current_page,
 				typecontrol_id: this.classifytypecontrol_id, //点击账号分组的grouping_id
-				grouping: this.classifygrouping_id, //点击分类的typecontrol_id
+				grouping_id: this.classifygrouping_id, //点击分类的typecontrol_id
 			};
 			this.getNickNameClassify(data);
 		},
@@ -353,7 +359,7 @@ export default {
 						limit: this.current_limit,
 						page: this.current_page,
 						typecontrol_id: this.classifytypecontrol_id, //点击账号分组的grouping_id
-						grouping: this.classifygrouping_id, //点击分类的typecontrol_id
+						grouping_id: this.classifygrouping_id, //点击分类的typecontrol_id
 					};
 					this.getNickNameClassify(data); //获取当前index
 					this.contentVisibleUpdate = false;
@@ -386,7 +392,7 @@ export default {
 						limit: this.current_limit,
 						page: this.current_page,
 						typecontrol_id: this.classifytypecontrol_id, //点击账号分组的grouping_id
-						grouping: this.classifygrouping_id, //点击分类的typecontrol_id
+						grouping_id: this.classifygrouping_id, //点击分类的typecontrol_id
 					};
 					this.getNickNameClassify(data);
 					this.$message.success(res.msg);
@@ -501,6 +507,7 @@ export default {
 			};
 			this.searchTypecontrolList = [];
 			this.$refs.groupselect.group = '';
+			this.$refs.typeSelect.classiFication = [];
 			this.subjectcontentListtable();
 		},
 		// 点击上传按钮

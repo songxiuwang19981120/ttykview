@@ -544,6 +544,10 @@ export default {
     url: '/Tasklist/pause',
     method: 'POST'
   },
+  'continueTask': { // 暂停任务
+    url: '/Tasklist/continue',
+    method: 'POST'
+  },
 
   'deleteTask': { // 删除任务
     url: '/Tasklist/delete',
@@ -748,6 +752,11 @@ export default {
   // 上传头像
   'headimageUpload': {
     url: '/Headimage/upload',
+    method: 'POST',
+  },
+  // 单个任务重试
+  'taskListDetailRetry': {
+    url: '/TaskListDetail/retry',
     method: 'POST',
   },
 }

@@ -3,7 +3,7 @@
 		<el-dialog :visible="showDialog" title="关注任务详情" @close="btnCancel" width="70%">
 			<!-- 表格 -->
 			<table-custom :mutiSelect="true" :loading="loading" :tableData="tableData" :columns="columns"
-				height="700"></table-custom>
+				:height="tableHeight"></table-custom>
 			<!-- 分页 -->
 			<pagination :total="total" :page="page" :limit="limit" @pagination="pageChange"></pagination>
 			<!-- 按钮 -->
@@ -12,7 +12,8 @@
 			</span>
 			<el-dialog width="55%" :visible="showfollow" :before-close="followClose" title="关注任务日志" append-to-body>
 				<table-custom :loading="followLoading" :tableData="followtableData" :columns="followColumns"
-					height="700"></table-custom>
+					:height="tableHeight"></table-custom>
+					<pagination :total="journaltotal" :page="journalpage" :limit="journallimit" @pagination="journalpageChange"></pagination>
 			</el-dialog>
 		</el-dialog>
 	</div>
@@ -38,38 +39,76 @@ export default {
 	},
 	data() {
 		return {
+			tableHeight: String(window.innerHeight - 440),
+			journaltotal:0,
+			journalpage:1,
+			journallimit:10,
 			showfollow: false,
 			followLoading: false,
 			followtableData: [],
 			followColumns: [
 				{
 					label: '目标uid',
-					prop: 'task_type',
+					prop: 'uid',
 					align: 'center',
 				},
-				{
-					label: '数据来源',
-					prop: 'task_type',
-					align: 'center',
-				},
+				// {
+				// 	label: '数据来源',
+				// 	prop: 'task_type',
+				// 	align: 'center',
+				// },
 				{
 					label: '更新时间',
-					prop: 'task_type',
 					align: 'center',
+					render: (h, { row }) => {
+						let time = ''
+						if (row.receive_times != '') {
+							time = row.receive_times
+						} else if (row.complete_times != '') {
+							time = row.complete_times
+						} else {
+							time = row.create_times
+						}
+						return (
+							<div>{time}</div>
+						);
+					}
 				},
 				{
 					label: '状态',
-					prop: 'task_type',
+					prop: 'status',
 					align: 'center',
+					render: (h, { row }) => {
+						let res;
+						if (row.status == 0) {
+							res = '完成';
+						} else if (row.status == 1) {
+							res = '未开始';
+						} else if (row.status == 2) {
+							res = '失败';
+						} else if (row.status == 3) {
+							res = '领取中';
+						}
+						return <div>{res}</div>;
+					},
 				},
 				{
 					label: '耗时',
-					prop: 'task_type',
+					// prop: 'complete_times',
 					align: 'center',
+					render: (h, { row }) => {
+						let time = '';
+						if (row.receive_times != '' && row.complete_times != '') {
+							time = this.calculateDiffTime(row.receive_time, row.complete_time)
+						} else if (row.complete_times != '' && row.create_times != '') {
+							time = this.calculateDiffTime(row.complete_time, row.create_time)
+						}
+						return <div>{time}</div>;
+					},
 				},
 				{
 					label: '失败原因',
-					prop: 'task_type',
+					prop: 'reason',
 					align: 'center',
 				},
 			],
@@ -185,7 +224,7 @@ export default {
 								<el-button
 									type="success"
 									size="mini"
-									onClick={this.followClick.bind(this, row.id)}
+									onClick={this.followClick.bind(this, row)}
 									style="margin-right:10px"
 								>
 									日志
@@ -211,22 +250,91 @@ export default {
 			total: 0,
 			resetloading: false,
 			task_id:'',
+			journalDetailList:{},
 		};
 	},
 	methods: {
+		// JS 计算两个时间戳相差年月日时分秒
+		calculateDiffTime(endTime, startTime, type) {
+			var runTime = parseInt(endTime - startTime)
+			var year = Math.floor(runTime / 86400 / 365)
+			runTime = runTime % (86400 * 365)
+			var month = Math.floor(runTime / 86400 / 30)
+			runTime = runTime % (86400 * 30)
+			var day = Math.floor(runTime / 86400)
+			runTime = runTime % 86400
+			var hour = Math.floor(runTime / 3600)
+			runTime = runTime % 3600
+			var minute = Math.floor(runTime / 60)
+			runTime = runTime % 60
+			var second = runTime
+			if (type === 1) { // 返回相差年数
+				return year + '年'
+			} else if (type === 2) { // 返回相差年数月数
+				return year + '年' + month + '月'
+			} else if (type === 3) { // 返回相差年数月数天数
+				return year + '年' + month + '月' + day + '日'
+			} else { // 返回相差年数月数天数时分秒
+				if (year == 0 && month == 0 && day == 0 && hour == 0 && minute == 0 && second == 0) {
+					return 0
+				} else if (year == 0 && month == 0 && day == 0 && hour == 0 && minute == 0) {
+					return second + '秒'
+				} else if (year == 0 && month == 0 && day == 0 && hour == 0) {
+					return minute + '分' + second + '秒'
+				} else if (year == 0 && month == 0 && day == 0) {
+					return hour + '时' + minute + '分' + second + '秒'
+				} else if (year == 0 && month == 0) {
+					return day + '日' + hour + '时' + minute + '分' + second + '秒'
+				} else if (year == 0) {
+					return month + '月' + day + '日' + hour + '时' + minute + '分' + second + '秒'
+				} else {
+					return year + '年' + month + '月' + day + '日' + hour + '时' + minute + '分' + second + '秒'
+				}
+			}
+		},
+		journalpageChange(obj) {
+			this.journalpage = obj.page
+			this.journallimit = obj.limit;
+			this.taskListDetailIndex();
+		},
 		// 日志取消
 		followClose() {
 			this.followtableData = []
+			this.journalDetailList={}
+			this.journallimit=10
+		    this.journalpage=1
+			this.journaltotal = 0
 			this.showfollow = false;
 		},
 		// 日志
-		followClick(id) {
+		followClick(row) {
 			this.showfollow = true
-			this.followtableData = [
-				{
-					task_type: 1
+			this.journalDetailList = row
+			this.taskListDetailIndex()
+		},
+		// 获取日志数据
+		async taskListDetailIndex() {
+			try {
+				this.followLoading = true
+				const res = await this.$api({
+					type: 'taskListDetailIndex',
+					data: {
+						uid: this.journalDetailList.uid,
+						tasklist_id: this.journalDetailList.tasklist_id,
+						limit: this.journallimit,
+						page: this.journalpage
+					},
+				});
+				this.followLoading = false
+				if (res.status == 200) {
+					this.followtableData = res.data.list;
+					this.journaltotal = res.data.count;
+				} else {
+					this.$message.error(res.msg);
 				}
-			]
+			} catch (error) {
+				console.error(error);
+			}
 		},
 		// 删除
 		deleteClick(id) {

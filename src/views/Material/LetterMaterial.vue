@@ -11,6 +11,7 @@
 				</div>
 				<div>
 					<TypeSelect
+					ref="typeSelect"
 						@handleTypeChange="handleTypeChange($event)"
 						:typeList="searchTypecontrolList"
 						style="margin-right: 10px"
@@ -27,7 +28,7 @@
 			</div>
 		</div>
 		<!-- 表格 -->
-		<table-custom height="700" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+		<table-custom :height="tableHeight" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 		<!-- 详情弹层 -->
 		<LetterMaterialDetailDialog
 			:outerVisible.sync="showDetailDialog"
@@ -62,6 +63,7 @@
 		},
 		data() {
 			return {
+				tableHeight:(window.innerHeight - 200).toString(),
 				searchEquipmentList: [], // 分组数据
 				searchTypecontrolList: [], // 账号分类数据
 				btnloading: false,
@@ -202,6 +204,7 @@
 				};
 				this.searchTypecontrolList = [];
 				this.$refs.groupselect.group = '';
+				this.$refs.typeSelect.classiFication = [];
 				this.getPrivateLetterClassify();
 			},
 			// 点击上传按钮

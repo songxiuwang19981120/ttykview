@@ -3,252 +3,244 @@
 		<div class="tt-accsituation">
 			<div class="tt-accsituation--operation">
 				<div>
-					<GroupSelect
-						ref="groupselect"
-						@handleChange="handleChange($event)"
-						style="margin-right: 10px"
-					/>
+					<GroupSelect ref="groupselect" @handleChange="handleChange($event)" style="margin-right: 10px" />
 				</div>
 				<div>
-					<TypeSelect
-						@handleTypeChange="handleTypeChange($event)"
-						:typeList="searchTypecontrolList"
-						style="margin-right: 10px"
-					/>
+					<TypeSelect ref="typeSelect" @handleTypeChange="handleTypeChange($event)"
+						:typeList="searchTypecontrolList" style="margin-right: 10px" />
 				</div>
 				<div>
 					<!-- 查询 -->
-					<el-button type="primary" size="medium" :loading="btnloading" @click="searchNickName">{{ btnloading ? '加载中...'
-		: '搜索'
-}}</el-button>
+					<el-button type="primary" size="medium" :loading="btnloading" @click="searchNickName">{{
+						btnloading
+						? '加载中...'
+							: '搜索'
+					}}</el-button>
 					<el-button type="primary" size="medium" @click="btnReset">重置</el-button>
 					<el-button type="primary" size="medium" @click="uploadNickName">上传</el-button>
 				</div>
 			</div>
 		</div>
 		<!-- 表格 -->
-		<table-custom height="700" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+		<table-custom :height="tableHeight" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
 		<!-- 详情弹层 -->
 
-		<NickNameDetailDialog
-			:outerVisible.sync="showDetailDialog"
-			ref="detailDialog"
-			:upParameter="nickData"
-		>
+		<NickNameDetailDialog :outerVisible.sync="showDetailDialog" ref="detailDialog" :upParameter="nickData">
 		</NickNameDetailDialog>
 		<!-- 上传弹层 -->
-		<NickNameUploadDialog
-			:showDialog.sync="showUploadDialog"
-			:upParameter="parameterData"
-			:nnClassifyDate="tableData"
-		></NickNameUploadDialog>
+		<NickNameUploadDialog :showDialog.sync="showUploadDialog" :upParameter="parameterData"
+			:nnClassifyDate="tableData"></NickNameUploadDialog>
 	</div>
 </template>
 
 <script>
-	import tableCustom from '@/components/myComponent/table/tableCustom.vue';
-	import NickNameDetailDialog from './component/NickNameDetailDialog.vue';
-	import NickNameUploadDialog from './component/NickNameUploadDialog.vue';
-	import GroupSelect from '@/components/base/baseSelect/GroupSelect.vue';
-	import TypeSelect from '@/components/base/baseSelect/TypeSelect.vue';
-	export default {
-		name: 'NikName',
-		components: {
-			tableCustom,
-			NickNameDetailDialog,
-			NickNameUploadDialog,
-			GroupSelect,
-			TypeSelect,
-		},
-		data() {
-			return {
-				searchEquipmentList: [], // 分组数据
-				searchTypecontrolList: [], // 账号分类数据
-				btnloading: false,
-				searchTableData: {
-					equipment: '',
-					typecontrol: '', // 表格搜索
+import tableCustom from '@/components/myComponent/table/tableCustom.vue';
+import NickNameDetailDialog from './component/NickNameDetailDialog.vue';
+import NickNameUploadDialog from './component/NickNameUploadDialog.vue';
+import GroupSelect from '@/components/base/baseSelect/GroupSelect.vue';
+import TypeSelect from '@/components/base/baseSelect/TypeSelect.vue';
+export default {
+	name: 'NikName',
+	components: {
+		tableCustom,
+		NickNameDetailDialog,
+		NickNameUploadDialog,
+		GroupSelect,
+		TypeSelect,
+	},
+	data() {
+		return {
+			tableHeight: (window.innerHeight - 200).toString(),
+			searchEquipmentList: [], // 分组数据
+			searchTypecontrolList: [], // 账号分类数据
+			btnloading: false,
+			searchTableData: {
+				equipment: '',
+				typecontrol: '', // 表格搜索
+			},
+			loading: false, // 表格-分页组件相关
+			tableData: [],
+			columns: [
+				{
+					prop: 'type_title',
+					label: '分类名称',
+					// align: 'center'
 				},
-				loading: false, // 表格-分页组件相关
-				tableData: [],
-				columns: [
-					{
-						prop: 'type_title',
-						label: '分类名称',
-						// align: 'center'
+				{
+					label: '已上昵称数量',
+					align: 'center',
+					render: (h, { row }) => {
+						const allCount = Number(row.yy) + Number(row.wy);
+						return <div>{allCount}</div>;
 					},
-					{
-						label: '已上昵称数量',
-						align: 'center',
-						render: (h, { row }) => {
-							const allCount = Number(row.yy) + Number(row.wy);
-							return <div>{allCount}</div>;
-						},
+				},
+				{
+					prop: 'yy',
+					label: '已用昵称数量',
+					align: 'center',
+				},
+				{
+					prop: 'wy',
+					label: '当前可用昵称',
+					align: 'center',
+				},
+				{
+					label: '操作',
+					align: 'center',
+					render: (h, { row }) => {
+						return (
+							<div>
+								<el-button
+									style="margin-right: 5px;"
+									type="primary"
+									size="mini"
+									onClick={this.toNickNameDetail.bind(this, row)}
+								>
+									昵称列表
+								</el-button>
+							</div>
+						);
 					},
-					{
-						prop: 'yy',
-						label: '已用昵称数量',
-						align: 'center',
-					},
-					{
-						prop: 'wy',
-						label: '当前可用昵称',
-						align: 'center',
-					},
-					{
-						label: '操作',
-						align: 'center',
-						render: (h, { row }) => {
-							return (
-								<div>
-									<el-button
-										style="margin-right: 5px;"
-										type="primary"
-										size="mini"
-										onClick={this.toNickNameDetail.bind(this, row)}
-									>
-										昵称列表
-									</el-button>
-								</div>
-							);
-						},
-					},
-				],
-				total: 0,
-				showDetailDialog: false,
-				showUploadDialog: false,
-				nickData: {}, // 传递给详情弹层的数据
-				parameterData: {},
-				resetloading: false,
+				},
+			],
+			total: 0,
+			showDetailDialog: false,
+			showUploadDialog: false,
+			nickData: {}, // 传递给详情弹层的数据
+			parameterData: {},
+			resetloading: false,
+		};
+	},
+
+	created() {
+		this.getNickNameClassify(this.page);
+		this.getaccGroup();
+	},
+
+	mounted() { },
+
+	methods: {
+		// 分组选择
+		async handleChange(e) {
+			this.searchTableData.equipment = e;
+			let searchTypeData = {
+				grouping_id: e,
 			};
-		},
-
-		created() {
-			this.getNickNameClassify(this.page);
-			this.getaccGroup();
-		},
-
-		mounted() {},
-
-		methods: {
-			// 分组选择
-			async handleChange(e) {
-				this.searchTableData.equipment = e;
-				let searchTypeData = {
-					grouping_id: e,
-				};
-				try {
-					let result = await this.$api({ type: 'getTypecontrol', data: searchTypeData });
-					if (result.status == '200') {
-						this.getTreeData(result.data);
-						this.searchTypecontrolList = result.data;
-					} else {
-						this.$message.error({ message: result.msg });
-					}
-				} catch (error) {}
-			},
-			// 分类选择
-			handleTypeChange(e) {
-				this.searchTableData.typecontrol = e;
-			},
-			// 获取账号分组数据
-			async getaccGroup() {
-				try {
-					const res = await this.$api({
-						type: 'getGrouping',
-					});
-					if (res.status == 200) {
-						this.searchEquipmentList = res.data.list;
-					} else {
-						this.$message.error(res.msg);
-					}
-				} catch (error) {
-					console.error(error);
-				} finally {
+			try {
+				let result = await this.$api({ type: 'getTypecontrol', data: searchTypeData });
+				if (result.status == '200') {
+					this.getTreeData(result.data);
+					this.searchTypecontrolList = result.data;
+				} else {
+					this.$message.error({ message: result.msg });
 				}
-			},
-			// 获取昵称分类数据
-			async getNickNameClassify(data) {
-				try {
-					this.loading = true;
-					const res = await this.$api({
-						type: 'getNickNameClassify',
-						data,
-					});
-					if (res.status == 200) {
-						this.tableData = res.data;
-						this.total = res.data.length;
-					} else {
-						this.$message.error(res.msg);
-					}
-				} catch (error) {
-					console.error(error);
-				} finally {
-					this.loading = false;
-					this.btnloading = false;
-					this.resetloading = false;
-				}
-			},
-			// 点击查询按钮
-			searchNickName() {
-				this.btnloading = true;
-				const { equipment, typecontrol } = this.searchTableData;
-				const typecontrol_id = typecontrol.length ? typecontrol[typecontrol.length - 1] : '';
-				const grouping_id = equipment;
-				this.parameterData = {
-					typecontrol_id,
-					grouping_id,
-				};
-				this.getNickNameClassify({
-					typecontrol_id,
-					grouping_id,
-				});
-			},
-			// 点击重置按钮
-			btnReset() {
-				this.resetloading = true;
-				this.searchTableData = {
-					equipment: '',
-					typecontrol: '',
-				};
-				this.parameterData = {
-					typecontrol_id: '',
-					grouping_id: '',
-				};
-				this.searchTypecontrolList = [];
-				this.$refs.groupselect.group = ''
-				this.getNickNameClassify();
-			},
-			// 点击上传按钮
-			uploadNickName() {
-				this.showUploadDialog = true;
-			},
-			// 点击详情按钮
-			toNickNameDetail(obj) {
-				this.showDetailDialog = true;
-				this.nickData = {
-					typecontrol_id: obj.typecontrol_id,
-					grouping_id: obj.grouping_id,
-				};
-				this.$refs.detailDialog.getNickName({
-					page: 1,
-					limit: 20,
-					typecontrol_id: obj.typecontrol_id,
-					grouping_id: obj.grouping_id,
-				});
-			},
-			// 处理树型children问题
-			getTreeData(arr) {
-				arr.forEach((item) => {
-					if (!item.children.length) {
-						item.children = undefined;
-					} else {
-						this.getTreeData(item.children);
-					}
-				});
-			},
+			} catch (error) { }
 		},
-	};
+		// 分类选择
+		handleTypeChange(e) {
+			this.searchTableData.typecontrol = e;
+		},
+		// 获取账号分组数据
+		async getaccGroup() {
+			try {
+				const res = await this.$api({
+					type: 'getGrouping',
+				});
+				if (res.status == 200) {
+					this.searchEquipmentList = res.data.list;
+				} else {
+					this.$message.error(res.msg);
+				}
+			} catch (error) {
+				console.error(error);
+			} finally {
+			}
+		},
+		// 获取昵称分类数据
+		async getNickNameClassify(data) {
+			try {
+				this.loading = true;
+				const res = await this.$api({
+					type: 'getNickNameClassify',
+					data,
+				});
+				if (res.status == 200) {
+					this.tableData = res.data;
+					this.total = res.data.length;
+				} else {
+					this.$message.error(res.msg);
+				}
+			} catch (error) {
+				console.error(error);
+			} finally {
+				this.loading = false;
+				this.btnloading = false;
+				this.resetloading = false;
+			}
+		},
+		// 点击查询按钮
+		searchNickName() {
+			this.btnloading = true;
+			const { equipment, typecontrol } = this.searchTableData;
+			const typecontrol_id = typecontrol.length ? typecontrol[typecontrol.length - 1] : '';
+			const grouping_id = equipment;
+			this.parameterData = {
+				typecontrol_id,
+				grouping_id,
+			};
+			this.getNickNameClassify({
+				typecontrol_id,
+				grouping_id,
+			});
+		},
+		// 点击重置按钮
+		btnReset() {
+			this.resetloading = true;
+			this.searchTableData = {
+				equipment: '',
+				typecontrol: '',
+			};
+			this.parameterData = {
+				typecontrol_id: '',
+				grouping_id: '',
+			};
+			this.searchTypecontrolList = [];
+			this.$refs.groupselect.group = ''
+			this.$refs.typeSelect.classiFication = [];
+			this.getNickNameClassify();
+		},
+		// 点击上传按钮
+		uploadNickName() {
+			this.showUploadDialog = true;
+		},
+		// 点击详情按钮
+		toNickNameDetail(obj) {
+			this.showDetailDialog = true;
+			this.nickData = {
+				typecontrol_id: obj.typecontrol_id,
+				grouping_id: obj.grouping_id,
+			};
+			this.$refs.detailDialog.getNickName({
+				page: 1,
+				limit: 20,
+				typecontrol_id: obj.typecontrol_id,
+				grouping_id: obj.grouping_id,
+			});
+		},
+		// 处理树型children问题
+		getTreeData(arr) {
+			arr.forEach((item) => {
+				if (!item.children.length) {
+					item.children = undefined;
+				} else {
+					this.getTreeData(item.children);
+				}
+			});
+		},
+	},
+};
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>

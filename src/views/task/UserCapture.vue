@@ -8,25 +8,26 @@
                     collectioning?'采集参数中...': '配置采集参数'
                 }}</el-button>
             </div>
-            <!-- <div class="tt-accsituation--operation">
-                <div>
-                    <el-input size="medium" v-model="searchData.nickname" placeholder="请输入昵称" style="width:140px;margin-right: 20px;"></el-input>
-                </div>
-                <div>
-                    <el-input size="medium" v-model="searchData.uid" placeholder="请输入uid" style="width:140px;margin-right: 20px;"></el-input>
-                </div>
-                <div>
-                    <el-select size="medium" v-model="searchData.sources" placeholder="请选择数据来源"
-                        style="width:140px;margin-right: 20px;">
-                        <el-option v-for="item in collectionContentlist" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        </div>
+        <div class="tt-accsituation">
+            <div class="tt-accsituation--operation">
+                <div  style="margin-right: 10px">
+                    <el-select v-model="search.status" placeholder="请选择任务状态" size="medium"  style="margin-right: 10px">
+                        <el-option v-for="item in searchStateList" :key="item.value" :label="item.label"
+                            :value="item.value">
+                        </el-option>
                     </el-select>
+                    <el-date-picker value-format="yyyy-MM-dd" size="medium" class="date-picker" v-model="search.date"
+                        type="daterange" align="right" unlink-panels range-separator="——" start-placeholder="开始日期"
+                        end-placeholder="结束日期" :picker-options="pickerOptions">
+                    </el-date-picker>
                 </div>
-                <div>
-                    <el-input size="medium" v-model="searchData.label" placeholder="请输入数据标签" style="width:140px;margin-right: 20px;"></el-input>
-                </div>
-                <el-button type="primary" size="medium" :loading="searching" @click="searchTable">{{searching? '查询中...' : '查 询'}}</el-button>
-                <el-button type="primary" size="medium" :loading="searching" @click="resetClick">重 置</el-button>
-            </div> -->
+                <el-button type="primary" size="medium" class="seachbut" :loading="btnloading" @click="searchTasks">{{
+                    btnloading? "加载中...": "搜索"
+                }}</el-button>
+                <el-button type="primary" size="medium" class="seachbut" @click="btnReset">重置</el-button>
+                <!-- <i class="el-icon-refresh-left"></i> -->
+            </div>
         </div>
         <el-dialog title="采集配置" :visible.sync="configureVisible" width="40%" :before-close="configureClose">
             <el-form ref="form" :rules="rules" :model="configureForm" label-width="140px">
@@ -66,14 +67,14 @@
             </span>
         </el-dialog>
         <div>
-            <table-custom height="700" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
-            <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination">
+            <table-custom :height="tableHeight" :loading="loading" :tableData="tableData"
+                :columns="columns"></table-custom>
+            <pagination :total="total" :page="page" :limit="limit" @pagination="handlePagination">
             </pagination>
         </div>
 
-        <el-dialog title="用户采集任务详情" :visible.sync="userDetailVisible" width="70%" :before-close="userDetailClose">
-            <table-custom height="700" :loading="detailLoading" :tableData="detailTableData" :columns="detailColumns"
-                :mutiSelect="true" @handleSelectionChange="detailSelectionChange"></table-custom>
+        <el-dialog title="用户采集任务详情" :visible.sync="userDetailVisible" width="80%" :before-close="userDetailClose">
+            <table-custom :height="tableDataDetail" :loading="detailLoading" :tableData="detailTableData" :columns="detailColumns" @handleSelectionChange="detailSelectionChange"></table-custom>
             <pagination :total="detailTotal" :page="detailCurrent_page" :limit="detailCurrent_limit"
                 @pagination="detailHandlePagination"></pagination>
             <span slot="footer" class="dialog-footer">
@@ -94,6 +95,12 @@ export default {
     },
     data() {
         return {
+            search: {
+                status: '',
+                date: '',
+            },
+            tableHeight: String(window.innerHeight - 300),
+            tableDataDetail:String(window.innerHeight - 400),
             userDetailVisible: false,
             detailLoading: false,
             detailTableData: [],
@@ -109,27 +116,27 @@ export default {
                     align: 'center',
                 },
                 {
-					prop: "avatar_thumb",
-					label: "头像",
-					align: "left",
-					width: "200",
-					render: (h, { row }) => {
-						return (
-							<div style="display: flex;max-width: 260px">
-								<el-image
-									class="table-avatar mr-15"
-									src={row.avatar_thumb}
-									style="width: 50px; height: 50px; border-radius: 50%;margin-right: 16px"
-								></el-image>
-								<div>
-									<p style="font-size: 14px;">{row.nickname}</p>
-									<p style="font-size: 12px;">ID ：{row.uid}</p>
-								</div>
-							</div>
-						);
-					},
-				},
-               
+                    prop: "avatar_thumb",
+                    label: "头像",
+                    align: "left",
+                    width: "250",
+                    render: (h, { row }) => {
+                        return (
+                            <div style="display: flex;max-width: 260px">
+                                <el-image
+                                    class="table-avatar mr-15"
+                                    src={row.avatar_thumb}
+                                    style="width: 50px; height: 50px; border-radius: 50%;margin-right: 16px"
+                                ></el-image>
+                                <div>
+                                    <p style="font-size: 14px;">{row.nickname}</p>
+                                    <p style="font-size: 12px;">ID ：{row.uid}</p>
+                                </div>
+                            </div>
+                        );
+                    },
+                },
+
                 {
                     prop: 'signature',
                     label: '签名',
@@ -183,11 +190,38 @@ export default {
             searching: false,
             collectioning: false,
             loading: false, //表格加载loading
-            tableData: [
-                {
-                    create_time: '2023-01-05 12:00'
-                }
-            ],  //表格数据
+            tableData: [],  //表格数据
+            pickerOptions: {
+				shortcuts: [
+					{
+						text: '最近一周',
+						onClick(picker) {
+							const end = new Date();
+							const start = new Date();
+							start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+							picker.$emit('pick', [start, end]);
+						},
+					},
+					{
+						text: '最近一个月',
+						onClick(picker) {
+							const end = new Date();
+							const start = new Date();
+							start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+							picker.$emit('pick', [start, end]);
+						},
+					},
+					{
+						text: '最近三个月',
+						onClick(picker) {
+							const end = new Date();
+							const start = new Date();
+							start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+							picker.$emit('pick', [start, end]);
+						},
+					},
+				],
+			},
             columns: [
                 {
                     prop: "create_time",
@@ -200,13 +234,13 @@ export default {
                     align: "center",
                 },
                 {
-                    prop: "status",
-                    label: "任务状态",
-                    align: "center",
-                    render: (h, { row }) => {
-                        return <div>{row.status == 0 ? "已完成" : "未完成"}</div>;
-                    },
-                },
+					prop: 'status',
+					label: '任务状态',
+					align: 'center',
+					render: (h, { row }) => {
+						return <div>{row.status == 0 ? '已完成' : '未完成'}</div>;
+					},
+				},
                 {
                     label: "任务进度",
                     align: "center",
@@ -240,12 +274,21 @@ export default {
                                     查看详情
                                 </el-button>
                                 <el-button
-                                    type="warning"
-                                    size="mini"
-                                    onClick={this.suspend.bind(this, row.tasklist_id)}
-                                >
-                                    暂停
-                                </el-button>
+									v-show={row.status == 1}
+									type='warning'
+									size="mini"
+									onClick={this.suspend.bind(this, row.tasklist_id)}
+								>
+									暂停
+								</el-button>
+								<el-button
+									v-show={row.status == 2}
+									type='info'
+									size="mini"
+									onClick={this.continue.bind(this, row.tasklist_id)}
+								>
+									继续
+								</el-button>
                                 <el-popconfirm
                                     confirm-button-text="删除"
                                     cancel-button-text="取消"
@@ -266,9 +309,17 @@ export default {
                     },
                 },
             ],
-            total: 0,  //数据总量
-            current_page: 1, //当前页
-            current_limit: 10, //每页条数
+            // 下拉选择数据
+            searchStateList: [
+                {
+                    value: "0",
+                    label: "已完成",
+                },
+                {
+                    value: "1",
+                    label: "未完成",
+                },
+            ],
             bloggerLink: '', //博主主页链接
             configureVisible: false,  //配置采集参数弹框
             configureForm: {
@@ -319,45 +370,130 @@ export default {
             submitting: false,  //配置采集参数提交确定
             allSearchList: [],
             userList: '',  //暂存搜索到的数据
+            total: 0,  //数据总量
+            page: 1,
+            limit: 10,
+            tasklist_id: '',
+            btnloading:false, //搜索
         };
     },
 
     mounted() {
-        // this.externalmemberIndex()
-
+        this.getVideoTasks();
     },
 
     methods: {
+        btnReset(){
+            this.page = 1;
+            this.getVideoTasks();
+            this.search.date=''
+            this.search.status=''
+
+        },
+        searchTasks() {
+            this.page = 1;
+            this.btnloading = true
+            this.getVideoTasks();
+        },
+        // 获取采集任务列表
+        async getVideoTasks() {
+            let data = {
+                page: this.page,
+                limit: this.limit,
+                status: this.search.status,
+                // date: this.search.date,
+                task_type: 'CollectionUser',
+            };
+            try {
+                this.loading = true;
+                const res = await this.$api({
+                    type: 'getTasklist',
+                    data,
+                });
+                if (res.status == 200) {
+                    this.tableData = res.data.list;
+                    this.total = res.data.count;
+                } else {
+                    this.$message.error(res.msg);
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                this.loading = false;
+                this.btnloading = false;
+            }
+        },
         // 删除
-        delete() {
-            this.$message.success({ message: '删除成功' })
+		async delete(id) {
+			let data = {
+				tasklist_ids: id
+			}
+			try {
+				const res = await this.$api({
+					type: "deleteTask",
+					data,
+				});
+				if (res.status == 200) {
+					this.$message.success(res.msg);
+					this.getVideoTasks()
+				} else {
+					this.$message.error(res.msg);
+				}
+			} catch (error) {
+				console.error(error);
+			}
+		},
+        // 暂停
+        async suspend(id) {
+            try {
+				const res = await this.$api({
+					type: 'pauseTask',
+					data: {
+						tasklist_id:id,
+					},
+				});
+				if (res.status == 200) {
+					this.$message.success(res.msg);
+					this.getVideoTasks()
+				} else {
+					this.$message.error(res.msg);
+				}
+			} catch (error) {
+				console.error(error);
+			}
         },
-        // 暂停/开始
-        suspend() {
-            this.$message.success({ message: '操作成功' })
-        },
+        // 继续
+		async continue(id) {
+			try {
+				const res = await this.$api({
+					type: 'continueTask',
+					data: {
+						tasklist_id:id,
+					},
+				});
+				if (res.status == 200) {
+					this.$message.success(res.msg);
+					this.getVideoTasks()
+				} else {
+					this.$message.error(res.msg);
+				}
+			} catch (error) {
+				console.error(error);
+			}
+		},
         // 查看详情
-        toDetail() {
+        toDetail(id) {
             this.userDetailVisible = true
+            this.tasklist_id = id
             this.externalmemberIndex()
         },
         // 查询表格
-        searchTable() {
-            this.detailCurrent_page = 1;  //页数
-            this.searching = true
-            this.externalmemberIndex()
-        },
         // 获取表格数据
         async externalmemberIndex() {
             let data = {
                 limit: this.detailCurrent_limit,
                 page: this.detailCurrent_page,
-                uid: this.searchData.uid,
-                nickname: this.searchData.nickname,   //昵称
-                status: '',  //状态1-正常-封禁2-登出
-                sources: this.searchData.sources,  //数据来源·
-                label: this.searchData.label,  //数据标签·
-                if_collection: '', //1=未用，@=以用
+                tasklist_id: this.tasklist_id,
             }
             try {
                 this.detailLoading = true
@@ -401,7 +537,7 @@ export default {
                 let result = await this.$api({ type: "collectionUser", data: data });
                 this.submitting = false
                 if (result.status == '200') {
-                    this.$message.success({ message: '数据采集中,请稍后刷新页面查看' })
+                    this.$message.success({ message: '采集任务新增成功' })
                     this.configureVisible = false
                     this.userList = []
                     this.bloggerLink = ''
@@ -412,6 +548,7 @@ export default {
                         upper_limit: '',
                         black_list: [],
                     }//配置采集参数弹框数据
+                    this.getVideoTasks()
                 } else {
                     this.$message.error({ message: result.msg })
                 }
@@ -463,7 +600,6 @@ export default {
             })
             this.userList = await Promise.all(this.allSearchList)
             this.$nextTick(() => {
-                console.log('', this.userList);
                 // if(this.userList.indexOf(undefined)==-1){
                 this.configureVisible = true
                 // }
@@ -514,29 +650,18 @@ export default {
             this.detailCurrent_limit = val.limit  //条数
             this.externalmemberIndex()
         },
-        // 重置表格
-        resetClick() {
-            this.searchData = {
-                nickname: '',
-                uid: '',
-                sources: '',
-                label: '',
-            }
-            this.detailCurrent_page = 1  //当前页
-            this.detailCurrent_limit = 10 //每页条数
-            this.externalmemberIndex()
-        },
         userDetailClose() {
             this.userDetailVisible = false;
             this.detailTableData = [];
+            this.tasklist_id = ''
             this.detailTotal = 0
             this.detailCurrent_page = 1
             this.detailCurrent_limit = 10
         },
         handlePagination(val) {
-            this.current_page = val.page;  //页数
-            this.current_limit = val.limit  //条数
-            // this.externalmemberIndex()
+            this.page = val.page;  //页数
+            this.page = val.limit  //条数
+            this.getVideoTasks()
         },
     },
 };

@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog width="70%" :visible="showTaskDetail" :before-close="handlerClose" title="评论点赞任务详情">
-      <table-custom :loading="loading" :tableData="tableData" :columns="columns" height="700"></table-custom>
+      <table-custom :loading="loading" :tableData="tableData" :columns="columns" :height="tableHeight"></table-custom>
       <pagination :total="total" :page="page" :limit="limit" @pagination="pageChange"></pagination>
       <span slot="footer">
         <el-button @click="handlerClose" size="medium">取 消</el-button>
@@ -11,7 +11,7 @@
             :loading="journalLoading"
             :tableData="journaltableData"
             :columns="journalColumns"
-            height="700"
+            :height="tableHeight"
             ></table-custom>
         </el-dialog>
     </el-dialog>
@@ -34,6 +34,7 @@ export default {
   },
   data() {
     return {
+      tableHeight: String(window.innerHeight - 440),
       journalLoading:false,
       journaltableData:[],
       journalColumns:[

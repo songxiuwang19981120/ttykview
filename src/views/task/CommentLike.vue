@@ -21,7 +21,7 @@
       </div>
     </div>
     <!-- 表格 -->
-    <table-custom :loading="loading" :tableData="tableData" :columns="columns" height="700"></table-custom>
+    <table-custom :loading="loading" :tableData="tableData" :columns="columns" :height="tableHeight"></table-custom>
     <!-- 分页 -->
     <pagination :total="total" :page="page" :limit="limit" @pagination="pageChange"></pagination>
     <!-- 弹层 -->
@@ -46,6 +46,7 @@ export default {
   },
   data() {
     return {
+      tableHeight: String(window.innerHeight - 240),
       showTaskDetail: false,
       showLikeCommentTask: false,
       // 下拉选择数据
@@ -114,13 +115,21 @@ export default {
                   查看详情
                 </el-button>
                 <el-button
-                  type="warning"
-                  size="mini"
-                  onClick={this.suspend.bind(this, row.tasklist_id)}
-                  style="margin-right:10px"
-                >
-                  暂停
-                </el-button>
+									v-show={row.status == 1}
+									type='warning'
+									size="mini"
+									onClick={this.suspend.bind(this, row.tasklist_id)}
+								>
+									暂停
+								</el-button>
+								<el-button
+									v-show={row.status == 2}
+									type='info'
+									size="mini"
+									onClick={this.continue.bind(this, row.tasklist_id)}
+								>
+									继续
+								</el-button>
                 <el-popconfirm
                   confirm-button-text="删除"
                   cancel-button-text="取消"
@@ -195,7 +204,7 @@ export default {
       }
       try {
         const res = await this.$api({
-          type: "tasklistDelete",
+          type: "deleteTask",
           data,
         });
         if (res.status == 200) {
@@ -210,24 +219,42 @@ export default {
     },
     // 暂停
     async suspend(id) {
-      let data = {
-        tasklist_id: id
-      }
       try {
-        const res = await this.$api({
-          type: "tasklistPause",
-          data,
-        });
-        if (res.status == 200) {
-          this.$message.success(res.msg);
-          this.getVideoTasks()
-        } else {
-          this.$message.error(res.msg);
-        }
-      } catch (error) {
-        console.error(error);
-      }
+				const res = await this.$api({
+					type: 'pauseTask',
+					data: {
+						tasklist_id:id,
+					},
+				});
+				if (res.status == 200) {
+					this.$message.success(res.msg);
+					this.getVideoTasks()
+				} else {
+					this.$message.error(res.msg);
+				}
+			} catch (error) {
+				console.error(error);
+			}
     },
+    // 继续
+		async continue(id) {
+			try {
+				const res = await this.$api({
+					type: 'continueTask',
+					data: {
+						tasklist_id:id,
+					},
+				});
+				if (res.status == 200) {
+					this.$message.success(res.msg);
+					this.getVideoTasks()
+				} else {
+					this.$message.error(res.msg);
+				}
+			} catch (error) {
+				console.error(error);
+			}
+		},
     // 隐藏评论点赞任务详情
     closeTaskDetail() {
       this.showTaskDetail = false

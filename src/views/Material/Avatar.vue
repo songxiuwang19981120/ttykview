@@ -6,7 +6,7 @@
 					<GroupSelect ref="groupselect" @handleChange="handleChange($event)" style="margin-right: 10px" />
 				</div>
 				<div>
-					<TypeSelect @handleTypeChange="handleTypeChange($event)" :typeList="libraryList"
+					<TypeSelect ref="typeSelect" @handleTypeChange="handleTypeChange($event)" :typeList="libraryList"
 						style="margin-right: 10px" />
 				</div>
 				<div>
@@ -46,7 +46,7 @@
 				</el-form-item>
 				<el-form-item label="图片:" prop="img">
 					<el-upload ref="imgUnload" class="upload-demo" drag action="" multiple accept=".png,.jpg,.jpeg"
-						:on-remove="handleRemove" :auto-upload="false" :on-change="uploadImg" :file-list="fileList">
+						:on-remove="handleRemove" :auto-upload="false" :on-change="uploadImg" :file-list="fileList"  :limit="1000" :on-exceed="uploadExceed">
 						<i class="el-icon-upload"></i>
 						<div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
 					</el-upload>
@@ -59,7 +59,7 @@
 				}}</el-button>
 			</span>
 		</el-dialog>
-		<div>
+		<div :style="'max-height:'+tableHeight+'px;margin-bottom:20px'">
 			<el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选
 				<span style="color: #ff411f; font-size: 12px; padding-left: 20px">
 					已选中 {{ checkedCities.length }} 个图片</span></el-checkbox>
@@ -98,6 +98,7 @@ export default {
 	},
 	data() {
 		return {
+			tableHeight:(window.innerHeight - 200).toString(),
 			deleteing: false, //删除ing
 			checkAll: false, //全选
 			checkedCities: [], //已选数据
@@ -208,6 +209,10 @@ export default {
 	},
 
 	methods: {
+		// 监听视频上传超过1000条
+		uploadExceed(){
+			this.$message.error('视频单次上传限制最大1000条');
+		},
 		// 图片拉取
 		uploadImg(file, fileList) {
 			let { size } = file || {};
@@ -485,6 +490,7 @@ export default {
 			};
 			this.libraryList = [];
 			this.$refs.groupselect.group = '';
+			this.$refs.typeSelect.classiFication = [];
 			this.getHeadimageList();
 		},
 	},

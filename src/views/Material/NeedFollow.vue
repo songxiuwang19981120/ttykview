@@ -17,7 +17,7 @@
         <el-button type="primary" size="medium" @click="uploadMaterialVisible = true">上传素材</el-button>
       </div>
     </div>
-    <table-custom height="700" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
+    <table-custom :height="tableHeight" :loading="loading" :tableData="tableData" :columns="columns"></table-custom>
     <pagination :total="total" :page="current_page" :limit="current_limit" @pagination="handlePagination"></pagination>
 
     <el-dialog title="新增ID库" :visible.sync="libraryVisible" width="40%" :before-close="cancelLibrary">
@@ -68,6 +68,7 @@ export default {
   },
   data() {
     return {
+      tableHeight:(window.innerHeight - 200).toString(),
       uploadMaterialVisible: false,  //上传素材
       editMaterialVisible: false,  //编辑素材
       editLibrarySubmitting: false, //ID库新增loading

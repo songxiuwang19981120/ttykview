@@ -22,14 +22,14 @@
           <el-input style="width: 50%" type="text" v-model="letterTaskForm.task_name" placeholder="请输入任务名称"></el-input>
         </el-form-item>
         <el-form-item label="国家 ：" v-model="letterTaskForm.country_list" prop="country_list">
-          <el-select style="width: 50%" clearable multiple v-model="letterTaskForm.country_list" placeholder="选择国家">
+          <el-select style="width: 50%" clearable multiple filterable v-model="letterTaskForm.country_list" placeholder="选择国家">
             <el-option v-for="(item, index) in countryOptions" :key="index" :label="item" :value="item">{{
               item
             }}</el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="数据来源 ：" v-model="letterTaskForm.tasklist_id_list" prop="tasklist_id_list">
-          <el-select multiple clearable style="width: 50%" v-model="letterTaskForm.tasklist_id_list"
+          <el-select multiple clearable filterable style="width: 50%" v-model="letterTaskForm.tasklist_id_list"
             placeholder="选择数据来源" v-loadMore="sourceLoadMore">
             <el-option v-for="item in sourceData" :key="item.tasklist_id" :label="item.task_name"
               :value="item.tasklist_id"></el-option>
@@ -44,7 +44,7 @@
             placeholder="单号私信上限"></el-input>
         </el-form-item>
         <el-form-item v-model="letterTaskForm.privateletter_id" prop="privateletter_id" label="私信素材 ：">
-          <el-select style="width: 50%" v-model="letterTaskForm.privateletter_id" placeholder="私信素材选择">
+          <el-select style="width: 50%" clearable filterable v-model="letterTaskForm.privateletter_id" placeholder="私信素材选择">
             <el-option v-for="item in letterOptions" :key="item.privateletter_id" :label="item.content"
               :value="item.privateletter_id"></el-option>
           </el-select>

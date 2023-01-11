@@ -6,7 +6,7 @@
 					<GroupSelect ref="groupselect" @handleChange="handleChange($event)" style="margin-right: 10px" />
 				</div>
 				<div>
-					<TypeSelect @handleTypeChange="handleTypeChange($event)" :typeList="libraryList"
+					<TypeSelect ref="typeSelect" @handleTypeChange="handleTypeChange($event)" :typeList="libraryList"
 						style="margin-right: 10px" />
 				</div>
 				<div>
@@ -41,7 +41,7 @@
 				</el-form-item>
 				<el-form-item label="视频:" prop="video">
 					<el-upload ref="videoUnload" class="upload-demo" drag action="" multiple accept=".mp4"
-						:auto-upload="false" :file-list="fileList" :on-change="uploadVideo" :on-remove="uploadRemove">
+						:auto-upload="false" :file-list="fileList" :on-change="uploadVideo" :on-remove="uploadRemove" :limit="1000" :on-exceed="uploadExceed">
 						<i class="el-icon-upload"></i>
 						<div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
 					</el-upload>
@@ -54,7 +54,7 @@
 				}}</el-button>
 			</span>
 		</el-dialog>
-		<div>
+		<div :style="'max-height:'+tableHeight+'px;margin-bottom:20px'">
 			<el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选
 				<span style="color: #ff411f; font-size: 12px; padding-left: 20px">
 					已选中 {{ checkedCities.length }} 个视频</span></el-checkbox>
@@ -98,6 +98,7 @@ export default {
 	},
 	data() {
 		return {
+			tableHeight:(window.innerHeight - 200).toString(),
 			checkAll: false, //全选
 			checkedCities: [], //已选数据
 			isIndeterminate: true, //复选框全选属性
@@ -224,6 +225,10 @@ export default {
 	},
 
 	methods: {
+		// 监听视频上传超过1000条
+		uploadExceed(){
+			this.$message.error('视频单次上传限制最大1000条');
+		},
 		// 视频拉取
 		uploadVideo(file, fileList) {
 			let { size } = file || {};
@@ -509,6 +514,7 @@ export default {
 				sort: '',
 			};
 			this.$refs.groupselect.group = '';
+			this.$refs.typeSelect.classiFication = [];
 			this.libraryList = [];
 			this.getMaterialList();
 		},
