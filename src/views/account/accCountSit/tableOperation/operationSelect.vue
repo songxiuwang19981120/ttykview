@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-select class="operaition-select" v-model="operation" clearable @change="hanldChange(operation)">
+    <el-select ref="tableOperation" class="operaition-select" v-model="operation" clearable @change="hanldChange(operation)">
       <el-option
         v-for="item in operationOption"
         :key="item.value"
@@ -44,7 +44,10 @@ export default {
 
   methods: {
     hanldChange(operation) {
+      
       this.$emit("setOperation", operation);
+      this.operation = ''
+      console.log(this.operation);
     },
   },
 };

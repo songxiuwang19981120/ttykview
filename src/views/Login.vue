@@ -35,6 +35,7 @@
                 style="width: 40%"
                 v-model="loginForm.captcha"
                 placeholder="请输入验证码"
+                @keydown.enter="confrim"
               ></el-input>
               <img
                 class="auth_img"

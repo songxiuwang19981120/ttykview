@@ -102,7 +102,10 @@
       </div>
     </div>
 
-    <div class="tt-accsituation-main" style="border: 1px solid #BBBBBB ; border-radius: 8px">
+    <div
+      class="tt-accsituation-main"
+      style="border: 1px solid #bbbbbb; border-radius: 8px"
+    >
       <div
         style="height: 35px; margin-bottom: 10px"
         class="flex-jus-spacebet pad-0-20"
@@ -123,11 +126,11 @@
             </p>
           </div>
 
-          <div class="pad-0-20 flex ml-20">
+          <div v-if="(startRefresh === true) && (busThread !==0) && (subThread !== 0)" class="pad-0-20 flex ml-20">
             <transition name="el-fade-in-linear">
-              <p v-show="startRefresh === true" class="fz-14">
-                <span></span>
-                总刷新进度 ：{{ busThread }} / {{ subThread }}
+              <p class="fz-14">
+                总刷新进度 ：
+                <span style="color:#98AFFD">{{ busThread }} / {{ subThread }}</span>
               </p>
             </transition>
             <transition name="el-fade-in-linear">
@@ -139,9 +142,10 @@
               />
             </transition>
           </div>
+
         </div>
 
-        <div  class="flex-jus-spacebet">
+        <div class="flex-jus-spacebet">
           <el-select
             size="medium"
             style="width: 110px"
@@ -180,15 +184,18 @@
             @click="handleSort"
             >查 看</el-button
           >
-          <el-button @click="handleRefresh" size="medium" type="primary"
-            >刷新账号</el-button
+          <el-button
+            :disabled="isRefreshBtnDis"
+            @click="handleRefresh"
+            size="medium"
+            type="primary"
+            >{{ refreshText }}</el-button
           >
         </div>
       </div>
 
       <keep-alive>
         <table-custom
-          style="margin-bottom: 10px;"
           ref="multipleTable"
           class="tt-accsituation--tabel"
           :mutiSelect="true"
@@ -200,13 +207,16 @@
         ></table-custom>
       </keep-alive>
 
-    <Pagination
-      style="padding: 4px"
-      :total="total"
-      :page="page"
-      :limit="limit"
-      @pagination="handlePagination"
-    />
+    <keep-alive>
+      <Pagination
+        style="padding: 4px"
+        :total="total"
+        :page="page"
+        :limit="limit"
+        @pagination="handlePagination"
+        @handleCurrentChange="handleCurrentChange"
+      />
+    </keep-alive>
     </div>
 
     <ConfrimDelDialog
@@ -250,6 +260,7 @@
     <BatchEditor
       :typecontrol_id="classiFication"
       :grouping_id="group"
+      :uidList="userIdList"
       :member_ids="member_ids"
       :showBatchEditor="showBatchEditor"
       :editorTota="editorTota"
@@ -302,13 +313,28 @@ export default {
     TableOperation,
     ConfrimDelDialog,
   },
+
+
   computed: {
+    showRefreshProgess(){
+      return this.startRefresh === true || this.endRefresh === true
+    },
     batchEditorLength() {
       return this.batchEditorList.length;
     },
     accTotal() {
       return this.check_all === true ? this.total : this.editorTota;
     },
+    refreshText() {
+      return this.startRefresh !== true ? "刷新账号数据" : "数据刷新中...";
+    },
+    isRefreshBtnDis(){
+      return this.startRefresh === true
+    }
+  },
+  created(){
+    this.page = Number(store.get('page'))
+    this.handleCurrentChange(this.page)
   },
   watch: {
     startRefresh(newVal) {
@@ -331,9 +357,12 @@ export default {
         this.checkType = false;
         return false;
       }
+      if (this.group === "") {
+        return false;
+      }
       this.checkType = true;
       let data = {
-        grouping_id:this.group,
+        grouping_id: this.group,
         typecontrol_id: this.classiFication[this.classiFication.length - 1],
       };
       let result = await this.getProjectNum(data);
@@ -365,7 +394,7 @@ export default {
   },
   data() {
     return {
-      tabelHeight: (window.innerHeight - 240).toString(),
+      tabelHeight: (window.innerHeight - 224).toString(),
       openFollow: false,
       total_fans: 0, //总关注次数
       total_follow: 0, //总粉丝量
@@ -410,7 +439,7 @@ export default {
           prop: "avatar_thumb",
           label: "基础信息",
           align: "left",
-         
+          width: "240",
           render: (h, { row }) => {
             return (
               <div style="display: flex;align-items:center;min-width: 270px">
@@ -454,7 +483,7 @@ export default {
         {
           prop: "status",
           label: "状态",
-          
+
           align: "center",
           render: (h, { row }) => {
             return (
@@ -468,7 +497,7 @@ export default {
           align: "center",
           render: (h, { row }) => {
             let showText;
-            let tipText
+            let tipText;
             row.signature.length > 0
               ? (showText = row.signature.substring(0, 10) + "...")
               : (showText = "暂无简介");
@@ -486,7 +515,7 @@ export default {
           prop: "aweme_count",
           label: "视频数量",
           align: "center",
-          
+
           render: (h, { row }) => {
             return (
               <span
@@ -502,7 +531,7 @@ export default {
           prop: "unread_viewer_count",
           label: "主页访问人数",
           align: "center",
-          
+
           render: (h, { row }) => {
             let colorRed = "";
             if (this.sortQuery == "unread_viewer_count") {
@@ -511,12 +540,12 @@ export default {
               colorRed = "";
             }
             return (
-              <span
-                style={"font-size: 12px" + colorRed}
+              <p
+                style={"cursor: pointer;font-size: 12px" + colorRed}
                 onClick={this.showviewerTabel.bind(this, row)}
               >
                 {row.unread_viewer_count}
-              </span>
+              </p>
             );
           },
         },
@@ -524,7 +553,7 @@ export default {
           prop: "following_status",
           label: "关注",
           align: "center",
-          
+
           render: (h, { row }) => {
             let colorRed = "";
             if (this.sortQuery == "following_count") {
@@ -542,7 +571,7 @@ export default {
         {
           prop: "follower_status",
           label: "粉丝",
-          
+
           align: "center",
           render: (h, { row }) => {
             let colorRed = "";
@@ -561,7 +590,7 @@ export default {
         {
           prop: "total_favorited",
           label: "获赞",
-          
+
           align: "center",
           render: (h, { row }) => {
             let colorRed = "";
@@ -580,7 +609,7 @@ export default {
         {
           prop: "follower_status",
           label: "播放/收藏/转发",
-          width: "150",
+          width: "130",
           align: "center",
           render: (h, { row }) => {
             return (
@@ -607,7 +636,7 @@ export default {
             return (
               <div style="display:flex">
                 <TableOperation
-                  ref="tableOperation"
+                  ref="operation"
                   style="margin-right:10px"
                   onsetOperation={this.setOperation.bind(this, row)}
                 />
@@ -678,6 +707,15 @@ export default {
   },
 
   methods: {
+    resetUidList() {
+      this.userIdList = [];
+    },
+
+
+    handleCurrentChange(currentPage){
+      this.page = currentPage
+    },
+
     /*
         function: autoFollow
         params: data | 需要传递给后端的数据
@@ -712,7 +750,7 @@ export default {
     },
 
     /*
-        function: handleRefresh
+        function: refreshAcc
         params: null
         desc: 发起刷新账号请求
     */
@@ -750,11 +788,12 @@ export default {
         if (result?.status == 200) {
           this.startRefresh = true;
           store.set("startRefresh", "0");
-          this.$message.success("刷新账号任务创建成功");
+          this.$message.success("操作成功，努力刷新中");
           return;
         }
         this.$message.error(result?.msg ?? "刷新账号失败");
       } catch (error) {
+        this.$message.error("操作失败");
         console.error(error);
       }
     },
@@ -778,16 +817,15 @@ export default {
         params: null
         desc: 创建刷新账号任务后执行，实时更新刷新进度
     */
-/*     updateProgress() {
+    updateProgress() {
       let update = setInterval(() => {
         this.getRefreshDetail().then((res) => {
-          console.log(res, "=====================updateProgress");
-          let date = Date.now();
-          let createTime = res.data.create_time;
-          let subTime = date - createTime;
           this.subThread = res.data.complete_num + res.data.fail_num;
           this.busThread = res.data.task_num;
-          if (subTime === 0) {
+          if (
+            this.subThread === this.busThread ||
+            this.subThread > this.busThread
+          ) {
             this.$message.success("刷新账号任务已完成");
 
             clearInterval(update);
@@ -799,7 +837,7 @@ export default {
           }
         });
       }, 5000);
-    }, */
+    },
 
     /*
         function: getTreeData
@@ -840,6 +878,9 @@ export default {
       isRefreshEnd === "0"
         ? (this.startRefresh = true)
         : (this.startRefresh = false);
+      if (this.startRefresh === true) {
+        this.updateProgress();
+      }
       if (group !== "" && typecontrol_id !== "") {
         this.isSearch = true;
         this.total_fans = store.get("total_fans") ?? 0;
@@ -847,11 +888,9 @@ export default {
       }
       if (fans !== "") {
         this.fans = fans;
-        fans = Object.entries(this.fansMap)
-          .find((item) => {
+        fans = Object.entries(this.fansMap).find((item) => {
             return item[1] == fans;
-          })[0]
-          .split(",");
+        })[0].split(",");
         this.min = fans[0] ?? "";
         this.max = fans[1] ?? "";
       }
@@ -860,12 +899,19 @@ export default {
       let data = {
         min: this.min ?? "",
         max: this.max ?? "",
-        typecontrol_id: this.classiFication[this.classiFication.length - 1] ?? "",
+        typecontrol_id:
+          this.classiFication[this.classiFication.length - 1] ?? "",
         grouping_id: this.group ?? "",
         limit: this.limit ?? 10,
         page: this.page ?? 1,
       };
+      let getProjectData = {
+        grouping_id: this.group,
+        typecontrol_id:
+          this.classiFication[this.classiFication.length - 1] ?? "",
+      };
       await this.getMemberList(data);
+      await this.getProjectNum(getProjectData);
     },
 
     /* 
@@ -943,8 +989,8 @@ export default {
           uid: this.acc_id,
           typecontrol_id: typecontrol_id ?? "",
           grouping_id: this.group ?? "",
-          order: this.sortQuery,
-          sort: this.sortWay || "asc",
+          order: this.sortQuery || 'follower_status',
+          sort: this.sortWay || "dasc",
         };
         let result = await this.getMemberList(data);
         if (result.status == 200) {
@@ -1002,6 +1048,8 @@ export default {
     */
     closeConfrimDel() {
       this.showConfrimDel = false;
+      let tabel = this.$refs["multipleTable"];
+      console.log(tabel.$refs["operation"]["operation"]);
     },
 
     /* 
@@ -1012,6 +1060,7 @@ export default {
     */
     setOperation(row, e) {
       this.accInfo = row;
+      console.log(e);
       if (e === "") {
         return false;
       }
@@ -1089,6 +1138,7 @@ export default {
       }
       this.showBatchEditor = true;
       let data = {
+        grouping_id: this.group,
         typecontrol_id: this.classiFication[this.classiFication.length - 1],
       };
       let result = await this.getProjectNum(data);
@@ -1270,13 +1320,14 @@ export default {
         };
         let result = await this.$api({
           type: "getMember",
-          data: data,
+          data,
         });
+        console.log(result);
         if (result.status == 200) {
-          this.memberList = result?.data?.list ?? [];
-          this.total = result?.data?.count ?? 0;
-          this.total_fans = result?.data?.total_fans ?? 0;
-          this.total_follow = result?.data?.total_follow ?? 0;
+          this.memberList = result?.data?.list || [];
+          this.total = result?.data?.count || 0;
+          this.total_fans = result?.data?.total_fans || 0;
+          this.total_follow = result?.data?.total_follow || 0;
           store.set("total_fans", this.total_fans);
           store.set("total_follow", this.total_follow);
           this.loading = false;
@@ -1331,8 +1382,8 @@ export default {
           return false;
         }
         let data = {
-          grouping_id: this.group ?? '',
-          typecontrol_id: this.formatTypeId(this.classiFication) ?? '',
+          grouping_id: this.group ?? "",
+          typecontrol_id: this.formatTypeId(this.classiFication) ?? "",
         };
         let result = await this.$api({ type: "getProjectNum", data: data });
         this.materialTotal = result.data.num ?? 0;
@@ -1390,7 +1441,7 @@ export default {
         desc: 更新可用素材，由子组件触发的自定义事件
     */
     async updateProjectNum(params) {
-      let data = { typecontrol_id: params[0],grouping_id:params[1] };
+      let data = { typecontrol_id: params[0], grouping_id: params[1] };
       let result = await this.$api({ type: "getProjectNum", data: data });
       this.materialTotal = result.data.num ?? 0;
     },
@@ -1446,7 +1497,19 @@ export default {
         params: null
         desc: 异步获取memberList，页面渲染时调用
     */
-    async getMemberList(data = { limit: this.limit, page: this.page }) {
+
+    async getMemberList(
+      data = {
+        limit: this.limit || 20,
+        page: this.page || 1,
+        order: this.sortQuery || "",
+        sort: this.sortWay || "",
+        typecontrol_id: this.formatTypeId(this.classiFication) || "",
+        grouping_id: this.group || "",
+        min: this.fans[0] || "",
+        max: this.fans[1] || "",
+      }
+    ) {
       try {
         this.loading = true;
         let result = await this.$api({
@@ -1454,7 +1517,7 @@ export default {
           data: data,
         });
         this.memberList = result.data.list;
-        this.total = result.data.count;
+        this.total = result?.data?.count || 0;
         this.loading = false;
         return result;
       } catch (error) {
@@ -1468,8 +1531,24 @@ export default {
         params: row | 该行的相应数据
         desc: 编辑操作时的回调
     */
-    handleEdit(row) {
+    async handleEdit(row) {
       this.user_id = row.uid;
+      console.log();
+      this.$refs["editor"].$data.accUpdateForm.grouping_id =
+        this.accInfo.grouping_id;
+      this.$refs["editor"].$data.accUpdateForm.typecontrol_id = parseInt(
+        this.accInfo.typecontrol_id
+      );
+
+      let searchTypeData = {
+        grouping_id: this.accInfo.grouping_id,
+      };
+      let result = await this.$api({
+        type: "getTypecontrol",
+        data: searchTypeData,
+      });
+      this.typeList = this.getTreeData(result.data);
+      this.$refs["editor"].$data.typeList = this.typeList;
       this.showEditorDialog = true;
     },
 
