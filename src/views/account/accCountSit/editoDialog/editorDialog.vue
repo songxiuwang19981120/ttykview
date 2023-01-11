@@ -27,12 +27,14 @@
 
         <el-form-item label="选择分类 :" prop="typecontrol_id">
           <el-cascader
+            class="typeid-cascader"
             style="width: 60%"
             clearable
             :props="{ checkStrictly: true, value: 'value' }"
             :options="typeList"
             v-model="accUpdateForm.typecontrol_id"
             :placeholder="typeTitle"
+            @change="updateType"
           ></el-cascader>
         </el-form-item>
 
@@ -235,6 +237,11 @@ export default {
     }
   },
   methods: {
+
+    updateType(){
+      this.$forceUpdate()
+    },
+
     /*
             function: getTreeData
             params: data | 需要进行递归处理的数组
@@ -564,4 +571,8 @@ export default {
 .ml-52 {
   margin-left: 52px;
 }
+
+/* ::v-deep .el-cascader .el-input__inner::placeholder{
+  color: #606266
+} */
 </style>

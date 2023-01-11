@@ -160,9 +160,13 @@ handleError(error){
         return false;
       }
     },
+    
     handlerClose() {
       this.$emit("closeReleaseVideoDialog");
       this.resetForm();
+      this.releaseVideoForm.video_url = "",
+      this.releaseVideoForm.text = "",
+      this.releaseVideoForm.label = ""
     },
 
     async confrimVideo(data) {
@@ -211,9 +215,6 @@ handleError(error){
     },
     resetForm() {
       this.$refs["releaseVideoForm"].resetFields();
-      this.releaseVideoForm.video_url = "",
-      this.releaseVideoForm.text = "",
-      this.releaseVideoForm.label = ""
     },
   },
 };

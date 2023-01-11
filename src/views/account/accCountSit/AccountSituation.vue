@@ -180,15 +180,15 @@
             @click="handleSort"
             >查 看</el-button
           >
-          <el-button @click="handleRefresh" size="medium" type="primary"
-            >刷新账号</el-button
+          <el-button :disabled="endRefresh" @click="handleRefresh" size="medium" type="primary"
+            >{{refreshText}}</el-button
           >
         </div>
       </div>
 
       <keep-alive>
         <table-custom
-          style="margin-bottom: 10px;"
+          
           ref="multipleTable"
           class="tt-accsituation--tabel"
           :mutiSelect="true"
@@ -250,6 +250,7 @@
     <BatchEditor
       :typecontrol_id="classiFication"
       :grouping_id="group"
+      :uidList="userIdList"
       :member_ids="member_ids"
       :showBatchEditor="showBatchEditor"
       :editorTota="editorTota"
@@ -309,6 +310,9 @@ export default {
     accTotal() {
       return this.check_all === true ? this.total : this.editorTota;
     },
+    refreshText(){
+      return this.endRefresh !== true ? '刷新账号数据' : '数据刷新中...'
+    }
   },
   watch: {
     startRefresh(newVal) {
@@ -330,6 +334,9 @@ export default {
       if (newVal.length === 0) {
         this.checkType = false;
         return false;
+      }
+      if(this.group === ''){
+        return false
       }
       this.checkType = true;
       let data = {
@@ -365,7 +372,7 @@ export default {
   },
   data() {
     return {
-      tabelHeight: (window.innerHeight - 240).toString(),
+      tabelHeight: (window.innerHeight - 224).toString(),
       openFollow: false,
       total_fans: 0, //总关注次数
       total_follow: 0, //总粉丝量
@@ -378,8 +385,8 @@ export default {
       showBatchEiDialog: false, //是否展示批量编辑按钮界面
       shwoVideoTabel: false, //是否展示视频播放弹窗
       showViewerTabel: false, //是否展示访问列表表格
-      sortQuery: "", //排序字段
-      sortWay: "", //排序方式
+      sortQuery: "粉丝", //排序字段
+      sortWay: "desc", //排序方式
       searchForm: {
         grouping_id: "",
         typecontrol_id: "",
@@ -511,12 +518,12 @@ export default {
               colorRed = "";
             }
             return (
-              <span
-                style={"font-size: 12px" + colorRed}
+              <p
+                style={"cursor: pointer;font-size: 12px" + colorRed}
                 onClick={this.showviewerTabel.bind(this, row)}
               >
                 {row.unread_viewer_count}
-              </span>
+              </p>
             );
           },
         },
@@ -607,7 +614,7 @@ export default {
             return (
               <div style="display:flex">
                 <TableOperation
-                  ref="tableOperation"
+                  ref="operation"
                   style="margin-right:10px"
                   onsetOperation={this.setOperation.bind(this, row)}
                 />
@@ -678,6 +685,10 @@ export default {
   },
 
   methods: {
+    resetUidList(){
+      this.userIdList = []
+    },
+
     /*
         function: autoFollow
         params: data | 需要传递给后端的数据
@@ -692,6 +703,7 @@ export default {
         console.error(error);
       }
     },
+
 
     /*
         function: toogleFollow
@@ -711,8 +723,9 @@ export default {
       }
     },
 
+
     /*
-        function: handleRefresh
+        function: refreshAcc
         params: null
         desc: 发起刷新账号请求
     */
@@ -724,6 +737,7 @@ export default {
         console.error(error);
       }
     },
+
 
     /*
         function: handleRefresh
@@ -750,11 +764,12 @@ export default {
         if (result?.status == 200) {
           this.startRefresh = true;
           store.set("startRefresh", "0");
-          this.$message.success("刷新账号任务创建成功");
+          this.$message.success("操作成功，努力刷新中");
           return;
         }
         this.$message.error(result?.msg ?? "刷新账号失败");
       } catch (error) {
+        this.$message.error('操作失败')
         console.error(error);
       }
     },
@@ -778,16 +793,13 @@ export default {
         params: null
         desc: 创建刷新账号任务后执行，实时更新刷新进度
     */
-/*     updateProgress() {
+     updateProgress() {
       let update = setInterval(() => {
         this.getRefreshDetail().then((res) => {
-          console.log(res, "=====================updateProgress");
-          let date = Date.now();
-          let createTime = res.data.create_time;
-          let subTime = date - createTime;
+
           this.subThread = res.data.complete_num + res.data.fail_num;
           this.busThread = res.data.task_num;
-          if (subTime === 0) {
+          if (this.subThread === this.busThread || this.subThread > this.busThread) {
             this.$message.success("刷新账号任务已完成");
 
             clearInterval(update);
@@ -799,7 +811,7 @@ export default {
           }
         });
       }, 5000);
-    }, */
+    }, 
 
     /*
         function: getTreeData
@@ -837,9 +849,10 @@ export default {
       let group = store.get("group") ?? "";
       let typecontrol_id = store.get("typecontrol_id") ?? "";
       let fans = store.get("fans") ?? "";
-      isRefreshEnd === "0"
-        ? (this.startRefresh = true)
-        : (this.startRefresh = false);
+      isRefreshEnd === "0" ? (this.startRefresh = true) : (this.startRefresh = false);
+      if(this.startRefresh === true){
+        this.updateProgress()
+      }
       if (group !== "" && typecontrol_id !== "") {
         this.isSearch = true;
         this.total_fans = store.get("total_fans") ?? 0;
@@ -847,11 +860,9 @@ export default {
       }
       if (fans !== "") {
         this.fans = fans;
-        fans = Object.entries(this.fansMap)
-          .find((item) => {
+        fans = Object.entries(this.fansMap).find((item) => {
             return item[1] == fans;
-          })[0]
-          .split(",");
+        })[0].split(",");
         this.min = fans[0] ?? "";
         this.max = fans[1] ?? "";
       }
@@ -1007,6 +1018,8 @@ export default {
     */
     closeConfrimDel() {
       this.showConfrimDel = false;
+      let tabel = this.$refs['multipleTable']
+      console.log(tabel.$refs['operation']['operation']);
     },
 
     /* 
@@ -1017,6 +1030,7 @@ export default {
     */
     setOperation(row, e) {
       this.accInfo = row;
+      console.log(e);
       if (e === "") {
         return false;
       }
@@ -1276,13 +1290,14 @@ export default {
         };
         let result = await this.$api({
           type: "getMember",
-          data: data,
+          data,
         });
+        console.log(result);
         if (result.status == 200) {
-          this.memberList = result?.data?.list ?? [];
-          this.total = result?.data?.count ?? 0;
-          this.total_fans = result?.data?.total_fans ?? 0;
-          this.total_follow = result?.data?.total_follow ?? 0;
+          this.memberList = result?.data?.list || [];
+          this.total = result?.data?.count || 0;
+          this.total_fans = result?.data?.total_fans || 0;
+          this.total_follow = result?.data?.total_follow || 0;
           store.set("total_fans", this.total_fans);
           store.set("total_follow", this.total_follow);
           this.loading = false;
@@ -1452,7 +1467,17 @@ export default {
         params: null
         desc: 异步获取memberList，页面渲染时调用
     */
-    async getMemberList(data = { limit: this.limit, page: this.page }) {
+
+    async getMemberList(data = { 
+      limit: this.limit || 20,
+      page: this.page || 1,
+     order: this.sortQuery || "", 
+    sort: this.sortWay || "",
+    typecontrol_id: this.formatTypeId(this.classiFication) || "",
+    grouping_id: this.group || "",
+            min :this.fans[0] || "",
+        max : this.fans[1] || ""
+     }) {
       try {
         this.loading = true;
         let result = await this.$api({
@@ -1460,7 +1485,7 @@ export default {
           data: data,
         });
         this.memberList = result.data.list;
-        this.total = result.data.count;
+        this.total = result?.data?.count || 0;
         this.loading = false;
         return result;
       } catch (error) {
@@ -1478,7 +1503,7 @@ export default {
       this.user_id = row.uid;
       console.log();
       this.$refs['editor'].$data.accUpdateForm.grouping_id = this.accInfo.grouping_id
-      this.$refs['editor'].$data.accUpdateForm.typecontrol_id = this.accInfo.typecontrol_id
+      this.$refs['editor'].$data.accUpdateForm.typecontrol_id = parseInt(this.accInfo.typecontrol_id)
       
       let searchTypeData = {
           grouping_id: this.accInfo.grouping_id,

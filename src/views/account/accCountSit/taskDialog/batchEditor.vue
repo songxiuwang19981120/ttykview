@@ -128,6 +128,9 @@ export default {
     },
     headimageCanUseNum:{
       type:Number
+    },
+    uidList:{
+      type:Array
     }
   },
   computed: {
@@ -158,7 +161,7 @@ export default {
           type: "getMember",
           data,
         })
-        this.checkAccTotal = result?.data?.count ?? 0
+        this.checkAccTotal = result?.data?.count || 0
       }
     },
     async typeId(newVal){
@@ -166,6 +169,7 @@ export default {
         if(newVal.length === 0){
           return false
         }
+        this.type_list.push('typecontrol_id')
         let data = {
           grouping_id :this.groupId,
           typecontrol_id: this.typeId[this.typeId.length - 1]
@@ -174,7 +178,28 @@ export default {
       } catch (error) {
         console.error(error);
       }
+    },
 
+    groupId(newVal){
+      if(newVal !== ''){
+        this.type_list.push('grouping_id')
+      }
+    },
+
+    nickname(newVal){
+      if(newVal === true){
+        this.type_list.push('nickname')
+      }
+    },
+        avatar_thumb(newVal){
+      if(newVal === true){
+        this.type_list.push('avatar_thumb')
+      }
+    },
+        signature(newVal){
+      if(newVal === true){
+        this.type_list.push('signature')
+      }
     }
   },
 
@@ -194,7 +219,7 @@ export default {
         }
       ],
       groupId: "",
-      typeId: "",
+      typeId: [],
       nickname:false,
       avatar_thumb:false,
       signature:false,
@@ -207,6 +232,7 @@ export default {
         modify_avatar: "",
         check_all: "",
       },
+      type_list:[],
     };
   },
   mounted() {
@@ -220,7 +246,13 @@ export default {
     this.typeList = [];
     this.groupList = [];
   },
+  
   methods: {
+
+    resetForm() {
+      this.$refs["editorForm"].resetFields();
+
+    },
 
     resetAccTotal(){
       this.$emit('resetAccTotal')
@@ -312,8 +344,16 @@ export default {
       }
     },
     handlerClose() {
-      this.$parent.closeBatchEditor();
+      this.resetForm()
+      this.groupId = ''
+      this.typeId = []
+      this.nickname = false
+      this.avatar_thumb = false
+      this.signature = false
+      this.modifyGroup = false
       this.checkAcc = ""
+      this.type_list = []
+      this.$parent.closeBatchEditor();
     },
 
     /*
@@ -323,21 +363,23 @@ export default {
     */
     async handlerConfrim() {
       try {
-        let uid_list = this.typecontrol_id.length !== 0 ? this.member_ids.split(',').filter(item=>{
-          return item !== ''
-        }) : ''
-      let old_typecontrol_id = uid_list.length === 0 ? this.typecontrol_id[this.typecontrol_id.length - 1] : ''
-      let old_grouping_id =  uid_list.length === 0 ? this.grouping_id : ''
+      let old_typecontrol_id = this.checkAcc === 'all' ? this.typecontrol_id[this.typecontrol_id.length - 1] : ''
+      let old_grouping_id =  this.checkAcc === 'all' ? this.grouping_id : ''
+      let typecontrol_id =  (this.typeId[this.typeId.length - 1] ?? '') 
+      let grouping_id =  this.groupId 
+      let uid_list = this.checkAcc === 'all' ? [] : this.uidList
       let data = {
         uid_list: uid_list,
         old_typecontrol_id: old_typecontrol_id ?? '',
         old_grouping_id: old_grouping_id ?? '',
-        typecontrol_id: this.typeId[this.typeId.length - 1] ?? '',
-        grouping_id: this.groupId,
-        nickname: this.nickname === false ? '' : 1,
-        avatar_thumb: this.avatar_thumb === false ? '' : 1,
-        signature: this.signature === false ? '' : 1,
+        typecontrol_id: typecontrol_id,
+        grouping_id: grouping_id,
+        //nickname: this.nickname === false ? '' : 1,
+        //avatar_thumb: this.avatar_thumb === false ? '' : 1,
+        //signature: this.signature === false ? '' : 1,
+        type_list: this.type_list
       }
+      console.log(data,1111111111111111111111111111111111);
       if(this.nickname === true && this.nicknameCanUseNum < this.accTotal){
         this.$message.warning('昵称素材不足，请前往素材库添加')
         return false
@@ -350,14 +392,15 @@ export default {
         this.$message.warning('头像素材不足，请前往素材库添加')
         return false
       }
-      let result = await this.$api({type:'batchEditorAcc',data})
+       let result = await this.$api({type:'batchEditorAcc',data})
       if(result?.status == 200){
         this.$message.success('操作成功')
         this.handlerClose();
+        this.$parent.getMemberList()
         this.resetForm();
         return
       }
-      this.$message.error(result.msg ?? "操作失败");
+      this.$message.error(result.msg ?? "操作失败"); 
       this.handlerClose();
       this.resetForm();
       } catch (error) {
