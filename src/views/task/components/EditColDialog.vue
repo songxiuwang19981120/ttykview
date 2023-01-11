@@ -4,7 +4,7 @@
 			<el-form-item label="任务名：" prop="task_name">
 				<el-input
 					v-model="ruleForm.task_name"
-					style="width: 60%"
+					style="width: 50%"
 					placeholder="请输入任务名"
 					size="mini"
 				></el-input>
@@ -29,7 +29,7 @@
 			<el-form-item label="采集数量：" prop="col_num">
 				<el-input
 					v-model="ruleForm.col_num"
-					style="width: 60%"
+					style="width: 50%"
 					placeholder="请输入采集数量"
 					size="mini"
 					type="number"

@@ -1,10 +1,10 @@
 <template>
-	<el-dialog title="编辑账号编辑任务" :visible="showdialog" @close="btnCancel" width="40%">
+	<el-dialog title="编辑账号编辑任务" :visible="showdialog" @close="btnCancel" width="30%">
 		<el-form label-width="150px" :model="ruleForm" :rules="rules" ref="ruleForm">
 			<el-form-item label="任务名：" prop="task_name">
 				<el-input
 					v-model="ruleForm.task_name"
-					style="width: 60%"
+					style="width: 50%"
 					placeholder="请输入任务名称"
 					size="mini"
 				></el-input>
