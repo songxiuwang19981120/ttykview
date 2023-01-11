@@ -468,14 +468,15 @@ export default {
     }) {
       try {
         this[loading] = true;
-        let typeId = this.accUpdateForm.typecontrol_id || this.accInfo.typecontrol_id;
+        let typeId = this.accUpdateForm.typecontrol_id || this.$parent.accInfo.typecontrol_id;
+        console.log(typeId);
         if (typeId.length === 0) {
           this.$message.error("请先选择分类");
           this[loading] = false;
           return false;
         }
         let data = {
-          typecontrol_id: typeId[typeId.length - 1],
+          typecontrol_id: typeId,
           type: type,
         };
         let result = await this.$api({ type: "getUserRandomInfo", data });

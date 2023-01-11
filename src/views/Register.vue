@@ -41,6 +41,7 @@
               style="width: 70%"
               v-model="registerForm.isSamePwd"
               placeholder="确认密码"
+              @keydown.enter="confrim"
             ></el-input>
           </el-form-item>
         </el-form>
