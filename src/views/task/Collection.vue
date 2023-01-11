@@ -3,11 +3,11 @@
 		<div class="tt-accsituation">
 			<div class="tt-accsituation--operation">
 				<div>
-					<el-button type="primary" size="medium" @click="addColl">新建采集</el-button>
-					<el-button type="primary" size="medium" :loading="refloading" @click="refresh">{{
+					<el-button type="primary" size="mini" @click="addColl">新建采集</el-button>
+					<el-button type="primary" size="mini" :loading="refloading" @click="refresh">{{
 						refloading ? '刷新中...' : '刷新'
 					}}</el-button>
-					<el-button type="danger" size="medium" :loading="delloading" @click="delColls">{{
+					<el-button type="danger" size="mini" :loading="delloading" @click="delColls">{{
 						refloading ? '删除中...' : '批量删除'
 					}}</el-button>
 				</div>
@@ -127,7 +127,7 @@
 									</el-button>
 									<el-button
 										style="margin-right: 10px;"
-										type="primary"
+										type="warning"
 										size="mini"
 										onClick={this.toStopTask.bind(this, row)}
 									>
