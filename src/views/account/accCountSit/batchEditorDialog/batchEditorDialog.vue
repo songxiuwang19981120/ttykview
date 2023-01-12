@@ -124,7 +124,7 @@ export default {
       }
       let result = await this.$api({type:'getProjectNum',data:data})
       this.$emit('updateProjectNum',this.batchEiatorForm.typecontrol_id[this.batchEiatorForm.typecontrol_id.length - 1])
-      console.log(result)
+
     },
 
 
@@ -141,7 +141,6 @@ export default {
         member_id: this.memberIdList.toString(),
         typecontrol_id: this.batchEiatorForm.typecontrol_id[this.batchEiatorForm.typecontrol_id.length - 1] ?? this.typecontrol_id,
       }
-      console.log(updateData)
       this.batchEiatorForm.eidtorList = userList;
       let result = await this.$api({type:'updateUserDate',data:updateData})
       if(result.status == 200){
