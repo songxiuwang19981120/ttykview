@@ -36,7 +36,7 @@
                 v-model="loginForm.captcha"
                 placeholder="请输入验证码"
                 @keydown.enter="confrim"
-              ></el-input>
+              ></el-input> 
               <img
                 class="auth_img"
                 :src="AUTH_IMG_URL"

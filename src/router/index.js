@@ -288,15 +288,15 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   NProgress.start()
+   if (to.path === '/login' || to.path === '/register') {
+    NProgress.done()
+    return next()
+  }
   const token = store.get(TOKEN_NAME)
   if (!token) {
     NProgress.done()
     return next('/login')
   } 
-   if (to.path === '/login' || to.path === '/register') {
-    NProgress.done()
-    return next()
-  }
   NProgress.done()
   next()
 })
