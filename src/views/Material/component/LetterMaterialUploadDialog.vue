@@ -18,7 +18,8 @@
 			</el-form-item>
 			<!-- 添加私信 -->
 			<el-form-item prop="content" label="添加私信：">
-				<el-input placeholder="请输入私信" rows="6" v-model="ruleForm.content" style="width: 60%" size="medium">
+				<el-input type="textarea" placeholder="请输入私信(一行仅限一个)" rows="6" v-model="ruleForm.content"
+					style="width: 60%" size="medium">
 				</el-input>
 			</el-form-item>
 		</el-form>
@@ -169,11 +170,28 @@ export default {
 			try {
 				await this.$refs.ruleForm.validate();
 				let nickNameArr = [];
-				this.ruleForm.content.split('\n').forEach((item) => {
+				let type = this.ruleForm.type
+				this.ruleForm.content.split('\n').forEach((item, index) => {
 					if (item != '') {
 						nickNameArr.push(item);
 					}
 				});
+				for (let i = 0; i < nickNameArr.length; i++) {
+					if (nickNameArr[i] != '') {
+						if (type == 1) {
+							if (nickNameArr[i].indexOf('http') == -1) {
+								return this.$message.warning('第' + (i + 1) + '条数据格式错误，请填写正确的链接地址！');
+							}
+						}
+						if (type == 2 || type == 3) {
+							if (isNaN(Number(nickNameArr[i], 10))) {
+								return this.$message.warning('第' + (i + 1) + '条数据格式错误，请填写正确uid！');
+							}
+						}
+					}else{
+						return this.$message.warning('第'+i+1+'条数据为空，请修改');
+					}
+				}
 				if (nickNameArr.length && nickNameArr[0]) {
 					this.ruleForm.content = nickNameArr.join('\n');
 				} else {
